@@ -1,0 +1,11 @@
+{
+  "immutable-key": {"language":"java","source":"record AccountKey(long tenantId, long accountId) {}\nvar cache = new java.util.HashMap<AccountKey, String>();\ncache.put(new AccountKey(10, 1), \"账户信息\");\nSystem.out.println(cache.get(new AccountKey(10, 1))); // 账户信息"},
+  "decimal": {"language":"java","source":"var amount = new java.math.BigDecimal(\"0.10\");\nvar total = amount.multiply(java.math.BigDecimal.valueOf(3));\nSystem.out.println(total); // 0.30"},
+  "conditional-stock": {"language":"sql","source":"UPDATE stock\nSET available = available - :quantity\nWHERE sku_id = :skuId AND available >= :quantity;\n-- quantity 必须为正；影响 1 行才算成功。"},
+  "idempotent": {"language":"sql","source":"CREATE UNIQUE INDEX uk_request ON business_result(request_id);\n-- 同键重试先核对参数，再返回已提交结果。"},
+  "page": {"language":"sql","source":"SELECT id, created_at FROM events\nWHERE created_at > :time\n   OR (created_at = :time AND id > :id)\nORDER BY created_at, id LIMIT 20;"},
+  "interrupt": {"language":"java","source":"try {\n    queue.take();\n} catch (InterruptedException e) {\n    Thread.currentThread().interrupt();\n    return;\n}"},
+  "cas": {"language":"java","source":"var remaining = new java.util.concurrent.atomic.AtomicInteger(1);\nboolean acquired = remaining.compareAndSet(1, 0);\nSystem.out.println(acquired); // 首个竞争者成功"},
+  "redis-unlock": {"language":"lua","source":"if redis.call('GET', KEYS[1]) == ARGV[1] then\n  return redis.call('DEL', KEYS[1])\nend\nreturn 0"},
+  "explain": {"language":"sql","source":"EXPLAIN ANALYZE\nSELECT id FROM orders\nWHERE user_id = 7 ORDER BY created_at DESC LIMIT 20;\n-- 会实际执行查询，仅在可控环境分析。"}
+}

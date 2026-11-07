@@ -1,0 +1,47 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        http-only: true
+        same-site: lax
+        # Secure by default so an HTTPS deployment cannot silently downgrade;
+        # local HTTP dev and e2e set COOKIE_SECURE=false explicitly.
+        secure: ${COOKIE_SECURE:true}
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/interview;MODE=MySQL;DATABASE_TO_LOWER=TRUE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+  jackson:
+    time-zone: UTC
+app:
+  instance-mode: single
+  single-instance-lock: ${SINGLE_INSTANCE_LOCK:false}
+  ai:
+    requests-per-hour: ${AI_REQUESTS_PER_HOUR:30}
+    max-concurrent: ${AI_MAX_CONCURRENT:2}
+    max-output-tokens: ${AI_MAX_OUTPUT_TOKENS:2048}
+    max-input-characters: ${AI_MAX_INPUT_CHARACTERS:80000}
+    chat-timeout-ms: ${AI_CHAT_TIMEOUT_MS:90000}
+    embedding-timeout-ms: ${AI_EMBEDDING_TIMEOUT_MS:20000}
+  search:
+    max-answer-characters: ${SEARCH_MAX_CHARACTERS:20000000}
+  login:
+    max-failures: ${LOGIN_MAX_FAILURES:5}
+    lockout-minutes: ${LOGIN_LOCKOUT_MINUTES:15}
+  knowledge:
+    max-characters: ${KNOWLEDGE_MAX_CHARACTERS:5000000}
+    max-chunks: ${KNOWLEDGE_MAX_CHUNKS:10000}
+    max-vector-bytes: ${KNOWLEDGE_MAX_VECTOR_BYTES:134217728}
+  admin-username: ${ADMIN_USERNAME:admin}
+  admin-password: ${ADMIN_PASSWORD:}
+  seed-path: ${SEED_PATH:../content/Java.md}
+  upload-dir: ${UPLOAD_DIR:./data/uploads}

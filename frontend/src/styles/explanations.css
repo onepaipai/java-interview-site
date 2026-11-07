@@ -1,0 +1,344 @@
+.explanation-content {
+  min-width: 0;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.85;
+}
+.explanation-section {
+  min-width: 0;
+  margin: 0;
+  padding: 28px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+.explanation-section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+.explanation-section:last-child {
+  padding-bottom: 0;
+}
+.explanation-section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.explanation-section-heading h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text);
+  scroll-margin-top: 100px;
+}
+.explanation-section-number {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font:
+    500 12px/1.5 Consolas,
+    monospace;
+  font-variant-numeric: tabular-nums;
+}
+.explanation-section-body {
+  min-width: 0;
+}
+.explanation-deep .explanation-section-body > h3 {
+  margin: 28px 0 12px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  scroll-margin-top: 110px;
+}
+.explanation-deep .explanation-section-body > h3:first-child {
+  margin-top: 0;
+}
+.explanation-deep .explanation-section-body > p {
+  margin: 12px 0;
+}
+.explanation-deep .explanation-answer blockquote {
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border-left: 3px solid #a69bcf;
+  border-radius: 0 6px 6px 0;
+  background: var(--accent-soft);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.85;
+}
+.explanation-deep .explanation-answer blockquote p {
+  margin: 0;
+}
+.explanation-deep .explanation-answer ol > li {
+  margin: 14px 0;
+}
+.explanation-deep .table-scroll {
+  max-width: 100%;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+.explanation-deep table {
+  font-size: 14px;
+  line-height: 1.75;
+}
+.answer-spoken-only .explanation-analysis,
+.answer-spoken-only .explanation-case {
+  display: none;
+}
+.explanation-section-body > :first-child {
+  margin-top: 0;
+}
+.explanation-section-body > :last-child {
+  margin-bottom: 0;
+}
+.explanation-content ol {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.explanation-content ol > li {
+  position: relative;
+  margin: 8px 0;
+  padding: 0 0 0 30px;
+  overflow-wrap: anywhere;
+}
+.explanation-content ol > li::before {
+  content: attr(data-point) '、';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.explanation-content li > p {
+  margin: 0;
+}
+.explanation-content li > p + p {
+  margin-top: 8px;
+}
+.explanation-content strong {
+  color: var(--text);
+  font-weight: 650;
+}
+.explanation-summary .explanation-section-heading h2 {
+  color: var(--text);
+}
+.explanation-summary ol > li::before {
+  color: var(--success);
+}
+.explanation-references {
+  min-width: 0;
+  padding: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.explanation-references summary {
+  width: fit-content;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.explanation-references ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+.explanation-references a {
+  color: var(--muted);
+}
+.explanation-content .explanation-diagram {
+  margin: 24px 0;
+  padding: 20px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.explanation-content .explanation-diagram img {
+  display: block;
+  width: auto;
+  max-width: min(100%, 520px);
+  height: auto;
+  max-height: none;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 0;
+  cursor: zoom-in;
+}
+.explanation-diagram figcaption {
+  margin-top: 12px;
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+.explanation-content .code-block {
+  min-width: 0;
+  margin: 18px 0;
+  border: 1px solid #24324a;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--inverse-surface);
+}
+.explanation-content .code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #303c51;
+  background: var(--inverse-surface);
+  color: var(--muted);
+  font:
+    11px/1.4 Consolas,
+    monospace;
+  letter-spacing: 0.7px;
+}
+.explanation-content .code-header button {
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid #536079;
+  border-radius: 5px;
+  color: var(--inverse-text);
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.explanation-content .code-header button:hover {
+  color: #fff;
+  background: var(--inverse-surface);
+}
+.explanation-content pre {
+  max-width: 100%;
+  margin: 0;
+  padding: 17px;
+  overflow-x: auto;
+  color: var(--inverse-text);
+  background: transparent;
+  font:
+    13px/1.8 Consolas,
+    'SFMono-Regular',
+    monospace;
+  tab-size: 4;
+}
+.explanation-content pre code {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  white-space: pre;
+}
+.explanation-content .hljs-keyword,
+.explanation-content .hljs-meta {
+  color: var(--accent-muted);
+}
+.explanation-content .hljs-string {
+  color: var(--success);
+}
+.explanation-content .hljs-title,
+.explanation-content .hljs-type {
+  color: var(--inverse-text);
+}
+.explanation-content .hljs-number,
+.explanation-content .hljs-literal {
+  color: var(--warn);
+}
+.explanation-content .hljs-comment {
+  color: var(--muted);
+}
+.reader .answer-section:has(.explanation-content) {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.reader .answer-section:has(.explanation-content) > .answer-divider {
+  display: none;
+}
+.reader .answer-content:has(> .explanation-content) {
+  padding-top: 0;
+}
+.reader:has(.explanation-content) .question-section {
+  margin-bottom: 28px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--border);
+}
+.reader:has(.explanation-content) .reader-actions {
+  margin-top: 16px;
+}
+.reader:has(.explanation-content) .mobile-answer-outline {
+  margin: 0 0 24px;
+}
+@media (max-width: 600px) {
+  .explanation-content {
+    font-size: 15px;
+    line-height: 1.85;
+  }
+  .explanation-section {
+    padding: 23px 0;
+  }
+  .explanation-section-heading {
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+  .explanation-section-heading h2 {
+    font-size: 17px;
+  }
+  .explanation-content ol > li {
+    padding-left: 28px;
+    margin: 9px 0;
+  }
+  .explanation-content .explanation-diagram {
+    padding: 16px 0 12px;
+    margin: 20px 0;
+    background: transparent;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+  .explanation-diagram figcaption {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  .explanation-content pre {
+    padding: 14px;
+    font-size: 12px;
+  }
+  .explanation-content .code-header {
+    padding: 8px 12px;
+  }
+  .reader:has(.explanation-content) {
+    padding: 23px 18px;
+  }
+  .reader:has(.explanation-content) .question-section {
+    margin-bottom: 23px;
+    padding-bottom: 22px;
+  }
+}
+
+/* 自测卡模式：未揭示前隐藏口述，始终隐藏分析与案例 */
+.answer-quiz-hidden .explanation-answer,
+.answer-quiz-hidden .explanation-analysis,
+.answer-quiz-hidden .explanation-case,
+.answer-quiz-open .explanation-analysis,
+.answer-quiz-open .explanation-case {
+  display: none;
+}
+.quiz-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+  padding: 13px 15px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 9px;
+  background: var(--accent-soft);
+}
+.quiz-card .quiz-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+}

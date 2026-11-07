@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="570" viewBox="0 0 320 570" role="img" aria-labelledby="title description">
+  <title id="title">自调用事务失效路径</title>
+  <desc id="description">前提是外层没有事务：进入普通 checkout 方法，this 调用有事务注解的内部方法，未重新经过事务代理，写入后抛出异常，已自动提交的数据仍存在。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7b82a6"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="318" height="568" rx="16" fill="#fafbfe" stroke="#e0e5ef"/>
+  <g font-family="Microsoft YaHei, PingFang SC, sans-serif" text-anchor="middle" fill="#26324b">
+    <text x="160" y="35" font-size="20" font-weight="700">自调用事务失效路径</text>
+    <text x="160" y="64" font-size="17" fill="#596681">前提：外层没有事务</text>
+    <g fill="#ffffff" stroke="#cfd7e8" stroke-width="1.5">
+      <rect x="25" y="90" width="270" height="66" rx="10"/>
+      <rect x="25" y="196" width="270" height="66" rx="10"/>
+      <rect x="25" y="302" width="270" height="66" rx="10"/>
+      <rect x="25" y="408" width="270" height="66" rx="10" fill="#fff3f2" stroke="#e2a5a0"/>
+    </g>
+    <g font-size="18">
+      <text x="160" y="117">进入普通方法</text>
+      <text x="160" y="142" fill="#596681">checkout()</text>
+      <text x="160" y="223">this 调用内部方法</text>
+      <text x="160" y="248" fill="#596681">insertAndFail()</text>
+      <text x="160" y="329">未重新经过代理</text>
+      <text x="160" y="354" fill="#596681">内部注解未触发事务</text>
+      <text x="160" y="435" fill="#a6423a">写入后抛出异常</text>
+      <text x="160" y="460" fill="#a6423a">已自动提交的数据仍存在</text>
+    </g>
+    <text x="160" y="516" font-size="17" font-weight="700">修复：经独立事务 Bean 调用</text>
+    <text x="160" y="544" font-size="17" fill="#596681">或使用 TransactionTemplate</text>
+  </g>
+  <g fill="none" stroke="#7b82a6" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M160 160 V184"/>
+    <path d="M160 266 V290"/>
+    <path d="M160 372 V396"/>
+  </g>
+</svg>

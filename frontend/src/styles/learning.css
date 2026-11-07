@@ -1,0 +1,253 @@
+.learning-home {
+  margin-bottom: 24px;
+  padding: 22px;
+}
+.learning-overview,
+.self-assessment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.learning-overview h2 {
+  font-size: 18px;
+}
+.learning-overview p,
+.self-assessment p {
+  font-size: 13px;
+}
+.resume-question {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  max-width: 55%;
+  min-width: 0;
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+.resume-question small {
+  color: var(--accent);
+}
+.resume-question strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+.review-questions {
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.review-questions > span {
+  font-size: 12px;
+}
+.review-questions button {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  justify-content: space-between;
+  text-align: left;
+  border: 0;
+  border-radius: 5px;
+  margin-top: 6px;
+}
+.review-questions button span {
+  overflow-wrap: anywhere;
+}
+.review-questions small {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.personal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.personal-note {
+  margin: 10px 0 16px;
+}
+.personal-note summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 13px;
+}
+.personal-note textarea {
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  margin-top: 10px;
+  padding: 10px;
+  resize: vertical;
+}
+.study-purpose {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 16px;
+}
+.study-purpose button[aria-pressed='true'],
+.self-assessment button[aria-pressed='true'] {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+.study-purpose > span {
+  color: var(--muted);
+  font-size: 12px;
+  margin-left: 5px;
+}
+.reader-navigation {
+  position: sticky;
+  top: 64px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 1062px;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.reader-navigation > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.reader-navigation button {
+  font-size: 12px;
+}
+.reading-layout .answer-outline {
+  top: 140px;
+  max-height: calc(100dvh - 158px);
+}
+.reading-column .explanation-section-heading h2,
+.reading-column .explanation-section-body > h3 {
+  scroll-margin-top: 150px;
+}
+.reader-purpose {
+  margin-top: 18px;
+}
+.reading-column .reader .answer-section {
+  padding-top: 8px;
+}
+.answer-reading-tools {
+  margin-bottom: 12px;
+}
+.reading-column .explanation-references {
+  padding-bottom: 12px;
+}
+.question-scenario {
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.question-scenario summary {
+  cursor: pointer;
+  color: var(--accent-muted);
+  font-size: 12px;
+}
+.practice-prompt {
+  padding: 25px;
+  margin-top: 14px;
+}
+.practice-prompt h2 {
+  font-size: 18px;
+}
+.practice-prompt p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.practice-prompt button {
+  margin-top: 18px;
+}
+.self-assessment {
+  padding: 20px;
+  margin-top: 24px;
+}
+.reader-format-note {
+  margin-top: 16px;
+  font-size: 12px;
+}
+@media (max-width: 720px) {
+  .learning-home {
+    padding: 16px;
+  }
+  .learning-overview,
+  .self-assessment {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .resume-question {
+    max-width: 100%;
+  }
+  .study-purpose > span {
+    flex-basis: 100%;
+    margin: 0;
+  }
+  .self-assessment .actions button {
+    flex: 1;
+    min-height: 44px;
+  }
+  .reader-open .header-inner > nav {
+    display: none;
+  }
+  .reader-open .header-inner {
+    padding: 8px 16px;
+    min-height: 58px;
+  }
+  .reader-open .user-menu button:first-child {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .reader-navigation {
+    top: 58px;
+  }
+}
+@media (max-width: 360px) {
+  .reader-open .user-menu button:first-child {
+    max-width: 48px;
+  }
+}
+@media (max-width: 600px) {
+  .reader-navigation {
+    position: static;
+    height: auto;
+    min-height: 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  .reader-navigation > button,
+  .reader-navigation > .actions {
+    display: none;
+  }
+  .reading-column .question-section .question-markdown {
+    font-size: 20px !important;
+  }
+  .reading-column .reader .question-section {
+    padding: 14px 16px;
+  }
+  .question-toolbar {
+    margin-bottom: 10px;
+  }
+  .reader-purpose {
+    margin-top: 14px;
+  }
+  .reader-purpose > span {
+    display: none;
+  }
+  .reading-column .explanation-section-heading h2,
+  .reading-column .explanation-section-body > h3 {
+    scroll-margin-top: 78px;
+  }
+}

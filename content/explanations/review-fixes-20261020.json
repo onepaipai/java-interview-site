@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-20",
+  "scope": "修复深度审查与验收中确认的串题、重复分析和机制遗漏；不代表全库事实核验完成",
+  "changes": [
+    {
+      "key": "java-language/3",
+      "title": "为什么不建议用 double 直接保存订单金额？",
+      "sourceKey": "d734874e293c842960853fb2fa278e921bb99a3e84d9813e6ec4e0f9a02f8365",
+      "answerSha256": "a66d079bea79c527317be9bc702ea593fde637d19017cdd1951f15fb8def21f9"
+    },
+    {
+      "key": "java-language/5",
+      "title": "PECS 原则如何用于设计集合型 API？",
+      "sourceKey": "78adbaa93e54ae395dd84f2e7056704554973a2e6d27245796695cf4956f5bb2",
+      "answerSha256": "8716d10055b40d64531d1083f7468ada12b27b7344f710808bdf3f44656df36d"
+    },
+    {
+      "key": "collections/2",
+      "title": "HashMap 为什么不适合并发读写？",
+      "sourceKey": "7ef35952b06dc1b3307b6f7e38287a7b2cc3d8e718e07f11cfb5f8a2cfcca1b6",
+      "answerSha256": "5fe592020baa30ccd736f87ea4dfdd5a2c19dcd34607851bb31daf24f7cb8685"
+    },
+    {
+      "key": "collections/21",
+      "title": "CopyOnWriteArrayList 适合什么读写比例？",
+      "sourceKey": "8fbe8a7c96ab23e1e7c2a3508ac87e9c9b8b5aa5d55ba388100537f6fe3d2604",
+      "answerSha256": "81cdab25733783a2720201680e2a21997ee871a8fd9d74a2771c43e4bd7d7f1e"
+    },
+    {
+      "key": "collections/25",
+      "title": "SynchronousQueue 为什么容量为零却能传递任务？",
+      "sourceKey": "513bedc1a8367b6b6754f582ba7e1e6cfbaff57abea503cd52041cb7192099a3",
+      "answerSha256": "6f3fd7255668202bc3fcfce95e5134434f03036d2a43cb8eacd194e0599f0a81"
+    },
+    {
+      "key": "collections/38",
+      "title": "IdentityHashMap 为什么不能替代普通业务 Map？",
+      "sourceKey": "5fc86c0aa3a740a1d6ac81fb4ed2be9d39e5d27f1dc2876b5e0208ff3838d699",
+      "answerSha256": "952b8c8dfa563c344ad37d449c6a7329baf4b3c874029e638ffe321a750c05ce"
+    },
+    {
+      "key": "collections/49",
+      "title": "如何防止监听器集合被慢回调拖垮？",
+      "sourceKey": "dafb45433fadef9fab0f41704ea3a02ba558aa9302642885383b785e4515df68",
+      "answerSha256": "134df9548a934b86b694c6df723454c8571d9f759612f636c86d480461e3e2b2"
+    },
+    {
+      "key": "collections/50",
+      "title": "如何为集合性能测试避免伪结论？",
+      "sourceKey": "9e4f8039d1b2d6968e7a794a3c664bb120c65395d5ac2ea15758ac05a6ba7d9b",
+      "answerSha256": "c526b9e8c8f6a3d3ad21cf0653290856970541125a64195d4118ea2d88e46f1e"
+    },
+    {
+      "key": "concurrency-basics/2",
+      "title": "happens-before 与操作实际执行先后有何区别？",
+      "sourceKey": "f0deb78ae8b60f024e10d6914dbbce97c507f323c9ef8cb53c3ace2558d02ee0",
+      "answerSha256": "b08b14e5f7ae654eae96be92e51a994306650d34eaae7ac8a4ccca0a157e8922"
+    },
+    {
+      "key": "concurrency-basics/50",
+      "title": "线程转储中的 WAITING 一定意味着故障吗？",
+      "sourceKey": "d8ea0021330f8014367684be4c6ca5d52f371579bdb6b3a856a5e79c3c20b64c",
+      "answerSha256": "2ba08365dfffdb0e5e0d23d051f22c53d947e1c1380a968ae2fb1d575b4ce24d"
+    },
+    {
+      "key": "jvm-basics/12",
+      "title": "Cleaner 能否替代 close 方法？",
+      "sourceKey": "347e2e2817a42767d415d174d71b9db75d15e34bc7fb97b45cae7b72d8bbbeff",
+      "answerSha256": "1cd51aa696951593942f67c9c57caa514f066e0c8e3767110580e45ac8baa711"
+    },
+    {
+      "key": "spring-basics/5",
+      "title": "BeanFactory 与 ApplicationContext 的职责有何不同？",
+      "sourceKey": "43e1af9dc5079032637c0b00553f6e0204db112ed619bbe1e13e9da85682450d",
+      "answerSha256": "2358d55c697fc2602d5f5299dfd35c2573fc3f271d715b232f1b6cdb409d6bf7"
+    },
+    {
+      "key": "spring-basics/12",
+      "title": "@Transactional 默认回滚规则有哪些局限？",
+      "sourceKey": "633030ea9a905f28dc0b106714beee68984e0e054a98a22ef99a225ae65b94e0",
+      "answerSha256": "921c834392f0c90121d0ce720b1074b838a0192d770dbf2aa8b6cc152ba01a0e"
+    },
+    {
+      "key": "spring-basics/35",
+      "title": "@Async 返回后异常如何被观察？",
+      "sourceKey": "ed5702016c3f3b754756532c6c609a5ee6073ce556d12d579c2ef0e8c774beb3",
+      "answerSha256": "f4333af2a20776e2e36d9903b1996675f1cb54bd1bcac23389af584fd2a83954"
+    },
+    {
+      "key": "database-basics/12",
+      "title": "慢查询优化为什么先看扫描行数而非只加索引？",
+      "sourceKey": "430322e87b3b8ee4b2d537a7cdae5a779c8ed36c8c820232b6b2a91485d03749",
+      "answerSha256": "a5abe760968862543f0df90516bd1c3914d59afdff4779557a37c00dae1d62f9"
+    },
+    {
+      "key": "database-basics/35",
+      "title": "NULL 在比较和唯一约束中有哪些注意点？",
+      "sourceKey": "c9c26dc18d5718e67636b9790c0e567e9883b883f108a9d6b34497c631ec63f0",
+      "answerSha256": "1fa38d30e0ed016b64c2d54e1c3190c932812c7c55f4feffe786b8d12c23b6ad"
+    },
+    {
+      "key": "network/12",
+      "title": "HTTP 状态码与业务错误码应如何配合？",
+      "sourceKey": "b32dbfd4e7992d424db5cf02e6234b35c47b49e298c6fc26b675786a1b83caeb",
+      "answerSha256": "3f5b8143da765fea014f0bc034b921729484762d9e9df7ef06b1b74b0949a176"
+    },
+    {
+      "key": "network/26",
+      "title": "零拷贝是不是意味着没有任何数据复制？",
+      "sourceKey": "c76e420a616f42319be7f6668a91cc8c6f1c3ed153a8f3365707c747c3b7b7dc",
+      "answerSha256": "16e39ccd093a1266d971606232ed0db3bae2406b8205f93ecd214cf073b6c126"
+    },
+    {
+      "key": "network/35",
+      "title": "跨域、跨站与同源分别指什么边界？",
+      "sourceKey": "8e345896a314f275772444c938f3802335f81b4887217b4436f30af60a0e4319",
+      "answerSha256": "d958059d78fbec16f541a3a52eab184aec3bef5fa52204c5c706db095d84fd98"
+    },
+    {
+      "key": "ai-basics/15",
+      "title": "topK 越大是否一定越好？",
+      "sourceKey": "19341a353f85f106fa769a92eabb5a82e9aaa8a9eb97a9ae7175e84e648055b1",
+      "answerSha256": "32a0712164827875f3f26cefb71978addea84cbbe661bad81de53a12a82b1e7a"
+    },
+    {
+      "key": "concurrency-advanced/12",
+      "title": "内存屏障的讨论应怎样落到 Java 可见性保证？",
+      "sourceKey": "ed05eb02f8a17193c2174c2071889b9ff16c601578f3d06d4d5df121a47d6fc6",
+      "answerSha256": "e096738f559f29e3d837d5d47f5d9b1089768bd79b354cf9e4126dad1d15452c"
+    },
+    {
+      "key": "concurrency-advanced/35",
+      "title": "如何设计按键串行、不同键并行的任务执行器？",
+      "sourceKey": "9731b6b04abbe05722f3aa7bd4f2b7f4256c6a968be3c1982898aaacc4627808",
+      "answerSha256": "2150a2ae5e984be42ab16b763b80ec582d7888083cb65097a68841f4a579258f"
+    },
+    {
+      "key": "jvm-advanced/2",
+      "title": "G1 的 Region 设计解决哪些管理问题？",
+      "sourceKey": "c313b51a453d435f37ac9734e8dcb07c52c38acc918ef82fa1f2a39722024ab2",
+      "answerSha256": "35de7bdf860f58f87f041756a9c51801ad670c53ea26d03d9206b70136f555c1"
+    },
+    {
+      "key": "jvm-advanced/50",
+      "title": "一次成功的 JVM 调优报告应包含哪些证据？",
+      "sourceKey": "e6e7ddbb1808086cf374b68c1704c5e5c7b77a8c48ade0f5b6f213b9e79789b0",
+      "answerSha256": "9ed2512c7ce762a7a87fc0f3b501e12fbc2d74aaea960ca661e1a6f901184221"
+    },
+    {
+      "key": "spring-advanced/12",
+      "title": "如何用 TransactionTemplate 修复明确的事务边界？",
+      "sourceKey": "35a5635102c84c19fd0ca361e4f13ad7dedd290581f9244214e5eb19b0219c64",
+      "answerSha256": "b91f3373a09e80b992a83b409ab5f75b3ea11b1f80fd6aa4890ca94885a2e195"
+    },
+    {
+      "key": "spring-advanced/35",
+      "title": "如何避免应用启动时把数据库压垮？",
+      "sourceKey": "7918d14dcae95a75cf4072632a42b622a5803cb00e2e935a42469428cc1f8dce",
+      "answerSha256": "1677326a2f57abd0a5628b77465efda881926308023f3c39615c4fa7aa2fb589"
+    },
+    {
+      "key": "database-advanced/6",
+      "title": "索引下推、回表和排序应如何联合分析？",
+      "sourceKey": "a2a1e0537591311f93f98156faf1a2acd552ee83ca794cf353d82ef2e3a0bcf3",
+      "answerSha256": "6676c82eabe4d232f362e004fb320cb4087ba0bd5d531859014f92a08ef9e46f"
+    },
+    {
+      "key": "database-advanced/11",
+      "title": "时间分区与分库分表的能力边界是什么？",
+      "sourceKey": "caa6b5eabfc0bab21d09900118bc54bf22883189f487272610fc8535857216bf",
+      "answerSha256": "dd93ad3784c269e04d2c79ef39cb6c2225dc116a8339ed6ae073c3c227b73faa"
+    },
+    {
+      "key": "cache-messaging/25",
+      "title": "Kafka 分区内有序为什么不等于全局有序？",
+      "sourceKey": "0e0034d285e5daa9025e9b8ee08a0f205abfb8232a4e06a41647d0f9745a6acc",
+      "answerSha256": "09ed5999a461c858a23b261df134650a64e434f8167d1cf21fc768d31e40aab2"
+    },
+    {
+      "key": "algorithms/35",
+      "title": "Dijkstra 算法为什么要求适当的边权条件？",
+      "sourceKey": "2f4e9bbf9982217cb5f75475d1e9c0a755f3b6f95cc6a1272ae4552ef85ca9a7",
+      "answerSha256": "cce8ad6560c46efc34ccb96cad5c7ff5b7f35775f7bd0692008f32e91af35867"
+    },
+    {
+      "key": "ai-advanced/12",
+      "title": "向量维度相同是否意味着可以混合检索？",
+      "sourceKey": "5a8ba3969d7c387e96c07c63fc8e2f243a7f1d3ef8be1780f2ea65eb250192a3",
+      "answerSha256": "9958a13415da9ea998aa6cbde71ee3756b6f88e41709754cd02aafc860e544fb"
+    },
+    {
+      "key": "ai-advanced/35",
+      "title": "模型量化后应该怎样做回归评估？",
+      "sourceKey": "63532abcf615cfe09992bfcc2f3656f6b07c2950fb7bb09d1a7fa98c0fc24438",
+      "answerSha256": "858e9eb9eb0b46710077e9a9736452f08aeade802f6eecda7185d30dc42c7a89"
+    },
+    {
+      "key": "banking/50",
+      "title": "如何复盘一次支付故障并防止再次发生？",
+      "sourceKey": "059b5b87c9640e9f7d92111b5f143f3372c97ec8055b0453d7a3b2d01a9ac9a2",
+      "answerSha256": "02cd180d9c17ba902153df2086f940847590b4e8cee73ba510947baba0eb450c"
+    },
+    {
+      "key": "distributed/5",
+      "title": "Raft 的多数派为什么需要与任期和日志规则配合？",
+      "sourceKey": "edcf37c8d652b3bc9d46d4094f678918974d0414febd37db940baac240a2b07c",
+      "answerSha256": "a1052a359797fb234c11a696df48a3818b1ab317a376919349f7e53e81090a10"
+    },
+    {
+      "key": "distributed/12",
+      "title": "Saga 适合哪些可补偿的长流程？",
+      "sourceKey": "57cedd7657dc79d1aa9f0d110299cc3a3f67ce086479cf0dbacb82b03ecbe49a",
+      "answerSha256": "e6d6dae88e389897365606f93e5c822d6ee35d219c7149ef3f8fbd797d5a5705"
+    },
+    {
+      "key": "distributed/19",
+      "title": "令牌桶与漏桶怎样对应业务流量目标？",
+      "sourceKey": "30dcebb2633d7751af565d0fe7d777f97d81f97e2c16cb8d9bcaa49f581a71b4",
+      "answerSha256": "496717608b7ce83302451f61d5c73029457f21588f5dee422e3f3080b6149839"
+    },
+    {
+      "key": "distributed/31",
+      "title": "配置中心不可用时服务应该怎样启动与运行？",
+      "sourceKey": "eacbefb25781ea1a604ec8530485f0ff68296fd50bfbbb0008f8df2f1444f58e",
+      "answerSha256": "815c5c6a51ffda5563e2c1b5d4be28497e9417f8281fd81541fd50547a2077cc"
+    },
+    {
+      "key": "reliability/35",
+      "title": "定时任务同时触发造成尖峰怎样治理？",
+      "sourceKey": "15c526f876587d4c08819a4d7ade14dcb790d3ce008b0c039fb7c26c0dbe80a0",
+      "answerSha256": "e0f4410b361e972fbafe7076b83b0fb05095cc8a44f1251fcb88a54c0aef351d"
+    },
+    {
+      "key": "architecture/35",
+      "title": "如何设计多环境发布产物？",
+      "sourceKey": "86c20b1effff5137ea10cb46ae4cdcfb46751eaa30bc02cd565d0a308a67d665",
+      "answerSha256": "bb15ecf87d31aa05138ba7e021d96d2c596db1ba1b7a94f1fa1649bea8731986"
+    },
+    {
+      "key": "ai-production/50",
+      "title": "资深开发如何总结一个可持续的 AI 工程方案？",
+      "sourceKey": "40a3e7783976c27dfd7b14dba3a0b58ddbb6f64cd46391d1160570d87e3166dc",
+      "answerSha256": "6c175c9dd4b43f7dd8556463fa5db0f8ed95991629925272610c3cb0bdc00415"
+    },
+    {
+      "key": "collections/6",
+      "title": "LinkedHashMap 如何实现访问顺序与 LRU？",
+      "sourceKey": "8a52fd2f21bd43217beec993445c25ebfab6c09ccaf3bab36ddca0ac2d26c83c",
+      "answerSha256": "d9e96d3c3829b499d3f775240e1b03405b84ec54d53fbfa55c266baf13ebfc74"
+    },
+    {
+      "key": "collections/7",
+      "title": "TreeMap 在什么业务场景优于 HashMap？",
+      "sourceKey": "2744b986f8e445ac8cc79f3df92018aed5e919dc7ae5ad25d21b9eb802937e31",
+      "answerSha256": "a78771deece6e443696052bce8f18931864d30df5b800e6c9905b45d0345c9d8"
+    },
+    {
+      "key": "collections/15",
+      "title": "ConcurrentHashMap 如何保证单键操作的原子性？",
+      "sourceKey": "ec33b29490bcda435b013459afaf9060bdc171d49318996e21d4f4857bbc3427",
+      "answerSha256": "9cccb90c9856dfcbb5740d76e0dabe678e75c898e9465f55e3ab1a22d1453d1d"
+    },
+    {
+      "key": "collections/18",
+      "title": "ConcurrentHashMap 为什么不支持 null 键值？",
+      "sourceKey": "30fa8820842139d2269aca2d38123b376ce1639ca2fa682790e747a415406c8b",
+      "answerSha256": "bdba2994dc3cbb733689626fe93d934f30cc2bf876dfd3063ebb4776fcedf067"
+    },
+    {
+      "key": "collections/19",
+      "title": "ConcurrentHashMap 的 size 能用于精确业务控制吗？",
+      "sourceKey": "32344ed716392291f93e7890e1286e427f80aae9d3dc963f80d47413426d6258",
+      "answerSha256": "5b178f68bd9ac79e9fc31355d5760e21add6e58cf7a0fa709b95f9d089cd0e37"
+    },
+    {
+      "key": "collections/41",
+      "title": "集合转换时如何保留确定性的输出顺序？",
+      "sourceKey": "0c7874fea8b3b75192afd0be1fd7eef4277ad4da06bffbaf2e748b7336091d74",
+      "answerSha256": "cf16d876a22c2c70f00e8a446b0f5dee979cb24b71c570cca673730598c90b6e"
+    }
+  ]
+}

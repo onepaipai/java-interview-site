@@ -1,0 +1,19 @@
+name: java-interview-tests
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: interview_test
+      MYSQL_USER: interview
+      MYSQL_PASSWORD: isolated-test-password
+      MYSQL_ROOT_PASSWORD: isolated-test-root-password
+    ports:
+      - "127.0.0.1:13316:3306"
+    tmpfs:
+      - /var/lib/mysql
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -h 127.0.0.1 -u interview -D interview_test -e 'SELECT 1'"]
+      interval: 2s
+      timeout: 5s
+      retries: 60

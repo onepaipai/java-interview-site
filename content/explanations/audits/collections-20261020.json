@@ -1,0 +1,1027 @@
+{
+  "version": 1,
+  "date": "2026-10-20",
+  "module": "collections",
+  "scope": "本模块 50 道高级题及 6 道原始题，逐题核对机制、边界、案例与总结",
+  "records": [
+    {
+      "key": "collections/1",
+      "title": "HashMap 的容量规划如何影响延迟和内存？",
+      "sourceKey": "7a7b53912c28171e18a36aa3a01c3660c0dabef3394abbb09847b506182f6cfd",
+      "answerSha256": "728814cf68c59e7653619549c7a8f130299d126c8d3eaf81a537cb43235301e0",
+      "decision": "corrected",
+      "finding": "删除容量分析中重复的性能和内存提醒，保留具体容量反例",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html",
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/HashMap.java"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "5d0ce37694f518762dfe783d97ce98db78f58904fbce332439ec2b7bcc4d90e7",
+        "expected": [
+          "1334 / 1000"
+        ]
+      }
+    },
+    {
+      "key": "collections/2",
+      "title": "HashMap 为什么不适合并发读写？",
+      "sourceKey": "7ef35952b06dc1b3307b6f7e38287a7b2cc3d8e718e07f11cfb5f8a2cfcca1b6",
+      "answerSha256": "5fe592020baa30ccd736f87ea4dfdd5a2c19dcd34607851bb31daf24f7cb8685",
+      "decision": "retained",
+      "finding": "保留并发交错与原子累计边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html",
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/3",
+      "title": "哈希冲突严重时如何定位与治理？",
+      "sourceKey": "a545fcfce2455d4b1e8236631c41b1f2c4650251bf0eb49fa595621a9c166885",
+      "answerSha256": "d2573cb4a481da3c2573b67807900367bb42213619e2a5f20cecaff04a457474",
+      "decision": "corrected",
+      "finding": "原案例没有展示哈希碰撞与键相等的区别",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "28ca0aad27abadd814584bfec572ede977261384b483cb61d578a65c6722a3af",
+        "expected": [
+          "3",
+          "2"
+        ]
+      }
+    },
+    {
+      "key": "collections/4",
+      "title": "HashMap 树化为何不是达到阈值就必然发生？",
+      "sourceKey": "2a7e8146e19a44316b9a7a61e894ed4c50d4d3e3239e43371c1154f65c30b013",
+      "answerSha256": "c3de27a656b57b58719b4e84f7677bcbd8d5baf81089177171eb04745ca5bb0b",
+      "decision": "corrected",
+      "finding": "原案例未验证树化触发路径",
+      "references": [
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/HashMap.java"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "29c90e569d56934f156eac461fb4dfc544799f3358d4427cd36c7a7390981171",
+        "expected": [
+          "Node",
+          "TreeNode"
+        ]
+      }
+    },
+    {
+      "key": "collections/5",
+      "title": "为什么遍历 HashMap 的开销不只取决于元素数？",
+      "sourceKey": "b7aeeb139c276828962c931cef8993ea5d98b6afe4f2826a49cb23fb6d551dfc",
+      "answerSha256": "65d77fa01e0f7e05087040308aab9c4127bf651f5ea93ce774cd9e6dac7b2c3e",
+      "decision": "corrected",
+      "finding": "原总结偏离容量扫描成本",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/6",
+      "title": "LinkedHashMap 如何实现访问顺序与 LRU？",
+      "sourceKey": "8a52fd2f21bd43217beec993445c25ebfab6c09ccaf3bab36ddca0ac2d26c83c",
+      "answerSha256": "d9e96d3c3829b499d3f775240e1b03405b84ec54d53fbfa55c266baf13ebfc74",
+      "decision": "retained",
+      "finding": "保留真实 LRU 淘汰示例",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "8a4e6fd7a83ae53ea383ed863b6af7f29330990f043960cce7f3fe852c69802b",
+        "expected": [
+          "[A, C]"
+        ]
+      }
+    },
+    {
+      "key": "collections/7",
+      "title": "TreeMap 在什么业务场景优于 HashMap？",
+      "sourceKey": "2744b986f8e445ac8cc79f3df92018aed5e919dc7ae5ad25d21b9eb802937e31",
+      "answerSha256": "a78771deece6e443696052bce8f18931864d30df5b800e6c9905b45d0345c9d8",
+      "decision": "retained",
+      "finding": "保留范围查询与共享视图验证",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TreeMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "95e59e9e8f7390964b709dc5038855dad3b4fca1239c783262362729f99b78b6",
+        "expected": [
+          "20",
+          "[10, 20]",
+          "[20, 30]"
+        ]
+      }
+    },
+    {
+      "key": "collections/8",
+      "title": "为什么 TreeSet 可能吞掉 equals 不相等的元素？",
+      "sourceKey": "c07ff8372c7752040d4032ac96f7ba3cc96a5662084b9f161f7296a5078a6dfa",
+      "answerSha256": "039f2ce1dddd5ecc64779a92cc074983a53e6b2e0011d44d632f642596dc9af2",
+      "decision": "corrected",
+      "finding": "原案例为分页，未展示比较为零判重",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TreeSet.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "999c3aed4454d0472f24b7a96b474e5b93ff02f80c35a71c90f9e863eec0e1c5",
+        "expected": [
+          "1 / 2"
+        ]
+      }
+    },
+    {
+      "key": "collections/9",
+      "title": "ArrayList 与 LinkedList 的性能如何正确比较？",
+      "sourceKey": "dccb6017c7d8efd3e55e90beeede7dda2eb6011922fc19dcdb62ab64f0a339df",
+      "answerSha256": "6b5a59be354df80c2903fcdfb796eb7b3e9180786aaab34796234c2027ff799d",
+      "decision": "corrected",
+      "finding": "原案例为 subList，未区分定位和插入成本",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/10",
+      "title": "ArrayList 扩容为什么可能引起尾延迟抖动？",
+      "sourceKey": "b7e90c8b9070f469cdb2ccc2673fb864cf9f9b11f7fa20c36df6c688d69e1ee7",
+      "answerSha256": "fd5900a9f1fc868f073cdb90f54753e62405222ab7ad3541e2f8c050bac158b8",
+      "decision": "corrected",
+      "finding": "原案例缺少扩容复制与尾延迟机制",
+      "references": [
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/ArrayList.java"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/11",
+      "title": "subList 为什么可能引起内存滞留和并发修改异常？",
+      "sourceKey": "10ee3a912a1991508483f346beee4e582487041c8a30a604ae51b315e098ca8d",
+      "answerSha256": "690fddd71722e694fd543d051d835e0f5be2580e38345b0fe81ac7a301784e12",
+      "decision": "corrected",
+      "finding": "增加视图失效反例并区分浅复制",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "69f75a7583c937ec1915931efce9c808beadbc24088b41887c2ecfacb3d8c5a7",
+        "expected": [
+          "view invalidated",
+          "[A, B]"
+        ]
+      }
+    },
+    {
+      "key": "collections/12",
+      "title": "Arrays.asList 与 List.of 的行为差异是什么？",
+      "sourceKey": "b2acd627ade5c3b39d3903e60592b03c6f24d3220e0ac194fa3fc517a17f2d59",
+      "answerSha256": "d161d2769809a4e4849f167fa4884e7350bc16121497893434a29d802fcc9de2",
+      "decision": "corrected",
+      "finding": "增加数组写穿、不可修改及基本类型数组边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "502f33d0075c67fcef86a934389a99f78dd481988d88613942a48ed85a849667",
+        "expected": [
+          "X",
+          "immutable",
+          "1"
+        ]
+      }
+    },
+    {
+      "key": "collections/13",
+      "title": "Collections.unmodifiableList 是否能隔离外部修改？",
+      "sourceKey": "236ea213071f6a485207db1c44cf16497942ef6ec7880191a837067c072458a3",
+      "answerSha256": "32e94e425bc86207245cda4785008827074f655a8176503643ddabec4423291a",
+      "decision": "corrected",
+      "finding": "原案例未对比只读视图与快照",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collections.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "bb6c2fbc61e4024d881f1f427c2ed9bc9313bb9c8a3953018f73b10f5d4de65b",
+        "expected": [
+          "[A, B]",
+          "[A]"
+        ]
+      }
+    },
+    {
+      "key": "collections/14",
+      "title": "迭代时删除元素如何避免 ConcurrentModificationException？",
+      "sourceKey": "85c735abc7d7de22f72f734c0283635db7eb3f6d1c86ee9677f1c3e062fc9f81",
+      "answerSha256": "37487688745bc5a83f047d1613a361becc61e09b62db1a8ecdebc7b569433673",
+      "decision": "corrected",
+      "finding": "明确迭代器删除协议与 fail-fast 边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Iterator.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "07e99a610f74ca10d69ec1c173da3c4d9f84127e610a85f989dfede193661a12",
+        "expected": [
+          "[1, 3]"
+        ]
+      }
+    },
+    {
+      "key": "collections/15",
+      "title": "ConcurrentHashMap 如何保证单键操作的原子性？",
+      "sourceKey": "ec33b29490bcda435b013459afaf9060bdc171d49318996e21d4f4857bbc3427",
+      "answerSha256": "9cccb90c9856dfcbb5740d76e0dabe678e75c898e9465f55e3ab1a22d1453d1d",
+      "decision": "retained",
+      "finding": "保留单键累计和回调约束",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "42f4293dcb2c4542466c1baeb6d3a05ca277b66261d4f75dc0e805f3e2ea2fd7",
+        "expected": [
+          "2000"
+        ]
+      }
+    },
+    {
+      "key": "collections/16",
+      "title": "为什么 containsKey 加 put 不能替代 putIfAbsent？",
+      "sourceKey": "f2941b38fdbcc1ada639fe32e19bf0380750d4d540244c89abbb5d200d51157e",
+      "answerSha256": "5b1b4ddf238ca7d8760320dca7b6f4608a5a545ddebd6ef0fdf5cea712e075a6",
+      "decision": "corrected",
+      "finding": "明确原子返回值不等于构造只执行一次",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "badabad926b8ec4c63a8492176eedc9335f4238a25430feaa3c9803ab4aee2c1",
+        "expected": [
+          "null",
+          "A",
+          "A"
+        ]
+      }
+    },
+    {
+      "key": "collections/17",
+      "title": "computeIfAbsent 中为什么不应执行长时间远程调用？",
+      "sourceKey": "56b6fc7b2697d2e0404d976844ab787455a35b402d0e23d0a9c1e571424ebae1",
+      "answerSha256": "2a63920bf38a78829d11472231d4e04e983061180448330246d65e77da106bd3",
+      "decision": "corrected",
+      "finding": "给出先安装 Future、回调外加载和同代条件清理",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "31e4e9e94c1e8d87c4fe671d2d7733550d3fb4bf814d68acb316bbad91ca48d8",
+        "expected": [
+          "1 / 1"
+        ]
+      }
+    },
+    {
+      "key": "collections/18",
+      "title": "ConcurrentHashMap 为什么不支持 null 键值？",
+      "sourceKey": "30fa8820842139d2269aca2d38123b376ce1639ca2fa682790e747a415406c8b",
+      "answerSha256": "bdba2994dc3cbb733689626fe93d934f30cc2bf876dfd3063ebb4776fcedf067",
+      "decision": "retained",
+      "finding": "保留显式空结果和 null 约定",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "590c3432df6a0749caa62a3c43c3833d78a73709f9d658a9cb2700f475eda90b",
+        "expected": [
+          "null-key rejected",
+          "null-value rejected",
+          "null",
+          "true / true"
+        ]
+      }
+    },
+    {
+      "key": "collections/19",
+      "title": "ConcurrentHashMap 的 size 能用于精确业务控制吗？",
+      "sourceKey": "32344ed716392291f93e7890e1286e427f80aae9d3dc963f80d47413426d6258",
+      "answerSha256": "5b178f68bd9ac79e9fc31355d5760e21add6e58cf7a0fa709b95f9d089cd0e37",
+      "decision": "retained",
+      "finding": "保留受控额度竞态示例",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "7a916bc7693acb5369e571e44a274a98420fecc50dd276d0b1ec303c63f720bd",
+        "expected": [
+          "2"
+        ]
+      }
+    },
+    {
+      "key": "collections/20",
+      "title": "为何线程安全 Map 中的 value 仍可能不安全？",
+      "sourceKey": "dd64098483e6b14d5108c9e224027691c27c08d852fa4f4902605028973c91d4",
+      "answerSha256": "8f15eb76d98e8d2fbe066bf8626da00c42fe46278c254dc2d624d010c174f275",
+      "decision": "corrected",
+      "finding": "明确 Map 与可变值的不同保护边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "e0049afb492a644a98d936bb185fcd93b254649aa3ae6740852a46e84da85073",
+        "expected": [
+          "[A]",
+          "[A, B]"
+        ]
+      }
+    },
+    {
+      "key": "collections/21",
+      "title": "CopyOnWriteArrayList 适合什么读写比例？",
+      "sourceKey": "8fbe8a7c96ab23e1e7c2a3508ac87e9c9b8b5aa5d55ba388100537f6fe3d2604",
+      "answerSha256": "81cdab25733783a2720201680e2a21997ee871a8fd9d74a2771c43e4bd7d7f1e",
+      "decision": "retained",
+      "finding": "保留快照迭代与复制成本",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "368e946bc21f42dbfa5b85530e9aba7c1cc44b03a7a0a8c902b2126ca516ad90",
+        "expected": [
+          "1",
+          "[1, 2]"
+        ]
+      }
+    },
+    {
+      "key": "collections/22",
+      "title": "CopyOnWriteArrayList 的迭代器能看到最新写入吗？",
+      "sourceKey": "e49082d8d140606174a129ec8c32560b597e74e361bff40ca8b92865ccec442f",
+      "answerSha256": "a2b1102cbae1b71e6d26b3a167d8b07884c8318c98021a08bb0a1dd259ffb864",
+      "decision": "corrected",
+      "finding": "去掉慢回调内容，验证 set 后快照不变与迭代删除限制",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "2221d3a3a5d4504aa0fea8fbf1bf4acd19f9f672087f4c4b4f0340b7f32f1f06",
+        "expected": [
+          "A",
+          "B",
+          "remove unsupported"
+        ]
+      }
+    },
+    {
+      "key": "collections/23",
+      "title": "BlockingQueue 的容量如何帮助系统背压？",
+      "sourceKey": "74365726f50f93b71c1738e6c97c3dacd6d6366b62000ba913ec92617b5a8a32",
+      "answerSha256": "05ea14a7a68b509efe98bae039467c3742604463aafeea3763f1f3d56b92b8d6",
+      "decision": "corrected",
+      "finding": "补齐上游处理满队列结果的背压条件",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/BlockingQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "b97a65039f858e078e25e898a730d59a2dc52ba25019b31cbbf7643adc147588",
+        "expected": [
+          "true",
+          "false",
+          "A",
+          "1"
+        ]
+      }
+    },
+    {
+      "key": "collections/24",
+      "title": "ArrayBlockingQueue 与 LinkedBlockingQueue 如何选型？",
+      "sourceKey": "0cc3be16f6ccbb531794ac4e11712a3802be5e2ca6568101b9787d6df72791db",
+      "answerSha256": "a301e6c4a3eb562fe5bdbdc822b49ed3b9b73614f0ff521fa4edd26cf582b241",
+      "decision": "corrected",
+      "finding": "对比显式容量、分配和锁边界，避免性能定论",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/LinkedBlockingQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "89110a5496a8cafd3324d3ea2c1741a3e1105289e5383b3013d19867275086a4",
+        "expected": [
+          "true / true / false",
+          "true / true / false"
+        ]
+      }
+    },
+    {
+      "key": "collections/25",
+      "title": "SynchronousQueue 为什么容量为零却能传递任务？",
+      "sourceKey": "513bedc1a8367b6b6754f582ba7e1e6cfbaff57abea503cd52041cb7192099a3",
+      "answerSha256": "6f3fd7255668202bc3fcfce95e5134434f03036d2a43cb8eacd194e0599f0a81",
+      "decision": "retained",
+      "finding": "保留零容量交接和中断边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/SynchronousQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "efd031996f34e8302e7c17c613ac9dea32fa69d0ec9b2761aef7f62f878975c8",
+        "expected": [
+          "false",
+          "true",
+          "7",
+          "0",
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "collections/26",
+      "title": "PriorityQueue 为什么不能保证整体迭代有序？",
+      "sourceKey": "f6b29a49e4a35e340d7ae2a66df4109626435c9d0549173e489dc3432852a237",
+      "answerSha256": "e1a7fa8f68ad6ace1ba5c26692305a57afb1375421b8638727e5062d44292bb0",
+      "decision": "corrected",
+      "finding": "去掉延迟任务恢复，验证 poll 顺序",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "c14c2c4b9c026640df8aa33bb2bea37704a82dc8e1d3b9ea81b0609e15fe71ab",
+        "expected": [
+          "1",
+          "[1, 2, 3]"
+        ]
+      }
+    },
+    {
+      "key": "collections/27",
+      "title": "DelayQueue 可以直接承担可靠的业务延迟任务吗？",
+      "sourceKey": "1f9e208115a132785d0e51197ead80f9806aaba434ee57de8b2c76e88d690fa2",
+      "answerSha256": "885646f3a718fbfd4479666bfadc4610e16d8944c144e28af278d0fcb9ddcbf2",
+      "decision": "corrected",
+      "finding": "去掉 Top K，补持久状态及重启补扫",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/DelayQueue.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/28",
+      "title": "Deque 为什么通常优于遗留的 Stack？",
+      "sourceKey": "938a853d1945c97d42af14c895142f133652cf7a6daa4be48664770c2bb6b57f",
+      "answerSha256": "2e7757d0983ca7415ba9762717896d764dadfb74d05dc5e6294e83dd7f599818",
+      "decision": "corrected",
+      "finding": "原堆案例不适合 Deque，改为栈语义",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Deque.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "323eeff4a91c21928883b1b6b4c2c0e5cd0a71777df171714737fe1aaa61f7ca",
+        "expected": [
+          "2",
+          "1",
+          "null"
+        ]
+      }
+    },
+    {
+      "key": "collections/29",
+      "title": "BitSet 适合怎样的海量标记场景？",
+      "sourceKey": "1aec4bffaab62c157567cd7a8262cb2285319b5b7484ad0a2c2a631ecca20ebf",
+      "answerSha256": "90557623a17e91fe5f1fb5692f9704f40d2e96fd35574299465271cad797db00",
+      "decision": "corrected",
+      "finding": "原去重案例没有区分位范围与基数",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/BitSet.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "4e0bb9f408cb87df571f88d6c33aeeddcf72ccccc847004aa8d9686fa564c278",
+        "expected": [
+          "2 / 6",
+          "3 / 1001"
+        ]
+      }
+    },
+    {
+      "key": "collections/30",
+      "title": "布隆过滤器的误判和删除限制如何处理？",
+      "sourceKey": "74170778016d6d16c87e08b902794bd3870152a1061266eb79581f0dc607559b",
+      "answerSha256": "b482aa1d80a0b0097b83900f809e232be5d1915218e335082ddb1eb27b6e2e0d",
+      "decision": "corrected",
+      "finding": "增加共享位删除反例与完整更新前提",
+      "references": [
+        "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/31",
+      "title": "如何为千万级数据实现去重？",
+      "sourceKey": "a78447d332e28e0d3a40722ec62a577d5b46da1a7450224848c2e9434f1729dc",
+      "answerSha256": "27b14773409aed45fca673d5bedd0de2e2505d29cbf061cefb236a187d56fecb",
+      "decision": "corrected",
+      "finding": "补精确分区、偏斜及碰撞验证",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashSet.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/32",
+      "title": "如何避免 HashSet 保存大量字符串造成内存膨胀？",
+      "sourceKey": "76a13aff63cbb81ed01ccaa07d5f7201b4b924eb8f31f8efeaf3964986227eb0",
+      "answerSha256": "c9a436cdb8480d8a254e93766ea8eb73264a60e6906cb9f3055a07c2ceacd84c",
+      "decision": "corrected",
+      "finding": "原例缺少字符串、数组、节点保留分析",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashSet.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/33",
+      "title": "如何设计复合键以避免字符串拼接冲突？",
+      "sourceKey": "70d92cf0cfcb715c9cc6d6693bef24c0cd5d92da973ad848699de96d27a0d1a2",
+      "answerSha256": "3fef264a594ceb1662b6ec5fb0a8d526022c519edc74c0629eb31a6a8a454dbc",
+      "decision": "corrected",
+      "finding": "增加拼接冲突与 record 浅不可变边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "a4cdbc6cb3f6240549b46d87511ee198922e6217c7f0c894960dff1d9deec391",
+        "expected": [
+          "true",
+          "2"
+        ]
+      }
+    },
+    {
+      "key": "collections/34",
+      "title": "集合排序为什么必须使用稳定且一致的比较器？",
+      "sourceKey": "2dc89de014fb22f027811131abdb540002a8d5e7d05bfec11e2abac5bda4f9fd",
+      "answerSha256": "53c52715b2bc34a8ea7f81ce6e7467b18c33b5d2cdddd39779329492121f9ca6",
+      "decision": "corrected",
+      "finding": "去掉分页模板，展示溢出比较器反例",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "eedc1fedde4066fff892eac1ae1342b6a5719db0db16f2a7c47cfa13bbe136e6",
+        "expected": [
+          "true",
+          "-1",
+          "-2147483648"
+        ]
+      }
+    },
+    {
+      "key": "collections/35",
+      "title": "Top K 问题为什么常用固定大小堆？",
+      "sourceKey": "c9d97cfa146e8814e73961042f692522b1bcb535d405f4f3e10c18e8622962b6",
+      "answerSha256": "dc4c4e5979e7f275850cca0244c603e6e2e405ec026e8262c58b2ec78bd9d7a1",
+      "decision": "corrected",
+      "finding": "去掉可靠延迟任务内容，给出候选堆实现",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "01eb7d2fe59328dfc8486ac93f848ca7f869d077228c6acab4caa14852b12b60",
+        "expected": [
+          "[5, 4]"
+        ]
+      }
+    },
+    {
+      "key": "collections/36",
+      "title": "ConcurrentSkipListMap 适合哪些并发有序查询？",
+      "sourceKey": "8642c1fcd699d9a109470e100052925f49f1cd68c54f273b281cc7a4a3e1a43e",
+      "answerSha256": "03ac7f3d8fd9a2c96698830971290f34c78b1260d4e46424e141f226bcfb7c1b",
+      "decision": "corrected",
+      "finding": "原例没有展示并发有序映射的实时视图",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentSkipListMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "954b53f54d3927efe533f49d1fbf4e97c2a04478d3a359e5cafa852b8cda7fd1",
+        "expected": [
+          "20",
+          "[10, 20, 25]"
+        ]
+      }
+    },
+    {
+      "key": "collections/37",
+      "title": "WeakHashMap 能直接当通用缓存使用吗？",
+      "sourceKey": "2e4c8a56822ebbeee1ca406f3fe2665ca739e8229f993600bf389e20a789e3a6",
+      "answerSha256": "bf00a6100409b4de705efdf62329b1a99bb05c6617e8c72298f6986b9eef0bd0",
+      "decision": "corrected",
+      "finding": "删除换词重复分析",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/package-summary.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/38",
+      "title": "IdentityHashMap 为什么不能替代普通业务 Map？",
+      "sourceKey": "5fc86c0aa3a740a1d6ac81fb4ed2be9d39e5d27f1dc2876b5e0208ff3838d699",
+      "answerSha256": "952b8c8dfa563c344ad37d449c6a7329baf4b3c874029e638ffe321a750c05ce",
+      "decision": "retained",
+      "finding": "保留引用身份与业务相等对照",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/IdentityHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "2fd9a9694b4fda9f31c6938044f6aeb4dfe3b3300fdebb2331f07ca55f3b85bd",
+        "expected": [
+          "2 / 1"
+        ]
+      }
+    },
+    {
+      "key": "collections/39",
+      "title": "如何实现线程安全的多值映射？",
+      "sourceKey": "a996fa6e10b82d836ed6737b9b3e5e229b05a8d9af613750baa1f5bdcdfdde3b",
+      "answerSha256": "6f3a2c50bca2d145bcae9a0c45c99bea1489d6da4677a6573fefa85fa1b7323b",
+      "decision": "corrected",
+      "finding": "补齐内层集合与末项回收的原子协调",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "c80238ebc703dea419fc4b9db96144fb050fd016fe4112dc807082842f2494ba",
+        "expected": [
+          "[B]",
+          "null"
+        ]
+      }
+    },
+    {
+      "key": "collections/40",
+      "title": "分组统计如何避免 Collectors 造成过多中间对象？",
+      "sourceKey": "f13b787bd5c455d145fe40c4e3242f16b16b2ca914b97cff3b2d6b11251e4ef1",
+      "answerSha256": "7a850558ab69cccd7a6637ca138012297aa470d49a071548d3d2cac7fef580bb",
+      "decision": "corrected",
+      "finding": "原性能模板缺少可执行分组累加",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Collectors.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ad5d1c6b2594354c08071257e217971636f2fd2025360361cf3f278ff275e192",
+        "expected": [
+          "A=5",
+          "B=4"
+        ]
+      }
+    },
+    {
+      "key": "collections/41",
+      "title": "集合转换时如何保留确定性的输出顺序？",
+      "sourceKey": "0c7874fea8b3b75192afd0be1fd7eef4277ad4da06bffbaf2e748b7336091d74",
+      "answerSha256": "cf16d876a22c2c70f00e8a446b0f5dee979cb24b71c570cca673730598c90b6e",
+      "decision": "retained",
+      "finding": "保留输入序与键序的具体对照",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "0ab677042263461ab313eb1c2b0d6b72fbab7cfe76bc6c660b5f3e01eb435eb0",
+        "expected": [
+          "[B, A]",
+          "[A, B]"
+        ]
+      }
+    },
+    {
+      "key": "collections/42",
+      "title": "大批量 removeAll 为什么可能出现意外性能问题？",
+      "sourceKey": "d8ea07b17d66d90dfb36142769dc1e25fea58cc070cb5b7fb5ba40aed10becdc",
+      "answerSha256": "7295489fac2959a339fef21faee41481f016ad9957b324143fa60361e9932dc2",
+      "decision": "corrected",
+      "finding": "补 removeAll 选路、contains 成本及转换语义",
+      "references": [
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/AbstractSet.java"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "b30209c86cb1340747cebb92c0d8142097257ed10f5dcb8643eecf2d05a8b8ca",
+        "expected": [
+          "[1, 3]"
+        ]
+      }
+    },
+    {
+      "key": "collections/43",
+      "title": "如何安全地返回内部集合？",
+      "sourceKey": "32fd20fc12e576d51d028035fad15c11da0910eed40725b760886f378bce3182",
+      "answerSha256": "a6563fc9cc0140f924cb6a9bb9bec1e819ea9956545c672b133850c4cef4b39d",
+      "decision": "corrected",
+      "finding": "原 subList 例未展示返回边界的浅复制风险",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "bf53797a0402a7a79bf1b5412507df0bd40705bc4d519ea8a63c7b3871c623ea",
+        "expected": [
+          "[A, B]",
+          "[A]"
+        ]
+      }
+    },
+    {
+      "key": "collections/44",
+      "title": "为什么分页结果需要稳定的多字段排序？",
+      "sourceKey": "b91241db726bc905ab811deb219bad090ca6b60a5ecb88253299e4f4b4519efb",
+      "answerSha256": "d44a978944a5399eb73774bfc43d40c6f936a358266eb19a7e0e4995fdf336fb",
+      "decision": "corrected",
+      "finding": "补唯一排序仍会发生 offset 位移的反例",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Comparator.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "db67d168e0007b9267974e271c333bfbfbbffc43cf058005da66caab30ed5ef6",
+        "expected": [
+          "[101, 102]",
+          "[102, 103]",
+          "[103]"
+        ]
+      }
+    },
+    {
+      "key": "collections/45",
+      "title": "如何在集合中实现按业务键去重且保留最新数据？",
+      "sourceKey": "502c7243e8224f7fcd420249b48a044ab96e7ca0466bbcee8df060342fb34b4b",
+      "answerSha256": "50fc44906d0afc2c2fe50c3b9f8accfe906458c40c64924d10fc06c5b1f860d8",
+      "decision": "corrected",
+      "finding": "补乱序版本合并及同版本冲突裁决",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "7a166eaa6ed7194f59aaf5aa5ae0660951d177a229995b764f322574bce15fad",
+        "expected": [
+          "3 / new"
+        ]
+      }
+    },
+    {
+      "key": "collections/46",
+      "title": "排序前后修改参与比较的字段会有什么后果？",
+      "sourceKey": "14e4e534131db49e460ab8b25bfe0174a6b4c8dc6667e719261fe160efde682c",
+      "answerSha256": "277397605ae3cecf4c3fd04e38cbaaab6ec59e63c8680ab55957eae34dd84677",
+      "decision": "corrected",
+      "finding": "补不可变节点替换与变更前删除协议",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "17e4913ee78c985d7de18754918ba5c3318bfc393d19e45ad876e32d97b5f5e3",
+        "expected": [
+          "B / 1"
+        ]
+      }
+    },
+    {
+      "key": "collections/47",
+      "title": "如何评估集合的真实内存占用？",
+      "sourceKey": "7c0c60b2adb33e06ead585e5422e4cc8c8855b068eb80cdd3cc0e70acbd17c6b",
+      "answerSha256": "92ce0286b8ea0c06c7e59444e300b01ba04f6e23dea86f3c2f13b644f265e3aa",
+      "decision": "corrected",
+      "finding": "区分浅大小、可达图和独占保留",
+      "references": [
+        "https://github.com/openjdk/jol"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/48",
+      "title": "并发队列的空检查与取出为何不能分开推断？",
+      "sourceKey": "70c51ebb58973e4c2d71f51a7c8c93df452a5df1cce0ccdcbce9855fb943081a",
+      "answerSha256": "c9154e31a849c53a84d53897122d3e1b78b42a9e3da56d692ac74fe8882d9aab",
+      "decision": "corrected",
+      "finding": "补空检查与取出之间的交错",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentLinkedQueue.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "0c4378f5d7a82b4784963a676e4c556402194b2b802c06a34cd332b6b794b55a",
+        "expected": [
+          "true / null"
+        ]
+      }
+    },
+    {
+      "key": "collections/49",
+      "title": "如何防止监听器集合被慢回调拖垮？",
+      "sourceKey": "dafb45433fadef9fab0f41704ea3a02ba558aa9302642885383b785e4515df68",
+      "answerSha256": "134df9548a934b86b694c6df723454c8571d9f759612f636c86d480461e3e2b2",
+      "decision": "retained",
+      "finding": "保留慢回调隔离及许可释放条件",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html",
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "collections/50",
+      "title": "如何为集合性能测试避免伪结论？",
+      "sourceKey": "9e4f8039d1b2d6968e7a794a3c664bb120c65395d5ac2ea15758ac05a6ba7d9b",
+      "answerSha256": "c526b9e8c8f6a3d3ad21cf0653290856970541125a64195d4118ea2d88e46f1e",
+      "decision": "retained",
+      "finding": "保留同语义基准与端到端复核",
+      "references": [
+        "https://github.com/openjdk/jmh"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；性能及外部系统行为未冒充实测"
+      }
+    },
+    {
+      "key": "legacy/12",
+      "title": "ArrayList 与 LinkedList 区别？ArrayList 扩容机制",
+      "sourceKey": "fb48c5dc27238c55be8b23bc765a8932ee7fa4f806d050d207fae100091bf023",
+      "answerSha256": "cfd2f685b4ac323cbf4d6449e090589e804dcfd85d62a44aea10234872185eba",
+      "decision": "corrected",
+      "finding": "替换共享视图案例，覆盖定位、插入与扩容",
+      "references": [
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/ArrayList.java"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ed19fd5e7d9bbb6cf50e3a84b868ba7c9d4af39b5c5bc6d36606409b49d28437",
+        "expected": [
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "legacy/13",
+      "title": "HashMap 底层结构？put 流程？容量为什么是 2 的幂",
+      "sourceKey": "fb50aaf0339853e765a5ea505014a0c92c96ed462308c8f308a438e674d37147",
+      "answerSha256": "929a022a27dcce45760d46f0c910c65dc744a0ca3e138e3bafd5b273f74d84f6",
+      "decision": "corrected",
+      "finding": "补 put 旧值返回、掩码定位和翻倍拆桶",
+      "references": [
+        "https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/HashMap.java"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ed09cc163f0eeca8158102912fb5dab22d1e43ec5775c824db5be250525bc768",
+        "expected": [
+          "null",
+          "old",
+          "1 / new"
+        ]
+      }
+    },
+    {
+      "key": "legacy/14",
+      "title": "HashMap、Hashtable、ConcurrentHashMap 区别",
+      "sourceKey": "ca585d83084dfa705ba6a20085b784e614c77455e964f0c6f04281794d097373",
+      "answerSha256": "03fe6fbf8b951a923d7f424cab918789b1eea34383db915b71609a6a0ab4bb6c",
+      "decision": "corrected",
+      "finding": "区分方法安全与复合业务原子性",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "a3d95d2d0440c47e48655bf6dbb554cc1e98c164c25dea936a5dc6fcc9c63f07",
+        "expected": [
+          "2",
+          "null rejected"
+        ]
+      }
+    },
+    {
+      "key": "legacy/15",
+      "title": "HashSet 如何保证不重复",
+      "sourceKey": "a6077c45b3f6f654d6e6ff4fa263d4e6104473ef3b31cfd7997fe732a5a8321c",
+      "answerSha256": "895399bc32a85912aca4155d09804aeece85a4fdfde69890c8f3cc89e363fee8",
+      "decision": "corrected",
+      "finding": "验证相等去重与不同键哈希碰撞",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashSet.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "353cd2e050ef9a09409dca9c0f6f54390c2282ed4adae26b614faf710d0e2c2a",
+        "expected": [
+          "2",
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "legacy/16",
+      "title": "fail-fast 是什么？遍历时如何安全删除",
+      "sourceKey": "695f6fed328214ad699d7d6610f51fcd2b920a474361464a5760d715b28059b2",
+      "answerSha256": "58c0e6997f3d1d76ec7a31909e335aabcdce28a57e69d2b3be220ef67069872e",
+      "decision": "corrected",
+      "finding": "验证连续匹配删除与修改检测边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "a7ac89bc96783f30341fdbc613223c5ca910e2e10315aab6d98910a4d76bcad9",
+        "expected": [
+          "[1, 3]"
+        ]
+      }
+    },
+    {
+      "key": "legacy/17",
+      "title": "TreeMap、LinkedHashMap 的特点",
+      "sourceKey": "9cd2653987bc43cf19d7bbe52dee43b0cde30740b46b3c71a10324efb2e56df6",
+      "answerSha256": "ec61a17acbd7d19039c9881ea940ba634eb23e87ce1d378d879441261c41cbbf",
+      "decision": "corrected",
+      "finding": "对照键序与插入序，明确访问序及同步要求",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "bf10fc5ad68444db4fc1427b82092ca2e0a14c7fca5726d065c47f8fda6df4bc",
+        "expected": [
+          "[A, B]",
+          "[B, A]"
+        ]
+      }
+    }
+  ]
+}

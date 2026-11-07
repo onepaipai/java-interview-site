@@ -1,0 +1,997 @@
+{
+  "version": 1,
+  "date": "2026-10-20",
+  "module": "concurrency-basics",
+  "scope": "本模块 50 道高级题及 8 道原始题，逐题核对机制、边界、案例与总结",
+  "records": [
+    {
+      "key": "concurrency-basics/1",
+      "title": "volatile 能解决哪些可见性问题，不能解决什么？",
+      "sourceKey": "703922e1bac6cb6861530fedd235371ef0552c086d7593adad76dd05eb92c8df",
+      "answerSha256": "b5b3c920f1cfb91f7f2148278062130cdc91be52fe93625355fec07cf014812a",
+      "decision": "retained",
+      "finding": "保留多字段快照、一次读取与安全发布边界",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "f14f45356053ed5876dc723389619faf3c6d2add5d3f82c80e3fa090c542f0e2",
+        "expected": [
+          "2 / 200"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/2",
+      "title": "happens-before 与操作实际执行先后有何区别？",
+      "sourceKey": "f0deb78ae8b60f024e10d6914dbbce97c507f323c9ef8cb53c3ace2558d02ee0",
+      "answerSha256": "b08b14e5f7ae654eae96be92e51a994306650d34eaae7ac8a4ccca0a157e8922",
+      "decision": "retained",
+      "finding": "保留 start/join 同步链与墙钟顺序区别",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html#jls-17.4.5"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/3",
+      "title": "为什么双重检查单例需要正确的安全发布？",
+      "sourceKey": "a5918b5d6f1e80371662a6b50359cd5d3676de7ee74a203c310a02a1818d1838",
+      "answerSha256": "88d93ed2a31e60dacb948dc7971d5d19e27dc2d0aa136bc7fef0f98a08b5c029",
+      "decision": "corrected",
+      "finding": "原例未展示 DCL，补锁内二次检查及发布",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ab320b9ccb99a2ed3fafa0a7a198f937bcc76fd72b2e5a2fbf171a4a078383da",
+        "expected": [
+          "true / 42"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/4",
+      "title": "synchronized 锁实例与锁 Class 有什么差异？",
+      "sourceKey": "f48cbabb1d5b13e9aa6a88808b14feaf6b087a6f0dbc098dedd044284c515487",
+      "answerSha256": "3c11516124a9ae95bc0a0cd02de3629a248e9c2382fdda6f42b25cae90767afa",
+      "decision": "corrected",
+      "finding": "原例未区分实例与 Class 监视器",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "23bcc6a125adc592095eb8cc5ec8f9b7add4820bf8b29a2cb1b94da24233b803",
+        "expected": [
+          "true / false",
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/5",
+      "title": "为什么不能用字符串常量作为业务锁？",
+      "sourceKey": "688632355c9461b1e202c4fcac810d29ef7e762d843b17938746d9bcdf446d3d",
+      "answerSha256": "4705618bbad37975c3289c3bfffffeba2f76bf07db33bf749e1dab3d32f09515",
+      "decision": "corrected",
+      "finding": "补驻留字符串身份及私有稳定锁",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "8dceadcbc51f91fb0b019875738d2f7fe3dfb8674281648cbc75aa01aca662e9",
+        "expected": [
+          "true",
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/6",
+      "title": "wait 为什么必须在循环中检查条件？",
+      "sourceKey": "545c577ec6fa3861227e80c2a52d4c03c308a045e737fad29588a75599c3a54c",
+      "answerSha256": "a680c6e7e32299e5bcfecab33c7e1a85c05545b708f704b3e5b23927685552aa",
+      "decision": "corrected",
+      "finding": "补双消费者重查谓词与关闭等待",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/7",
+      "title": "wait 与 sleep 对锁和线程状态的影响有何区别？",
+      "sourceKey": "d654aba9829bcd06126fca5a8e5e2b989691ffb047a3c548ac61d303c1c00b3c",
+      "answerSha256": "57124e72ae0cc6132737bd9a81aa4aefa6e9c5c47f3a18c418450b372f766c8b",
+      "decision": "corrected",
+      "finding": "明确 wait 只释放目标锁，sleep 不释放锁",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/8",
+      "title": "notify 与 notifyAll 如何选择？",
+      "sourceKey": "40eb07d77ed8e46a765f66a2ccc9fbe9ebcdac8ad969648ee4b12db010ff7d9f",
+      "answerSha256": "1a17ab46bdc26f1a49acf784af1cef62a74c2cc53aabed960678f3d619b18f23",
+      "decision": "corrected",
+      "finding": "补多等待条件下通知错误角色的进展风险",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/9",
+      "title": "中断为什么是一种协作取消机制？",
+      "sourceKey": "3ecbcab9f0c386f4ebbe096c58594a267e551725f4dba210b95897bcc48ef510",
+      "answerSha256": "fc4cd3cf233f45040e3e5975a70615b052df01b1667dca6d5aae4bcc8e6bd8e6",
+      "decision": "corrected",
+      "finding": "展示中断协作及阻塞抛异常清除标志",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "4a9d4f6bf305db5ce07263d141534dd22398b0f62ff1e81a9efdd698b48c524a",
+        "expected": [
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/10",
+      "title": "为什么不应吞掉 InterruptedException？",
+      "sourceKey": "dfb3889818abaf39841d2337f86f5f80ede17ccc2bd2eba76abf4c7602cc1833",
+      "answerSha256": "279c22844558e55986b75447a31c151ef0db71e7037b0cdd6ca073eafca63d3a",
+      "decision": "corrected",
+      "finding": "明确恢复标志后退出，避免恢复后无条件重复等待",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/InterruptedException.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "8cdf18888f1fcebb7df664b311ab904eada368ed03c0593130428f5870a9e927",
+        "expected": [
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/11",
+      "title": "ThreadLocal 为什么在线程池中容易泄漏？",
+      "sourceKey": "c6383b6c13091d12d3223ed9e073b37c07967c2344c4d3a18c3c9cd11d4d1b54",
+      "answerSha256": "0b71de27020a40c13327ad1a195272d850afea0e1a4878827e4a5006a8ce150d",
+      "decision": "corrected",
+      "finding": "以复用线程稳定复现旧值串用与清理",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ThreadLocal.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "6bed3c5bca8f413ad8f35f0bcf5c41c658d4ac7baa96193f7b4769733663279d",
+        "expected": [
+          "A",
+          "null"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/12",
+      "title": "InheritableThreadLocal 为什么不适合直接传递线程池上下文？",
+      "sourceKey": "348686698267e7073bdcce06d170656f75d1268d61c293f54e3307243455e808",
+      "answerSha256": "82c06710260e941309bd05b78564544b4f5a527ecdfe94e5d7af2d2c9f84cd98",
+      "decision": "corrected",
+      "finding": "以两个提交验证继承只发生在线程创建时",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/InheritableThreadLocal.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "2f08cf5e739e07b593fb95ac00f453bb78682b787af66a8a4c9ab03bf1121e7e",
+        "expected": [
+          "A",
+          "A"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/13",
+      "title": "原子类 CAS 循环为何也可能消耗大量 CPU？",
+      "sourceKey": "1a3b5d48d02592c0fa12beff660da1f9abe427ea1e01fe1bb08110b5e3944a75",
+      "answerSha256": "6f69c4a4ea44db1f3a1c83e63e5d518b70fe021e0915e314bbb0421c1d95b28a",
+      "decision": "corrected",
+      "finding": "区分 CAS 原子性、重试与公平进展",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicLong.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/14",
+      "title": "ABA 问题何时需要版本号解决？",
+      "sourceKey": "0663c3a001dfcef094f8c56a0a9d6b9e12129ccc2c6ffea7f677a01b91602bdc",
+      "answerSha256": "d75762e3312753ac325d696189a8f709cc44e91cd6d98113e463b46e6c671368",
+      "decision": "corrected",
+      "finding": "给出 A→B→A 的普通及带版本 CAS 对照",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicStampedReference.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "00d42014b6d76f68f5f1f702952645cfb53f1f9c0b4e72a5c5da1f078a56717c",
+        "expected": [
+          "true",
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/15",
+      "title": "AtomicLong 与 LongAdder 的使用边界是什么？",
+      "sourceKey": "8a2b7bb3605fdfbe934333cedb89f5d197c2ce541d0d5c26d1fdb9d7ebcf31d0",
+      "answerSha256": "da65dd5de49400824ead085fafcbc305026ef958d654caa421ae95c79c50618c",
+      "decision": "corrected",
+      "finding": "移除重复分析，分别验证统计与条件准入",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "a7ef47feeba0d1f69aa13a7a12b41b1de409abe1bd741a1cfc3e2f11001a65eb",
+        "expected": [
+          "3",
+          "true / false / 0"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/16",
+      "title": "线程池的核心线程数如何估算？",
+      "sourceKey": "04b03730f3140cd40e5558f548fd63fe8d04c0fc79a8f3f688660485041e1378",
+      "answerSha256": "76dcaf1cbb9b56337c7186962878f1355ed5820b7e240c6a4ce8105e5edebd6b",
+      "decision": "corrected",
+      "finding": "原父子任务案例偏题，改为 CPU 和下游共同预算",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/17",
+      "title": "无界队列为什么会掩盖线程池过载？",
+      "sourceKey": "92abe05732a437e4376364641fe9ef77ed972d723a80f97cc92cf93b730cdfe3",
+      "answerSha256": "bfc7abd07a6895e351f1c181c373d985ca4a475af020cb6f11f053c65e8abd43",
+      "decision": "corrected",
+      "finding": "实证无界队列使最大数不触发扩容",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ad96f54f0f93ee2d33057d8a2bb858dba7e42f702e940cdb106bce2c1190b52a",
+        "expected": [
+          "1 / 1"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/18",
+      "title": "CallerRunsPolicy 有什么隐藏风险？",
+      "sourceKey": "48361bd55a4f1a1f9f6866641826a55b1229a3016dff85f6b024b7d291b0ad4f",
+      "answerSha256": "c1707f6c9d97da79250a097193c8eb2655c22e07ebf0427ca6cebe86067c22e9",
+      "decision": "corrected",
+      "finding": "补提交线程回压及关闭后静默丢弃",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.CallerRunsPolicy.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ef04ce8daa55e431694a7536723854786ea66d3e871b5116ca66307f745e3793",
+        "expected": [
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/19",
+      "title": "execute 与 submit 的异常表现有什么不同？",
+      "sourceKey": "e0edaa8e749fd3fcdaf1e7258cc0f0af218ec0cab56607008dd98670c07142f0",
+      "answerSha256": "96c96dacf5287f3f1ee636b024022d92b71b8de8c1f025e6a256020f25dd5bb1",
+      "decision": "corrected",
+      "finding": "区分 execute 异常入口与 submit Future 包装",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/20",
+      "title": "线程池关闭时 shutdown 与 shutdownNow 如何取舍？",
+      "sourceKey": "8ac03851342297afee4d6f936f06ca7735127c8733fa4369bd801a2241db4bd2",
+      "answerSha256": "9c8ff6df62e5c53ac6b530dad17c94f88d32787d5d31dfb0ad7c6d7f4cf7b3f2",
+      "decision": "corrected",
+      "finding": "补实际终止、返回的排队任务和许可所有权",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutorService.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/21",
+      "title": "CountDownLatch 与 CyclicBarrier 分别适合什么协作？",
+      "sourceKey": "589ba3c2d54bbd250e53126a9a13a5bafdd2271adadf857253740939481c8bc1",
+      "answerSha256": "d719301ba6c9325f6ef4d7921f07251462e287204a5d1ab9f4ed4c931acecf11",
+      "decision": "corrected",
+      "finding": "区分计数完成、业务成功与屏障破损",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CyclicBarrier.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/22",
+      "title": "Semaphore 能直接限制接口的 QPS 吗？",
+      "sourceKey": "720d9c7904f9c60a078e8a08d63206542a64cb504178d46a497389a21ffba8d7",
+      "answerSha256": "903a368b31ec388cdeb7b95da7ea7cc11b3fc443be5b00600f03943a4079a08f",
+      "decision": "corrected",
+      "finding": "验证单许可可反复使用，不能推导 QPS",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Semaphore.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "0d82ec6ce2ae943c339bc02c026c1b8c94888752d0a5dcb6d151eae16508e3fa",
+        "expected": [
+          "3"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/23",
+      "title": "ReentrantLock 相比 synchronized 提供了哪些控制能力？",
+      "sourceKey": "2a619ab883c62796fedab71206d70ef293c617b22a4723b17f1fb14ede944e9a",
+      "answerSha256": "563e34ee3aa19935a25fe956b363d6970fab1a464df909531d460a61cefac511",
+      "decision": "corrected",
+      "finding": "明确可中断获取及获取失败不解锁",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "f66ca286fd4996e1d61f75bb2ebed5d758b1a8645a74742c71f05cefaa12dca9",
+        "expected": [
+          "2",
+          "1",
+          "0"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/24",
+      "title": "公平锁是否一定比非公平锁更适合生产？",
+      "sourceKey": "5ee7ecbffee26deb80f04708c6a081d74e3b61178681734097f0885b06252bab",
+      "answerSha256": "d1e2b452240364c0af2ddced6c2b89a7b8f5164709bdd65cff6400c3a2c7ba8d",
+      "decision": "corrected",
+      "finding": "补无参 tryLock 不遵守公平排队的边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/25",
+      "title": "读写锁为什么在读多场景也可能没有收益？",
+      "sourceKey": "07ed3065e63b47f92092a78d9426259b07ead00b1ef6f5e41375aca33385a1a9",
+      "answerSha256": "9f7f3ebf7b378aa5fd857ab4c635c664b05c958a6f3d73723f906ddd33ae6c33",
+      "decision": "corrected",
+      "finding": "区分短读协调成本、写等待与读锁升级风险",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantReadWriteLock.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/26",
+      "title": "Condition 如何避免丢失唤醒？",
+      "sourceKey": "16ff5668377bd7e7a11286dc6bb6226349d44c5fe24c4bf716e41a71b4ac08c1",
+      "answerSha256": "16474dcd52a222ab5cf94a7af61624b905103b05ed6d30bf7c9d93c2ddf2e811",
+      "decision": "corrected",
+      "finding": "用提前通知场景验证谓词持久化",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/Condition.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "639d3d3d0d2647d854f80afda5ed3ea730037172559f9113bfe700540669c56b",
+        "expected": [
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/27",
+      "title": "Future.get 没有超时会带来什么风险？",
+      "sourceKey": "c87aa9a57fe82d311d4ff08676d867931ce236a2e029093b45d64d770e86854a",
+      "answerSha256": "3554270eeba34f181d50278fb6515fb8dea510405028f7970ffdddce3b837141",
+      "decision": "corrected",
+      "finding": "验证 get 超时后 Future 仍可完成",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Future.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "66775d70121debde1f26d33d2a4f3fbbf0bee95891848408378a2568136b0bca",
+        "expected": [
+          "false",
+          "42"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/28",
+      "title": "CompletableFuture 的异常为什么容易被忽略？",
+      "sourceKey": "6be2f1750c5eb473b1c5c197167dd8932efe68e8f3ad972bc884e5ceb7d9faf3",
+      "answerSha256": "4c6df16a58c30c070e93f27887302e63ee3f2d6d23059ec574639a8ec5925465",
+      "decision": "corrected",
+      "finding": "明确失败观察、恢复决策与新派生阶段",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "b61d725b6523bc8e0b39c1c8013120f623b339478ff3960d63e97bf564fb2a99",
+        "expected": [
+          "true",
+          "7"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/29",
+      "title": "thenApply 与 thenCompose 解决的问题有何不同？",
+      "sourceKey": "3a4cf3d57aec0dde6265919a00f6d3158f401b2e6f535ada37f4d05a297c7e90",
+      "answerSha256": "c7241f2b2b80f004b2c1c8843e02988cd4fdecb3e28bc4c92488aafc80329a53",
+      "decision": "corrected",
+      "finding": "给出嵌套与展平 Future 的可执行对照",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "2ef05214a07d0124d198f0fd55a4e9b8fdadb816d565839855daa2cff74ce0af",
+        "expected": [
+          "3",
+          "3"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/30",
+      "title": "异步方法为什么可能丢失 MDC 日志上下文？",
+      "sourceKey": "d62726d8e44edd49be4f019e672e1bce8a44909a344601749f955afb4cceded0",
+      "answerSha256": "eb32b2b105c2264a73c5cc5b75dcbc556e061c0e2dca3262857eade4f91ff9bd",
+      "decision": "corrected",
+      "finding": "区分提交时捕获与执行线程旧值恢复",
+      "references": [
+        "https://www.slf4j.org/api/org/slf4j/MDC.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/31",
+      "title": "如何在不使用 sleep 的情况下编写并发测试？",
+      "sourceKey": "1031127a3c59805d62e2bee5f02a92d642f529ad6ef99beb7f1920208c34483f",
+      "answerSha256": "4de9b3ed3f101e35088d799b382a18a414fc1d92a255aa1dc8af19d2d64b5461",
+      "decision": "corrected",
+      "finding": "去掉转账模板，验证闸门交付及测试同步边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CountDownLatch.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "f0e87592066b20f58273dd68fbca874c0aa652e134c7b7f866edbfa91a9c7f4d",
+        "expected": [
+          "42"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/32",
+      "title": "死锁产生需要满足哪些条件，工程上怎样规避？",
+      "sourceKey": "eaeb456f27d3e61c04f390fa7b3a9a467c6e94e1511d7c48057910bd3f385553",
+      "answerSha256": "908c663bc9be5b918b7a4467bcc0938e352577419bf0833dfc98d969673bb70a",
+      "decision": "corrected",
+      "finding": "按账户锁序说明打破等待环和业务回退",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/Lock.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/33",
+      "title": "活锁与死锁在监控上有哪些不同？",
+      "sourceKey": "4beed7f341dbba3d6ee8cba90ea7c84162114c926325267669289a5cd74e8ecf",
+      "answerSha256": "d3b545360467bd3df77f01cdef0df9da3462a9fa4de04a1d88bd0aa6ad4b330c",
+      "decision": "corrected",
+      "finding": "原锁序案例未解释活锁，补完成率与重试证据",
+      "references": [
+        "https://docs.oracle.com/javase/tutorial/essential/concurrency/starvelive.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/34",
+      "title": "线程饥饿为什么不一定伴随死锁？",
+      "sourceKey": "93be9b78f7be48c2ad7bc0280e664aa3652de6e47657e4a7f8915b80ac193b3a",
+      "answerSha256": "4a1d52ee501dbcd69545236cb0e75bf2f0d2ebe0eb8e69716ee0e02a1307bbf8",
+      "decision": "corrected",
+      "finding": "补持续高优先级输入下的局部饥饿",
+      "references": [
+        "https://docs.oracle.com/javase/tutorial/essential/concurrency/starvelive.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/35",
+      "title": "同一线程池中父任务等待子任务为什么危险？",
+      "sourceKey": "6e0cce006d168d005ee5ec8ae62cd6127cb7b0b1db2539375b9af47a9ce6a2e2",
+      "answerSha256": "29a5d7ccfbf8acba600622a4391662ea1595d0f9a95f053bed43105f5398770f",
+      "decision": "corrected",
+      "finding": "用可结束反例复现同池父子资源不足",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "800a4de6d68c925f705aff15c8668065bcc4c54a1ea08edfc7cedd469f230fd0",
+        "expected": [
+          "-1"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/36",
+      "title": "为什么多个线程打印顺序不能证明内存模型正确性？",
+      "sourceKey": "71748f957e517eda973974b7cbbfa86803fd1bdb1c56c930a3e500c844664048",
+      "answerSha256": "df4a3c3cfd3f66dc877ab39972c7ba280f94f1d03723228082e1e81fa7b87e25",
+      "decision": "corrected",
+      "finding": "明确输出可能改变待测关系，未复现不是证明",
+      "references": [
+        "https://github.com/openjdk/jcstress"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/37",
+      "title": "共享 boolean 停止标志什么时候需要 volatile？",
+      "sourceKey": "108047d3ff0dec53459ebe58a5a544475dd4dcb6898c1e15d58b846e59b31d6f",
+      "answerSha256": "4c1f083e871775a89cc9c3a3f406b12b3b18ac792e6e14c4a72a45fc733209a9",
+      "decision": "corrected",
+      "finding": "补可见停止标志不能唤醒阻塞操作",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/38",
+      "title": "final 字段的初始化安全是否允许 this 逃逸？",
+      "sourceKey": "582d4741be1455b75b5c963eff293de9105ac017f6a72a11336860d9b4488fb8",
+      "answerSha256": "673912adc53d5d1e16868ae1c5c6cfffee2ee22b68d922e22c11d9411adab25a",
+      "decision": "corrected",
+      "finding": "构造器回调稳定暴露 final 默认值",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "daf1e87b2930231c793b09e562e51e24e560490ebd16153918a5e74269cd424b",
+        "expected": [
+          "0",
+          "42"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/39",
+      "title": "如何为共享缓存实现安全发布？",
+      "sourceKey": "52369865ac48d71de422b72bea96d1a886ce821b656fb54fa720c85a26da4d40",
+      "answerSha256": "4868f9c07df2a2fb3bfac52e0817146c4c30cbb687a4ebe8e56a971879f438a1",
+      "decision": "corrected",
+      "finding": "补发布前复制和外部输入后续修改",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "4f24a912457e7a23e9cd6761cd0a78bfb15603360baa3a1ce51811f9facdca2f",
+        "expected": [
+          "old"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/40",
+      "title": "为什么多个 volatile 字段不能自动组成一致快照？",
+      "sourceKey": "8a31c4d3f81c8ed96220154d20c5e1c4aa546e2219bb5801698a6544c1a04595",
+      "answerSha256": "5ca9608b8e422f29f504d5de22224c4a39438e5799ed7bd4bb5d329a39c581aa",
+      "decision": "corrected",
+      "finding": "具体演示多 volatile 的混合版本",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "b5f073282ff0d4ba2bd2e8e84b935bac5beb8a2627b28ab557668f653f7bf567",
+        "expected": [
+          "2 / 100",
+          "2 / 200"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/41",
+      "title": "如何用生产者消费者模型处理过载？",
+      "sourceKey": "b9cb6921ec9f6467146a40f21df3fc6021b650265e58dbf412ae3dafab9b85f2",
+      "answerSha256": "34019d9f600087219a9b766e710922bd168798e656dfaed0075651459dedbcd5",
+      "decision": "corrected",
+      "finding": "补过载速率模型、队列年龄与接收反馈",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/BlockingQueue.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/42",
+      "title": "定时任务为什么可能越跑越慢？",
+      "sourceKey": "4dc3de9fd65fd19eebb228af914311c449bf1af93f6b8e91acc9b29243af90c9",
+      "answerSha256": "945328afacc2253c28e252373f57a0c6abe23c773cd77b6e676b5b023d01b907",
+      "decision": "corrected",
+      "finding": "纠正周期任务迟到与同任务重叠的混淆",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ScheduledThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/43",
+      "title": "Timer 与 ScheduledExecutorService 的选择依据是什么？",
+      "sourceKey": "f93b7fef4ac4581b84637d97e5e2e4bc5007a4d9a972d40d4b636871427e9605",
+      "answerSha256": "526b8b49d42d3fc265f84daa7294bef71cd3876ca256e9ccf16bb2fce913dfe9",
+      "decision": "corrected",
+      "finding": "验证周期任务异常停止但其他任务仍可执行",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ScheduledExecutorService.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "ea4f1a4ba1a3b186ff8cd8ed1349e2f2376515fe1b7652f29a310a6f377246ca",
+        "expected": [
+          "true / false",
+          "7"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/44",
+      "title": "如何让并发任务失败后释放许可和锁？",
+      "sourceKey": "d4de2cf7d45c8448155ec92eb55cf014c4bc5a910c1640d7456cdbc0e9ab6f2e",
+      "answerSha256": "4d74a27b966a0ce4915df7a22ce51097edbfe0004ad15cdbbf38bf2e305ce781",
+      "decision": "corrected",
+      "finding": "补启动前取消不执行 finally 的资源责任",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Semaphore.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "3b7a45c15606a5f5410a86d21bf1a2a4e48356d722ee789aff20cf58df0de15c",
+        "expected": [
+          "1"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/45",
+      "title": "阻塞方法返回超时后，底层工作是否一定停止？",
+      "sourceKey": "8fbd3e03906d56cd267adce3337fb5a8c0c35c9df1de89d5d3a465388f42a692",
+      "answerSha256": "5b8dc470be1d98fb409d8e3700eae96a5f199897bfd84db9d7d5934a98a272c3",
+      "decision": "corrected",
+      "finding": "验证 CompletableFuture 取消与实际退出分离",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "3eda8d56061087964b251c8c9ca9dc3da9704b04b4478655e02994977f3d9923",
+        "expected": [
+          "true / 1"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/46",
+      "title": "线程安全对象是否等价于业务操作线程安全？",
+      "sourceKey": "9dc4e25ca774c056a434a61cb90122fb2ec07e5ceaf64ac3317c1c3e9fe5a144",
+      "answerSha256": "cab7a30fb92075b4d9fb3b5e5cee3ac0d87642a2426f80458c14ad2bf034ad21",
+      "decision": "corrected",
+      "finding": "用同步列表的检查新增交错验证业务不原子",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collections.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "32ccf43cb74496dd2d646dd00ca9a2180a671a28c8cf6a4344f47131f0d880b5",
+        "expected": [
+          "[A, A]"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/47",
+      "title": "如何识别伪共享带来的性能退化？",
+      "sourceKey": "7c4bc373fdd1084f4a6cc747fa5664477cf765f4f416d3d0a43c9f43029d15ed",
+      "answerSha256": "afe254e39c4c21807811aa5ca528b6664d2d632c10244926eb379b44b8c17050",
+      "decision": "corrected",
+      "finding": "区分伪共享与锁争用，要求硬件及布局证据",
+      "references": [
+        "https://github.com/openjdk/jmh/tree/master/jmh-samples/src/main/java/org/openjdk/jmh/samples"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/48",
+      "title": "如何设计可重入方法中的锁粒度？",
+      "sourceKey": "d9c8688021a64cfa5a7c1b40180f9de58ed1944cd069e00a5c7df86458157383",
+      "answerSha256": "284953e9488624adb315a3484a407a5c41405b3d188ab36cd6c9c960f7178f75",
+      "decision": "corrected",
+      "finding": "原锁选型案例不足，改为组合不变式及嵌套边界",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "concurrency-basics/49",
+      "title": "中断标志的读取方法为何容易用错？",
+      "sourceKey": "7e583ca1a53194fb3bc0dd34f5a460485ed0b179688d876d992a6be62aa52f38",
+      "answerSha256": "eed67b900471b70a318920fc2db9003fca2f0787853b9b3aa82b96e1ec7441cc",
+      "decision": "corrected",
+      "finding": "验证只读与读清中断标志方法",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "df7da07836258cb694189b60a840dd057492d1da2a1310daee91e6bbac52e6eb",
+        "expected": [
+          "true",
+          "true",
+          "true",
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "concurrency-basics/50",
+      "title": "线程转储中的 WAITING 一定意味着故障吗？",
+      "sourceKey": "d8ea0021330f8014367684be4c6ca5d52f371579bdb6b3a856a5e79c3c20b64c",
+      "answerSha256": "2ba08365dfffdb0e5e0d23d051f22c53d947e1c1380a968ae2fb1d575b4ce24d",
+      "decision": "retained",
+      "finding": "保留正常 WAITING 与故障进展区分",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.State.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "legacy/18",
+      "title": "进程与线程区别？线程有哪些状态",
+      "sourceKey": "a1e15f567d974dce87bc53de00d0ed32ba82d9721149ec40baf5d2cc3a47b39c",
+      "answerSha256": "eaee233b0e6c08f4c497a6cd9e0ed2f4366e8b56a439914d0c28b360bd4a6ca2",
+      "decision": "corrected",
+      "finding": "去掉转账模板，核对 Java 状态与系统状态",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.State.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "70045457a710a9cdd702e6d5ecf511a223f03d04b3287bd851006551d30df983",
+        "expected": [
+          "NEW",
+          "TERMINATED"
+        ]
+      }
+    },
+    {
+      "key": "legacy/19",
+      "title": "创建线程的方式？start 与 run 区别",
+      "sourceKey": "ba787b1b741992464b2cc5357d25be821361033dd281f6fdeb5c5de119396c97",
+      "answerSha256": "a257d1ca29a9ee85823ad3cb328c3e397bb00d123fcfb2f1bc9a4d4865ec54d9",
+      "decision": "corrected",
+      "finding": "对照直接 run 和真正 start",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "94f68bcf9cb412a3316e85bb5b7e420bd48f34ca13719a1652aeb2a9ad2f80e8",
+        "expected": [
+          "true",
+          "false"
+        ]
+      }
+    },
+    {
+      "key": "legacy/20",
+      "title": "sleep 与 wait 区别？notify 与 notifyAll 区别",
+      "sourceKey": "272d8add218c747673b08c84de2f02cf7c12e23fbd0645aa88c9b8bad7b5578b",
+      "answerSha256": "97baf867f6867afdbcacf29af5696c915b5ad81e6a6f6273c105f68e22e7092f",
+      "decision": "corrected",
+      "finding": "用多谓词关闭场景区分等待、休眠及通知",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "legacy/21",
+      "title": "synchronized 的使用方式与锁的范围",
+      "sourceKey": "08957ec30790254da78550ccee08cc8ec18a8f2633b96bf64abe248dbc2b1cc0",
+      "answerSha256": "1c66feb7f48dbc2cdae8ba868c09ff61ccb8732734bfc6f2e90c97d0f2397b1f",
+      "decision": "corrected",
+      "finding": "统一私有锁保护读写，并区分解锁与业务回滚",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "7571acf49906e6b7c8f24b2dc0132e3f7102098f8b6dd234a07320f018351428",
+        "expected": [
+          "2"
+        ]
+      }
+    },
+    {
+      "key": "legacy/22",
+      "title": "volatile 的作用？能否保证原子性",
+      "sourceKey": "8a087c68819ac19260caf4725ce1b3bf5404fe22b9dcda718fec66011c8b99f4",
+      "answerSha256": "8174154db8d8ffc0ee04077ea3ac294f00df04be595f02960c6f1fd48d04fbb4",
+      "decision": "corrected",
+      "finding": "演示 volatile 读改写仍丢更新",
+      "references": [
+        "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "18005279387d1ca82c3722fb615530d5f2734fa172556734786e936fe44b92da",
+        "expected": [
+          "1"
+        ]
+      }
+    },
+    {
+      "key": "legacy/23",
+      "title": "线程池核心参数与任务提交流程",
+      "sourceKey": "548e614d356ee7fd86e5d15b25747f98da2230d039e60a32b8e57e5384bd4824",
+      "answerSha256": "7eda4a8ad64c171fe66e4f0baf4f3a91069821e8a2b4f646ed6e8cbd76b02ccb",
+      "decision": "corrected",
+      "finding": "明确七参数及入队、扩容、拒绝完整流程",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "legacy/24",
+      "title": "为什么不建议用 Executors 创建线程池",
+      "sourceKey": "99f3692a41bbdacf549672f400a5e5c67e62c712ad085e2cdee1f7ece3a2ad22",
+      "answerSha256": "a0c99085cbd8a97256b82c72b23599411ad87c26707aa265a686cda602996b09",
+      "decision": "corrected",
+      "finding": "按具体 Executors 工厂区分风险",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Executors.html"
+      ],
+      "validation": {
+        "kind": "scenario-review",
+        "meaning": "核对具体输入、操作、可观察结果与失败路径；并非生产性能或故障演练实测"
+      }
+    },
+    {
+      "key": "legacy/25",
+      "title": "ThreadLocal 是什么？为什么会内存泄漏",
+      "sourceKey": "bef2dc879853ae0c23093a626d510d61f28dcd11d3e1555a30d9c68253784771",
+      "answerSha256": "86943ff2bd797617eb82ea70c5e30cb7afba73c80a92cf6a616c3d37320d340d",
+      "decision": "corrected",
+      "finding": "验证嵌套上下文结束后恢复外层",
+      "references": [
+        "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ThreadLocal.html"
+      ],
+      "validation": {
+        "kind": "java-output",
+        "codeSha256": "788e6fb55c827f9ee93d9712152c7f5653bcf233664c86c1b5a6fbde4cbe3539",
+        "expected": [
+          "B",
+          "A"
+        ]
+      }
+    }
+  ]
+}

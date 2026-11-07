@@ -1,0 +1,10 @@
+CREATE TABLE ai_documents (
+ id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(200) NOT NULL, content MEDIUMTEXT NOT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE ai_chunks (
+ id BIGINT AUTO_INCREMENT PRIMARY KEY, source_key VARCHAR(100) NOT NULL,
+ fingerprint VARCHAR(64) NOT NULL, title VARCHAR(1000) NOT NULL, question_id BIGINT,
+ chunk_no INT NOT NULL, content TEXT NOT NULL, embedding MEDIUMTEXT, embedding_model VARCHAR(300),
+ UNIQUE(source_key,chunk_no)
+);

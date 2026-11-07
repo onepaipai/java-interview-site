@@ -1,0 +1,147 @@
+.ai-panel {
+  margin-top: 24px;
+  border: 1px solid #ddd8f0;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+}
+.ai-panel-toggle {
+  border: 0;
+  border-radius: 0;
+  background: var(--accent-soft);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 19px 23px;
+  text-align: left;
+  color: var(--muted);
+  gap: 15px;
+}
+.ai-panel-toggle strong {
+  display: block;
+  font-size: 16px;
+}
+.ai-panel-toggle small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.ai-panel-body {
+  padding: 23px;
+}
+.ai-options {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+.ai-options label {
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  display: flex;
+}
+.ai-options input {
+  width: auto;
+}
+.ai-options button {
+  margin-left: auto;
+  font-size: 12px;
+  min-height: 32px;
+}
+.ai-shortcuts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.ai-shortcuts button {
+  font-size: 13px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.ai-turn {
+  padding: 19px;
+  margin: 16px 0;
+  background: var(--surface-2);
+  border-radius: 9px;
+  border: 1px solid var(--border);
+}
+.ai-turn.user {
+  margin-left: 30px;
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+}
+.ai-turn > strong {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 12px;
+}
+.ai-turn.user > p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ai-sources {
+  padding: 13px 0;
+  font-size: 13px;
+}
+.ai-sources details {
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  margin: 8px 0;
+  border-radius: 7px;
+}
+.ai-sources p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.7;
+  max-height: 300px;
+  overflow: auto;
+}
+.ai-compose {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.ai-compose button {
+  justify-self: end;
+}
+.ai-caption,
+.ai-setup {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.ai-loading {
+  color: var(--accent);
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  .ai-panel-toggle,
+  .ai-panel-body {
+    padding: 16px;
+  }
+  .ai-turn {
+    padding: 14px;
+  }
+  .ai-turn.user {
+    margin-left: 10px;
+  }
+  .ai-compose textarea {
+    font-size: 16px;
+  }
+  .ai-shortcuts button {
+    min-height: 42px;
+  }
+  .ai-options > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "publication": "explanations-v5",
+  "reviewedOn": "2026-10-15",
+  "scope": "仅以下题目按机制、边界、取舍与反例重写；不代表全库深度审查完成。",
+  "criteria": [
+    "回答直接给结论和前提",
+    "分析说明机制、失败原因与取舍",
+    "案例含具体输入、操作、可观察结果和失败路径",
+    "总结保留成立条件，不用口号代替知识"
+  ],
+  "questions": [
+    {
+      "key": "java-language/2",
+      "title": "BigDecimal 在金额计算中有哪些常见陷阱？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "collections/1",
+      "title": "HashMap 的容量规划如何影响延迟和内存？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "concurrency-basics/1",
+      "title": "volatile 能解决哪些可见性问题，不能解决什么？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "jvm-basics/7",
+      "title": "为什么同样 Xmx 的两个服务 RSS 差异很大？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "spring-basics/3",
+      "title": "单例 Bean 为什么不能直接保存请求级状态？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "database-basics/3",
+      "title": "最左前缀原则为什么不能机械理解为后续列完全无用？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "network/4",
+      "title": "TCP 是字节流为什么会出现所谓粘包？",
+      "previousContentSource": "question"
+    },
+    {
+      "key": "ai-basics/5",
+      "title": "幻觉产生后怎样从系统层面降低损失？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "concurrency-advanced/19",
+      "title": "CompletableFuture.allOf 为什么不是完整的失败取消方案？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "jvm-advanced/1",
+      "title": "如何制定以尾延迟为目标的 GC 调优方案？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "spring-advanced/2",
+      "title": "REQUIRED 与 REQUIRES_NEW 在连接占用上有什么区别？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "database-advanced/1",
+      "title": "如何按真实负载设计复合索引而非凭经验加列？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "cache-messaging/1",
+      "title": "缓存旁路模式中为什么通常先更新数据库再删缓存？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "algorithms/1",
+      "title": "手写 LRU 缓存应怎样保证获取和淘汰效率？",
+      "previousContentSource": "question"
+    },
+    {
+      "key": "ai-advanced/1",
+      "title": "如何为 RAG 建立可归因的分层评测？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "banking/8",
+      "title": "为什么资金流程不能把超时直接判定为失败？",
+      "previousContentSource": "question"
+    },
+    {
+      "key": "distributed/7",
+      "title": "分布式系统为什么难以判断一次超时操作是否成功？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "reliability/4",
+      "title": "监控直方图聚合时为什么不能直接平均各节点 P99？",
+      "previousContentSource": "question"
+    },
+    {
+      "key": "architecture/3",
+      "title": "如何判断一个服务拆分是否切断了事务不变式？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "ai-production/6",
+      "title": "多租户 AI 系统怎样防止跨租户检索？",
+      "previousContentSource": "topic"
+    },
+    {
+      "key": "system-design/5",
+      "title": "设计订单中心怎样处理支付成功但订单更新失败？",
+      "previousContentSource": "topic"
+    }
+  ],
+  "editorialRule": "直接回答已讲明机制时不再另设分析；保留分析必须增加独立的机制、取舍或反例。",
+  "analysisOmitted": [
+    "concurrency-basics/1",
+    "spring-basics/3",
+    "database-basics/3",
+    "network/4",
+    "concurrency-advanced/19",
+    "algorithms/1",
+    "distributed/7"
+  ]
+}

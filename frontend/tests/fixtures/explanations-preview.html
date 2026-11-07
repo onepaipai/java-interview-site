@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>经典题解 · 知序</title>
+</head>
+<body class="explanation-preview">
+  <header class="preview-header">
+    <div class="preview-header-inner">
+      <a class="preview-brand" href="/#/catalog" aria-label="知序题库首页">
+        <span class="preview-brand-mark"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+        <strong>知序</strong><span class="preview-brand-divider"></span><span class="preview-brand-label">经典题解</span>
+      </a>
+      <a class="preview-back" href="/#/catalog">返回题库 <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <div class="preview-layout">
+    <aside class="preview-sidebar" aria-label="题目与目录">
+      <p class="preview-sidebar-label">题目样例</p>
+      <div id="sample-links" class="preview-sample-links"></div>
+      <div class="preview-sidebar-toc">
+        <p class="preview-sidebar-label">本题目录</p>
+        <div id="desktop-toc" class="preview-toc"></div>
+      </div>
+    </aside>
+    <main class="preview-main">
+      <div class="preview-mobile-picker"><label for="sample-picker">切换题目</label><select id="sample-picker"></select></div>
+      <div class="preview-breadcrumb"><a href="/#/catalog">知识目录</a><span>/</span><span id="module-name"></span></div>
+      <div class="preview-title-block">
+        <div class="preview-title-tags"><span class="preview-experience">7–10 年</span><span>经典面试题</span></div>
+        <h1 id="question-title"></h1>
+        <div class="preview-question-meta"><span id="question-version"></span><details class="preview-references"><summary id="reference-label">参考资料</summary><div id="reference-links"></div></details></div>
+      </div>
+      <div id="mobile-toc" class="preview-mobile-toc" aria-label="本题目录"></div>
+      <div id="answer" class="markdown"></div>
+      <footer class="preview-footer"><span class="preview-footer-dot"></span>知序 · 把知识讲清楚</footer>
+    </main>
+  </div>
+  <dialog id="diagram-dialog" class="preview-diagram-dialog" aria-label="流程图大图">
+    <div class="preview-diagram-heading"><strong>流程图</strong><button type="button" id="close-diagram" aria-label="关闭大图">关闭 <span aria-hidden="true">×</span></button></div>
+    <img id="diagram-large" alt="">
+  </dialog>
+  <script id="sample-data" type="application/json">__SAMPLE_DATA__</script>
+  <script type="module" src="/src/explanationPreview.ts"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+target/
+data/
+.env
+*.log
+backups/
+.playwright/
+
+frontend/test-results/
+release/
+.zcode/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

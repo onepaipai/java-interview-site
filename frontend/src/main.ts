@@ -1,0 +1,11 @@
+import { createApp } from 'vue';
+import App from './App.vue';
+import './styles/theme.css';
+import './styles/theme-dark.css';
+import './styles/navigation.css';
+import 'highlight.js/styles/github.css';
+import './styles/explanations.css';
+import './styles/reader.css';
+import './styles/learning.css';
+import './styles/catalog.css';
+createApp(App).mount('#app');

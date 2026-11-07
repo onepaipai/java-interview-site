@@ -1,0 +1,11 @@
+{
+  "legacy/41": "sql-safety", "legacy/55": "legacy-patterns", "legacy/56": "legacy-git",
+  "legacy/61": "hash-map", "legacy/62": "concurrent-map", "legacy/67": "coordination",
+  "legacy/72": "threadlocal", "legacy/73": "g1", "legacy/74": "classload",
+  "legacy/83": "bean-life", "legacy/89": "mvc", "legacy/90": "legacy-mybatis",
+  "legacy/91": "async-event", "legacy/97": "logs-basic", "legacy/99": "pagination-basic",
+  "legacy/104": "legacy-redis-types", "legacy/109": "message-ack", "legacy/113": "legacy-algorithms",
+  "legacy/115": "rag-basics", "legacy/116": "prompt", "legacy/117": "tools-basic",
+  "legacy/118": "ai-runtime-basic", "legacy/120": "dist-transactions", "legacy/141": "backup-dr",
+  "legacy/147": "capacity-drill"
+}

@@ -1,0 +1,89 @@
+/* 深色主题：以 token 重映射为主，个别组件在此追加覆盖。由 html[data-theme='dark'] 启用。 */
+html[data-theme='dark'] {
+  --accent: #8f84ff;
+  --accent-hover: #a49bff;
+  --accent-soft: #2c2850;
+  --accent-muted: #9d94cf;
+  --accent-ring: #5b539a;
+  --text: #d5dbe8;
+  --muted: #8a94a8;
+  --border: #2c3546;
+  --border-strong: #3a4459;
+  --surface: #1a2130;
+  --surface-2: #151b28;
+  --surface-3: #232c3e;
+  --background: #10151f;
+  --danger: #e07a8a;
+  --danger-soft: #382229;
+  --success: #7db89a;
+  --success-soft: #1c2b24;
+  --success-border: #2c4237;
+  --warn: #c9a26a;
+  --warn-soft: #2e2718;
+  --inverse-surface: #131926;
+  --inverse-text: #c9d2e2;
+  color-scheme: dark;
+}
+
+/* 高亮代码：github 亮色 token 在暗色下的对应值 */
+html[data-theme='dark'] .hljs {
+  color: #c9d1d9;
+}
+html[data-theme='dark'] .hljs-comment,
+html[data-theme='dark'] .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+html[data-theme='dark'] .hljs-keyword,
+html[data-theme='dark'] .hljs-selector-tag,
+html[data-theme='dark'] .hljs-literal,
+html[data-theme='dark'] .hljs-section,
+html[data-theme='dark'] .hljs-doctag,
+html[data-theme='dark'] .hljs-type,
+html[data-theme='dark'] .hljs-name,
+html[data-theme='dark'] .hljs-strong {
+  color: #ff7b72;
+}
+html[data-theme='dark'] .hljs-string,
+html[data-theme='dark'] .hljs-regexp,
+html[data-theme='dark'] .hljs-addition,
+html[data-theme='dark'] .hljs-attribute,
+html[data-theme='dark'] .hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+html[data-theme='dark'] .hljs-number,
+html[data-theme='dark'] .hljs-symbol,
+html[data-theme='dark'] .hljs-bullet,
+html[data-theme='dark'] .hljs-variable,
+html[data-theme='dark'] .hljs-template-variable,
+html[data-theme='dark'] .hljs-link,
+html[data-theme='dark'] .hljs-selector-attr,
+html[data-theme='dark'] .hljs-selector-pseudo {
+  color: #79c0ff;
+}
+html[data-theme='dark'] .hljs-title,
+html[data-theme='dark'] .hljs-title.class_,
+html[data-theme='dark'] .hljs-title.function_ {
+  color: #d2a8ff;
+}
+html[data-theme='dark'] .hljs-built_in,
+html[data-theme='dark'] .hljs-class .hljs-title {
+  color: #ffa657;
+}
+html[data-theme='dark'] .hljs-attr,
+html[data-theme='dark'] .hljs-property {
+  color: #79c0ff;
+}
+html[data-theme='dark'] .hljs-deletion {
+  color: #ffdcd7;
+  background: #67060c;
+}
+html[data-theme='dark'] .hljs-emphasis {
+  font-style: italic;
+}
+
+/* 滚动条与选区 */
+html[data-theme='dark'] ::selection {
+  background: #39346b;
+  color: #e6e9f5;
+}

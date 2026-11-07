@@ -1,0 +1,153 @@
+{
+  "generatedAt": "2026-10-24T13:01:20.432Z",
+  "meaning": "结构覆盖不等于事实审查完成；sharedTopic 需要逐题核对分析、案例与问题是否对应。",
+  "modules": [
+    {
+      "module": "java-language",
+      "total": 61,
+      "questionSpecific": 13,
+      "sampleSpecific": 1,
+      "sharedTopic": 47
+    },
+    {
+      "module": "collections",
+      "total": 56,
+      "questionSpecific": 56,
+      "sampleSpecific": 0,
+      "sharedTopic": 0
+    },
+    {
+      "module": "concurrency-basics",
+      "total": 58,
+      "questionSpecific": 58,
+      "sampleSpecific": 0,
+      "sharedTopic": 0
+    },
+    {
+      "module": "jvm-basics",
+      "total": 57,
+      "questionSpecific": 50,
+      "sampleSpecific": 0,
+      "sharedTopic": 7
+    },
+    {
+      "module": "spring-basics",
+      "total": 59,
+      "questionSpecific": 59,
+      "sampleSpecific": 0,
+      "sharedTopic": 0
+    },
+    {
+      "module": "database-basics",
+      "total": 59,
+      "questionSpecific": 59,
+      "sampleSpecific": 0,
+      "sharedTopic": 0
+    },
+    {
+      "module": "network",
+      "total": 56,
+      "questionSpecific": 50,
+      "sampleSpecific": 0,
+      "sharedTopic": 6
+    },
+    {
+      "module": "ai-basics",
+      "total": 54,
+      "questionSpecific": 5,
+      "sampleSpecific": 0,
+      "sharedTopic": 49
+    },
+    {
+      "module": "concurrency-advanced",
+      "total": 62,
+      "questionSpecific": 51,
+      "sampleSpecific": 0,
+      "sharedTopic": 11
+    },
+    {
+      "module": "jvm-advanced",
+      "total": 60,
+      "questionSpecific": 14,
+      "sampleSpecific": 0,
+      "sharedTopic": 46
+    },
+    {
+      "module": "spring-advanced",
+      "total": 60,
+      "questionSpecific": 60,
+      "sampleSpecific": 0,
+      "sharedTopic": 0
+    },
+    {
+      "module": "database-advanced",
+      "total": 61,
+      "questionSpecific": 52,
+      "sampleSpecific": 0,
+      "sharedTopic": 9
+    },
+    {
+      "module": "cache-messaging",
+      "total": 57,
+      "questionSpecific": 50,
+      "sampleSpecific": 0,
+      "sharedTopic": 7
+    },
+    {
+      "module": "algorithms",
+      "total": 54,
+      "questionSpecific": 51,
+      "sampleSpecific": 0,
+      "sharedTopic": 3
+    },
+    {
+      "module": "ai-advanced",
+      "total": 54,
+      "questionSpecific": 4,
+      "sampleSpecific": 0,
+      "sharedTopic": 50
+    },
+    {
+      "module": "banking",
+      "total": 64,
+      "questionSpecific": 50,
+      "sampleSpecific": 0,
+      "sharedTopic": 14
+    },
+    {
+      "module": "distributed",
+      "total": 60,
+      "questionSpecific": 17,
+      "sampleSpecific": 0,
+      "sharedTopic": 43
+    },
+    {
+      "module": "reliability",
+      "total": 55,
+      "questionSpecific": 11,
+      "sampleSpecific": 0,
+      "sharedTopic": 44
+    },
+    {
+      "module": "architecture",
+      "total": 55,
+      "questionSpecific": 14,
+      "sampleSpecific": 0,
+      "sharedTopic": 41
+    },
+    {
+      "module": "ai-production",
+      "total": 56,
+      "questionSpecific": 3,
+      "sampleSpecific": 0,
+      "sharedTopic": 53
+    },
+    {
+      "module": "system-design",
+      "total": 57,
+      "questionSpecific": 4,
+      "sampleSpecific": 0,
+      "sharedTopic": 53
+    }
+  ]
+}

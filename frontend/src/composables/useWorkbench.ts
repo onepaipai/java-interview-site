@@ -7,12 +7,15 @@ import ModuleNavigator from '../components/ModuleNavigator.vue';
 import GlobalSearch from '../components/GlobalSearch.vue';
 import { readSetting, saveSetting, readScrollPositions, saveScrollPositions } from '../lib/storage';
 import { copyCodeButton } from '../lib/clipboard';
-import { confirmAction } from '../lib/confirm';
 import { api, ApiError } from '../lib/api';
 import { normalizePage, pageWithinTotal, PAGE_SIZE } from '../lib/navigation';
-import type { Question, QuestionSummary, Category, Page, IdResponse } from '../lib/types';
+import type { Question, QuestionSummary, Category, Page } from '../lib/types';
 import { useSession } from './useSession';
 import { useLearning } from './useLearning';
+import { createLinks } from './workbench/links';
+import { buildOutline, jumpTo, plain } from './workbench/render';
+import { createQuestionActions } from './workbench/questionActions';
+import { createEditorActions } from './workbench/editorActions';
 export function useWorkbench() {
   const { user, restore, authenticate, signOut } = useSession();
   const imageDialog = ref<HTMLDialogElement>();
@@ -92,22 +95,9 @@ export function useWorkbench() {
   );
   const renderedQuestion = computed(() => markdown(selected.value?.title || ''));
   const rendered = computed(() => renderAnswer(selected.value?.answer || ''));
-  const answerOutline = computed(() => {
-    if (
-      (selected.value?.answer.length || 0) < 400 &&
-      !rendered.value.includes('explanation-content')
-    ) {
-      return [];
-    }
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = rendered.value;
-    const headings = Array.from(wrapper.querySelectorAll('h1,h2,h3')).map((h) => ({
-      id: h.id,
-      label: h.textContent || '',
-      level: Number(h.tagName[1]),
-    }));
-    return headings.length >= 2 ? headings : [];
-  });
+  const answerOutline = computed(() =>
+    buildOutline(rendered.value, selected.value?.answer.length || 0),
+  );
   let historyIndex = Number(history.state?.zhixuIndex) || 0;
   let routeSequence = 0;
   let listSequence = 0;
@@ -120,100 +110,78 @@ export function useWorkbench() {
       noticeTimer = setTimeout(() => (notice.value = ''), 4000);
     }
   });
-  function plain(s: string) {
-    const element = document.createElement('div');
-    element.innerHTML = markdown(s);
-    element.querySelectorAll('.code-header').forEach((h) => h.remove());
-    element.querySelectorAll('img').forEach((i) => i.replaceWith(i.alt));
-    return (element.textContent || '').replace(/\s+/g, ' ').trim();
-  }
-  async function adoptAi(text: string) {
-    const q = selected.value;
+  const routeToken = () => routeSequence;
+  const routeSignal = () => routeController?.signal;
+  const { params, listLink, questionLink } = createLinks({ category, search, page, acceptedHash });
+  async function action(fn: () => Promise<void>, msg = '') {
+    if (busy.value) {
+      return;
+    }
+    error.value = '';
+    busy.value = true;
     const token = routeSequence;
-    if (!q) {
-      return;
-    }
-    if (text.length > 200000) {
-      error.value = 'AI 回答超过 200,000 个字符，请精简后再采用。';
-      return;
-    }
-    if (
-      q.answer &&
-      !(await confirmAction(
-        '使用 AI 回答进行编辑？',
-        '已有回答会保留到你点击保存为止。',
-        '进入编辑',
-      ))
-    ) {
-      return;
-    }
-    if (token !== routeSequence || selected.value?.id !== q.id) return;
-    await edit(q);
-    if (routeSequence === token + 1 && editor.value && editing.value?.id === q.id) {
-      answer.value = text;
+    try {
+      await fn();
+      if (msg) {
+        notice.value = msg;
+      }
+    } catch (e) {
+      if (token === routeSequence) {
+        error.value = e instanceof Error ? e.message : '操作失败，请重试';
+      }
+    } finally {
+      busy.value = false;
     }
   }
   function success(text: string) {
     notice.value = text;
   }
-  function remember() {
-    scrollPositions[acceptedHash.value] = window.scrollY;
-    saveScrollPositions(scrollPositions);
-  }
-  function params(p = page.value) {
-    const q = new URLSearchParams();
-    if (category.value) {
-      q.set('module', category.value);
-    }
-    if (search.value.trim()) {
-      q.set('search', search.value.trim());
-    }
-    if (p > 1) {
-      q.set('page', String(p));
-    }
-    return q;
-  }
-  function listLink(p = page.value) {
-    const q = params(p);
-    if (category.value) q.delete('module');
-    const source = new URL(acceptedHash.value, location.origin);
-    const weak = source.searchParams.get('weak') === '1';
-    const global = source.searchParams.get('global') === '1';
-    if (weak) q.set('weak', '1');
-    if (global) q.set('global', '1');
-    return (
-      (weak
-        ? '#/search'
-        : category.value
-          ? '#/module/' + category.value
-          : search.value.trim()
-            ? '#/search'
-            : '#/catalog') + (q.size ? '?' + q : '')
-    );
-  }
-  function questionLink(id: number, p = page.value) {
-    const q = params(p);
-    const source = new URL(acceptedHash.value, location.origin);
-    if (!category.value && search.value.trim()) q.set('global', '1');
-    if (source.searchParams.get('weak') === '1') q.set('weak', '1');
-    if (source.searchParams.get('global') === '1') q.set('global', '1');
-    return '#/question/' + id + (q.size ? '?' + q : '');
-  }
-  async function leave() {
-    if (!(dirty.value || extraDirty.value || uploading.value)) {
-      return true;
-    }
-    const discard = await confirmAction(
-      '放弃未保存的修改？',
-      '离开后，本次修改不会保存。',
-      '放弃修改',
-      true,
-    );
-    if (discard && editor.value) {
-      clearDraft();
-    }
-    return discard;
-  }
+  const questions = createQuestionActions({
+    acceptedHash,
+    search,
+    category,
+    page,
+    total,
+    items,
+    selected,
+    loading,
+    busy,
+    go,
+    action,
+    listLink,
+    questionLink,
+    routeToken,
+    routeSignal,
+  });
+  const editorActions = createEditorActions({
+    acceptedHash,
+    category,
+    search,
+    page,
+    total,
+    items,
+    selected,
+    error,
+    editor,
+    editing,
+    title,
+    answer,
+    moduleId,
+    difficulty,
+    dirty,
+    uploading,
+    extraDirty,
+    go,
+    applyRoute,
+    action,
+    startEdit,
+    clearDraft,
+    listLink,
+    questionLink,
+    params,
+    routeToken,
+  });
+  const { leave } = editorActions;
   async function go(hash: string, replace = false) {
     if (!(await leave())) {
       return;
@@ -434,25 +402,9 @@ export function useWorkbench() {
       }
     }
   }
-  async function action(fn: () => Promise<void>, msg = '') {
-    if (busy.value) {
-      return;
-    }
-    error.value = '';
-    busy.value = true;
-    const token = routeSequence;
-    try {
-      await fn();
-      if (msg) {
-        success(msg);
-      }
-    } catch (e) {
-      if (token === routeSequence) {
-        error.value = e instanceof Error ? e.message : '操作失败，请重试';
-      }
-    } finally {
-      busy.value = false;
-    }
+  function remember() {
+    scrollPositions[acceptedHash.value] = window.scrollY;
+    saveScrollPositions(scrollPositions);
   }
   async function login() {
     await action(async () => {
@@ -490,88 +442,6 @@ export function useWorkbench() {
     const path = category.value ? '#/module/' + category.value : term ? '#/search' : '#/catalog';
     await go(path + (term ? '?' + new URLSearchParams({ search: term }) : ''));
   }
-  async function paginate(delta: number) {
-    if (new URL(acceptedHash.value, location.origin).searchParams.get('weak') === '1') {
-      await go('#/search?weak=1&page=' + (page.value + delta));
-      return;
-    }
-    await go(listLink(page.value + delta));
-  }
-  async function open(id: number, p = page.value) {
-    await go(questionLink(id, p));
-  }
-  async function returnToList() {
-    const source = new URL(acceptedHash.value, location.origin);
-    if (source.searchParams.get('weak') === '1') {
-      const query = new URLSearchParams({ weak: '1', page: String(page.value) });
-      await go('#/search?' + query);
-      return;
-    }
-    if (source.searchParams.get('global') === '1') {
-      const query = new URLSearchParams({ global: '1', page: String(page.value) });
-      if (search.value) query.set('search', search.value);
-      await go('#/search?' + query);
-      return;
-    }
-    await go(listLink());
-  }
-  async function openSelectedModule() {
-    if (selected.value) await go('#/module/' + selected.value.category_id);
-  }
-  async function startReview() {
-    await go('#/search?weak=1');
-  }
-  async function updateProgress(
-    question: Question,
-    patch: Partial<Pick<Question, 'mastery' | 'favorite' | 'note'>>,
-    reviewed = false,
-    message = '学习记录已保存',
-  ) {
-    await action(async () => {
-      await api('/questions/' + question.id + '/progress', 'PUT', {
-        mastery: patch.mastery ?? question.mastery,
-        favorite: patch.favorite ?? question.favorite,
-        note: patch.note ?? question.note,
-        reviewed,
-      });
-      if (selected.value?.id === question.id) Object.assign(selected.value, patch);
-      if (
-        acceptedHash.value.includes('weak=1') &&
-        patch.mastery &&
-        patch.mastery !== 'NO' &&
-        patch.mastery !== 'PARTIAL'
-      ) {
-        const index = items.value.findIndex((item) => item.id === question.id);
-        if (index >= 0) {
-          items.value.splice(index, 1);
-          total.value = Math.max(0, total.value - 1);
-        }
-      }
-    }, message);
-  }
-  async function rateQuestion(mastery: string) {
-    const question = selected.value;
-    if (question) await updateProgress(question, { mastery }, true, '自评已保存');
-  }
-  async function updateFavorite(favorite: boolean) {
-    const question = selected.value;
-    if (question)
-      await updateProgress(question, { favorite }, false, favorite ? '已加入收藏' : '已取消收藏');
-  }
-  async function updateNote(note: string) {
-    const question = selected.value;
-    if (question && note !== question.note)
-      await updateProgress(question, { note }, false, '笔记已保存');
-  }
-  async function searchAll(term: string) {
-    const value = term.trim();
-    if (value) {
-      await go('#/search?search=' + encodeURIComponent(value));
-    }
-  }
-  async function openSearchQuestion(q: QuestionSummary, term: string, p = 1) {
-    await go('#/question/' + q.id + '?global=1&page=' + p + '&search=' + encodeURIComponent(term));
-  }
   async function showSearch() {
     await nextTick();
     if (globalSearch.value) {
@@ -589,136 +459,11 @@ export function useWorkbench() {
       saveSetting('zhixu-sidebar', sidebarCollapsed.value ? 'collapsed' : 'expanded');
     }
   }
-  async function edit(q: Question | null) {
-    const query = params();
-    if (!category.value && search.value.trim()) {
-      query.set('global', '1');
-    }
-    await go(
-      q
-        ? '#/question/' + q.id + '/edit' + (query.size ? '?' + query : '')
-        : '#/new' + (category.value ? '?module=' + category.value : ''),
-    );
-  }
-  async function cancel() {
-    await go(editing.value ? questionLink(editing.value.id) : listLink());
-  }
   /** 版本冲突后的重载：用户已明确选择，跳过放弃确认并保留本地草稿供恢复。 */
   async function reloadEditor() {
     history.replaceState({ zhixuIndex: historyIndex }, '', acceptedHash.value);
     await applyRoute(acceptedHash.value);
   }
-  function discardEditorDraft() {
-    clearDraft();
-    startEdit(editing.value);
-  }
-  async function save() {
-    if (uploading.value || !title.value.trim()) {
-      return;
-    }
-    await action(async () => {
-      const token = routeSequence;
-      const q = editing.value;
-      const result = await api<IdResponse>(
-        q ? '/admin/questions/' + q.id : '/admin/questions',
-        q ? 'PUT' : 'POST',
-        {
-          title: title.value.trim(),
-          categoryId: Number(moduleId.value),
-          answer: answer.value,
-          difficulty: difficulty.value,
-          sortOrder: q?.sort_order || 0,
-          tags: q?.tags || [],
-          version: q?.version,
-        },
-      );
-      if (token !== routeSequence) {
-        return;
-      }
-      editor.value = false;
-      clearDraft();
-      category.value = moduleId.value;
-      search.value = '';
-      page.value = 1;
-      await go('#/question/' + (q?.id || result.id) + '?module=' + moduleId.value, true);
-    }, '题目已保存');
-  }
-  async function removeQuestion() {
-    const q = selected.value;
-    if (
-      !q ||
-      !(await confirmAction('删除这道题目？', '题目及其回答将从题库中移除。', '删除题目', true))
-    ) {
-      return;
-    }
-    await action(async () => {
-      await api('/admin/questions/' + q.id, 'DELETE');
-      if (selected.value?.id !== q.id) {
-        return;
-      }
-      if (items.value.length === 1 && page.value > 1) {
-        page.value--;
-      }
-      await go(listLink(), true);
-    }, '题目已删除');
-  }
-  async function removeAnswer() {
-    const q = selected.value;
-    if (
-      !q ||
-      !(await confirmAction('删除回答？', '题目会保留，可以重新编写回答。', '删除回答', true))
-    ) {
-      return;
-    }
-    await action(async () => {
-      await api('/admin/questions/' + q.id, 'PUT', {
-        title: q.title,
-        categoryId: q.category_id,
-        difficulty: q.difficulty,
-        answer: '',
-        sortOrder: q.sort_order,
-        tags: q.tags,
-        version: q.version,
-      });
-      if (selected.value?.id === q.id) {
-        await applyRoute(acceptedHash.value);
-      }
-    }, '回答已删除');
-  }
-  async function stepQuestion(delta: number) {
-    if (loading.value || busy.value) return;
-    const index = items.value.findIndex((q) => q.id === selected.value?.id);
-    if (index < 0) return;
-    const next = items.value[index + delta];
-    if (next) {
-      await open(next.id);
-      return;
-    }
-    const nextPage = page.value + delta;
-    if (nextPage < 1 || (nextPage - 1) * PAGE_SIZE >= total.value) {
-      return;
-    }
-    await action(async () => {
-      const token = routeSequence;
-      const query = new URLSearchParams({ size: String(PAGE_SIZE), page: String(nextPage) });
-      if (search.value) query.set('search', search.value);
-      const currentUrl = new URL(acceptedHash.value, location.origin);
-      if (currentUrl.searchParams.get('weak') === '1') query.set('weak', 'true');
-      else if (currentUrl.searchParams.get('global') === '1') query.set('global', 'true');
-      else if (category.value) query.set('category', category.value);
-      const r = await api<Page<QuestionSummary>>(
-        '/questions?' + query,
-        'GET',
-        undefined,
-        undefined,
-        routeController?.signal,
-      );
-      if (token === routeSequence && r.items.length) {
-        await open(delta > 0 ? r.items[0].id : r.items[r.items.length - 1].id, nextPage);
-      }
-    });
-  }
-  const questionIndex = computed(() => items.value.findIndex((q) => q.id === selected.value?.id));
   async function copyCode(e: MouseEvent) {
     const image = (e.target as Element).closest<HTMLImageElement>('.markdown img');
     if (image) {
@@ -733,16 +478,6 @@ export function useWorkbench() {
       return;
     }
     await copyCodeButton(b);
-  }
-  function jumpTo(id: string) {
-    const heading = document.getElementById(id);
-    if (!heading) return;
-    heading.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-      block: 'start',
-    });
-    heading.tabIndex = -1;
-    heading.focus({ preventScroll: true });
   }
   function unload(e: BeforeUnloadEvent) {
     if (dirty.value || extraDirty.value || uploading.value) {
@@ -828,11 +563,11 @@ export function useWorkbench() {
     category,
     selected,
     practice,
-    openSelectedModule,
-    rateQuestion,
-    updateFavorite,
-    updateNote,
-    startReview,
+    openSelectedModule: questions.openSelectedModule,
+    rateQuestion: questions.rateQuestion,
+    updateFavorite: questions.updateFavorite,
+    updateNote: questions.updateNote,
+    startReview: questions.startReview,
     extraDirty,
     editor,
     editing,
@@ -856,7 +591,7 @@ export function useWorkbench() {
     answerOutline,
     searchGroups,
     plain,
-    adoptAi,
+    adoptAi: editorActions.adoptAi,
     success,
     go,
     login,
@@ -865,22 +600,22 @@ export function useWorkbench() {
     chooseModule,
     moduleHome,
     filter,
-    paginate,
-    open,
-    returnToList,
-    searchAll,
-    openSearchQuestion,
+    paginate: questions.paginate,
+    open: questions.open,
+    returnToList: questions.returnToList,
+    searchAll: questions.searchAll,
+    openSearchQuestion: questions.openSearchQuestion,
     showSearch,
     toggleSidebar,
-    edit,
-    cancel,
+    edit: editorActions.edit,
+    cancel: editorActions.cancel,
     reloadEditor,
-    discardEditorDraft,
-    save,
-    removeQuestion,
-    removeAnswer,
-    stepQuestion,
-    questionIndex,
+    discardEditorDraft: editorActions.discardEditorDraft,
+    save: editorActions.save,
+    removeQuestion: editorActions.removeQuestion,
+    removeAnswer: editorActions.removeAnswer,
+    stepQuestion: questions.stepQuestion,
+    questionIndex: questions.questionIndex,
     copyCode,
     questionPreviews,
     jumpTo,

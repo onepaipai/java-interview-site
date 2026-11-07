@@ -28,7 +28,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
 ## 文档
 
 - [文档导航](docs/README.md)：按功能分类的统一入口（架构与接口、部署运维、测试验证、内容题解、轮次报告与历史归档）。
-- [部署、备份和恢复](deploy/README.md)：Docker Compose、MySQL、HTTPS 与恢复步骤。
+- [部署、备份和恢复](docs/guide/deployment.md)：Docker Compose、MySQL、HTTPS 与恢复步骤。
 
 ## 内容与升级
 

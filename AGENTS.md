@@ -6,7 +6,7 @@
 - `backend/src/main/java/dev/interview/`: Spring Boot modules `account`, `question`, `knowledge`, `publication`, and `shared`. Keep controllers, services, and repositories within their feature module.
 - `backend/src/main/resources/`: application configuration and Flyway migrations under `db/migration/`.
 - Tests live in `backend/src/test/java/`, `frontend/tests/unit/`, and browser scripts in `frontend/tests/`.
-- `content/` holds question banks and explanation sources; `scripts/` contains validation and development tools (retired one-off tools live in `scripts/archive/`); `docs/` and `deploy/` document contracts, testing, and operations.
+- `content/` holds question banks and explanation sources; `scripts/` contains validation and development tools (retired one-off tools removed, recoverable from git history); `docs/` centralizes guides (`docs/guide/`), round reports (`docs/reports/`), history and the OpenAPI contract; `deploy/` holds deployment scripts and config only.
 
 ## Build, Test, and Development Commands
 
@@ -27,7 +27,7 @@ Use PascalCase for Vue components and Java classes, camelCase for functions and 
 
 Use JUnit 5/Spring Boot tests named `*Test.java` and Vitest tests named `*.test.ts`. Add focused regression coverage for behavior changes; no numeric coverage threshold is configured.
 
-Run Playwright suites through `.\scripts\test-e2e.ps1` after building the JAR; it creates disposable data and credentials. Never target everyday application data. MySQL tests require explicit isolated configuration; skipped tests do not count as verified. See `docs/TESTING.md`.
+Run Playwright suites through `.\scripts\test-e2e.ps1` after building the JAR; it creates disposable data and credentials. Never target everyday application data. MySQL tests require explicit isolated configuration; skipped tests do not count as verified. See `docs/guide/testing.md`.
 
 ## Commit & Pull Request Guidelines
 

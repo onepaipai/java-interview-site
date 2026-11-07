@@ -118,10 +118,10 @@ docker compose down 保留卷；不要使用 down -v，后者会删除题库和�
 - 数据库及图片备份成功，恢复失败保持停机，并在测试环境完成恢复演练。
 
 阅读页已提供先答再看、自评、收藏与个人笔记入口；资料编辑和导入导出仍没有页面入口。历史数据与兼容接口仍保留。
-测试命令与范围见 [测试指南](../docs/TESTING.md)，AI 配置见 [AI 与 RAG](AI-RAG.md)。
+测试命令与范围见 [测试指南](./testing.md)，AI 配置见 [AI 与 RAG](./ai-rag.md)。
 
 ## 运行诊断与内容审核
 
 管理员可读取 `/api/admin/metrics` 的聚合计数、耗时和可用 AI 槽位，不返回密钥、提示词或账号标识。`/api/admin/publications/status` 对比业务库答案与发布基线，列出人工答案差异；只读，不执行覆盖。内容审核台账见 `content/explanations/review-ledger.json`。
 
-[接口契约](../docs/openapi.json)明确摘要/详情、管理员边界、CSRF、版本冲突、容量及超时语义。普通列表不再用于全量备份；`snapshot-question-bank.ps1` 已切换为管理员完整快照接口。
+[接口契约](../openapi.json)明确摘要/详情、管理员边界、CSRF、版本冲突、容量及超时语义。普通列表不再用于全量备份；`snapshot-question-bank.ps1` 已切换为管理员完整快照接口。

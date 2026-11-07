@@ -1,6 +1,6 @@
 # scripts/
 
-Three kinds of files live here. When adding one, put it in the right group.
+Two kinds of files live here. When adding one, put it in the right group.
 
 ## 校验/发布管线（verify.ps1 与 CI 按清单调用，勿随意删除）
 
@@ -24,12 +24,11 @@ Three kinds of files live here. When adding one, put it in the right group.
   被 `validate-explanations.mjs`、`sync-content-status.mjs`、`test-*-answers.mjs` 等 import。
 - `publish-explanations.mjs` — 被 `test-explanation-publication.mjs` import。
 
-## 历史一次性内容生成/审查工具（archive/）
+## 退役脚本
 
-不参与 verify 管线的旧工具已移入 `archive/`：`review-*-facts.mjs`（各模块事实核查）、
-`build-explanations.mjs`、`prepare-*.mjs`、`verify-explanation-samples.ps1`、
-`verify-explanation-upgrade.mjs`、`verify-reviewed-examples.ps1`、`verify-review-fixes.mjs`。
-其中的 `.mjs` 已把仓库根定位与共享库 import 调整为 `../../`、`../`，可独立运行；
-仅作追溯，不再维护。
+历史一次性内容生成/审查工具（`review-*-facts.mjs`、`build-explanations.mjs`、`prepare-*.mjs`、
+`verify-explanation-*.ps1/.mjs`、`verify-reviewed-examples.ps1`、`verify-review-fixes.mjs`）
+已于 2026-11-07 删除，不参与任何管线；如需追溯，从 git 历史取回：
+`git show bf8768a:scripts/<脚本名>`。
 
 如需确认哪些脚本仍在门禁中，以 `verify.ps1` 与 `.github/workflows/verify.yml` 的调用清单为准。

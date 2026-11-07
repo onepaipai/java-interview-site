@@ -57,7 +57,7 @@ npm run build
 
 `SpringCoreExamplesTest` 从生成正文中提取 3 段完整 Java 源码，通过 JDK 17 编译并执行，核对 prototype、后处理器与代理边界的结果，记录源码摘要到 `backend/target/spring-content-examples/`。另用独立 H2 连接对照默认受检异常、运行时异常和显式回滚规则；测试方法自身不包自动回滚事务。Maven 完成后运行 `node scripts/test-spring-core-answers.mjs`，校验模块完整覆盖、独立案例、已发布内容和执行证据是否匹配当前源码。这些检查不代表 MySQL 锁行为或完整事实审核通过。
 
-`test:spring-advanced-reader` 使用同一读取检查器的新配置，覆盖进阶模块全部 60 题的三种宽度、模式、段落目录、代码与精确导入内容。新增 `SpringAdvancedExamplesTest` 执行正文的三个 Java 程序，并以真实事务与事件适配器对照提交、回滚、无事务和两类提交后异常；`node scripts/test-spring-advanced-answers.mjs` 核对执行记录及当前发布。已加入默认验证入口，详细范围见 [进阶题解记录](reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
+`test:spring-advanced-reader` 使用同一读取检查器的新配置，覆盖进阶模块全部 60 题的三种宽度、模式、段落目录、代码与精确导入内容。新增 `SpringAdvancedExamplesTest` 执行正文的三个 Java 程序，并以真实事务与事件适配器对照提交、回滚、无事务和两类提交后异常；`node scripts/test-spring-advanced-answers.mjs` 核对执行记录及当前发布。已加入默认验证入口，详细范围见 [进阶题解记录](../reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
 
 ## MySQL 8.4
 
@@ -86,9 +86,9 @@ node scripts/sync-content-status.mjs
 mvn -o -B -Dtest=SearchBenchmark -DforkCount=0 test
 ```
 
-[OpenAPI](openapi.json) 由 `scripts/api-contract.mjs` 确定性生成；检查会比对全部 Controller 路由。题目摘要和详情还有真实响应字段回归。常规列表不含完整答案、笔记或来源键，运维全量快照改走管理员接口 `/api/admin/snapshot/questions`。
+[OpenAPI](../openapi.json) 由 `scripts/api-contract.mjs` 确定性生成；检查会比对全部 Controller 路由。题目摘要和详情还有真实响应字段回归。常规列表不含完整答案、笔记或来源键，运维全量快照改走管理员接口 `/api/admin/snapshot/questions`。
 
-[搜索诊断记录](reports/architecture/SEARCH-BENCHMARK-20261021.json)比较实际 1,215 道题解的旧式重复清洗和新投影排序，并测量同线程分配量。它排除数据库和网络，不是生产吞吐或延迟承诺。
+[搜索诊断记录](../reports/architecture/SEARCH-BENCHMARK-20261021.json)比较实际 1,215 道题解的旧式重复清洗和新投影排序，并测量同线程分配量。它排除数据库和网络，不是生产吞吐或延迟承诺。
 
 ## 恢复控制流
 
@@ -112,10 +112,10 @@ python scripts/test-restore.py G:/Git/bin/bash.exe
 
 限制进程时，后端可用 `mvn -o -DforkCount=0 package`，前端可用 `node node_modules/vitest/vitest.mjs run tests/unit --pool=threads --maxWorkers=1 --no-file-parallelism --no-isolate`，构建与测试串行执行。
 
-正文示例验证：先在根目录运行 `node scripts/archive/prepare-review-examples.mjs`，再用 Java 17 执行 `backend/target/ReviewExamples20261020.java`。
+正文示例验证：脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回（`git show bf8768a:scripts/prepare-review-examples.mjs > scripts/prepare-review-examples.mjs`）后运行，再用 Java 17 执行 `backend/target/ReviewExamples20261020.java`。
 
 发布后对快照运行 `node scripts/verify-explanation-upgrade.mjs <备份目录> expected-version-increments.json` 及 `node scripts/verify-review-fixes.mjs <备份目录>`。第三参数仅用于本次分阶段发布的显式版本次数；常规单次发布省略它，默认每题只增加一次版本。
 
-逐项结果见 [修复验收](history/FIXES-20261020.md)。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围。
+逐项结果见 [修复验收](../history/FIXES-20261020.md)。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围。
 
 以上不代表真实模型供应商、生产 MySQL 或远程部署已验收。

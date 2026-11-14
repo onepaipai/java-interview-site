@@ -10,24 +10,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. AQS 围绕状态与等待队列实现获取、阻塞、释放及唤醒。
-2. ReentrantLock 支持限时、可中断、公平选项和多 Condition。
-3. synchronized 自动释放且语法简单；选择依据真实控制需求和实测。
+<!-- explanation:deep -->
+
+> 场景与约束：网银锁沙盘:AQS(队列同步器)=state(原子状态)+CLH 变体队列(等待线程)+模板方法(tryAcquire/tryRelease)——ReentrantLock 与 synchronized 的底层差异(AQS vs ObjectMonitor)。
+
+1. AQS 核心:volatile int state(CAS 修改)+CLH 变体双向队列(等待线程)+模板方法(子类实现 tryAcquire/tryRelease);独占模式(ReentrantLock)与共享模式(Semaphore/CountDownLatch,tryAcquireShared 返回 int,并发进阶 2 题)
+2. ReentrantLock:可重入(state 计数)+公平/非公平(是否检查队列)+tryLock(限时)+lockInterruptibly(可中断)+Condition(多条件);synchronized:JVM 内置(ObjectMonitor)+自动释放+不可中断+无公平(并发基础 23 题)。
+3. CLH 队列的节点状态:waitStatus 四态(CANCELLED/SIGNAL/CONDITION/PROPAGATE)——独占流程:获取失败→shouldParkAfterFailedAcquire(前驱置 SIGNAL)→park;释放→unpark 后继(并发进阶 2 题详解)。
 
 ## 参考分析
 
-1. 入队不是直接授予锁。
-2. 非公平获取允许插队。
-3. 锁实现与优化随 JDK 演进，偏向锁不能当作现代默认流程。
+### 机制:AQS 为什么是"模板方法模式"
+
+AQS 定义了"队列管理+挂起唤醒+取消+超时"的骨架(不变),子类只需实现 tryAcquire/tryRelease(获取/释放的状态协议)——ReentrantLock 的 tryAcquire=state 0→1+CAS;Semaphore 的 tryAcquireShared=state>0 则减 1——一个框架承载两种模式(并发进阶 2 题的"模板方法"分析)。
+
+### 反例:锁选择的两种事故
+
+事故一:synchronized 无法 tryLock——锁竞争激烈时线程永久阻塞(无法限时获取);修复=ReentrantLock.tryLock(timeout)。事故二:ReentrantLock 忘记 unlock——finally 中未 unlock→锁永久占用(其他线程永久等待);修复=finally{lock.unlock()}(synchronized 自动释放的优势)。
+
+### 取舍:ReentrantLock vs synchronized 的选型
+
+需要高级功能(tryLock/可中断/公平/Condition)→ReentrantLock;简单互斥(synchronized 简洁+不易漏解锁)→synchronized;synchronized 的性能(JDK 6 后偏向锁/轻量级锁优化,并发基础 23 题)——大多数场景 synchronized 足够,ReentrantLock 的价值在高级功能。
 
 ## 案例
 
-1. 场景（教学示例）：多个线程争用一个限时可重入锁。
-2. 处理：记录获取延迟、阻塞时长与持有栈，对比公平和非公平实现。
+### 验证:AQS 的走查核对
 
-3. 验证：能区分长持锁与排队问题；调优以实际 JDK 的监视器指标为准。
+验证:可重入断言(同线程多次 lock→holdCount 递增);公平/非公平断言(公平锁先到先得,非公平锁插队);Condition 断言(await/signal 的队列对应,第 26 题并发基础);AQS 队列断言(jstack 观察 WAITING 线程的 park 调用栈)。验证:锁行为断言可程序化(AQS 的功能覆盖测试)。
+
+### 追问链:AQS 三刀
+
+一刀:"AQS 的 PROPAGATE 状态?"——共享模式的"迟到的传播信号"(防止唤醒在链中间丢失,并发进阶 2 题)——共享源码最难读的一段,但理解它=理解共享模式的精髓。二刀:"Condition 与 Object.wait?"——Condition 支持"多条件队列"(notFull/notEmpty 各一个队列,精准唤醒);Object.wait 只有一条队列(notify 随机挑人,第 26 题并发基础)。三刀:"AQS 的可重入实现?"——state 计数(同线程 acquire→state+1)+owner 线程记录(ExclusiveOwnerThread)——release 时 state-1 到 0 才真正释放。
 
 ## 总结点
 
-1. 排队不等于得锁。
-2. 先缩短持锁。
+1. AQS=state+CLH 队列+模板方法
+2. ReentrantLock 高级功能,synchronized 简洁
+3. CLH 队列 waitStatus 四态

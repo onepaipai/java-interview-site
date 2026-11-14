@@ -9,27 +9,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. HashMap 不提供共享修改安全，支持 null 键值；Hashtable 是遗留同步表，禁止 null，但多次方法调用仍不是业务原子事务。
-2. ConcurrentHashMap 禁止 null，提供单键原子更新与并发读取；不能把某版本的分段锁或 CAS 概括成所有版本统一实现。
-3. get 后 put 在后两者中也不是原子累计；使用 merge、compute 或统一外部锁，跨键一致性仍需另设协议。
+<!-- explanation:deep -->
+
+> 场景与约束：网银共享缓存沙盘:多线程读写账户表——HashMap(非线程安全)/Hashtable(全表锁)/ConcurrentHashMap(CAS+桶级锁)——并发度与性能的代际差异。
+
+1. HashMap:非线程安全(允许一个 null key/null value,JDK8 尾插);Hashtable:线程安全但全表一把锁(get/put 都 synchronized)——读写互斥,并发度 1;已过时。ConcurrentHashMap:JDK8 CAS+synchronized 锁单个桶头——并发度=桶数,读无锁(volatile)。
+2. CHM JDK7 vs JDK8:JDK7 Segment 分段锁(默认 16 段,并发度=段数,二次哈希);JDK8 取消分段——CAS 空桶+synchronized 链头 Node,粒度从段细化到桶;size 用 CounterCell 分片计数(LongAdder 思路)。
+3. null 语义:HashMap 允许 null key/value;Hashtable 与 CHM 都禁止(null 会 NPE)——CHM 禁止的原因:并发下 containsKey(key)==false 与 get(key)==null 无法区分(key 不存在 vs 映射为 null 的歧义)。
+
+## 参考分析
+
+### 机制:CHM 为什么读不需要加锁
+
+Node.val 与 Node.next 都是 volatile——读线程看到最新值;数组引用 volatile 保证扩容后可见。写侧:空桶 CAS 放入,非空 synchronized 锁桶头(锁的是链表头 Node,不是数组槽)——不同桶互不影响,并发度接近桶数。
+
+### 反例:并发容器的两种事故
+
+事故一:HashMap 多线程 put——数据丢失或(JDK7)扩容死循环;修复=CHM。事故二:Collections.synchronizedMap 当高性能用——所有操作一把互斥锁(与 Hashtable 同级);高并发必须 CHM。事故三:CHM 复合操作不原子——先 get 再 put 的检查-操作仍有竞态,用 putIfAbsent/computeIfAbsent。
+
+### 取舍:同步容器的演进逻辑
+
+Hashtable(全表锁)→synchronizedMap(包装,同粒度)→分段锁(JDK7 CHM)→桶级锁+CAS(JDK8 CHM)——锁粒度逐代细化;选型:单线程 HashMap,并发 CHM,排序并发 ConcurrentSkipListMap(无并发 TreeMap)。
 
 ## 案例
 
-1. 场景（教学示例）：同一业务计数通过 ConcurrentHashMap.merge 累加两次，避免分离读改写。
+### 验证:三者并发的实测走查
 
-2. 核心代码。
+验证:并发压力断言(8 线程×10 万 put:HashMap 丢数据/CHM 无丢失);并发度断言(CHM 不同桶并行,单桶串行——计时对照);null 断言(HashMap 可 null,CHM 抛 NPE);复合操作断言(putIfAbsent 幂等 vs get+put 竞态)——集合模块 C 系列并发实验可复用。预期:CHM 无丢失且吞吐显著高于 Hashtable。
 
-```java
-var counts = new java.util.concurrent.ConcurrentHashMap<String,Integer>();
-counts.merge("A",1,Integer::sum); counts.merge("A",1,Integer::sum);
-System.out.println(counts.get("A"));
-try { new Hashtable<String,String>().put("A",null); }
-catch (NullPointerException expected) { System.out.println("null rejected"); }
-```
+### 追问链:CHM 三刀
 
-3. 预期：2、null rejected；并发测试需对比 get/put 的丢更新交错，不把“每次调用线程安全”当成整段业务原子。
+一刀:size 弱一致=CounterCell 分片+sumCount 无全局锁(返回瞬时近似值)。二刀:迭代器弱一致=创建时不抛 CME(fail-fast 反面),可能读到旧值。三刀:computeIfAbsent 死锁风险=同桶嵌套 compute(JDK9 修复递归更新抛 IllegalStateException)——嵌套计算换普通 put。
 
 ## 总结点
 
-1. 线程安全方法不组合成事务。
-2. 共享累计用单键原子接口。
+1. Hashtable 全表锁已过时
+2. CHM=CAS+桶级锁,读 volatile 无锁
+3. CHM 禁 null:并发歧义

@@ -9,28 +9,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. Runnable 描述无返回值任务，Callable 可返回结果并抛异常；可交由 Thread 或受控执行器运行，任务与线程是不同概念。
-2. start 创建并调度一次新的执行，直接调用 run 只是当前线程的普通方法调用；同一个 Thread 不能重复 start。
-3. 线上明确线程数、队列、命名、异常观察和关闭策略；Java 17 例子不混入仅后续 JDK 提供的虚拟线程 API。
+<!-- explanation:deep -->
+
+> 场景与约束：网银异步任务沙盘:导出报表任务异步执行——四种创建方式(Thread/Runnable/Callable/线程池)的演进与 start/run 的一字之差(开新线程 vs 当前线程普通方法调用)。
+
+1. 四种方式:继承 Thread(run 无返回值,不能抛受检异常);实现 Runnable(任务与线程解耦,推荐);Callable+FutureTask(有返回值+可抛异常,Future.get 阻塞取结果);线程池 ThreadPoolExecutor 提交(生产标准,复用线程,第 23 题)——本质都是构造 Thread 对象执行任务。
+2. start 与 run:start() 开启新线程并由 JVM 调新线程的 run(一次调用,重复 start 抛 IllegalThreadStateException);直接调 run()=当前线程普通方法调用(没有并发,异步变同步)——一字之差=并发语义全失。
+3. 生产实践:业务线程一律走线程池(不用裸 new Thread——无复用无上限);Runnable/Callable 作为任务对象提交——任务的返回值/异常处理策略明确(Future.get 要设超时)。
+
+## 参考分析
+
+### 机制:start 做了什么
+
+start()→JVM 调用 OS 创建内核线程(分配栈)→新线程调度执行 run();run() 只是对象方法调用——线程体内跑的是 run 的字节码,谁调 run 谁执行。start 后线程进入 RUNNABLE(第 18 题状态机);isAlive() 判断是否已 start 未终止。
+
+### 反例:创建方式的两种事故
+
+事故一:高并发下 new Thread——每次建线程(1MB 栈+内核开销),流量峰值线程爆炸 OOM;修复=线程池(第 24 题 Executors 陷阱)。事故二:future.get() 无超时——任务挂死调用方永久阻塞;修复=get(timeout,unit)+超时策略(降级/取消)。
+
+### 取舍:Runnable vs Callable
+
+Runnable:无返回值,异常只能内部消化(线程池场景被吞,UncaughtExceptionHandler 兜底);Callable:返回值+受检异常可抛(FutureTask 捕获后 get 时重抛)——需要结果/异常感知用 Callable;CompletableFuture 更现代(组合/回调,不用阻塞 get)。
 
 ## 案例
 
-1. 场景（教学示例）：同一段 run 先被直接调用，再通过真正的新线程执行。
+### 验证:start/run 的实测走查
 
-2. 分别记录代码执行者是否还是调用线程。
+验证:线程名断言(new Thread(task, 'worker') start 后打印 currentThread().getName()=worker;直接调 run() 打印的是 main——一字之差立现);重复 start 断言(抛 IllegalThreadStateException);Callable 断言(Future.get 拿到返回值+异常重抛);线程池提交断言(池线程名 pool-N-thread-M)——四组固化创建语义,本机可复跑。
 
-```java
-var caller=Thread.currentThread(); var result=new AtomicBoolean();
-Runnable work=()->result.set(Thread.currentThread()==caller);
-work.run(); System.out.println(result.get());
-var worker=new Thread(work); worker.start(); worker.join(2000);
-if(worker.isAlive()) throw new AssertionError("not terminated");
-System.out.println(result.get());
-```
+### 追问链:创建三刀
 
-3. 预期：true、false；任务相同，执行载体不同。后者先完成再由 join 建立结果观察关系。
+一刀:Thread 与 Runnable 的解耦=任务对象化(可复用/可排队/可取消)——线程池只认任务不认线程。二刀:Future.get 的阻塞陷阱=无超时永久挂;CompletableFuture.orTimeout(JDK9+)。三刀:虚拟线程(JDK21)=Thread.ofVirtual,百万级轻量线程——阻塞挂起零内核切换,IO 密集场景替代池化。
 
 ## 总结点
 
-1. 任务不是线程。
-2. 直接 run 不会创建新执行线程。
+1. 四种创建,生产走线程池
+2. start 开新线程,run 当前线程调用
+3. Callable 带返回值,Future.get 要超时

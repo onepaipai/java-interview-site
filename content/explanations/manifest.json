@@ -1,5 +1,5 @@
 {
-  "version": "explanations-v35",
+  "version": "explanations-v36",
   "count": 1215,
   "entries": [
     {
@@ -12630,7 +12630,7 @@
       "sourceKey": "fb48c5dc27238c55be8b23bc765a8932ee7fa4f806d050d207fae100091bf023",
       "title": "ArrayList 与 LinkedList 区别？ArrayList 扩容机制",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "cfd2f685b4ac323cbf4d6449e090589e804dcfd85d62a44aea10234872185eba",
+      "answerSha256": "c0cdaa27abb67cc61fa867464a3924054d6a7564c8d83eb8e0e10fed3bb199d5",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-12.md",
       "topic": "list-storage",
       "references": [
@@ -12641,7 +12641,7 @@
       "sourceKey": "fb50aaf0339853e765a5ea505014a0c92c96ed462308c8f308a438e674d37147",
       "title": "HashMap 底层结构？put 流程？容量为什么是 2 的幂",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "929a022a27dcce45760d46f0c910c65dc744a0ca3e138e3bafd5b273f74d84f6",
+      "answerSha256": "080830c4226e6e7be0a8661b8556135cd57c2b88c388c5ad77f067a175de74ca",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-13.md",
       "topic": "hash-map",
       "references": [
@@ -12652,7 +12652,7 @@
       "sourceKey": "ca585d83084dfa705ba6a20085b784e614c77455e964f0c6f04281794d097373",
       "title": "HashMap、Hashtable、ConcurrentHashMap 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "03fe6fbf8b951a923d7f424cab918789b1eea34383db915b71609a6a0ab4bb6c",
+      "answerSha256": "77c45ffe941f12cbde2d23c2faee3b0c40bdfa4be860e41fd067b4150a2bd657",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-14.md",
       "topic": "concurrent-map",
       "references": [
@@ -12663,7 +12663,7 @@
       "sourceKey": "a6077c45b3f6f654d6e6ff4fa263d4e6104473ef3b31cfd7997fe732a5a8321c",
       "title": "HashSet 如何保证不重复",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "895399bc32a85912aca4155d09804aeece85a4fdfde69890c8f3cc89e363fee8",
+      "answerSha256": "b0198c36a2ae8de9f438163b3390939a9977b3b507db3e601012881115a4f2b8",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-15.md",
       "topic": "hash-map",
       "references": [
@@ -12674,7 +12674,7 @@
       "sourceKey": "695f6fed328214ad699d7d6610f51fcd2b920a474361464a5760d715b28059b2",
       "title": "fail-fast 是什么？遍历时如何安全删除",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "58c0e6997f3d1d76ec7a31909e335aabcdce28a57e69d2b3be220ef67069872e",
+      "answerSha256": "6c68d8770131943f89ccaa65ccb0ff9df3f6d80a7ffc5175398203758c3de8f9",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-16.md",
       "topic": "iteration",
       "references": [
@@ -12685,7 +12685,7 @@
       "sourceKey": "9cd2653987bc43cf19d7bbe52dee43b0cde30740b46b3c71a10324efb2e56df6",
       "title": "TreeMap、LinkedHashMap 的特点",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "ec61a17acbd7d19039c9881ea940ba634eb23e87ce1d378d879441261c41cbbf",
+      "answerSha256": "92aec29c997c40d3630feb5d5c3f0acf83e749164c012ec77086a19fac488d82",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-17.md",
       "topic": "ordered-map",
       "references": [
@@ -12696,7 +12696,7 @@
       "sourceKey": "a1e15f567d974dce87bc53de00d0ed32ba82d9721149ec40baf5d2cc3a47b39c",
       "title": "进程与线程区别？线程有哪些状态",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "eaee233b0e6c08f4c497a6cd9e0ed2f4366e8b56a439914d0c28b360bd4a6ca2",
+      "answerSha256": "e6754fe43a31eed2010f9feb93133fb284d168a0c910ab4f574369da86be37f6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-18.md",
       "topic": "concurrency-proof",
       "references": [
@@ -12707,7 +12707,7 @@
       "sourceKey": "ba787b1b741992464b2cc5357d25be821361033dd281f6fdeb5c5de119396c97",
       "title": "创建线程的方式？start 与 run 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "a257d1ca29a9ee85823ad3cb328c3e397bb00d123fcfb2f1bc9a4d4865ec54d9",
+      "answerSha256": "63dd68f141457162784d0e378b803bd35215317fef6d749b529a7b12880985fe",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-19.md",
       "topic": "concurrency-proof",
       "references": [
@@ -12718,7 +12718,7 @@
       "sourceKey": "272d8add218c747673b08c84de2f02cf7c12e23fbd0645aa88c9b8bad7b5578b",
       "title": "sleep 与 wait 区别？notify 与 notifyAll 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "97baf867f6867afdbcacf29af5696c915b5ad81e6a6f6273c105f68e22e7092f",
+      "answerSha256": "99d8ff0bc87f256d44e5fd5b856c23815cd52fad588b4ec795bb46508bcfe668",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-20.md",
       "topic": "wait-condition",
       "references": [
@@ -12729,7 +12729,7 @@
       "sourceKey": "08957ec30790254da78550ccee08cc8ec18a8f2633b96bf64abe248dbc2b1cc0",
       "title": "synchronized 的使用方式与锁的范围",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "1c66feb7f48dbc2cdae8ba868c09ff61ccb8732734bfc6f2e90c97d0f2397b1f",
+      "answerSha256": "a367726ce9739ddbaece0cfde5d8c74efa65117f0fc7b2e298a9ca9081b5ca81",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-21.md",
       "topic": "monitor",
       "references": [
@@ -12740,7 +12740,7 @@
       "sourceKey": "8a087c68819ac19260caf4725ce1b3bf5404fe22b9dcda718fec66011c8b99f4",
       "title": "volatile 的作用？能否保证原子性",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "8174154db8d8ffc0ee04077ea3ac294f00df04be595f02960c6f1fd48d04fbb4",
+      "answerSha256": "0d8d6d3dd17fb724ffc1209fb3149035dec3c88dcf54dacd2b3bb425e986a5fb",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-22.md",
       "topic": "memory-model",
       "references": [
@@ -12751,7 +12751,7 @@
       "sourceKey": "548e614d356ee7fd86e5d15b25747f98da2230d039e60a32b8e57e5384bd4824",
       "title": "线程池核心参数与任务提交流程",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "7eda4a8ad64c171fe66e4f0baf4f3a91069821e8a2b4f646ed6e8cbd76b02ccb",
+      "answerSha256": "67c0f53e1c70220ba40dfece35ac783e1498373d4da0189de4d750df6c306fe6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-23.md",
       "topic": "pool-basics",
       "references": [
@@ -12762,7 +12762,7 @@
       "sourceKey": "99f3692a41bbdacf549672f400a5e5c67e62c712ad085e2cdee1f7ece3a2ad22",
       "title": "为什么不建议用 Executors 创建线程池",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "a0c99085cbd8a97256b82c72b23599411ad87c26707aa265a686cda602996b09",
+      "answerSha256": "3bb1cde0cc5a2c7c441076f98622ad71c5b9306480bf622307a2834f83eb15ff",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-24.md",
       "topic": "pool-basics",
       "references": [
@@ -12773,7 +12773,7 @@
       "sourceKey": "bef2dc879853ae0c23093a626d510d61f28dcd11d3e1555a30d9c68253784771",
       "title": "ThreadLocal 是什么？为什么会内存泄漏",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "86943ff2bd797617eb82ea70c5e30cb7afba73c80a92cf6a616c3d37320d340d",
+      "answerSha256": "1e7f1dc470bad81f00e693dc74534625378a5a6a6b6b214c19fb9044dbbc6270",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-25.md",
       "topic": "threadlocal",
       "references": [
@@ -12784,7 +12784,7 @@
       "sourceKey": "836f7822364a7d0a7d46e828f7bfd6e295b0350de4730c49dea7b0ff78efce8b",
       "title": "JVM 内存区域有哪些？各存什么",
       "baselineAnswerSha256": "3c96b1563c6451fbe93b14bcd615bfbb3b52fd54be902865194b76be2055a349",
-      "answerSha256": "9ec201c5ba42d45d306c3bf0cdf9978958c4cb4b641b65d1387408c04009c18e",
+      "answerSha256": "ec92107476cceba56387df609120dbdceb8fd12820a41eb32747171b4a1d3c0f",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-26.md",
       "topic": "jvm-memory",
       "references": [
@@ -12796,7 +12796,7 @@
       "sourceKey": "41822616a689e54dfaf4c9df83c33c5e36b1d9b4e59478ab5f8c2301527d630b",
       "title": "对象创建过程？对象在堆中的布局",
       "baselineAnswerSha256": "7b869bf76e7737b1ee66a73d557c380a06b8a88791660cd17699804714dc1dc7",
-      "answerSha256": "8cac5b8d5d45db801c6287ffafa52c678109ba7362d05b68c8c05499850fc5ff",
+      "answerSha256": "e8879a6dc78c55c03c61ce0809d29a77152a029988c714d73dee21ba28ed75bd",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-27.md",
       "topic": "jvm-memory",
       "references": [
@@ -12808,7 +12808,7 @@
       "sourceKey": "1314587931f1ba2b32f77587719a08b695673610bdb22e7f96f0ec7408b6614f",
       "title": "如何判断对象可回收？",
       "baselineAnswerSha256": "22923dedeae2b5c72ecf217a3e78c891ff0ac26ed05438e3ca079517fc2da4fa",
-      "answerSha256": "413b21534632fc93422aeefec59c081b0a6d06fce65e31d38a3a614edde4ea36",
+      "answerSha256": "0c3a6ed463433d1e386ddfa0c9a66890bc8665750c47138317054dcbbf66bba6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-28.md",
       "topic": "reachability",
       "references": [
@@ -12820,7 +12820,7 @@
       "sourceKey": "0c8611b762c8f79591633a1ed360ade56c8347188bb7e85168f8f8b0a40ecce1",
       "title": "四种引用类型与应用场景",
       "baselineAnswerSha256": "fa9e178c4b5b99e9488b493c8c770426b08a5bd178fcee26339ef65eaf4972be",
-      "answerSha256": "60e433dc46b9504d9dee03f85c0e24ef906a814218fc0d516c5f50d132ef6df5",
+      "answerSha256": "accffd63e7591450074a3de11bc8309037071479e75ba1ef8a18aa4add6c830e",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-29.md",
       "topic": "reachability",
       "references": [
@@ -12832,7 +12832,7 @@
       "sourceKey": "3021751528bea90c74710255279d26d9349ebcd52c397f917d7d3ef1fe68b0c4",
       "title": "常见 GC 算法",
       "baselineAnswerSha256": "4870cfd9e6f01712e8ad670d6b46334da1337aa0fbb4317664c412b10572d338",
-      "answerSha256": "8b1bfa5f4035e910834d1d076fc644a3f9722eacfe47f455c9cd9adb93001e2c",
+      "answerSha256": "936c52109a72ec1da06a894897a7fdfca5d92d3eb54e9d1c14b743cf85665de9",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-30.md",
       "topic": "gc-basics",
       "references": [
@@ -12844,7 +12844,7 @@
       "sourceKey": "20fe4312bda286e662c6d83347d224bb734f4d780ced366662d07266e5c8f45e",
       "title": "分代思想？Minor / Major / Full GC 区别",
       "baselineAnswerSha256": "7f0218e39fac1d2b646b03e962433f4bb4b68138532008ec3bce3e3582a752cf",
-      "answerSha256": "d2e3871b1ee2e8b8a4a145c7a11f9db068f04a2683e8d6effacbc6698c1a9751",
+      "answerSha256": "298b135e0471f5e43c9b3df531ed53e2ce539c637d8f60c6a710eae0352773b2",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-31.md",
       "topic": "gc-basics",
       "references": [
@@ -12856,7 +12856,7 @@
       "sourceKey": "166d0e681cced164ff6d60e5932d73bbd7d2689b84fe7abbd0a5ba455632a358",
       "title": "StackOverflowError 与堆 OOM 的区别和常见原因",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d238d66475aafc7e04f8e2a7b8ec97d763e1a48ef7f3a2f87875492e88a40282",
+      "answerSha256": "b520f3e37b7346a188751e4550525f7b61e2cc879610cdea2736c1be1ced06d4",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-32.md",
       "topic": "stack-overflow",
       "references": [
@@ -12868,7 +12868,7 @@
       "sourceKey": "b719bc6090cd908904ae002579f6c19e6e19bcd4e05845e3f2eacad179e492bf",
       "title": "IoC、DI 是什么？好处",
       "baselineAnswerSha256": "8c9c987822ba9a3cf227917e29b70bfe10f0225786a33f58b78bf4522a7819ab",
-      "answerSha256": "e33b43d5325b44030c9b5c4ce5e03a6ecb7e99e06ad69e1121cdc5ec564a99e1",
+      "answerSha256": "d82bb553e8e369c147681cb2ddeabc1c5ae86f4365a9f233de03d6984fbbd278",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-33.md",
       "topic": "di",
       "references": [
@@ -12879,7 +12879,7 @@
       "sourceKey": "af2882e69a8f8d4a6b73f399284e6f1b277609f156fb4cf9c33c2f9bb55b228b",
       "title": "Bean 作用域有哪些？singleton 线程安全吗",
       "baselineAnswerSha256": "0fb95c11a40ead7faff55436ba6a3e9385d6b35182176be5872757d9022235a5",
-      "answerSha256": "251af23b3285ee26df63c1578298ba66b3e755efc854d666de43582fe09754b1",
+      "answerSha256": "d7ab5f575be00b0b6cf6827a5d4c2d120158b5310e444ba972c468ac8dca7bf5",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-34.md",
       "topic": "scope",
       "references": [
@@ -12890,7 +12890,7 @@
       "sourceKey": "fd02e0d7c21d82eac78e366e163757e8b0dcae56ebc154dc2d7f3bb250fbb0fb",
       "title": "AOP 是什么？典型应用场景",
       "baselineAnswerSha256": "05d8dcad98d940cbd3f27ca684bfe5d7cb749bc7e5e0fb2b6a2fabb389c53bea",
-      "answerSha256": "fc39b2dd8d90c5a24ea25993143b17fd6a7a15bf27c272422732a99632dc69a2",
+      "answerSha256": "970154f0b7a3a0246ccf9e414eb7f0b42c920302f342183e7a3185ed8cacda3c",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-35.md",
       "topic": "proxy",
       "references": [
@@ -12902,7 +12902,7 @@
       "sourceKey": "fbd0778b8e4ec87bce78ba969434772ddfae95c57f7bf29ecb745de9f5dbbe36",
       "title": "@Autowired 与 @Resource 区别",
       "baselineAnswerSha256": "7b7815eac90db06046b166aad7608cf2da00ff940d33ba9ae2e35b11ab3dc181",
-      "answerSha256": "0358d5c9ff3f8019962e6cb3cb4f79b8bc0a4dc6ce950750b1795d3911657995",
+      "answerSha256": "2f660b3e11700fc5ea7cbb608b9cb7ea15f8dfd643e56f80ac45e89ae8bc3f11",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-36.md",
       "topic": "di",
       "references": [
@@ -12914,7 +12914,7 @@
       "sourceKey": "806c9810f406dc77660ef90235af4c74799661fefcd237c66cdd6f504b30e92c",
       "title": "@Component、@Service、@Repository、@Controller 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "9c31fc3f87ae60f64587caf43ea2ac8c355f42b7d5285a7d2fa2411fac997cc8",
+      "answerSha256": "2b6b45399a3f691843fe6fb1aba60c0cacbc50667e3fc6a7575acff070ce4ab6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-37.md",
       "topic": "di",
       "references": [
@@ -12925,7 +12925,7 @@
       "sourceKey": "ca8042d3bd8fc36d4c88f7fdd3669bb73c22ae57167a89321446ad61313b2af4",
       "title": "Spring MVC 请求处理流程",
       "baselineAnswerSha256": "f003a12b8f437264f660ee5e50751b2b298b9aa24df6dde93e829b7ece809fec",
-      "answerSha256": "aa9408714d70aad7ebd9178f1d6720d2a8e689aed442497d46ac0b4b7e5505c6",
+      "answerSha256": "bbedf0eb651f2ec49820a95c7b467fc1dc625f85661aa2c4f3042190beea635a",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-38.md",
       "topic": "mvc",
       "references": [
@@ -12936,7 +12936,7 @@
       "sourceKey": "2f516079a1026acff3ad19153e0bacd7303dc2fa21c1631f3d1bdabe2093d627",
       "title": "Spring Boot 的优点？starter 是什么",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "dfc2067ab6377a03387f74dabeb67e33a5332a35a343a9f6fe1be432c2c998f2",
+      "answerSha256": "05fce54f4ef975bf3578c70c08379de3e6bddb46268d6e14519c5bb6798f3ee7",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-39.md",
       "topic": "autoconfig",
       "references": [
@@ -12948,7 +12948,7 @@
       "sourceKey": "0c7ce1c28a4f636c4c7970a50f8b0c8eaf74a648f115c50ebfe51c4249d40c78",
       "title": "配置文件加载优先级？多环境 profile 如何切换",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d56063076c68c10b05f4c54d9c9e98fbd882de00a04e03bf8e64b8686db53814",
+      "answerSha256": "156275469e011a06f4c545dd50dc9d45c97910104d25e2829ce8531c90a39bb4",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-40.md",
       "topic": "autoconfig",
       "references": [
@@ -12959,7 +12959,7 @@
       "sourceKey": "3b4ca50a18c858621e1864b5eff1b9ff5f99a4754d97c434489d253a9d6e4348",
       "title": "MyBatis 中 #{} 与 ${} 区别",
       "baselineAnswerSha256": "f8e0dfc8c25e7e5825f260bc146dcf63b5ff57ee3fc563a0736977a3faaed567",
-      "answerSha256": "83cf53f9c9ab88813bf9789b61536d2ab9bfabb1cb6cf2c734f8a875074aaa73",
+      "answerSha256": "bc5f223b36e436f81ff7d11dd0966f27fd1833417b49f1fe13892bd395a7fa2a",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-41.md",
       "topic": "sql-safety",
       "references": [
@@ -12970,7 +12970,7 @@
       "sourceKey": "35e95658ea85cbbb2da40f9848edeb80e16b3220ef43848c5f02d6ca7c47a855",
       "title": "事务 ACID 分别是什么",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d2480bdaa2f4febc81b99ff8957c556054876d59cbad6c4af9423fb9437f5489",
+      "answerSha256": "71c294ce0c620019d37cb82f7a79c8ea7190398477e29dda8b4ac047b765ad67",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-42.md",
       "topic": "transactions-basic",
       "references": [
@@ -12981,7 +12981,7 @@
       "sourceKey": "ea7e3c3083190a0dc657f34f2a7bc5d6d9966ae04593e4f8fd536119a489f748",
       "title": "四种隔离级别与对应问题（脏读、不可重复读、幻读）？MySQL 默认级别",
       "baselineAnswerSha256": "f8310ca7819185c8e2a8b3c04c99ffd62633fe7d1e998fd7bdfc42788f94b58e",
-      "answerSha256": "07dff018ec493e41f3107575cb34d6ac65dfbf70d8ab1a60a8200d674361fba5",
+      "answerSha256": "94bfb94ad9d403d1c8f72a8f11939619b06df5fed1c38998e5d5edb6b20a9747",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-43.md",
       "topic": "transactions-basic",
       "references": [
@@ -12994,7 +12994,7 @@
       "sourceKey": "743a90aa5a84a101ed7dac1f94947c082aa0c787667a2cc293903ec34b2ee7a3",
       "title": "索引的作用与分类？聚簇与非聚簇索引区别",
       "baselineAnswerSha256": "909eaaf9408390004c08d289539f4bf3691eba90040c80549ad40e7252bdda08",
-      "answerSha256": "fac0a063c3502c80c03b257f053d9c7d4efa6e9381ddbfac9eb686b51f5e4d64",
+      "answerSha256": "64d0c08880645d48341fa8549459435e84ab501247700cc65b767e42eab24d8b",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-44.md",
       "topic": "index-basics",
       "references": [
@@ -13006,7 +13006,7 @@
       "sourceKey": "459d8e0bd4a8577e9fabbdf888517bc0d1a272b1b56748c4296547b256606576",
       "title": "什么情况下索引失效",
       "baselineAnswerSha256": "c1f71cef36f808b9db69db07f534fd8bc0f20910e0d2d1397e936c21c4c556df",
-      "answerSha256": "a8bd5709585673e5da2f8cb406deb81e56b7667298eafc7cdc02b7d2c09a5bb8",
+      "answerSha256": "7aacc8f54ffe7d5fb93eb6854adcfc46b42a95aad2ad58f631c4393961d52c44",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-45.md",
       "topic": "index-basics",
       "references": [
@@ -13019,7 +13019,7 @@
       "sourceKey": "d0fb4f282d12be3ad7292c9e7893f00d56c1e50db0b8edf3849e9d86f0572b8b",
       "title": "drop、delete、truncate 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "aa92e8c1f6b7b75155be8bb5c9aa8bb11c4919e33e6619f0e02a4e0cdafc342a",
+      "answerSha256": "215e57946f7ff96958d6c45a127cdc48300eb2510ff0a6fdb6f3b48302781b03",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-46.md",
       "topic": "schema-basic",
       "references": [
@@ -13032,7 +13032,7 @@
       "sourceKey": "38966716350b92b2bbb267f5100391b2fd7624441f1f1738c8e5e72ec02f84b8",
       "title": "内连接与外连接？where 与 having 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "c2decd522573e581031ae2eb1725b9c992c7218d2acc1b7e531e3b0b6b093d64",
+      "answerSha256": "96738f74d66c233fc8e728927473340d8ba539fd29968415ed427bfeaf423981",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-47.md",
       "topic": "legacy-join",
       "references": [
@@ -13044,7 +13044,7 @@
       "sourceKey": "e1d05aa3caab16a3c5587f4152b17cbfdc0c7eac8465bbd066dc0b8582168869",
       "title": "常见 SQL 优化手段",
       "baselineAnswerSha256": "8f326dcac769daa73a56e0b01dc722e5f43fa47b6abc7a6d985e6e2c1c7b3837",
-      "answerSha256": "c3def730c52c4819547f81fe5242a90012dcc0e05952c327ab0d0f761af3b747",
+      "answerSha256": "a4ad06104946360ebc5d63466cd56a27bb10cab6c47a0c8e1f6789cf402b9ccb",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-48.md",
       "topic": "explain-basic",
       "references": [
@@ -13056,7 +13056,7 @@
       "sourceKey": "6bf759c5a679f530cfaf1e1464eff0650e75fda06da7aa7b038896069324e3c4",
       "title": "主键选择：自增、UUID、雪花算法的优缺点",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "b42be1090dd6c48ada8f822e2649181adcfd7a7435bff7762ba454859b47ac0b",
+      "answerSha256": "d23937cf032808142288730aaa08bde15f05b4564753afefd87040830360edf6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-49.md",
       "topic": "sql-safety",
       "references": [
@@ -13068,7 +13068,7 @@
       "sourceKey": "27627107b5f844a9bab9704ff66488d2a45a6a4212d4880d62807b59d5951678",
       "title": "varchar 与 char 区别？金额为什么用 decimal 或以分为单位的 long",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "55020095520df83a12cf867a04dc02bbcac7690c730cc4c47e1ef7355312dfa7",
+      "answerSha256": "d2407f3a21a76e930fac20ecba4f3132afbb1cb1cb73c4e2d4e6be6f6b14dddf",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-50.md",
       "topic": "schema-basic",
       "references": [
@@ -13080,7 +13080,7 @@
       "sourceKey": "96a3648929fc8352a5e3657bfa62cb3cb7fafdb535c3146d7282eca09ab187b6",
       "title": "TCP 与 UDP 区别？三次握手、四次挥手，为什么是三次",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "6c4afcfd9fa153013db207a17b91e722b5c0fe5f83c65820dfc0483c29079528",
+      "answerSha256": "7fceab496421fe64d04243425d0013a31aef6764034e2d90dec107dff56373a4",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-51.md",
       "topic": "http-path",
       "references": [
@@ -13093,7 +13093,7 @@
       "sourceKey": "00853fa1b4811841827aff7df75ac6d5e1223416c170ec867ab9ef29a9290555",
       "title": "HTTP 与 HTTPS 区别？HTTPS 握手过程简述",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d0c7ce5f72c365758345a8eb7ebe8fd19d03ab7f00aecb66c1c59290954d2a31",
+      "answerSha256": "50e2c874a6a75c7dadc8a840a6f373ec346610ae8cdf6b9246240fa312416915",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-52.md",
       "topic": "tls-http2",
       "references": [
@@ -13106,7 +13106,7 @@
       "sourceKey": "c14446127c6bfdb86a92dc29f76c9f521035ac4d9b3cda655d3bc87b94b71d26",
       "title": "常见 HTTP 状态码？GET 与 POST 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "44aec022c4995fe56cd8eb7c2a42d3fd9020760845a549f8f905fb3b57a56313",
+      "answerSha256": "a59c935adbf48c0a157a84a330cfbcda3fffbd9f237205ef8f2affc5999652e2",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-53.md",
       "topic": "http-contract",
       "references": [
@@ -13119,7 +13119,7 @@
       "sourceKey": "31da54c13c3a0a45851b6f3d1ede9706baa030df60dcf5f897c509e4410d9545",
       "title": "Cookie 与 Session 区别？分布式 Session 方案",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "43386533091d603f49fbe0775bf6b2f69da060be6630673cebd3c5187b432529",
+      "answerSha256": "156c2ba112a40fbd6201299826c500db5603d0778b090055a4b46c0cfce662d8",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-54.md",
       "topic": "browser-security",
       "references": [
@@ -13132,7 +13132,7 @@
       "sourceKey": "0223d6e7b40abab05c04af2419ccdd7cbea973df0cbdf0228ac0618c89c20e6e",
       "title": "常见设计模式：单例（手写双重检查）、工厂、代理、观察者、策略",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "eb599b1f43166b59dfe66088785edc877f7a504f12c405a8a0992343b0ddcb85",
+      "answerSha256": "a144a846ebe0a6fe51a14182fa24a56021d7e5bf9624d26631cdcf9bdd4b0613",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-55.md",
       "topic": "legacy-patterns",
       "references": [
@@ -13145,7 +13145,7 @@
       "sourceKey": "41cfb38c762f51cc7cfe559400c6776a0a28cd75eda7c0eaffca8f6b98588506",
       "title": "Git：merge 与 rebase 区别？冲突如何处理",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "fa68ce836c08c39d43e9782d915dc6f4c51138ba9e5eac25ba28df68eb46939e",
+      "answerSha256": "23610fd54ffc23f6fd0da13e85024f70bb2ee879d6442462298506ffb4b18cf9",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-56.md",
       "topic": "legacy-git",
       "references": [
@@ -13158,7 +13158,7 @@
       "sourceKey": "c1a8899f2917c06ff6f2965cdcc63f1bab8a4107ae140714ac069a2baca432a3",
       "title": "什么是大模型？token 是什么",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "08015a96949f60349010938e45f759dc73823fed204ba0b490c65af4b805de48",
+      "answerSha256": "b4dc9da77f64073d95955ddf2b596e5187af4506b860b8868a2daf68e2fe2a6c",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-57.md",
       "topic": "llm-basics",
       "references": [
@@ -13172,7 +13172,7 @@
       "sourceKey": "c9e7545a9fbd38167c268913fcb2cf1347f5fb29bc3f889ab86fe3a2ca8a675d",
       "title": "上下文窗口是什么？超出了怎么办",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "4bcc64af25763c61af6a92b10a00fb075d814d572f2dbd65913e712ed8ed61d0",
+      "answerSha256": "76eaec49b04032c006fda7b3373d54dde1f0ebab78ef8a4c887ea28436b42fa2",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-58.md",
       "topic": "llm-basics",
       "references": [
@@ -13186,7 +13186,7 @@
       "sourceKey": "687551c8c044ac6976078a35045ca1a7812a1cfb9655b91f7a950961ed5d9b62",
       "title": "什么是幻觉？temperature 的作用",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "43e4d7ffb6cb4a99bcb7cb325915d413f3f08d2bd6ea4e04f7e20a48771e2dc8",
+      "answerSha256": "23d33cca60c590d028a3af645263239751570fd03db0cf740f929dabc002fab2",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-59.md",
       "topic": "llm-basics",
       "references": [
@@ -13200,7 +13200,7 @@
       "sourceKey": "ce6f789fb80070234fd63ffa253cc259ca30eb4cea1be5a1907617842a5d9a89",
       "title": "平时用哪些 AI 工具？如何验证它生成的代码",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "7d2c8f25fa22f21710e0e67dce48b1c3515c899a501347b4d0a6d66b83095a52",
+      "answerSha256": "8a71b20520f6188b4dabdbcacc5e412af13fab4706627b96837987060eed625b",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-60.md",
       "topic": "ai-eval-basic",
       "references": [
@@ -13214,7 +13214,7 @@
       "sourceKey": "c251aa67c75033beafb5fd894d27ec1bda571c8c7a18c9fe4bb230c920620259",
       "title": "HashMap 扩容过程？链表转红黑树的条件（链表长度≥8 且数组≥64）？JDK7 头插法死循环问题",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "ae4ed7545416c466db44d0d74d9216ae1d916832e45aee2f2f07139e5a8bb037",
+      "answerSha256": "474836cd816a2a09cc5b156e9fe06afb6343d5fdc83031a048eb4856e6ae3407",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-61.md",
       "topic": "hash-map",
       "references": [
@@ -13226,7 +13226,7 @@
       "sourceKey": "5d331980692d762cf27944d6cbc30c12f5b48d5c37f00749e310312185a68264",
       "title": "ConcurrentHashMap：JDK7 分段锁与 JDK8 CAS + synchronized 的区别？size 如何统计",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "53d24eee4439a9b4934e3798989bc030380643b89e595bedf9c1c95a1e301ae4",
+      "answerSha256": "cc12f7c351069ba649a7be671d3aa57ee722e7705a2cf7f036f228c12e691159",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-62.md",
       "topic": "concurrent-map",
       "references": [
@@ -13238,7 +13238,7 @@
       "sourceKey": "a1777fd7900bb89d2485349710b4df82dccff4e7f9b6b67a705e72314542ad10",
       "title": "CAS 原理？ABA 问题与 AtomicStampedReference",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d0dc875c5a58c2b2473c5dbda72723cfa11dfc616ff83bdf3116941639f038ef",
+      "answerSha256": "976cf26d57e30bd69e12dc8676a20752b403de00d121fece9b268731866b0450",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-63.md",
       "topic": "atomic-advanced",
       "references": [
@@ -13250,7 +13250,7 @@
       "sourceKey": "aa4a26c898a54a95ea523393e726d7b4cb9aa7ca79690165e48c997988dca1a9",
       "title": "synchronized 锁升级（无锁 → 偏向 → 轻量 → 重量）",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "be7e22a79c5c37d78d292bed5f2b205bb7e9a3aec31337ca3b550482cdb6d201",
+      "answerSha256": "6b642133affd6398493575ecbc54ae2de9b919d0be18c4b9c2f44c778c639027",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-64.md",
       "topic": "aqs",
       "references": [
@@ -13262,7 +13262,7 @@
       "sourceKey": "0a3c34c275a16511a37839102608182342538ba40c030a1c9352a55747ea87a3",
       "title": "AQS 原理（state + CLH 队列）？ReentrantLock 与 synchronized 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "39ca5b2cb6c27a55e0575338c8da4104ab66f58bd886b3f63677594665b912c5",
+      "answerSha256": "69f4626ace00aaab6ecc865e483b4bcab9f0c71fc5e7a7afe3b19c36d9dfa7e9",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-65.md",
       "topic": "aqs",
       "references": [
@@ -13274,7 +13274,7 @@
       "sourceKey": "72191172b3d69993dd61fb7b9cbfe453b14cdd559a26f5d8fce16f93e4531b1c",
       "title": "公平锁与非公平锁？读写锁、StampedLock 的适用场景",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "26443fda4da69532c0ce490848650d4fdc8f480977d66b0c316c33aab23b6a49",
+      "answerSha256": "2358e2766fe978e3709228ff59a0c93fc861f3d59d1ac76ae22923597dcad205",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-66.md",
       "topic": "lock-scope",
       "references": [
@@ -13286,7 +13286,7 @@
       "sourceKey": "2cfd6f5d7292600d407c343e6b6c2281cb844d78066cc8576504b38a0abd7170",
       "title": "CountDownLatch、CyclicBarrier、Semaphore 区别与场景",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "0e319902dc7f617edb873ded37c7d7719dbfb97b237f569712fe4fda8b4f6b41",
+      "answerSha256": "fab4a13174a0239fb4c213d439c73c0c11c6886fd91a4111b3b5bdac82bf88d8",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-67.md",
       "topic": "coordination",
       "references": [
@@ -13298,7 +13298,7 @@
       "sourceKey": "e9632533fc26963af1d345281ff1078a1189f51640d07d292e7354714b419e33",
       "title": "JMM、happens-before、指令重排；volatile 如何靠内存屏障保证可见性",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "1ab8122bc07ebac008b8d0727eeadde41301cc5265aef0b7d53b108ca3f8214b",
+      "answerSha256": "e5ef43d01f6494ba436fd6726f662f114378b746ef07838a74425c602ab000b1",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-68.md",
       "topic": "atomic-advanced",
       "references": [
@@ -13310,7 +13310,7 @@
       "sourceKey": "45de687da99b141083c60a64a31eb69018ae9697bfaa74b9fed9745a3291a580",
       "title": "线程池参数如何设置？队列怎么选？如何监控与动态调整",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "0dec53e30df3a8af733bc8b27d3cf7f68095ff86e335d582d89997ae31c69162",
+      "answerSha256": "de52d6d935fd454d1afaaccdf6f675426dc3578bea7c7879fc6a13b996baa515",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-69.md",
       "topic": "pool-advanced",
       "references": [
@@ -13322,7 +13322,7 @@
       "sourceKey": "0ccf3a10814c27d4d2e4936a82df95a9e08c9d6257978a3a875c4e9d8943dcdc",
       "title": "CompletableFuture 的编排与异常处理",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "3feb4832867735be62523f57a21ab729d378589cf9c3cf9dcb3f8f1f97fb4130",
+      "answerSha256": "eff1654d1515bf0d38daf93f4284356fbac58e311c83b5b5e3ca0a5223358f99",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-70.md",
       "topic": "async-lifecycle",
       "references": [
@@ -13334,7 +13334,7 @@
       "sourceKey": "f7b799f768cca4fa45f853a5c12f1d1073926152dd52af97b3738243cb4f2a25",
       "title": "死锁的四个条件？如何排查（jstack）与避免",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "c7e7b3048897b68de0e20f149c57933ee246764f903fbc45c0c7ecbc33c5c9d1",
+      "answerSha256": "ad7bcf865cc018f7164fdf22b0d480448eb29650c35dffb6af214bb2ad979089",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-71.md",
       "topic": "concurrency-eval",
       "references": [
@@ -13346,7 +13346,7 @@
       "sourceKey": "3a216591416d82b014f30a769c0363f452df132ba48fc4a684d1cd31f7b68218",
       "title": "ThreadLocal 在线程池中的问题，如何避免",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "fe6adbcb4d58604506b1e9baf98f35fa53f9a91cc655766b48f84592569f063a",
+      "answerSha256": "56e8326e96363908b5e85a1458bd859f172ee189c3018bf971d3a8962c465b4a",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-72.md",
       "topic": "threadlocal",
       "references": [
@@ -13358,7 +13358,7 @@
       "sourceKey": "afbd33d24e1116aed72030889c3fa88d8898bcbc55cfc2d734c72211be970078",
       "title": "G1 原理？Region、Young GC、Mixed GC、停顿预测；与 CMS 区别",
       "baselineAnswerSha256": "259d4706ff84bd9b3e537217e054be891ffbccc355767743cdee63092e4f239b",
-      "answerSha256": "d5358b480dd0064e5db2308748500aa92ea363ff962e806483c4eea6a4454768",
+      "answerSha256": "bfe637ef0936d3b7db04ebc0623dd0ca0ee5c2baa7768eebea50d47a129804a6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-73.md",
       "topic": "g1",
       "references": [
@@ -13370,7 +13370,7 @@
       "sourceKey": "54d3b4383943dafe999228a70a8379738ba185040993f832d8e77481c764b6d9",
       "title": "类加载过程与双亲委派？如何打破",
       "baselineAnswerSha256": "5deb965227baf6d4ededee279bccbff463cb1002252507384d28f1e3028cebee",
-      "answerSha256": "e712026a547e93be9f2f0df121c1a4d1d33202deff4c0bac98cd3fe2b7875dbc",
+      "answerSha256": "a034e03d8435864531710873b8392919529b42afc65aed80c7924c37188d193b",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-74.md",
       "topic": "classload",
       "references": [
@@ -13382,7 +13382,7 @@
       "sourceKey": "3b157960e19b81dec77d07b9f8ca37c36d71f59ae6f866a3d55cf7bdb43915d9",
       "title": "垃圾回收器如何选型？ZGC 有什么特点",
       "baselineAnswerSha256": "8808fd34c2d99c4fa352b71b34c417239b5ce70726fe46e6a4eba17d61bf0a76",
-      "answerSha256": "697cc7a2032ba240a6ac55395a9cba6a24725c131420441643203b8d1953396a",
+      "answerSha256": "681232e6ef0afd9f083c965cbb6d8938f7923139468cd5bda44f5934a3312401",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-75.md",
       "topic": "collector",
       "references": [
@@ -13394,7 +13394,7 @@
       "sourceKey": "ff3cd2634dc1f0da3f59e1139af24e6b169002c5d7f3bd97b38f613cdc2a4a1a",
       "title": "常用 JVM 参数？堆大小怎么定",
       "baselineAnswerSha256": "70a77ad7945a2f2934c19a94dfc92b518382998b354c5c84dc6d12f55906c1f5",
-      "answerSha256": "438c71c606bc5dc9d81906605ef3c5325111915a304797001e3210c3005b2570",
+      "answerSha256": "7faee396e0e2f413c92baeb65a0130bb6b333be39ddecc8dfc11d7c5100905e0",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-76.md",
       "topic": "native-memory",
       "references": [
@@ -13406,7 +13406,7 @@
       "sourceKey": "da85ed128c1dfb7884bb7746a1ccb1ac4f3d5e84dbc26f66d7bf8b85980789ee",
       "title": "OOM 完整排查流程",
       "baselineAnswerSha256": "21df956e2a85462434524d638ee16fa6975a769aeda7a54fd2359e81024aa32b",
-      "answerSha256": "de47e01f9d127cdc20d7320a88ccb6f85780255b691459a90b10c34b97c3d542",
+      "answerSha256": "0efb016c368b4bbe6485f2f2067ea748802fb4e832c508613b0e0c98a1bca561",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-77.md",
       "topic": "heap-leak",
       "references": [
@@ -13418,7 +13418,7 @@
       "sourceKey": "b04a447457114c7b6376676404fb1f1c24193fef2523a26f7a06069943de47be",
       "title": "Full GC 频繁怎么排查",
       "baselineAnswerSha256": "1a3ac24a691b1d651314c4c72176587b4e949788b514290cca0d061a9b57cb1b",
-      "answerSha256": "0a71b6574f02456f03bf00ad622978ece24a2ff3302679b21e9c1127c73999d0",
+      "answerSha256": "5bb53ae7bbf0fe353290a71ed1cd49254673cb54026ac495805c3af62eb9a72b",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-78.md",
       "topic": "g1",
       "references": [
@@ -13430,7 +13430,7 @@
       "sourceKey": "ef54d7ef9aac1593ed1ff5280886ef313879305ae0cd84c8f8f2ae15e6b2ee7e",
       "title": "对象晋升老年代的条件？空间分配担保是什么",
       "baselineAnswerSha256": "0f7665163e17b516fe2fe97485d7def0eca9ad4aabcd4d1fc89f86e4da50c0c4",
-      "answerSha256": "944ddae5acc9f460c4c5a6d714ebcfc47bae4b5f8d9284417e3ca34e0c492a8b",
+      "answerSha256": "f76d788a407af36e7f38016949557809e2a46191402f99fe737922857e62c69b",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-79.md",
       "topic": "g1",
       "references": [
@@ -13442,7 +13442,7 @@
       "sourceKey": "df5e693f62e9c693b55dc433604e539437be062a7f59e414a4f4f2014416053c",
       "title": "逃逸分析、标量替换、JIT 编译分别做了什么",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "e11328d97d687363da9a79680f9d159fdbf02c5c9bb3c4b1205e580b6f62f187",
+      "answerSha256": "6f6fca99078949963bfd1779069c65cdf0cc3f571f59d95a19de02df5280aceb",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-80.md",
       "topic": "jit-advanced",
       "references": [
@@ -13454,7 +13454,7 @@
       "sourceKey": "c1cfc6c066e7877c0b7a8dbe718c344cbea5519fa81f28e4f88c070e8e1191c2",
       "title": "CPU 飙高排查",
       "baselineAnswerSha256": "529caec2dd4d7e9f7dcbe3b5ede9686dbccd9fe62608798b14cc6adf15fcc90d",
-      "answerSha256": "a5a8d81c894a30c9a5d9e367f33ab28931413c0ad5164657dfd26d31610ce6ca",
+      "answerSha256": "0bfe9fc3d4d50f5ab8a59cefef679e49accf1a52b95a60861c5687cb27706a01",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-81.md",
       "topic": "cpu-profile",
       "references": [
@@ -13466,7 +13466,7 @@
       "sourceKey": "057b63aebad4436dd300955d4afcaab587462ba7d7fa2586433e68fc326c216d",
       "title": "内存泄漏的典型场景",
       "baselineAnswerSha256": "ab0bf5769d08f72e81f6b33b4dc4daea4d8d197f82cb82324e42b0214012c212",
-      "answerSha256": "5ba4065d44be4069c63fc5c4466dad95e639d55618e088f105fce3907719f988",
+      "answerSha256": "a0f428f2fde40cefd2c100be658d2c30ddd728bc7849347c27912fdc11af1df1",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-82.md",
       "topic": "heap-leak",
       "references": [
@@ -13478,7 +13478,7 @@
       "sourceKey": "aafa6448477d061d551f64cee9e51700597a5ed6500e4a6c129df76b6f850c02",
       "title": "Bean 完整生命周期？BeanPostProcessor 的作用",
       "baselineAnswerSha256": "5a9827e9584d981b24f73e2ac3e429c1eed5880ea8e8336a02ff765a0d37cad5",
-      "answerSha256": "c01cbc49b01aac4c91700116b332a352cb8a7f14c0ced9d26ddb7ce4db14f5e5",
+      "answerSha256": "5326646b40cb264adba0a27cd0ed37b71a34b5f05759a5a630f21cf397e2973a",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-83.md",
       "topic": "bean-life",
       "references": [
@@ -13490,7 +13490,7 @@
       "sourceKey": "a2ea0286e25f77a72b72e7b48e7c9e422c4bf4af10ac1dfe6c08bbf101b8bfc5",
       "title": "循环依赖如何解决？三级缓存分别存什么？为什么需要三级",
       "baselineAnswerSha256": "6091ca1cf2bd259e0360d5fa702f4d972e7a8b14a45c2335c7431891c8d36c6a",
-      "answerSha256": "0b5333aa429c9ee174459d180515bc85ccfdc30e63b85e0d67cb6b83d5d7092a",
+      "answerSha256": "85e47877ce3133b7108f84ad2d62148013944f62feb65f70520b99d8163b89ea",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-84.md",
       "topic": "early-bean",
       "references": [
@@ -13502,7 +13502,7 @@
       "sourceKey": "46af5ef67f249bf2393841799125ad9de2fe0ae50eed631d597eee338366bdc9",
       "title": "事务传播行为",
       "baselineAnswerSha256": "a6f1128e0b2e40147a90ca3c38ce3932aeb755f89c1bea0b1015d656044e7ef2",
-      "answerSha256": "ff953f73234eee9d1b11c946de687ede117651a6673dca451d1ac3516e49d6f6",
+      "answerSha256": "181fdbf464610016f27ded943b89d4da419d9063f2607f6a98517f57412a4f6f",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-85.md",
       "topic": "propagation",
       "references": [
@@ -13514,7 +13514,7 @@
       "sourceKey": "945dff1a6255c37aafc20616943c58e9dde1891d6f74f06630736470d66bb9e1",
       "title": "事务失效的场景",
       "baselineAnswerSha256": "c0f30f21c19a7783676801eef46589db153bc3c4876bac7995f0467a39ec0a86",
-      "answerSha256": "84f26756290309b90e12b222b2e19ee7de04feffb9ca84692a821dc9ae11be89",
+      "answerSha256": "9cf2f7dedbbbb01c5917a8e105e5cbdac03d77424f73e5c4f61f71c2cf424be6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-86.md",
       "topic": "txn-proxy",
       "references": [
@@ -13526,7 +13526,7 @@
       "sourceKey": "de6d776afe0fbb0268b01278cc233d60a652d0a2cd1a653eb4b0c878d916fbf2",
       "title": "JDK 动态代理与 CGLIB 区别？为什么自调用时 AOP 不生效",
       "baselineAnswerSha256": "f51ebe0548ac076ba05eddc4d592e9cbdf5d39b0a05eb174ecd3c22a1598464a",
-      "answerSha256": "66a18e394645d0d240a1c72927badd2168a8cec72d98bf679e158f77837f706f",
+      "answerSha256": "b9a16e79104dc66ffb8df7505fac8a7095d401f21cdfcb04e9fcc15614b104f9",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-87.md",
       "topic": "txn-proxy",
       "references": [
@@ -13538,7 +13538,7 @@
       "sourceKey": "09a2198a56dfe8a0323b9465bb663292b74acef36058a1ca0d954c8f9e3dc997",
       "title": "Spring Boot 自动装配原理",
       "baselineAnswerSha256": "9e2986e51adf666ea159e733053983ed529f9ab544971c9f54f24b510b0c7a7b",
-      "answerSha256": "350e22f42bf0ba4a21b26ebdc84d1abd83b9468ffdbc391673ad9a6fe448dfdf",
+      "answerSha256": "a855063668d4b51f313431a91c6ad9680ea544dac662e27735649b3f43b5e19f",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-88.md",
       "topic": "auto-advanced",
       "references": [
@@ -13550,7 +13550,7 @@
       "sourceKey": "31819a3a504ade8de38162e92757ce8c4b69067305cc9d71e2f4e95e53542b82",
       "title": "拦截器与过滤器的区别？执行顺序",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "8c1a2bcd7b4b76b0c9e66d47942a4babbcb93e31babc37aab5896f9e53b5b011",
+      "answerSha256": "cf0ff55c28ed1500f14b866aa366090750c0fadaf43466f24520a6fa16895292",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-89.md",
       "topic": "mvc",
       "references": [
@@ -13562,7 +13562,7 @@
       "sourceKey": "7891d1298f501f4897259b0966159f61902ef7eb4c69914596e8a6ae19cf3d3f",
       "title": "MyBatis 执行流程？一二级缓存？延迟加载",
       "baselineAnswerSha256": "aa039137243a054609feac7e33a0f1182f1cc103147d637b16ffa7310b41228d",
-      "answerSha256": "d6158d57d1fe64e04a538121ba03c106e20a23317f849ef462a44aeb90bd1026",
+      "answerSha256": "4fc82fa1fd8640173b95d8511d5d8d173ce70f7664354aa879efbadc4515ddf7",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-90.md",
       "topic": "legacy-mybatis",
       "references": [
@@ -13574,7 +13574,7 @@
       "sourceKey": "e893774cee6d91ffa422e45baa7ce000c32616942bc68857af92981accbdbf8c",
       "title": "Spring 事件机制；@Async 原理与线程池配置",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "d3e8b97d70362ae59a92ab48d14a95df106b095ba02a486a7ac23b7051c811a9",
+      "answerSha256": "55ecac21bde6c126aecc598cbb6ffd55de0f667dae2e0277d1022e3c1d188512",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-91.md",
       "topic": "async-event",
       "references": [
@@ -13586,7 +13586,7 @@
       "sourceKey": "0452b78c1fdeb9b384086852e49a2b482151a87fabf9fde39cf930305e5d353f",
       "title": "如何自定义一个 starter",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "78ae8b5e14806f05004a7c8ed873df92d7d63bcbafd21f653e81cbdc227312a8",
+      "answerSha256": "b96303eed79e5d22fe47490eb391261a9e758ff5696305fb9df2b14ccf69763e",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-92.md",
       "topic": "auto-advanced",
       "references": [
@@ -13598,7 +13598,7 @@
       "sourceKey": "819fe609192934dd66b52f7786698b109df58f14f0fd5c284f12b9914e833356",
       "title": "B+ 树为什么适合做索引？对比 B 树、红黑树、哈希",
       "baselineAnswerSha256": "5c1569f4891b2295751a1f4852bea33dc822e1754b72407634e96555a437c714",
-      "answerSha256": "8507cd54652009be43ee22bb13b779f71091551f6168ab3b479a8be8e982cb7c",
+      "answerSha256": "19d7e95e6311d8c7db5ab93d3f2ceaa2d9f441c7aaa4703c214b174583295e88",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-93.md",
       "topic": "query-advanced",
       "references": [
@@ -13610,7 +13610,7 @@
       "sourceKey": "be760281fa4a3a958c69670615552880be4da28f8c27fd102cdbc1f4f4b67df7",
       "title": "联合索引的最左前缀？覆盖索引？索引下推",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "c6915aabe441bcff31a8a118b5a6657324a20eaef71ebd230375c7a4b186653d",
+      "answerSha256": "1589159dcc25f6e98301e7d338e5f5b2c7cc09d60cf72e251a56089b934c304f",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-94.md",
       "topic": "query-advanced",
       "references": [
@@ -13622,7 +13622,7 @@
       "sourceKey": "87b7568f336d01b94740d6a9665cf8686386490f300f6f61a98d38c06b53ec31",
       "title": "MVCC 实现原理？Read View 是什么",
       "baselineAnswerSha256": "a9f54afd1f36d49bfd7e7c32c07037698b5f9a240567b94cf8d371208d2125fe",
-      "answerSha256": "fccbd9d40dab2448642508e365dc68c6b91f914cff1f6bb3fe4171bb1f255f92",
+      "answerSha256": "69713c866cb1bed842aaab29be9c9e12cf9ca547080aebc07f06dbaaab30d381",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-95.md",
       "topic": "locks-advanced",
       "references": [
@@ -13634,7 +13634,7 @@
       "sourceKey": "d350089cfae96d8c65e0548419712ab99d6e4a2dce1161b7f161067331fcae5b",
       "title": "间隙锁、临键锁？幻读如何解决",
       "baselineAnswerSha256": "0575dff4b79787a6efd81fa80906df353cb893c42cd5620ec256aaf5a9aa1125",
-      "answerSha256": "4f19803fa755e74fc74437cb52482da4cf035fec499883b42c3930c6ac3daf05",
+      "answerSha256": "10a3bfd52ccdf39b5c13a24da3f2603d88539b3e32b73ad612506b023dddbc86",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-96.md",
       "topic": "locks-advanced",
       "references": [
@@ -13646,7 +13646,7 @@
       "sourceKey": "68c1606a7565721cf80f98d808d4dc8779d3360ebcec581f3bc9dafaad095817",
       "title": "redo log、undo log、binlog 各自作用？两阶段提交",
       "baselineAnswerSha256": "4ae99a486bba9f7fb7cac6ebdf8922469776d4bdb0ed494146d58528207507cf",
-      "answerSha256": "a36b46fdaad1eb30a9b349ba2ba28ea28e634f096307095b05b986f03a1ef339",
+      "answerSha256": "f9a401f60fb818857195f5455dddabcf903f306ff516d84a1aaba4efc65b917d",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-97.md",
       "topic": "logs-basic",
       "references": [
@@ -13658,7 +13658,7 @@
       "sourceKey": "95a78edcc5bacf0ad32c9f7186f8dfd6d46dc7b6440d0609ae20987271eb4a7b",
       "title": "慢 SQL 排查流程？explain 关键字段",
       "baselineAnswerSha256": "ef5310b13d8878eb5e7d833b5892a734f3f9acba8f7bf9dfcc23007420ccfcb8",
-      "answerSha256": "412fea33f499eed0a60311e1335f49fcb94ff33e78efea9727e7c5675486b24a",
+      "answerSha256": "c4609299c65f39a8259271f7b2f438b419bf34782bb55879e1584ca02b39ed14",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-98.md",
       "topic": "query-advanced",
       "references": [
@@ -13670,7 +13670,7 @@
       "sourceKey": "eac748d2a964cbe085221ca775be116cdb630ed40ab0eaf4e48b844622a7efd5",
       "title": "深分页如何优化",
       "baselineAnswerSha256": "1623ce9e8df6405bb53d3493f2d23fece8b3bbe097c262f4a2d8402a252844a7",
-      "answerSha256": "282392d6a6d02c38bb8e795a9f1af788154b89ebedf638b500fa794f473b37e8",
+      "answerSha256": "f1a2d943fc37ff1010d4d47d912bfa69aebd80b11d8756a6d9e0e5f8e1dfbe8f",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-99.md",
       "topic": "pagination-basic",
       "references": [
@@ -13682,7 +13682,7 @@
       "sourceKey": "9d79bdf1595447e9b52031e1d41cb6b5944d14064f130f44329ba6242ad735f8",
       "title": "主从复制原理？主从延迟的原因与处理 - 要点：binlog → relay log → 重放；延迟原因：大事务、从库压力大、单线程回放；处理：并行复制、拆大事务、关键读走主库",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "454cbbc834515d042bdc555b72bf6e5d47e0bf33809014f9dc780c3ec2cb7517",
+      "answerSha256": "eea17bc79f8e584b50e9adab40ef9e4176f744dd373f784c8720e5d9653511ba",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-100.md",
       "topic": "replication-advanced",
       "references": [
@@ -13694,7 +13694,7 @@
       "sourceKey": "a90229ece749b100d969c257f18024780d8c0a6cc8f38f46ceb9367e3c98684d",
       "title": "死锁如何产生、如何排查 - 要点：加锁顺序不一致；show engine innodb status 查看；统一加锁顺序、缩小事务范围、失败重试",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "45f460e0e5ba5a5ff8a77252a1b3c7095a7ecbbf121c40f8e7b767ebaf47d786",
+      "answerSha256": "9c7da01994ee7c46dcff2454b5d71f828fd88073f2a71e7dd9fedf851d913729",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-101.md",
       "topic": "locks-advanced",
       "references": [
@@ -13706,7 +13706,7 @@
       "sourceKey": "d6e53156debc06df2cfed2c357019da6cd89eeabdb5aa50def3969ff496f70b0",
       "title": "大表 DDL、加索引如何不影响线上",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "dd07d16ef78fa8c9338c42850c1ad6ee1426222278fe57d9a9e1405f68f7922a",
+      "answerSha256": "4ed98fe45bbe8e43a05999bc7239b036e6a2fd850ffb3364078141b960077e39",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-102.md",
       "topic": "online-ddl",
       "references": [
@@ -13718,7 +13718,7 @@
       "sourceKey": "e390ffe77497c5f44330946d94bd3967124812ef3853a38cab7ddb5c30e517a2",
       "title": "转账场景下事务隔离级别怎么选？SELECT ... FOR UPDATE 如何使用",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "ff01140a0f1ac3ad94da68a9d06e092e517e9d478b98f3d7e6f26ac1d4e46930",
+      "answerSha256": "e499d59b12bde3bbafaa6e6c6bd30c6fdfec420c59433eef1623816e66ba69bd",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-103.md",
       "topic": "locks-advanced",
       "references": [
@@ -13730,7 +13730,7 @@
       "sourceKey": "f0a19bb754cc059f17cfbb2964f09590af8a9ea2261f638a45b6d97e4c0f0074",
       "title": "Redis 数据类型与应用场景？为什么快",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "211372e79f1cf0da48facd0f563caa00e0355f6f8aee49c8e82440de1e47d5b7",
+      "answerSha256": "bd23e92ea9dee8ef66cd5ad69932725564086624f7a9ce53d6e732cc66948623",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-104.md",
       "topic": "legacy-redis-types",
       "references": [
@@ -13743,7 +13743,7 @@
       "sourceKey": "b26f0c8685d34be7e1ccea93dcd8a0419da384212c393aa3642470d223e11bf6",
       "title": "缓存穿透、击穿、雪崩的区别与解决",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "1b9b46f912ef36bd7918f6b285c3a9ce449065753239eda7869546d30a0cd41e",
+      "answerSha256": "f23149a0bd9ad66c9164d263c62462a2bc857d239f8794dc29408cce16d86ad8",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-105.md",
       "topic": "cache-hot",
       "references": [
@@ -13756,7 +13756,7 @@
       "sourceKey": "1fe4db2cb8ee8fc5ef6acec570acc46670112c01e3e119ff381cac44372aeb90",
       "title": "缓存与数据库一致性方案",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "399a047eeb338556b8dc7d30691c9e3ae43bb820a2dc5cd8f274e7d1738ce90c",
+      "answerSha256": "9fc8d95d42125e52e73f1c84732720942345b40cd3bfa9d18bf7515abdc3fdf6",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-106.md",
       "topic": "cache-consistency",
       "references": [
@@ -13769,7 +13769,7 @@
       "sourceKey": "c39cbe56cab26354edba569ef30fe0a1819c749e16ad52e6f5548cfce47d0bdc",
       "title": "Redis 持久化 RDB 与 AOF？过期与淘汰策略",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "729494d1fa2127f671d2685b1474796e950bc7aa802147071dc98a214cfa2e26",
+      "answerSha256": "e884c82659c8768d1e7a042e33455d3d7ab8ab8f6e80edd4302b8139bac8d021",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-107.md",
       "topic": "redis-capacity",
       "references": [
@@ -13782,7 +13782,7 @@
       "sourceKey": "ed0f10bb9503037a4f11f0a684dfe9660940fa6306dbe0708b0735f30079293e",
       "title": "Redis 分布式锁：实现、过期时间、误删、Redisson 看门狗",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "16ee49bb93789f6aaa9ab34b83a80a192e28f631cb856fd9dc45a70e2ebc10e3",
+      "answerSha256": "7da0983a4b67439e78415e6f3f3b5a1541ce6c9af03d5fef94888ae6bc8c4f73",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-108.md",
       "topic": "redis-lock",
       "references": [
@@ -13795,7 +13795,7 @@
       "sourceKey": "fc58ebdad9d738c8c5fc560defabea1b3641969e1a91b9330a3c950d5ef2970d",
       "title": "MQ 如何保证消息不丢失、不重复、有序",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "73af95179006a42e9dd5a1624fe7757668af75bb8c0a60ce65e80c3cd4c491da",
+      "answerSha256": "3987243c4356d11e015007c8da6ec41c146c02099fba63905b0eda408c5d96b2",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-109.md",
       "topic": "message-ack",
       "references": [
@@ -13808,7 +13808,7 @@
       "sourceKey": "8134387aa023bdc4e47a63c76ee6711f1d47b6cf7086986bf07f81e9cc68fcd8",
       "title": "消息积压如何处理？Kafka 与 RocketMQ 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "735b9366ef252d47258a8dbeeb293f646bee8553c5f08c414e8a0eef7b9f24c6",
+      "answerSha256": "d28e2f52838b4530d399b80c99ec7099f136e9c81e5ff668312c955a2e3451ba",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-110.md",
       "topic": "kafka-order",
       "references": [
@@ -13833,7 +13833,7 @@
       "sourceKey": "ae4a0a0f15138a80785f0e114e440d53e07c52c1c8fe9778d745ae0b8a033a3c",
       "title": "线程安全单例、生产者消费者",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "9032162a4c47d851f1d05b1583e22c86d9647c07f7e5796b6c59710080ba5ece",
+      "answerSha256": "e8ade4f78fbcfbd0e038a4bd3631145a34ea1188deb954ab7bb3cf28d162a917",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-112.md",
       "topic": "algo-queue",
       "references": [
@@ -14328,7 +14328,7 @@
       "sourceKey": "390dc8bd928c288775019a0bd2d122099be0ad6aa21782fbc81bc0f1952c135d",
       "title": "接口设计规范：版本兼容、错误码、幂等、重试",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "94ef87299c1ebb180448c1bde09ed5d9c9e0831b8b73a51869c79391c0563677",
+      "answerSha256": "0cbf7bf8647d14305847d5ebc5ac3fca6554090d7ea3fbdd414069ee0fbe25fd",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-150.md",
       "topic": "api-front",
       "references": [

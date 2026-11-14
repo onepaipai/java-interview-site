@@ -10,23 +10,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. thenApply 转值，thenCompose 展开后续异步结果，独立任务按依赖组合。
-2. 异常显式处理并汇总；allOf 不自动取消所有兄弟任务。
-3. 使用明确执行器、整体截止时间和取消协议，避免公共池阻塞。
+<!-- explanation:deep -->
+
+> 场景与约束：网银并行调用沙盘:并行调三个下游(订单/库存/物流)→汇总结果——CompletableFuture 的编排(supplyAsync→thenCombine→allOf)+异常处理(exceptionally/handle)+超时(orTimeout)。
+
+1. 编排模式:thenApply(转换)/thenCompose(扁平化,避免嵌套 Future)/thenCombine(合并两个结果)/allOf(等待全部)/anyOf(任意完成)——编排的"依赖图":A→B→C 串行,A→B+C 并行合并;allOf 后 get 各 Future(等待全部完成)。
+2. 异常处理:exceptionally(异常时降级返回默认值)、handle(无论成功失败都处理——类似 finally)、whenComplete(观察但不改变结果)——异常传播:一个环节异常→后续环节跳过(直到 exceptionally/handle 拦截);未处理的异常在 join 时抛 CompletionException。
+3. 超时控制:orTimeout(timeout, unit)(JDK 9+——超时后 exceptionally 异常)或 completeOnTimeout(default, timeout)(超时返回默认值)——每个环节设超时(第 12 题超时预算)+整体 deadline(第 12 题)。
 
 ## 参考分析
 
-1. allOf 不会自动完成完整的兄弟取消。
-2. 取消 Future 不等于停止远程工作，过早释放许可会低估真实在途量。
+### 机制:CompletableFuture 的"回调地狱"与编排
+
+CompletableFuture 用回调(thenApply/thenCompose)替代回调地狱(嵌套匿名类)——链式调用类似 Stream(声明式);编排的核心=依赖关系建模(哪些可并行/哪些有依赖/哪里合并)——类比电路:串联(thenCompose)与并联(thenCombine+allOf)。
+
+### 反例:CompletableFuture 的两种事故
+
+事故一:默认线程池 ForkJoinPool.commonPool 被占用——IO 操作用 commonPool(线程少,阻塞 IO 占满)→其他并行流也卡(第 24 题并发进阶);修复=自定义线程池(supplyAsync(supplier, executor))。事故二:异常被吞——链中某环节异常未处理→后续环节不执行→结果为 null(无报错);修复=链尾 handle 或 exceptionally(确保异常显式处理)。
+
+### 取舍:CompletableFuture vs 结构化并发(JDK 21)
+
+CompletableFuture:灵活(自由编排)+复杂(手动管理取消/超时/异常);结构化并发(StructuredTaskScope,JDK 21 预览):作用域管理(子任务生命周期对齐)+取消传播(自动)+错误聚合(统一收集)——结构化并发是"框架级约束",CompletableFuture 是"自由编排"(并发进阶 29 题)。
 
 ## 案例
 
-1. 场景（教学示例）：三路查询两路成功、一路超时。
-2. 处理：汇总独立结果并标注缺失；取消向下传播，等资源真正停止或隔离后再释放占用。
+### 验证:CompletableFuture 的走查核对
 
-3. 验证：总耗时受预算约束；停机先停接单再排空，外部写入按幂等键核对。
+验证:编排断言(并行三下游→allOf 等待→合并结果);异常处理断言(exceptionally 降级返回默认值——链不断);超时断言(orTimeout 超时触发降级);线程池断言(自定义 executor 而非 commonPool)。验证:编排+异常+超时的断言可程序化(mock 下游延迟/失败);SD1 延迟任务实验可复用。
+
+### 追问链:CF 三刀
+
+一刀:"thenApply vs thenCompose?"——thenApply 返回值直接包装(返回 T→CompletableFuture<T>);thenCompose 返回 CompletableFuture(扁平化,避免嵌套)——flatMap vs map 的函数式类比。二刀:"取消 CompletableFuture?"——cancel 不中断正在执行的任务(只标记为 cancelled)——真正取消需要 interrupt(第 16 题断连取消)+任务内响应中断。三刀:"CompletableFuture 与虚拟线程?"——虚拟线程(JDK 21)让"同步阻塞写法"获得"异步性能"——CompletableFuture 的异步复杂度(回调链)在虚拟线程下可用同步写法替代(第 69 题虚拟线程)。
 
 ## 总结点
 
-1. 超时要向下取消。
-2. 资源结束才释放。
+1. 编排:thenApply/Compose/Combine/allOf
+2. 异常:exceptionally/handle 显式处理
+3. 超时:orTimeout 每环节设预算

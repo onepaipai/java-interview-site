@@ -1270,4 +1270,1955 @@ export default {
     ['Lambda=函数式接口的简洁实现', 'Stream 惰性+声明式,不修改源', 'Optional 替代返回值 null,不做参数'], [jls17, api('java/util/Optional')],
   ),
 
+
+  // ---- x-leg3-p0 ----
+"legacy/12": deep(
+    "ArrayList 与 LinkedList 区别？ArrayList 扩容机制",
+    "网银对账单沙盘:按月拉取 10 万条流水——ArrayList(随机访问/尾部追加快)与 LinkedList(头插/中间插快)的选型差异;ArrayList 满了怎么扩容(1.5 倍+复制)。",
+    [
+      "ArrayList:动态数组——随机访问 O(1)(下标直达)、尾部均摊 O(1);中间插删 O(n)(移动元素);内存连续(CPU 缓存友好)。LinkedList:双向链表——头尾插删 O(1),随机访问 O(n)(从头/尾遍历),每节点额外 prev/next 指针开销。",
+      "扩容:容量不足时 newCapacity=oldCapacity+(oldCapacity>>1)(1.5 倍)——Arrays.copyOf 复制到新数组(O(n) 一次成本,均摊后每元素 O(1));扩容时机=add 时 size==capacity;建议预估容量构造(initialCapacity)避免反复扩容。",
+      "选型:查询为主/尾部追加→ArrayList(绝大多数场景);频繁头插/用作队列栈→LinkedList(或 ArrayDeque——数组实现的双端队列,性能优于 LinkedList)。",
+    ],
+    [
+      block("机制:1.5 倍的取舍", "1.5 倍=扩容频率与内存浪费的折中:翻倍(2 倍)浪费上限大,线性(每次+1)扩容 O(n) 次数多;1.5 倍下扩容次数 O(log n) 且旧数组可复用部分空间(1.5 倍扩出来的新数组与旧数组重叠,HotSpot 可就地收缩)。实测:扩容 10 次≈容量 40 倍增长。"),
+      block("反例:List 误用的两种事故", "事故一:LinkedList 做随机访问——循环 get(i) 每次 O(n)→总 O(n²)(百万数据秒级变分钟级);修复=ArrayList 或迭代器。事故二:不预估容量——10 万次 add 触发约 24 次扩容(每次全量复制);修复=new ArrayList<>(expectedSize)。"),
+      block("边界:remove 与 fail-fast", "ArrayList.remove 按索引 O(n)(移动后续元素);遍历中 remove 抛 ConcurrentModificationException(fail-fast,第 16 题);LinkedList 遍历删除用 iterator.remove O(1)。"),
+    ],
+    [
+      block("验证:扩容的实测走查", "验证:反射读 elementData.length——add 第 11 个元素时 10→15,16 个时 15→22(1.5 倍链);System.arraycopy 复制断言(旧数组内容不变);随机访问耗时对照(ArrayList get(百万级)毫秒 vs LinkedList 秒级)——集合模块 C 系列实验可复用。预期:1.5 倍链与源码 grow() 一致。"),
+      block("追问链:List 三刀", "一刀:ArrayDeque vs LinkedList=数组环形缓冲 vs 链表——双端队列首选 ArrayDeque(缓存友好+无节点开销)。二刀:CopyOnWriteArrayList=写时复制(读无锁,写贵)——读多写少(并发基础)。三刀:subList 视图= backed by 原数组(改原数组影响视图,序列化风险)。"),
+    ],
+    ["ArrayList 查询快,LinkedList 插删快", "扩容 1.5 倍+copyOf 复制", "预估容量避免反复扩容"], [api("java/util/ArrayList"), api("java/util/LinkedList")],
+  ),
+  "legacy/13": deep(
+    "HashMap 底层结构？put 流程？容量为什么是 2 的幂",
+    "网银账户缓存沙盘:50 万账户 key 查询——HashMap(数组+链表+红黑树)的 put 五步流程与树化边界;容量 2 的幂让取模退化为位运算。",
+    [
+      "结构(JDK8):数组+链表+红黑树——桶头碰撞→链表追加(尾插);链表长度≥8 且数组容量≥64→树化(查询 O(log n));≤6 退化回链表(留缓冲防抖动);数组容量>64 但链长≥8 只扩容不树化。",
+      "put 流程:计算 hash((h=key.hashCode())^(h>>>16) 高低位异或扰动)→定位桶((n-1)&hash)→空槽直接放/槽非空:头 key 相等覆盖,否则链尾追加或入树→树化判断→size 超阈值(容量×0.75)触发 resize(2 倍扩容,元素重哈希拆分)。",
+      "容量 2 的幂:(n-1)&hash 等价于 hash%n 且更快(位运算 vs 除法)——n 非 2 的幂时(n-1) 二进制不全是 1,散列不均匀;默认容量 16、最大 2^30(tableSizeFor 向上取整到 2 的幂)。",
+    ],
+    [
+      block("机制:扰动函数为什么高低位异或", "hashCode 低 bits 相同的 key 常见(如自增 id 低位变化)——只取低 bits 碰撞率高;高 16 位异或进低 16 位=高位信息参与索引(代价一条指令)——散列更均匀,树化与扩容概率下降。"),
+      block("反例:HashMap 的三种事故", "事故一:可变对象做 key——put 后修改字段→hashCode 变→get 找不到(条目成孤儿);修复=key 不可变(String/Integer)。事故二:多线程 put——JDK7 头插扩容成环(死循环 CPU 100%),JDK8 尾插不环但数据丢失;修复=ConcurrentHashMap(第 14 题)。事故三:容量设 100——tableSizeFor 取整 128,阈值 96,存 97 个就扩容;预估容量应按 expectedSize/0.75+1 设置。"),
+      block("边界:树化的两个阈值", "TREEIFY_THRESHOLD=8(泊松分布下单桶 8 个概率亿分之一,树化是兜底而非常规);MIN_TREEIFY_CAPACITY=64(容量小优先扩容而不是树化)——树化要同时满足链长与容量两个条件。"),
+    ],
+    [
+      block("验证:树化与扩容的实测走查", "验证:集合模块 C1 实验——16 桶放入 30 个同桶键,反射读 table 观察链表→红黑树轨迹;扩容断言(存 13 个→容量 16→32,阈值 12 触发);(n-1)&hash 等价 hash%n 断言(万级随机 key 对照);扰动断言(关闭扰动构造对照散列分布)。预期:树化轨迹与阈值 8/64 一致。"),
+      block("追问链:HashMap 三刀", "一刀:resize 拆分=JDK8 高低位两条链(e.hash&oldCap==0 低位链/非 0 高位链)——免重算 hash。二刀:负载因子 0.75=时间(碰撞)与空间(利用率)的经验折中。三刀:1.7 vs 1.8=头插(并发成环)vs 尾插+树化+高低位拆分——并发安全交给 CHM(第 14 题)。"),
+    ],
+    ["数组+链表+红黑树,树化 8/64", "put:扰动→定位→覆盖或尾插→树化→扩容", "2 的幂:位运算取模+散列均匀"], [api("java/util/HashMap")],
+  ),
+  "legacy/14": deep(
+    "HashMap、Hashtable、ConcurrentHashMap 区别",
+    "网银共享缓存沙盘:多线程读写账户表——HashMap(非线程安全)/Hashtable(全表锁)/ConcurrentHashMap(CAS+桶级锁)——并发度与性能的代际差异。",
+    [
+      "HashMap:非线程安全(允许一个 null key/null value,JDK8 尾插);Hashtable:线程安全但全表一把锁(get/put 都 synchronized)——读写互斥,并发度 1;已过时。ConcurrentHashMap:JDK8 CAS+synchronized 锁单个桶头——并发度=桶数,读无锁(volatile)。",
+      "CHM JDK7 vs JDK8:JDK7 Segment 分段锁(默认 16 段,并发度=段数,二次哈希);JDK8 取消分段——CAS 空桶+synchronized 链头 Node,粒度从段细化到桶;size 用 CounterCell 分片计数(LongAdder 思路)。",
+      "null 语义:HashMap 允许 null key/value;Hashtable 与 CHM 都禁止(null 会 NPE)——CHM 禁止的原因:并发下 containsKey(key)==false 与 get(key)==null 无法区分(key 不存在 vs 映射为 null 的歧义)。",
+    ],
+    [
+      block("机制:CHM 为什么读不需要加锁", "Node.val 与 Node.next 都是 volatile——读线程看到最新值;数组引用 volatile 保证扩容后可见。写侧:空桶 CAS 放入,非空 synchronized 锁桶头(锁的是链表头 Node,不是数组槽)——不同桶互不影响,并发度接近桶数。"),
+      block("反例:并发容器的两种事故", "事故一:HashMap 多线程 put——数据丢失或(JDK7)扩容死循环;修复=CHM。事故二:Collections.synchronizedMap 当高性能用——所有操作一把互斥锁(与 Hashtable 同级);高并发必须 CHM。事故三:CHM 复合操作不原子——先 get 再 put 的检查-操作仍有竞态,用 putIfAbsent/computeIfAbsent。"),
+      block("取舍:同步容器的演进逻辑", "Hashtable(全表锁)→synchronizedMap(包装,同粒度)→分段锁(JDK7 CHM)→桶级锁+CAS(JDK8 CHM)——锁粒度逐代细化;选型:单线程 HashMap,并发 CHM,排序并发 ConcurrentSkipListMap(无并发 TreeMap)。"),
+    ],
+    [
+      block("验证:三者并发的实测走查", "验证:并发压力断言(8 线程×10 万 put:HashMap 丢数据/CHM 无丢失);并发度断言(CHM 不同桶并行,单桶串行——计时对照);null 断言(HashMap 可 null,CHM 抛 NPE);复合操作断言(putIfAbsent 幂等 vs get+put 竞态)——集合模块 C 系列并发实验可复用。预期:CHM 无丢失且吞吐显著高于 Hashtable。"),
+      block("追问链:CHM 三刀", "一刀:size 弱一致=CounterCell 分片+sumCount 无全局锁(返回瞬时近似值)。二刀:迭代器弱一致=创建时不抛 CME(fail-fast 反面),可能读到旧值。三刀:computeIfAbsent 死锁风险=同桶嵌套 compute(JDK9 修复递归更新抛 IllegalStateException)——嵌套计算换普通 put。"),
+    ],
+    ["Hashtable 全表锁已过时", "CHM=CAS+桶级锁,读 volatile 无锁", "CHM 禁 null:并发歧义"], [juc, api("java/util/concurrent/ConcurrentHashMap")],
+  ),
+  "legacy/15": deep(
+    "HashSet 如何保证不重复",
+    "网银去重沙盘:百万流水号去重——HashSet 底层就是 HashMap(add=map.put(key, PRESENT))——不重复靠 hashCode+equals 契约,两个环节缺一即漏。",
+    [
+      "HashSet 包装 HashMap:private transient HashMap<E,Object> map+静态 PRESENT 占位对象——add(e) 返回 map.put(e, PRESENT)==null(返回 null=新增,非 null=已存在)——去重逻辑全部复用 HashMap 的 key 判重。",
+      "判重两环节:先 hashCode 定位桶(快),桶内 equals 精确比较——hashCode 相等只是必要条件,equals 相等才真重复;两对象 equals 相等必须 hashCode 相等(契约,反之不要求)。",
+      "违反契约的后果:只重写 equals 不重写 hashCode——两个业务相等的对象散到不同桶→Set 出现重复;只重写 hashCode 不重写 equals——hashCode 相同但 equals 不同→都进 Set(业务重复)。hashCode 稳定性:存入后修改参与 hash 的字段→对象成孤儿(删不掉找不到)。",
+    ],
+    [
+      block("机制:为什么两环节缺一即漏", "HashMap 判重=先按 hashCode 找桶(等价于按桶分组),再桶内逐个 equals——hashCode 不同=不同桶,equals 根本没机会执行;hashCode 相同但 equals 不同=同桶不同条目(碰撞,合法)。类比:邮编(hashCode)分拣+门牌(equals)精确投递——邮编错了信永远进错小区。"),
+      block("反例:去重失效的两种事故", "事故一:自定义类只重写 equals——HashSet 出现业务重复(如两个金额相同但实例不同的交易对象都入 Set);修复=Lombok @EqualsAndHashCode 或按字段重写。事故二:可变 key 入 Set 后改字段——contains/remove 失效;修复=不可变 key 或不改参与 hash 的字段。"),
+      block("取舍:去重容器的选型", "HashSet(无序 O(1))/LinkedHashSet(保插入序)/TreeSet(排序 O(log n),compare 判重不走 hashCode——Comparator 一致性同样要求)/并发 CopyOnWriteArraySet(读多写少);百万级去重内存敏感→布隆过滤器(允许误判)。"),
+    ],
+    [
+      block("验证:去重契约的实测走查", "验证:契约断言(equals 相等→hashCode 必相等——反射构造只重写一个的反例,观察 Set 重复/孤儿);remove 孤儿断言(入 Set 后改字段→remove 返回 false);PRESENT 断言(反射读 map 确认占位对象)——三组固化契约语义,本机可复跑。预期:契约破坏立即表现为重复或孤儿。"),
+      block("追问链:Set 三刀", "一刀:TreeSet 判重=compare/compareTo==0(不走 hashCode/equals)——排序字段与相等字段要一致。二刀:HashSet 如何判断元素存在=contains 走同 put 的两环节(O(1) 均摊)。三刀:LinkedHashSet=LHM 的 accessOrder=false 插入序(区别于 LRU 访问序,legacy/111 同源)。"),
+    ],
+    ["HashSet=HashMap 的 key 集合视图", "hashCode 定位+equals 判等,缺一即漏", "可变 key 入集合=孤儿风险"], [api("java/util/HashSet"), api("java/util/HashMap")],
+  ),
+  "legacy/16": deep(
+    "fail-fast 是什么？遍历时如何安全删除",
+    "网银风控清单沙盘:遍历黑名单时删除命中项——抛 ConcurrentModificationException(fail-fast);安全删除三法:iterator.remove/removeIf/并发容器。",
+    [
+      "fail-fast 机制:集合维护 modCount(结构修改计数)——迭代器创建时记录 expectedModCount,每次 next/remove 前校验 modCount==expectedModCount,不等抛 CME——设计目标是尽早暴露并发修改 bug,不是保证(fail-fast 只是尽力而为)。",
+      "安全删除三法:iterator.remove()(通过迭代器删,同步维护 expectedModCount/modCount);collection.removeIf(Predicate,JDK8 内部用迭代器删,语义清晰);并发容器 CopyOnWriteArrayList(写时复制,迭代旧快照,弱一致)或 CHM 条目遍历。",
+      "易错场景:for-each 中 list.remove(i)——直接改 modCount,下一轮 next 抛 CME;倒序 for 循环按索引删(只对 ArrayList 这类可随机访问且删后索引可控的场景可行,通用性差);遍历 Map 删除需 entrySet().iterator().remove 或 removeIf。",
+    ],
+    [
+      block("机制:modCount 为什么不能被迭代器删绕过", "iterator.remove 先调 list 的删除(改 modCount)再把 expectedModCount=modCount(同步)——所以迭代器自己的删除不触发校验失败;而 list.remove 绕过迭代器只改 modCount——期望值与实际值脱节。类比:只有持票人能改票面座位号,别人改了票就作废(检测到外部改动)。"),
+      block("反例:删除的两种事故", "事故一:for-each 删第一个命中后继续遍历——CME 在下一次 next 抛出(有时滞后到 hasNext 才抛,给人偶然不抛的假象);修复=removeIf。事故二:依赖 fail-fast 保证正确性——modCount 校验无同步保证,并发下可能漏检(Javadoc 明示 fail-fast 不可依赖);真正的并发安全靠并发容器或锁。"),
+      block("取舍:三法的适用边界", "单线程+条件删:removeIf(首选,代码短);需要删除时做额外动作:iterator.remove;并发读写并存:CopyOnWriteArrayList(读多写少)或加锁(写多)——并发容器遍历的是快照/弱一致,不是 fail-fast。"),
+    ],
+    [
+      block("验证:fail-fast 的实测走查", "验证:CME 断言(for-each 中 remove→CME,且 hasNext 偶发不抛的滞后现象);iterator.remove 断言(删除顺利+modCount 同步);removeIf 断言(等价于迭代器删);CopyOnWriteArrayList 断言(遍历中并发写不抛 CME,读到旧快照)——四组固化删除语义,本机可复跑。预期:fail-fast 抛出时机与 modCount 校验点一致。"),
+      block("追问链:fail 三刀", "一刀:fail-safe 对比=CopyOnWrite/COW 迭代快照不抛 CME(代价:内存复制+弱一致)。二刀:modCount 也用于 subList 视图校验(原集合结构性修改→视图操作抛 CME)。三刀:Map 遍历删=entrySet removeIf(CHM 用 entry 迭代器 remove 或 values removeIf——弱一致)。"),
+    ],
+    ["fail-fast=modCount 校验,尽早暴露 bug", "安全删:iterator.remove/removeIf/COW", "fail-fast 不可依赖为正确性保证"], [api("java/util/ArrayList")],
+  ),
+  "legacy/17": deep(
+    "TreeMap、LinkedHashMap 的特点",
+    "网银报表沙盘:按账户等级排序输出(TreeMap)与按访问热度排序(LinkedHashMap 访问序)——两者都在 HashMap 之上加了结构:红黑树与双向链表。",
+    [
+      "TreeMap:红黑树实现——按 key 排序(自然序或定制 Comparator),get/put/remove O(log n);支持范围查询(floorKey/ceilingKey/subMap/headMap/tailMap);key 必须可比较,判重靠 compare==0(不走 hashCode/equals)。",
+      "LinkedHashMap:HashMap+双向链表串联所有 Entry——保序两种:插入序(accessOrder=false,默认)与访问序(true,get/put 移到链尾);重写 removeEldestEntry 可做 LRU(legacy/111 同源);其余判重/扩容行为与 HashMap 一致。",
+      "选型:需要排序或范围查询→TreeMap;需要保持插入顺序或 LRU→LinkedHashMap;纯查找→HashMap(O(1) 最快);并发排序→ConcurrentSkipListMap(跳表,无并发 TreeMap)。",
+    ],
+    [
+      block("机制:两种结构的代价差在哪", "TreeMap 每次插入要在红黑树中旋转着色(O(log n)),换来全局有序;LinkedHashMap 在 HashMap 的 O(1) 上只多做链表指针维护(每个条目多两个指针)——代价近零,换来遍历顺序稳定。类比:TreeMap 是随时保持书架按字母排好,LinkedHashMap 是书按放进来的顺序串成一条绳。"),
+      block("反例:有序容器的两种事故", "事故一:TreeMap 的 key compareTo 与 equals 不一致——compare 认为相等但 equals 不等→put 覆盖丢失数据;修复=比较字段与相等字段一致。事故二:LinkedHashMap 并发使用——非线程安全(同 HashMap);LRU 缓存并发用 Caffeine(W-TinyLFU,legacy/111 取舍)。"),
+      block("边界:accessOrder 的隐性行为", "accessOrder=true 时 get 也会改链表结构(移到尾部)——遍历中 get 同一 key 会影响遍历序;removeEldestEntry 在 put 后回调(删链头 eldest)——淘汰逻辑只看容量,要 TTL 需手写(legacy/111 取舍)。"),
+    ],
+    [
+      block("验证:有序性的实测走查", "验证:TreeMap 断言(乱序 put→keySet 迭代有序;floorKey/ceilingKey 边界);LinkedHashMap 断言(插入序遍历=put 顺序;accessOrder=true 时 get A 后 A 移尾——legacy/111 反射读链表同源);compare-equals 不一致断言(put 覆盖丢数据复现)——三组固化有序语义,本机可复跑。"),
+      block("追问链:有序三刀", "一刀:NavigableMap 接口=TreeMap 的范围查询全集(descendingMap/navigableKeySet)。二刀:ConcurrentSkipListMap=跳表(概率平衡,平均 O(log n)),替代并发场景红黑树(旋转难并发)。三刀:LinkedHashMap 与 LRU 的关系=accessOrder+removeEldestEntry 五行实现(legacy/111),手写版的定制空间=TTL/分段/权重。"),
+    ],
+    ["TreeMap 红黑树排序,支持范围查询", "LinkedHashMap 链表保序,访问序可做 LRU", "TreeMap 判重靠 compare,一致性要求高"], [api("java/util/TreeMap"), api("java/util/LinkedHashMap")],
+  ),
+  "legacy/18": deep(
+    "进程与线程区别？线程有哪些状态",
+    "网银并发沙盘:一个 JVM 进程内跑数百业务线程——进程(资源分配单位,独立地址空间)与线程(调度执行单位,共享进程内存)的边界;Java 线程六状态。",
+    [
+      "进程:操作系统资源分配的基本单位——独立地址空间/文件句柄/信号处理;进程间隔离(一个崩溃不影响其他)。线程:CPU 调度的基本单位——共享进程的堆/方法区,私有栈/程序计数器——线程切换成本低于进程切换(不换地址空间,缓存更友好)。",
+      "Java 六状态:NEW(未 start)/RUNNABLE(可运行,含等待 CPU 与 IO)/BLOCKED(等 monitor 锁)/WAITING(无限等待:wait/join/park)/TIMED_WAITING(限时等待)/TERMINATED(结束);迁移由 synchronized/wait/notify/join 触发。",
+      "对应关系:Java 线程映射到内核线程(JDK8+ 各平台 1:1,BLOCKED/WAITING 在 OS 层可能挂起);RUNNABLE 在 OS 层可能是 running 或 ready——Java 状态是 JVM 视角,不等于 OS 调度状态。",
+    ],
+    [
+      block("机制:BLOCKED 与 WAITING 的分界", "BLOCKED=synchronized 竞争锁(锁释放自动唤醒,OS 层重量级锁挂起);WAITING=主动进入(wait/join/park),必须被 notify/notifyAll/unpark/目标线程结束唤醒——被动等锁与主动等待的分界;第 20 题展开 wait/notify 语义。"),
+      block("反例:状态误判的两种事故", "事故一:把 RUNNABLE 等同于正在跑 CPU——网络 IO 阻塞时线程也是 RUNNABLE(Java 视角),CPU 利用率却低;诊断要看 OS 层线程状态(top -H/jstack)。事故二:线程池任务卡死但状态 WAITING——jstack 看栈顶(park 在 LockSupport→查锁;wait→查 notify 配对)。"),
+      block("取舍:线程的创建成本与虚拟线程", "线程创建成本高(默认 1MB 栈预留+内核调度体)——数量受内存与上下文切换约束(JDK17 实测 2 万线程建完 2s,并发基础 11 题);海量并发任务→线程池复用(第 23 题)或虚拟线程(JDK21,挂起零内核切换)。"),
+    ],
+    [
+      block("验证:线程状态的实测走查", "验证:状态断言(未 start→NEW;start 后 run 中→RUNNABLE;synchronized 竞争→BLOCKED;wait→WAITING;sleep(100)→TIMED_WAITING;run 返回→TERMINATED——六态全覆盖,线程状态实验已在并发模块验证可复跑);jstack 断言(池中空闲 worker=WAITING park)。预期:六态断言与 Thread.State 枚举一一对应。"),
+      block("追问链:线程三刀", "一刀:守护线程=setDaemon(true),JVM 退出不等守护线程——GC/清理类后台任务用,业务别用(随时被杀)。二刀:线程优先级=仅提示(1-10,OS 可忽略),别依赖优先级做正确性。三刀:Thread.yield=建议让步不保证——正确性绝不能建立在 yield/priority 上。"),
+    ],
+    ["进程=资源单位,线程=调度单位", "六状态:NEW/RUNNABLE/BLOCKED/WAITING/TIMED/TERMINATED", "BLOCKED 被动等锁,WAITING 主动等待"], [jls17, api("java/lang/Thread.State")],
+  ),
+  "legacy/19": deep(
+    "创建线程的方式？start 与 run 区别",
+    "网银异步任务沙盘:导出报表任务异步执行——四种创建方式(Thread/Runnable/Callable/线程池)的演进与 start/run 的一字之差(开新线程 vs 当前线程普通方法调用)。",
+    [
+      "四种方式:继承 Thread(run 无返回值,不能抛受检异常);实现 Runnable(任务与线程解耦,推荐);Callable+FutureTask(有返回值+可抛异常,Future.get 阻塞取结果);线程池 ThreadPoolExecutor 提交(生产标准,复用线程,第 23 题)——本质都是构造 Thread 对象执行任务。",
+      "start 与 run:start() 开启新线程并由 JVM 调新线程的 run(一次调用,重复 start 抛 IllegalThreadStateException);直接调 run()=当前线程普通方法调用(没有并发,异步变同步)——一字之差=并发语义全失。",
+      "生产实践:业务线程一律走线程池(不用裸 new Thread——无复用无上限);Runnable/Callable 作为任务对象提交——任务的返回值/异常处理策略明确(Future.get 要设超时)。",
+    ],
+    [
+      block("机制:start 做了什么", "start()→JVM 调用 OS 创建内核线程(分配栈)→新线程调度执行 run();run() 只是对象方法调用——线程体内跑的是 run 的字节码,谁调 run 谁执行。start 后线程进入 RUNNABLE(第 18 题状态机);isAlive() 判断是否已 start 未终止。"),
+      block("反例:创建方式的两种事故", "事故一:高并发下 new Thread——每次建线程(1MB 栈+内核开销),流量峰值线程爆炸 OOM;修复=线程池(第 24 题 Executors 陷阱)。事故二:future.get() 无超时——任务挂死调用方永久阻塞;修复=get(timeout,unit)+超时策略(降级/取消)。"),
+      block("取舍:Runnable vs Callable", "Runnable:无返回值,异常只能内部消化(线程池场景被吞,UncaughtExceptionHandler 兜底);Callable:返回值+受检异常可抛(FutureTask 捕获后 get 时重抛)——需要结果/异常感知用 Callable;CompletableFuture 更现代(组合/回调,不用阻塞 get)。"),
+    ],
+    [
+      block("验证:start/run 的实测走查", "验证:线程名断言(new Thread(task, 'worker') start 后打印 currentThread().getName()=worker;直接调 run() 打印的是 main——一字之差立现);重复 start 断言(抛 IllegalThreadStateException);Callable 断言(Future.get 拿到返回值+异常重抛);线程池提交断言(池线程名 pool-N-thread-M)——四组固化创建语义,本机可复跑。"),
+      block("追问链:创建三刀", "一刀:Thread 与 Runnable 的解耦=任务对象化(可复用/可排队/可取消)——线程池只认任务不认线程。二刀:Future.get 的阻塞陷阱=无超时永久挂;CompletableFuture.orTimeout(JDK9+)。三刀:虚拟线程(JDK21)=Thread.ofVirtual,百万级轻量线程——阻塞挂起零内核切换,IO 密集场景替代池化。"),
+    ],
+    ["四种创建,生产走线程池", "start 开新线程,run 当前线程调用", "Callable 带返回值,Future.get 要超时"], [juc, api("java/lang/Thread")],
+  ),
+  "legacy/20": deep(
+    "sleep 与 wait 区别？notify 与 notifyAll 区别",
+    "网银任务队列沙盘:生产者消费者模型——wait 释放锁等条件,notify 唤醒随机一个(可能唤醒错/丢失);虚假唤醒必须 while 循环判条件。",
+    [
+      "sleep vs wait:所属(Thread 静态方法 vs Object 实例方法);锁(wait 需持有 monitor 且调用后释放锁,sleep 不释放);用途(wait=条件等待+notify 唤醒,sleep=纯暂停);wait 必须在 synchronized 块内(否则 IllegalMonitorStateException)。",
+      "notify vs notifyAll:notify 随机唤醒一个等待线程(选哪个由 JVM 决定,可能唤醒的条件未满足→该线程重新 wait,而满足条件的线程没醒=通知丢失);notifyAll 唤醒全部(竞争锁后各自 while 检查条件,不满足继续 wait)——多条件共享一个锁时必须 notifyAll。",
+      "虚假唤醒(wait 在无 notify 时也可能返回,OS 层面允许)→等待必须 while(!condition) wait,不能用 if——醒来后重新检查条件;这也是三重防线之一(条件判断/超时/中断)。",
+    ],
+    [
+      block("机制:wait 为什么必须在 synchronized 内", "wait/notify 语义绑定 monitor:wait=释放 monitor 并进入该对象的 WAITING 集,notify=从该对象等待集唤醒一个——不在 monitor 内调用=没有 monitor 可释放(Immediate IllegalMonitorStateException);释放锁是 wait 的关键副作用(否则其他线程永远拿不到锁改条件=死锁)。"),
+      block("反例:wait/notify 的两种事故", "事故一:notify 丢通知——两个条件(队列空/满)共用一个锁,生产者 notify 唤醒了另一个生产者→消费者永远睡;修复=notifyAll 或按条件拆锁(Lock+Condition 多等待集)。事故二:if 判条件——虚假唤醒后直接执行(条件实际不成立)→队列越界/空取;修复=while 循环判条件(规约级写法)。"),
+      block("取舍:Object.wait vs Lock/Condition", "Object.wait/notify:一个对象一个等待集,多条件只能 notifyAll(低效);ReentrantLock+多个 Condition:每个条件独立等待集,signal 精准唤醒(数组阻塞队列的实现);生产大多数场景直接用 BlockingQueue(封装好条件队列)。"),
+    ],
+    [
+      block("验证:等待唤醒的实测走查", "验证:锁释放断言(wait 期间另一线程可获同一把锁,sleep 期间获不到——对照实验);IllegalMonitorStateException 断言(块外 wait);虚假唤醒断言(无 notify 的 wait 超时返回——while 重检);notify 丢失断言(两条件一锁,notify 唤醒错线程——notifyAll 修复对照);并发模块条件队列实验可复用。预期:while+notifyAll 组合在所有扰动下收敛。"),
+      block("追问链:等待三刀", "一刀:sleep(0)/yield 的语义=让出时间片建议(调度提示,不释放锁)。二刀:Thread.interrupt 与 wait——wait 被中断抛 InterruptedException 并恢复中断标志;中断是协作式取消。三刀:Condition.awaitUntil/awaitNanos=限时等待(避免永久 WAITING——超时兜底)。"),
+    ],
+    ["wait 释放锁,sleep 不释放", "notify 可能丢通知,多条件用 notifyAll", "虚假唤醒→while 判条件"], [juc, api("java/lang/Object")],
+  ),
+  "legacy/21": deep(
+    "synchronized 的使用方式与锁的范围",
+    "网银余额扣减沙盘:同一方法三种加法(实例方法/静态方法/代码块)——锁的对象不同=互斥范围不同;锁错对象=白加。",
+    [
+      "三种用法:实例方法 synchronized(this)——锁当前实例(不同实例互不影响);静态方法 synchronized(Class 对象)——锁类,全局互斥;代码块 synchronized(任意对象)——锁指定对象,粒度可控。互斥判断标准:多个线程争的必须是同一把锁(同一个对象/类)。",
+      "可重入:同一线程可重复获取自己持有的锁(计数+1/退出-1)——子类同步方法调父类同步方法不死锁;可重入但不释放给他人(线程内重入,跨线程仍互斥)。",
+      "锁对象选择:私有 final Object lock(防外部代码锁同一对象干扰,防锁对象被替换)——锁 this 或公开对象=外部也能 synchronized 它(引入不可控互斥);字符串常量做锁=全局池共享(不同业务撞同一把锁,禁)。",
+    ],
+    [
+      block("机制:锁范围=锁对象的生命周期", "锁实例=实例级互斥(每个对象一把);锁 Class=类级互斥(JVM 内全局一把——静态计数器/初始化);锁局部对象=块级互斥(范围最小)——粒度越细并发度越高,但要保证竞争同一资源的多线程拿到同一把锁。synchronized 底层=对象头 Mark Word+monitor(第 64 题锁升级)。"),
+      block("反例:锁对象的两种事故", "事故一:锁 this 但外部也 synchronized(this)——外部长持锁阻塞业务(不可控互斥);修复=私有锁对象。事故二:锁字符串字面量——不同业务 new Object 意图分开,实际 JVM 常量池共享同一 String→互相阻塞;修复=专用锁对象。事故三:读写都用实例锁但实例是每请求新建——每个请求一把锁=没互斥(该锁 Class 或共享对象)。"),
+      block("取舍:synchronized vs Lock", "synchronized:JVM 内建(自动释放/锁升级优化/够用的语义);ReentrantLock:tryLock/超时/公平/多 Condition/可中断——需要高级语义才用;普通互斥 synchronized 优先(简单+JIT 优化好,锁消除/粗化)。"),
+    ],
+    [
+      block("验证:锁范围的实测走查", "验证:实例锁断言(两个实例的同步方法并行,同一实例串行——计时);类锁断言(静态方法与 synchronized(X.class) 互斥);可重入断言(线程内嵌套获锁不死锁);锁错对象断言(每请求新锁对象→互斥失效复现)——四组固化锁范围语义,本机可复跑。预期:互斥与否完全由“是否同一锁对象”决定。"),
+      block("追问链:锁三刀", "一刀:锁升级=偏向→轻量级(CAS 自旋)→重量级(monitor/OS 挂起)——竞争烈度驱动(第 64 题详解)。二刀:死锁=两线程交叉持锁——定序获取/tryLock 超时打破(第 62 题并发批次)。三刀:锁粗化与消除=JIT 对相邻锁合并/对非逃逸对象删锁(第 27 题逃逸分析同源)。"),
+    ],
+    ["实例方法锁对象,静态方法锁类", "可重入:线程内计数,跨线程互斥", "私有 final 锁对象,禁字符串锁"], [jls17, api("java/lang/Object")],
+  ),
+  "legacy/22": deep(
+    "volatile 的作用？能否保证原子性",
+    "网银状态位沙盘:running 标志位用 volatile(可见性)但 count++ 仍丢更新(非原子)——volatile=可见性+有序性,不等于原子性。",
+    [
+      "volatile 两保证:可见性(写立即刷主存并使其他 CPU 缓存行失效,读走主存——JMM 层面=写后读有 happens-before 关系);有序性(禁止指令重排——内存屏障:volatile 写前 StoreStore+写后 StoreLoad,读后 LoadLoad)。语义上=轻量级同步(读写本身原子,但复合操作不原子)。",
+      "不能保证原子性:count++ 是 读-改-写 三步(volatile 只保证每步可见,不保证三步连续)——两个线程同时读到旧值+1 后写回→丢失更新;验证:10 线程×1 万次 volatile int++ 结果<10 万;替代=AtomicInteger(CAS)或 synchronized。",
+      "典型正确场景:状态标志(running/double-check 的 instance 引用,禁止半初始化对象重排序暴露)+一次性写多读(配置刷新);典型错误场景:计数器/累加器(用 Atomic/LongAdder)。",
+    ],
+    [
+      block("机制:可见性与 happens-before 的关系", "JMM 规则:volatile 写 happens-before 后续对同一变量的 volatile 读——读线程必见写线程之前的所有写(不仅是 volatile 变量本身)——这是 DCL 单例正确性的关键(instance 为 volatile,getInstance 读到非 null 时对象构造一定完成,并发基础 2 题规则清单)。"),
+      block("反例:volatile 误用的两种事故", "事故一:volatile 计数器——压测对账发现少计(丢失更新);修复=AtomicInteger/LongAdder(第 8 题 CAS)。事故二:非 volatile 标志——后台线程永远看不到 running=false( JIT 缓存到寄存器)→死循环;修复=volatile 标志位(可见性是它的本职)。"),
+      block("取舍:三种方案的性能谱系", "volatile(最轻,仅可见+有序)<Atomic(CAS 自旋,无锁)<synchronized(互斥,最重但语义完整)——按操作复杂度选:单变量读写=volatile,单变量复合=Atomic,多变量临界区=synchronized(或 Lock)。"),
+    ],
+    [
+      block("验证:原子性缺失的实测走查", "验证:丢失更新断言(10 线程×1 万 volatile int++ → 结果<10 万,多次复跑均丢);AtomicInteger 对照(同条件=恰好 10 万);可见性断言(非 volatile 标志死循环复现,volatile 后正常退出);内存屏障效果(并发基础 2 题 happens-before 断言同源)——四组固化 volatile 边界,本机可复跑。"),
+      block("追问链:volatile 三刀", "一刀:volatile 与 64 位读写=long/double 非 volatile 可能撕裂(JVM 允许),volatile 后原子。二刀:volatile 数组=仅数组引用 volatile,元素读写不 volatile(AtomicIntegerArray 才保证)。三刀:DCL=volatile instance 防半初始化(第 80 题逃逸分析/并发基础 23 题同源)。"),
+    ],
+    ["volatile=可见+有序,不保证原子", "count++ 丢更新,换 Atomic/CAS", "标志位与 DCL 是正确场景"], [jls17, api("java/util/concurrent/atomic/AtomicInteger")],
+  ),
+  "legacy/23": deep(
+    "线程池核心参数与任务提交流程",
+    "网银批量出账沙盘:峰值每秒 500 个导出任务——7 参数决定池的行为,提交流程(核心→队列→最大→拒绝)决定任务去向;参数错=队列堆积或拒绝风暴。",
+    [
+      "7 参数:corePoolSize(常驻)/maximumPoolSize(上限)/keepAliveTime+unit(非核心空闲存活)/workQueue(任务队列)/threadFactory(线程命名/守护标志)/handler(拒绝策略)——core 满→先入队,队列满→再建非核心线程到 max,max 满+队列满→拒绝。",
+      "提交流程(execute):当前线程数<core→新建核心线程执行(即使有空闲线程);≥core→入队;队列满且线程数<max→新建非核心线程;线程数=max 且队列满→触发拒绝策略——顺序是先队列后扩容(与直觉相反,队列无界则 max 永远不生效)。",
+      "拒绝策略:AbortPolicy(抛异常,默认——调用方感知可降级)/CallerRunsPolicy(提交线程自己执行——天然限流,但阻塞调用方)/DiscardPolicy(静默丢弃——危险)/DiscardOldestPolicy(丢最老——可能丢关键任务);生产常用自定义(记录+落库+告警)。",
+    ],
+    [
+      block("机制:先入队再扩容的设计含义", "队列是缓冲(削峰)但无界队列=内存泄漏(任务堆积 OOM,第 24 题 Executors 陷阱)——生产用有界队列(如 1000):满了才扩到 max,max 也满才拒绝——拒绝是过载信号(必须可见:监控+告警),不是静默损失。"),
+      block("反例:线程池的两种事故", "事故一:core=10/max=10+无界队列——流量峰值任务全部堆积(内存涨/延迟涨)但线程数恒 10(从不扩容);修复=有界队列。事故二:CallerRunsPolicy 在 web 线程池——Tomcat 工作线程被拉去跑慢任务→HTTP 并发骤降;修复=快慢任务分池+拒绝策略按池定(交互池拒绝要快,批处理池可 CallerRuns)。"),
+      block("取舍:参数怎么定", "IO 密集(线程多,2×核或按等待/计算比)vs CPU 密集(核数+1);core=max 或接近(避免扩缩抖动)或分层(核心常驻+峰值弹性);依据=压测画像(目标吞吐/延迟)而非公式——公式只是起点(第 80 题并发模块同源)。"),
+    ],
+    [
+      block("验证:提交流程的实测走查", "验证:流程断言(core=2/max=4/队列=2:提交 8 任务→2 核心+2 队列+2 扩容+2 拒绝——与 execute 顺序完全对应);拒绝断言(Abort 抛异常/CallerRuns 主线程执行/Discard 静默——四种策略行为对照);keepAlive 断言(非核心线程空闲超时回收);命名断言(threadFactory 命名可观测)——并发模块线程池实验可复用。预期:任务去向与参数推演一致。"),
+      block("追问链:线程池三刀", "一刀:预热线程=prestartAllCoreThreads(冷启动场景);allowCoreThreadTimeOut(核心也回收,低峰省资源)。二刀:动态调参=setCorePoolSize/setMaximumPoolSize 运行时可调(美团动态线程池思路)+配置中心联动。三刀:监控=getActiveCount/getQueue().size()/拒绝计数——线程池必须可观测(过载早发现)。"),
+    ],
+    ["7 参数,core→队列→max→拒绝", "先入队再扩容,无界队列=max 失效", "拒绝策略按池定,必须可观测"], [juc, api("java/util/concurrent/ThreadPoolExecutor")],
+  ),
+  "legacy/24": deep(
+    "为什么不建议用 Executors 创建线程池",
+    "网银故障沙盘:FixedThreadPool 撑过平日、大促 OOM——Executors 四个工厂方法的隐患(无界队列/无界线程);手动 ThreadPoolExecutor 显式声明边界。",
+    [
+      "四个坑:newFixedThreadPool/newSingleThreadExecutor——无界队列(LinkedBlockingQueue 默认 Integer.MAX_VALUE)→堆积 OOM;newCachedThreadPool——线程数无上限→线程爆炸 OOM;newScheduledThreadPool 延时任务也无界。",
+      "根因:Executors 隐藏了队列与线程上限的决策——OOM 的两类(任务对象堆积=堆 OOM;线程数爆炸=每线程 1MB 栈+元数据);手动 ThreadPoolExecutor 强制声明 7 参数(边界显式化,评审可见)——阿里巴巴 Java 开发手册强制规约。",
+      "正确姿势:new ThreadPoolExecutor(核心,最大,存活,单位,有界队列,命名 threadFactory,拒绝策略+监控)——按业务画像选参数(第 23 题);需要延时任务手动构造 ScheduledThreadPoolExecutor 并配 backlog 监控。",
+    ],
+    [
+      block("机制:无界队列为什么必然堆积", "无界队列=消费速率低于生产速率时任务无限堆积(内存线性涨);默认拒绝策略永不触发(队列永不“满”)——过载被静默吸收而非暴露;限流的本质=必须有界(队列/线程/令牌),无界=放弃自我保护(第 51 题 TCP 滑动窗口同源思想)。"),
+      block("反例:Executors 的两种事故", "事故一:newFixedThreadPool(10) 做报表导出——大促 50 万导出任务全部入无界队列→堆 OOM(转储全是 LinkedBlockingQueue.Node);修复=有界队列+拒绝落库+告警。事故二:newCachedThreadPool 做回调——瞬时回调洪峰建 8000 线程(8GB 栈预留)→unable to create native thread;修复=上限线程+有界队列。"),
+      block("边界:规约的适用范围", "规约针对生产业务线程池;原型/脚本/测试用 Executors 可接受(生命周期短);池必须命名(threadFactory)+登记(全局池注册表)——排查 dump 时能认出哪个池(未命名池=pool-N-thread-M 无法归因)。"),
+    ],
+    [
+      block("验证:OOM 陷阱的实测走查", "验证:堆积断言(FixedThreadPool+慢任务→队列 size 线性涨,JMap 看堆中 Node 占比);线程爆炸断言(CachedThreadPool+瞬时提交→线程数冲顶,getPoolSize 监控);对照断言(手动池有界队列→拒绝策略触发可见)——三组固化规约理由,并发模块线程池实验可复跑。预期:Executors 两类 OOM 形态均可构造复现。"),
+      block("追问链:池规约三刀", "一刀:Spring @Async 默认池=SimpleAsyncTaskExecutor(每次新建线程,更危险)——必须自定义池(第 89 题异步同源)。二刀:队列容量=按(峰值速率-消费速率)×缓冲时长+压测校准。三刀:池隔离=快慢任务/核心非核心分池(互不拖垮——舱壁模式,第 138 题 reliability 同源)。"),
+    ],
+    ["Fixed=无界队列 OOM,Cached=无界线程 OOM", "手动 7 参数,边界显式化", "有界队列让过载可见"], [juc, api("java/util/concurrent/Executors")],
+  ),
+  "legacy/25": deep(
+    "ThreadLocal 是什么？为什么会内存泄漏",
+    "网银用户上下文沙盘:拦截器存 userId/租户信息——ThreadLocal 每线程独立副本;线程池线程长命+不 remove→Entry 泄漏(弱 key 强 value)。",
+    [
+      "ThreadLocal 机制:每个 Thread 内有 ThreadLocalMap(key=ThreadLocal 弱引用,value=强引用)——set 存当前线程的 map,get 取本线程条目(线程隔离,无共享无竞争);典型用途:用户上下文/事务绑定/日期格式化副本(替代共享 SimpleDateFormat)。",
+      "泄漏链:key 是弱引用(ThreadLocal 对象被回收后 key=null)但 value 是强引用——线程池线程存活数年,Entry(ThreadLocal→null,value 还在)无法触达也无法回收→随任务累积泄漏;强引用链:Thread→ThreadLocalMap→Entry→value。",
+      "防泄漏三件事:finally 中 remove()(try-finally 配对,拦截器 afterCompletion 清理);set 前先 remove(防旧值);不存大对象;JDK 优化:Entry 的 key=null 时 set/get 遍历顺带清理 stale entry(探测式)——不能依赖(不触发 set 就不清)。",
+    ],
+    [
+      block("机制:为什么 key 弱 value 强", "key 弱引用的目的=ThreadLocal 实例外部无引用时可回收(key 自动置 null,防止 ThreadLocal 泄漏);但 value 无对应机制(无法自动判“不再使用”)——value 生命周期=线程生命周期;设计权衡:若 value 也弱,业务用一半就被 GC(不可接受)——所以防泄漏责任在使用者(remove)。"),
+      block("反例:ThreadLocal 的两种事故", "事故一:线程池+不 remove——用户 A 的上下文残留到用户 B 的请求(数据串号!)+内存缓涨;修复=拦截器 finally remove(必须)。事故二:父子线程传递缺失——主线程 set 后线程池任务 get 为 null(InheritableThreadLocal 只在创建时继承,池线程不新建;跨池传递用 TransmittableThreadLocal)。"),
+      block("取舍:ThreadLocal vs 显式传参", "ThreadLocal:免改方法签名(横切上下文)但隐式(难追踪/忘清理);显式传参:清晰(每个方法签名可见)但侵入所有层——上下文横切多处(日志 traceId/租户/用户)用 ThreadLocal+强规约(必须 remove);仅两三层传递用参数(简单直接)。"),
+    ],
+    [
+      block("验证:泄漏链的实测走查", "验证:泄漏断言(线程池 50 线程循环 set 不 remove→堆中 value 实例持续增长不回收;finally remove 后回收);串号断言(任务 A set 后不清理,任务 B 读到 A 的值——复现上下文污染);弱 key 断言(置空 ThreadLocal 引用+System.gc→key=null,value 仍在——反射读 Thread.threadLocals)——三组固化泄漏语义,本机可复跑。预期:remove 是唯一可靠防线。"),
+      block("追问链:ThreadLocal 三刀", "一刀:哈希机制=魔数 0x61c88647 斐波那契散列(2 的幂容量下均匀分布,开放寻址而非链表)。二刀:InheritableThreadLocal=子线程创建时复制父值(池线程失效——复用不新建);TTL 库=任务提交时捕获+执行时恢复(线程池可用)。三刀:Spring 场景=RequestContextHolder 本质 ThreadLocal+拦截器清理(spring 是 remove 纪律的样板,第 89 题)。"),
+    ],
+    ["线程隔离副本,无竞争", "弱 key 强 value→池线程泄漏", "finally remove 是唯一可靠防线"], [juc, api("java/lang/ThreadLocal")],
+  ),
+
+
+  // ---- p1(26-32) ----
+"legacy/26": deep(
+    "JVM 内存区域有哪些？各存什么",
+    "网银应用沙盘:OOM 发生在哪个区域?JVM 内存分区各有用途与 OOM 形态——堆/栈/元空间/程序计数器/本地方法栈。",
+    [
+      "线程私有:程序计数器(字节码行号)+虚拟机栈(栈帧,SOE)+本地方法栈(Native);线程共享:堆(对象,GC 主战场)+元空间(类信息,JDK 8 替代永久代,用本地内存)。",
+      "堆细分:新生代(Eden+Survivor From/To)与老年代;对象优先 Eden 分配,大对象直接进老年代(Humongous);TLAB 每线程私有分配缓冲(无锁)。",
+      "OOM 按区域:heap space(堆满)/Metaspace(类泄漏)/unable to create native thread(线程数超限)/Direct buffer memory(堆外)——每种排查路径不同。",
+    ],
+    [
+      block("机制:线程私有与共享的生命周期", "线程私有随线程创建销毁(栈帧随方法进出);共享区域随 JVM 存活(堆 GC 管理,元空间按类加载卸载)。类比办公楼:工位按员工分配回收,会议室按需预订,档案室按项目存档。"),
+      block("边界:三种 OOM 的事故", "SOE:递归无终止→栈满(看栈顶定位);元空间 OOM:CGLIB 代理持续生成不卸载(排查类加载器泄漏);堆 OOM:内存泄漏或大对象(dump 分析 dominator tree)。每种 OOM 的区域决定排查路径。"),
+      block("取舍:堆大小与区域比例", "-Xms=-Xmx(生产相等避免扩容)+-XX:NewRatio+SurvivorRatio+-XX:MetaspaceSize——依据=负载画像(对象大小/存活率/分配速率)与压测校准,不是默认值。"),
+    ],
+    [
+      block("验证:内存区域的实测走查", "验证:-Xlog:gc+heap=info 查看堆布局;NMT 查看各区域 committed;OOM 各形态可构造复现(堆 OOM=无限 new/栈 SOE=无限递归/元空间=循环生成代理);NMT 三种口径互不相等(第 19 题 jvm-advanced 实测)。预期:实测与理论分区对应。"),
+      block("追问链:内存三刀", "一刀:堆外内存=DirectByteBuffer(NMT 监控,Cleaner 兜底,第 33 题)。二刀:元空间 vs 永久代=本地内存 vs 堆内(JDK 8 移除永久代);字符串常量池 JDK 7 起在堆。三刀:栈帧=局部变量表+操作栈+动态链接+返回地址;-Xss 设栈大小(第 11 题线程栈实测 4000/20000 线程)。"),
+    ],
+    ["线程私有:计数器+栈;共享:堆+元空间", "OOM 按区域分类排查", "堆是 GC 主战场,元空间本地内存"], [jvms2, g1tun],
+  ),
+  "legacy/27": deep(
+    "对象创建过程？对象在堆中的布局",
+    "网银对象沙盘:new Object() 背后五步与对象三区域布局(头/实例数据/对齐填充)——JOL 工具可验证(第 5 题 JVM 实测)。",
+    [
+      "创建五步:类加载检查→分配内存(TLAB 指针碰撞或空闲列表)→初始化零值→设置对象头(Mark Word+Klass Pointer)→执行构造器;TLAB=线程私有分配缓冲(无锁)。",
+      "对象布局:对象头(Mark Word 8B+Klass Pointer 4B 压缩)+实例数据(字段)+对齐填充(8 字节倍数);JOL 实测:Integer 16B(12 头+4 值对齐)。",
+      "JIT 优化:逃逸分析→标量替换(未逃逸对象拆为标量不分配)+锁消除(未逃逸的 synchronized 移除)——第 80 题 JVM 详解。",
+    ],
+    [
+      block("机制:TLAB 无锁分配", "TLAB=每线程在 Eden 预分配的私有缓冲,指针碰撞分配(移动指针即可,无 CAS);TLAB 用完再 CAS 申请新 TLAB。类比食堂:每人专用餐盘架(无抢锁),架空再从大货架补。"),
+      block("边界:大对象与逃逸", "大对象(>region 一半)绕过 TLAB 直接进老年代 Humongous(第 45 题);逃逸分析:未逃逸对象→标量替换(不分配)+锁消除(第 80 题);构造器 this 逃逸→final 字段保证失效(并发基础 38 题)。"),
+      block("取舍:压缩指针的条件", "堆<32GB 时 UseCompressedOops(引用 4B)>32GB 自动关闭(引用 8B→内存跳涨)——堆从 31GB 调到 33GB 可用内存反而变少(压缩指针失效的临界点,第 76 题 JVM)。"),
+    ],
+    [
+      block("验证:对象布局的 JOL 走查", "验证:JOL 实测(第 5 题 JVM):Integer 16B/Long 24B/空对象 16B;压缩指针开启 vs 关闭的字节数对照;JFR ObjectAllocationSample(分配路径);TLAB 日志(-Xlog:gc+tlab=debug)。验证:对象布局断言可程序化(JOL)。"),
+      block("追问链:布局三刀", "一刀:字段重排=JVM 自动按类型排序减少填充(long→int→short→ref)。二刀:数组对象额外 4B 存长度,元素连续存储。三刀:this 逃逸→final 保证失效(并发基础 38 题)——构造完成才发布。"),
+    ],
+    ["五步创建,TLAB 无锁", "头+数据+填充=布局", "JOL 验证,压缩指针省一半"], [jvms2, api("java/lang/Object")],
+  ),
+  "legacy/28": deep(
+    "如何判断对象可回收？",
+    "网银 GC 沙盘:可达性分析(GC Roots 出发沿引用链遍历)而非引用计数(循环引用问题)——能到达=存活,不可达=可回收。",
+    [
+      "可达性分析:从 GC Roots(线程栈/静态字段/JNI 引用/活跃线程)出发沿引用链遍历——可达=存活,不可达=可回收;解决引用计数的循环引用问题(A→B→A 无外部引用→都不可达→都回收)。",
+      "四种引用:强引用(不回收)>软引用(内存不足回收)>弱引用(下次 GC 回收)>虚引用(不影响,仅通知)——第 29 题 JVM 详解。",
+      "finalize 的影响:finalize 执行前对象入 F-Queue→GC Roots 包含 F-Queue→对象复活→下次 GC 不可达才真正回收——finalize 至少两轮 GC(第 11 题拖累回收)。",
+    ],
+    [
+      block("机制:GC Roots 为什么是根", "GC Roots=确定存活的起点(线程栈中变量/静态字段/JNI/活跃线程)——从起点沿引用链追踪,所有可达对象=正在使用;类比追踪感染链:从已知感染者出发追踪,未追踪到=可安全隔离。"),
+      block("反例:可达性的两种事故", "事故一:静态集合持有——业务认为不用了但静态 Map 还引用→GC 无法回收(内存泄漏,第 82 题);修复=用完 remove 或 WeakHashMap。事故二:finalize 复活——finalize 中 this 赋给静态字段→对象复活且 finalize 不再执行;修复=Cleaner(不可复活)。"),
+      block("取舍:引用类型的选择", "强=常规对象/软=缓存(内存不足回收)/弱=辅助映射(WeakHashMap)/虚=清理通知(DirectByteBuffer)——按回收时机严格程度选,引用选错=回收时机完全失控。"),
+    ],
+    [
+      block("验证:可达性的走查核对", "验证:GC Roots 遍历断言(静态置 null→可回收);循环引用断言(A→B→A 无外部→都回收);四种引用断言(强不回收/软内存不足回收/弱下次 GC 回收/虚不影响)——四组固化可达性语义(本机可复跑)。"),
+      block("追问链:GC Roots 三刀", "一刀:GC Roots 来源=虚拟机栈+方法区静态/常量+JNI+活跃线程+同步锁。二刀:finalize 对可达性的影响=F-Queue 入队→复活→两轮 GC(第 11 题)。三刀:泄漏判断=堆转储 MAT 对比+Full GC 后不回落(第 82 题)。"),
+    ],
+    ["可达性分析从 GC Roots 出发", "循环引用 JVM 可回收", "四种引用按回收强度选"], [jvms2, g1tun],
+  ),
+  "legacy/29": deep(
+    "四种引用类型与应用场景",
+    "网银缓存沙盘:强(永不回收)/软(内存不足回收,缓存)/弱(下次 GC 回收,映射)/虚(通知,堆外清理)——四种引用=GC 的四种容忍度。",
+    [
+      "强引用:GC 永不回收——常规对象;软引用:内存不足时回收——可丢失缓存;弱引用:下次 GC 必回收——WeakHashMap(key 回收 entry 移除);虚引用:get() 恒 null,仅回收通知——DirectByteBuffer 的 Cleaner。",
+      "引用队列 ReferenceQueue:软/弱/虚可关联——对象被回收时引用入队(程序轮询做清理);Cleaner(Java 9+)=虚引用+队列封装(无复活风险,替代 finalize,第 11 题 JVM)。",
+      "ThreadLocal 的弱引用 key:ThreadLocalMap Entry extends WeakReference<ThreadLocal<?>>——key 弱引用(ThreadLocal 回收后 key=null),value 强引用(泄漏链,第 72 题)。",
+    ],
+    [
+      block("机制:回收强度是 GC 的容忍度", "强=不容忍(GC 不回收)/软=容忍内存不足时回收/弱=容忍下次 GC 回收/虚=完全容忍(不影响生命周期)——类比租约:强=永久,软=可短租,弱=随时退租,虚=只通知不占房。"),
+      block("反例:引用误用的两种事故", "事故一:软引用做主存储——高内存压力下大面积回收→命中率骤降;修复=软引用只做二级缓存。事故二:虚引用 get()——虚引用 get() 恒 null(与软/弱不同)——用途是回收通知不是延迟获取。"),
+      block("取舍:引用与内存策略匹配", "缓存=软引用(内存不足自动回收)+LRU;数据安全=强引用+显式 null;资源清理=虚引用+Cleaner(不复活)+显式 close——引用类型是 GC 的指令,选错=回收时机不可控。"),
+    ],
+    [
+      block("验证:四种引用的走查核对", "验证:强引用断言(置 null 后才回收);软引用断言(-Xmx 小堆+大量分配→回收);弱引用断言(System.gc()→get()==null);虚引用断言(get()==null 但 queue.poll() 有值)——四组固化回收时机(本机可复跑)。"),
+      block("追问链:引用三刀", "一刀:ThreadLocal 弱 key(第 72 题泄漏链)。二刀:WeakHashMap(key 弱→entry 自动移除,value 非弱)。三刀:Cleaner vs finalize=无复活+可注册多+显式 clean(第 12 题 JVM)。"),
+    ],
+    ["强=不回收,弱=下次 GC 必回收", "软引用适合缓存,弱引用适合映射", "虚引用=通知,Cleaner 替代 finalize"], [jvms2, api("java/lang/ref/SoftReference")],
+  ),
+  "legacy/30": deep(
+    "常见 GC 算法",
+    "网银 GC 沙盘:标记-清除(碎片)/标记-复制(空间浪费)/标记-整理(移动成本)——三种基础算法各有取舍,现代回收器按代际特征组合(新生代复制+老年代整理)。",
+    [
+      "标记-清除:标记存活→清除未标记——碎片+效率不稳定;CMS 使用(并发清除减暂停,碎片→Full GC)。",
+      "标记-复制:From/To 两块,存活复制到 To——无碎片+存活率低时极快;空间浪费(To 空闲);新生代使用(Eden+Survivor 复制)。",
+      "标记-整理:标记→向一端移动(压缩碎片)——无碎片+空间全用;移动成本高(暂停长);老年代使用(G1 Mixed/Parallel Full GC)。",
+    ],
+    [
+      block("机制:存活率决定算法选择", "新生代存活率低(98% 死亡)→复制划算(只复制 2%);老年代存活率高→整理划算(碎片不可接受)——弱分代假设=复制算法的理论基础(第 31 题分代),假设不成立时换不分代回收器。"),
+      block("反例:算法误用的两种事故", "事故一:CMS 碎片累积→大对象无连续空间→Full GC(第 15 题术语);修复=碎片整理或换 G1。事故二:新生代用标记-整理——存活率低时整理成本>复制成本;修复=新生代用复制。"),
+      block("取舍:三色标记与并发标记", "白/灰/黑三色——并发标记的漏标(黑→白,灰→白断开)与多标;CMS 增量更新 vs G1 SATB(快照)——写屏障是并发标记的正确性保证,代价是每次引用写多一次屏障指令。"),
+    ],
+    [
+      block("验证:GC 算法的走查核对", "验证:标记-清除断言(碎片→大对象分配失败→Full);复制断言(Eden→Survivor 移动,From/To 交换);整理断言(移动后连续空间增加)——三组可通过 GC 日志(-Xlog:gc*)观测;第 15 题 JVM CMS/G1 对照。"),
+      block("追问链:算法三刀", "一刀:三色标记与并发标记的漏标/多标问题。二刀:写屏障(pre/post)=并发标记的正确性保证(微小开销)。三刀:现代回收器=基础算法+并发技术+分代策略的组合(G1=复制+整理+SATB)。"),
+    ],
+    ["清除碎片,复制省空间,整理无碎片", "存活率决定算法选择", "现代回收器=组合使用"], [g1tun, jvms2],
+  ),
+  "legacy/31": deep(
+    "分代思想？Minor / Major / Full GC 区别",
+    "网银 GC 沙盘:弱分代假设(大多数对象朝生夕死)→新生代频繁低成本回收(Minor)与老年代低频高成本回收(Full);G1 独有 Mixed GC(选择性回收老年代 region)。",
+    [
+      "弱分代假设:对象生命周期二八分布(大多数朝生夕死)→新生代/老年代分区——假设成立时分代高效;不成立(大量中寿命对象)→调整 Survivor 或换不分代回收器(ZGC,第 75 题)。",
+      "GC 类型:Minor(新生代,Eden 满→Survivor 复制,高频快速)/Mixed(G1 独有,新生代+部分老年代 region,并发标记后按回收价值选择)/Full(全堆压缩,STW 最长,兜底——G1 的 Full 是失败降级,第 14 题 JVM)。",
+      "对象晋升:Eden→Survivor(年龄+1)→达阈值或动态年龄→老年代;大对象直接 Humongous(超过 region 一半);动态年龄:同龄对象>Survivor 一半→提前晋升(第 44 题详解)。",
+    ],
+    [
+      block("机制:分代为什么高效", "新生代 98% 对象 Minor GC 死亡→复制只移动 2%(极快);老年代存活率高→整理(避免碎片)——分代把高频低成本与低频高成本分开,总成本最优。类比:门诊(高频低成本)vs 手术(低频高成本)分开。"),
+      block("反例:分代的两种事故", "事故一:Survivor 太小→动态年龄提前晋升→老年代压力(第 44 题);修复=调 SurvivorRatio。事故二:Humongous 进新生代→放不下→直接老年代→碎片;修复=增大 region 或拆分。"),
+      block("取舍:分代参数的调优", "-Xmn/-XX:NewRatio/-XX:SurvivorRatio/-XX:MaxTenuringThreshold——依据=对象存活率画像(JFR+GC 日志,第 44 题);G1 下参数含义变化(region 动态决定)。"),
+    ],
+    [
+      block("验证:分代 GC 的走查核对", "验证:本机实验(-Xlog:gc* 观察 Minor/Mixed/Full 分布);分代假设验证(JFR ObjectAllocationSample 看生存期分布);Minor 触发(Eden 满);Humongous 分配(大数组→老年代)——第 14/15/44 题 JVM 实测数据可复用。验证:GC 日志分代行为断言可程序化。"),
+      block("追问链:分代三刀", "一刀:Minor 触发=Eden 满(不是 Survivor 满)。二刀:G1 Mixed=并发标记完成后按回收价值选择老年代 region(第 73 题)。三刀:不分代回收器=ZGC JDK 17(全堆并发标记,大存活集时周期长,第 75 题);分代 ZGC=JDK 21 JEP 439。"),
+    ],
+    ["弱分代假设→分代高效", "Minor 快,Mixed 精准,Full 兜底", "参数依据=存活率画像"], [g1tun, jvms2],
+  ),
+  "legacy/32": deep(
+    "StackOverflowError 与堆 OOM 的区别和常见原因",
+    "网银故障沙盘:SOE(栈满,递归无终止)vs OOM: Java heap space(堆满)——区域不同(栈 vs 堆),成因与排查完全不同(第 32 题 JVM 的完整版)。",
+    [
+      "SOE:虚拟机栈满——递归无终止/深度过大/栈帧过大;排查=栈顶方法(stack trace 第一个重复帧);配置=-Xss(默认 512K-1M)。",
+      "Heap OOM:堆满——泄漏(不再使用但可达)/大对象批量分配/堆太小;排查=heap dump(MAT dominator tree);配置=-Xmx 或修泄漏。",
+      "其他 OOM:Metaspace(类泄漏)/unable to create native thread(线程数)/Direct buffer memory(堆外)——每种排查路径不同(第 77 题 JVM 详解)。",
+    ],
+    [
+      block("机制:栈与堆的物理位置", "栈=线程私有(每线程独立,大小 -Xss);堆=线程共享(全局,大小 -Xmx);栈总量=线程数×栈大小(第 11 题实测:4000/20000 线程均 2s 建完——保留≠提交)。"),
+      block("反例:OOM 混淆的两种事故", "事故一:SOE 误判为堆 OOM——看到 OutOfMemoryError 就调 -Xmx(实际是递归);修复=看错误子类型。事故二:线程 OOM 误调 -Xmx——unable to create native thread(线程栈空间不足)调堆无效;修复=区分 OOM 子类型。"),
+      block("取舍:-Xss 的设置", "大=递归深但总线程少(内存=线程数×栈大小);小=可创建更多线程但递归受限——默认 512K-1M 足够绝大多数场景;深递归业务→改迭代或增大 -Xss,同时监控线程总量。"),
+    ],
+    [
+      block("验证:两种 OOM 的走查核对", "验证:SOE 复现(无限递归→stack trace 重复帧);Heap OOM 复现(无限 new→OOM: heap space,heap dump);线程 OOM 复现(大量线程→OOM: native thread)——三种 OOM 形态与排查路径完全不同(第 32 题 JVM)。"),
+      block("追问链:OOM 三刀", "一刀:OOM 子类型=heap/Metaspace/native thread/direct buffer——各走不同排查路径。二刀:-Xss 默认=512K-1M(Linux x64 1MB);大部分方法栈帧<1KB。三刀:SOE 可 catch(Throwable 子类)但栈已满,再调方法可能再 SOE——catch SOE 通常无意义(修代码)。"),
+    ],
+    ["SOE=栈满看栈顶,Heap OOM=堆满看转储", "子类型不同排查路径不同", "-Xss 管栈深,-Xmx 管堆大小"], [jvms2, g1tun],
+  ),
+
+  // ---- x-leg3-p15 ----
+"legacy/33": deep(
+    "IoC、DI 是什么？好处",
+    "网银模块解耦沙盘:订单服务 new 支付服务(硬编码)vs 容器注入接口(可替换可测试)——IoC 是思想(创建权反转),DI 是实现(依赖注入)。",
+    [
+      "IoC(控制反转):对象的创建与依赖管理权从业务代码反转给容器——业务不 new,向容器要;DI(依赖注入)是 IoC 的实现手段——容器把依赖通过构造器/setter/字段注入进来;两者关系:IoC 是原则,DI 是落地技术(还有 ServiceLocator 等其他实现)。",
+      "三种注入方式:构造器注入(依赖不可变+必填保证,推荐)/setter 注入(可选依赖)/字段注入(@Autowired 直接打字段——隐藏依赖难测试,不推荐);Spring 官方推荐构造器注入(单构造器可省注解)。",
+      "好处:解耦(依赖接口而非实现——换支付渠道只改配置)、可测试(mock 注入替代真依赖)、生命周期托管(单例/初始化/销毁回调统一管理)、装配一致(AOP/事务等横切能力以 Bean 为前提)。",
+    ],
+    [
+      block("机制:容器启动装配链", "启动扫描(@ComponentScan/自动配置)→BeanDefinition 注册→实例化(构造器注入在此解析依赖图,循环依赖在此暴露——setter/字段注入靠三级缓存兜底,第 88 题)→初始化(Aware/BeanPostProcessor/init)→就绪。构造器注入的循环依赖无法三级缓存解决(实例未成无法提前暴露)——Spring Boot 2.6+ 默认禁止循环依赖,引导设计解耦。"),
+      block("反例:IoC 误用的两种事故", "事故一:new 出来的对象里 @Autowired 注入为 null——字段注入依赖容器装配,new 绕过容器=依赖永不注入;修复=该类本身交容器管理,或 new 时手动传依赖。事故二:静态工具类注入——静态字段不属于 Bean 生命周期,注入时机不确定;修复=组件类持有依赖或 Setter 写静态桥(过渡方案)。"),
+      block("取舍:字段注入为何流行又为何被劝退", "字段注入代码最短(现场常见)——但依赖隐藏(看构造器不知道要什么)、无法脱离容器单测(反射才能 mock)、强耦合容器;构造器注入多写几行,换来依赖显式+测试友好——评审要点=新代码用构造器,存量字段注入迁移风险另评。"),
+    ],
+    [
+      block("验证:注入行为的实测走查", "验证:单测断言(构造器注入 mock 依赖,不启容器即可测;字段注入必须 @SpringBootTest);循环依赖断言(构造器互注→启动失败明确报错;setter 互注→成功——Boot 2.6 前行为);作用域断言(singleton 唯一/prototype 每次新)——Spring 模块测试可复用。预期:构造器注入的依赖图在启动期完全可解析。"),
+      block("追问链:IoC 三刀", "一刀:IoC 容器两级=BeanFactory(基础,懒加载)vs ApplicationContext(事件/国际化/AOP 集成,业务用)。二刀:BeanPostProcessor=容器扩展点(代理生成/AutowireAnnotationProcessor 都靠它——第 87 题 AOP 同源)。三刀:Spring Boot 自动配置=IoC 的规模化(条件化 BeanDefinition,第 39 题 starter 同源)。"),
+    ],
+    ["IoC 是原则,DI 是实现", "构造器注入首选:显式+可测", "new 绕过容器=注入失效"], [juc, sre],
+  ),
+  "legacy/34": deep(
+    "Bean 作用域有哪些？singleton 线程安全吗",
+    "网银并发访问沙盘:全局唯一 Service 被数百线程并发调用——singleton 不是线程安全保证;无状态才安全,有状态需 prototype/ThreadLocal/锁。",
+    [
+      "六种作用域:singleton(默认,容器一个实例)/prototype(每次获取新建)/request(HTTP 请求内)/session(会话内)/application(ServletContext)/websocket(会话内);后四种 Web 环境限定,需要代理桥接(@Scope(proxyMode=TARGET_CLASS) 注入到单例)。",
+      "singleton 不等于线程安全:全局唯一实例=多线程共享同一份字段——有状态(可变成员)就竞态;线程安全的条件=无状态(成员只读或本地变量)或状态本身线程安全(ConcurrentHashMap/Atomic);Spring 官方不保证并发,单例的线程安全是使用者的责任。",
+      "有状态怎么办:每次新建(prototype——但注入到单例只注入一次,要 prototype 语义用 ObjectFactory/Provider 每次取)/请求上下文用 ThreadLocal(第 25 题)/共享状态容器化(ConcurrentHashMap)+不可变值对象。",
+    ],
+    [
+      block("机制:为什么 singleton 是默认", "业务组件绝大多数无状态(Service 的字段是注入的其他 Bean,不是运行时数据)——单例省创建成本+全局一致;危险在于把运行时数据放进字段(如实例变量当请求缓存)——污染源=状态跨请求泄漏(用户 A 的数据被 B 读到,第 25 题 ThreadLocal 串号同源)。"),
+      block("反例:作用域的两种事故", "事故一:Service 字段存中间结果(简单变量当局部缓存)——并发下互相覆盖(复现:两请求交叉,结果错乱);修复=方法内局部变量或去掉状态。事故二:prototype 注入 singleton——只实例化一次,以为是每次新建;修复=ObjectProvider<Service> 每次getObject() 或 @Lookup 方法。"),
+      block("边界:Web 作用域的实现", "request/session 作用域 Bean 注入单例会报错(作用域对象不存在于启动期)——容器注入代理(继承原类,调用时按作用域从 RequestContextHolder 取真实实例);RequestContextHolder 本质 ThreadLocal(第 25 题)。"),
+    ],
+    [
+      block("验证:作用域的实测走查", "验证:单例断言(两次注入同一实例==);prototype 断言(直接注入=同一实例,ObjectProvider=不同——语义差异立现);并发污染断言(有状态 Service 字段计数,并发下结果错乱;去状态后正确)——三组固化作用域语义,Spring 模块测试可复跑。预期:线程安全责任在状态设计不在 scope 声明。"),
+      block("追问链:作用域三刀", "一刀:@Scope 与 @RefreshScope(配置热刷新=销毁重建 Bean——Boot Cloud 思路)。二刀:依赖中的 prototype 链=单例持有 prototype 工厂,每次取新实例(状态隔离)。三刀:singleton 的销毁回调(@PreDestroy)只在容器关闭触发——进程被 kill -9 不走(优雅停机信号,第 76 题 JVM 同源)。"),
+    ],
+    ["singleton 默认但非安全保证", "无状态才安全,有状态要隔离", "prototype 注入 singleton 只一次"], [juc, sre],
+  ),
+  "legacy/35": deep(
+    "AOP 是什么？典型应用场景",
+    "网银审计日志沙盘:每个敏感操作前后记日志(20 个方法重复写)——AOP 切面一处定义全局织入;典型场景=事务/日志/权限/限流/缓存。",
+    [
+      "AOP(面向切面编程):把横切关注点(日志/事务/安全)从业务方法中抽出为切面——切点(Pointcut,匹配哪些方法)+通知(Advice,前/后/环绕/返回/异常)+织入(Weaving,运行时动态代理);业务只写业务,横切逻辑集中管理。",
+      "Spring AOP 实现:运行时动态代理——目标有接口→JDK 动态代理(实现接口);无接口→CGLIB 子类代理(final 类/方法不行);AspectJ 是编译期/类加载期织入(功能更强,注解裁剪/构造器切点,Spring 只用其注解风格)。",
+      "五种通知:@Before/@After/@AfterReturning/@AfterThrowing/@Around——环绕最强(可控制是否执行目标/改参/改返回值);典型场景:声明式事务(@Transactional=环绕)、操作审计、接口限流、权限校验、缓存(方法结果缓存)、慢查询监控。",
+    ],
+    [
+      block("机制:代理为什么拦不到自调用", "AOP 代理是包在目标外的对象——this.method() 走的是目标对象自身(未经代理),切面不生效;@Transactional 自调用失效是经典事故(第 90 题);修复=AopContext.currentProxy() 或拆类或自注入;这也是字段注入难测的同一根因(容器增强都发生在代理上)。"),
+      block("反例:切面的两种事故", "事故一:切点表达式过宽(execution(* com..*.*(..)))——非业务方法也被代理(反射/getter 全被套上,性能+日志噪音);修复=精确到注解或包+方法语义。事故二:切面里抛异常吞业务——通知异常传播会覆盖业务异常;修复=切面内部 try-catch(监控类切面绝不抛,事务切面除外)。"),
+      block("取舍:Spring AOP vs AspectJ", "Spring AOP=方法级+运行时代理(覆盖 95% 场景,无编译期依赖);AspectJ=字段/构造器切点+编译期织入(无代理开销,功能全但构建链复杂);选型:方法级横切用 Spring AOP,需要字段级/性能敏感/非 Spring 环境用 AspectJ。"),
+    ],
+    [
+      block("验证:切面的实测走查", "验证:织入断言(切面计数器:一次调用=一次通知;自调用断言(this 调用不触发,代理调用触发——失效复现+修复对照);异常传播断言(AfterThrowing 拿到业务异常,切面抛异常覆盖验证);代理类型断言(有接口 JDK 代理/无接口 CGLIB——instanceof 检查)——Spring 模块 AOP 实验可复用。预期:五种通知顺序与自调用失效均可复现。"),
+      block("追问链:AOP 三刀", "一刀:@Transactional 失效场景族=自调用/final/private/非 public/异常被吞/传播配置错(第 90 题事务详解)。二刀:通知顺序=Around 前→Before→目标→AfterReturning→After→Around 后(异常走 AfterThrowing);同切面多通知用 @Order。三刀:代理与 BeanPostProcessor=AnnotationAwareAspectJAutoProxyCreator 在初始化后创建代理(第 33 题 BPP 同源)。"),
+    ],
+    ["切点+通知+织入,运行时代理", "自调用不走代理=切面失效", "Spring AOP 方法级,AspectJ 全量"], [juc, sre],
+  ),
+  "legacy/36": deep(
+    "@Autowired 与 @Resource 区别",
+    "网银多实现注入沙盘:同一接口三个实现类(微信/支付宝/银联)——@Autowired byType 歧义报错,@Resource byName 先行;装配语义不同导致启动期差异。",
+    [
+      "@Autowired:Spring 提供——默认 byType(按类型);同类型多候选→按字段名/参数名匹配→仍不唯一→报 NoUniqueBeanDefinitionException,需 @Qualifier 指名或 @Primary 标主;required=false 允许缺失。",
+      "@Resource:JSR-250 标准注解——默认 byName(按名字),名字找不到再回退 byType;name 属性显式指定;与 Spring 解耦(JSR 标准,换容器理论上可用);不支持构造器注入(只能字段/setter)。",
+      "装配行为差异:@Autowired 支持构造器/方法/参数注入;@Resource 只字段+setter;多候选时 @Autowired(name 匹配+@Qualifier/@Primary)生态更全——团队统一一种(常见 Spring 项目用 @Autowired+构造器),避免混用造成装配路径不一致。",
+    ],
+    [
+      block("机制:两种查找策略的失败模式", "byType 失败=歧义(多候选)或缺失(无候选)——失败发生在启动期(早失败,好);byName 失败=名字对不上(回退 byType 可能又歧义)——名字是隐式契约(重构改名=装配断,编译期无感知)。显式 @Qualifier/name=把隐式变显式(可读性优先)。"),
+      block("反例:注入的两种事故", "事故一:@Autowired 字段名与 Bean 名不一致+多实现——启动报 NoUnique;修复=@Qualifier 或改字段名对齐(隐式匹配,不推荐)。事故二:依赖 @Resource 的 byType 回退——改名后回退到 byType 碰上多实现,行为随重构漂移;修复=显式指定 name 或统一 @Autowired。"),
+      block("取舍:注解的选择", "Spring 项目+构造器注入=@Autowired(唯一选择,@Resource 不支持构造器);需要按名装配=@Resource(name) 或 @Autowired+@Qualifier(等价,前者少一个注解);脱离 Spring 的可移植诉求=@Resource(JSR 标准)——实际上 Spring 一统,可移植性是弱理由;一致性>个体偏好。"),
+    ],
+    [
+      block("验证:装配语义的实测走查", "验证:byType 歧义断言(三实现+@Autowired 无限定→启动失败;@Qualifier 后成功);byName 断言(@Resource 按字段名命中对应实现;name 属性断言);构造器断言(@Resource 用于构造器→不支持,编译/运行报错);required 断言(@Autowired(required=false) 缺 Bean 不炸)——四组固化装配语义,Spring 模块测试可复跑。"),
+      block("追问链:注入三刀", "一刀:集合注入=List<PayChannel>/Map<String,PayChannel> 注入全部实现(策略模式天然落法,第 55 题)——新增实现零改动。二刀:@Primary vs @Qualifier=全局默认 vs 局部指定(多候选治理)。三刀:Optional/Provider 注入=可选依赖与延迟获取(ObjectProvider 语义,第 34 题 prototype 同源)。"),
+    ],
+    ["@Autowired byType,@Resource byName 先", "多候选:@Qualifier/@Primary", "构造器注入只能 @Autowired"], [juc, sre],
+  ),
+  "legacy/37": deep(
+    "@Component、@Service、@Repository、@Controller 区别",
+    "网银分层架构沙盘:四层注解各归其位——本质都是 @Component 的语义化别名,差别=语义+少量附加行为(@Repository 异常转换/@Controller Web 路由)。",
+    [
+      "本质同源:@Service/@Repository/@Controller 内部都标注 @Component——注册为 Bean 的机制完全一致;区别第一层=语义(分层意图可读):Controller(Web 入口)/Service(业务编排)/Repository(数据访问)/Component(通用组件)。",
+      "附加行为:@Repository=持久层异常转换(DataAccessException 体系——统一翻译 ORM 厂商异常);@Controller=被识别为路由(@RestController=+@ResponseBody 返回 JSON);@Service/@Component 无额外行为。",
+      "组件扫描:@ComponentScan 从主类包向下扫(@SpringBootApplication 默认扫本包及子包)——注解只决定“要不要注册与怎么用”,扫描决定“注册哪些”——外部包的 Bean 用 @Bean/@Import 显式注册。",
+    ],
+    [
+      block("机制:语义注解的工程价值", "语义化=架构约束的可执行化:Reviewer 看到数据访问逻辑写在 @Service 就能拦截(分层越界);工具可按注解统计分层(ArchUnit 规则:Repository 只被 Service 依赖)——注解不是编译器强制,但提供了静态检查的锚点。"),
+      block("反例:分层注解的两种事故", "事故一:数据访问写在 Service 不用 Repository——丢失异常转换(MySQL 异常直穿上层,错误处理按厂商异常硬编码);修复=DAO 层 @Repository。事故二:业务逻辑写在 Controller——路由层膨胀(单类千行,复用为零);修复=Controller 只做参数装配+调 Service(薄控制器)。"),
+      block("边界:什么时候用 @Component", "不属于任何层的通用组件(工具 Bean/配置类/事件监听)用 @Component;三层的用语义注解(即使行为相同)——语义注解是给人和工具看的,编译器不在乎,架构在乎。"),
+    ],
+    [
+      block("验证:分层注解的实测走查", "验证:注册断言(四注解都注册成功——getBean 可取);异常转换断言(@Repository 的 DAO 抛出 DataAccessException 子类,而非厂商异常——翻译对照);路由断言(@RestController 方法返回对象→JSON,纯 @Controller 返回视图名——响应对照)——三组固化语义行为,Spring 模块测试可复跑。"),
+      block("追问链:分层三刀", "一刀:薄控制器纪律=参数校验(@Valid)/转换 DTO/调服务/返回——不做业务(第 138 题 reliability 分层同源)。二刀:@Bean vs @Component=第三方类(改不了源码)用 @Bean 显式注册。三刀:扫描边界=跨包用 @ComponentScan(basePackages) 或 starter 自动配置(第 39 题)。"),
+    ],
+    ["四注解同源,语义分层", "@Repository 换异常,@Controller 进路由", "Controller 薄,业务在 Service"], [juc, sre],
+  ),
+  "legacy/38": deep(
+    "Spring MVC 请求处理流程",
+    "网银接口沙盘:一笔 POST /orders 进来——DispatcherServlet 前端控制器统一调度(映射→适配→业务→异常→序列化);前后端分离下 ViewResolver 退化为消息转换。",
+    [
+      "九步主线:请求→DispatcherServlet(前端控制器)→HandlerMapping(找 Handler+拦截器链)→HandlerAdapter(适配调用)→Controller(参数解析/校验)→返回对象→异常翻译(@ControllerAdvice)→消息转换(JSON)→视图渲染→响应。",
+      "前后端分离形态:ViewResolver 基本不用——@ResponseBody 走 HttpMessageConverter(Jackson)序列化;参数解析=HandlerMethodArgumentResolver(@RequestBody/@PathVariable);校验=@Valid(失败→全局异常处理)。",
+      "扩展点:拦截器(preHandle/postHandle/afterCompletion——登录校验/日志/ThreadLocal 清理,第 25 题);全局异常处理=@RestControllerAdvice+@ExceptionHandler(统一错误响应,第 12 题状态码纪律)。",
+    ],
+    [
+      block("机制:为什么前端控制器模式", "所有请求走统一入口——横切逻辑(编码/安全/日志/异常)集中一处,Handler 层只写业务;适配器解耦 Handler 的形态(注解方法/旧式 Controller/函数式)——框架演进加新形态不改主线。类比总台:客人不直接找部门,总台派单+汇总+结账。"),
+      block("反例:流程的两种事故", "事故一:拦截器 afterCompletion 不清 ThreadLocal——线程复用上下文串号(第 25 题);修复=afterCompletion 必清(finally 语义)。事故二:异常没进全局处理——500 白页/堆栈泄漏;修复=@RestControllerAdvice 兜底 Throwable+按异常类型分级(第 12 题状态码)。"),
+      block("边界:与 Spring Boot 的关系", "Boot 自动配置 DispatcherServlet(默认拦截所有 /)+Jackson+错误页(/error)——WebMvcConfigurer 定制(拦截器/转换器/跨域);理解流程=排错时的地图(404=映射没命中/415=转换器不认/500=异常链没接住)。"),
+    ],
+    [
+      block("验证:流程的实测走查", "验证:主线断言(打日志在拦截器/Controller/Advice——顺序为 preHandle→业务→异常翻译→afterCompletion);异常断言(业务异常→@ExceptionHandler→统一 JSON 错误体,状态码正确);序列化断言(@RestController 返回 JSON,Content-Type=application/json);404/415 断言(错误路径/错误 Content-Type 的响应码)——四组固化主线,Spring 模块 MVC 测试可复跑。"),
+      block("追问链:MVC 三刀", "一刀:拦截器 vs Filter=Handler 层(感知路由/方法)vs Servlet 层(更早,编码/压缩);认证用 Filter(安全链),业务横切用拦截器。二刀:参数校验链=@Valid 级联对象+分组校验(创建/更新不同规则)。三刀:异步=DeferredResult/Callable(释放容器线程,第 80 题池化同源)。"),
+    ],
+    ["DispatcherServlet 统一调度九步", "分离架构=JSON 消息转换替代视图", "全局异常+拦截器是两大扩展点"], [juc, sre],
+  ),
+  "legacy/39": deep(
+    "Spring Boot 的优点？starter 是什么",
+    "网银服务搭建沙盘:传统 Spring 要几十个 XML 与依赖版本对齐——Boot 约定优于配置+starter 一键依赖+内嵌容器+Actuator 运维端点。",
+    [
+      "四个核心价值:自动配置(@Conditional 条件装配——classpath 有什么就装配什么);起步依赖(starter 聚合依赖+版本对齐);内嵌容器(jar 自启,不用外部 Tomcat);生产就绪(Actuator 健康检查/指标端点)。",
+      "starter 机制:聚合依赖(传递引入功能所需全部 jar)+自动配置类(@ConditionalOnClass/@ConditionalOnMissingBean——有类才配,用户没配才兜底);自定义 starter=编写 AutoConfiguration+import 注册文件+starter pom,内部组件统一接入。",
+      "优点对应工程效率:版本仲裁(parent 管依赖冲突)/无 XML(JavaConfig+注解)/配置外部化(application.yml+profile,第 40 题)/一键构建运行(mvn package→java -jar)——本质=把 Spring 生态最佳实践固化为约定。",
+    ],
+    [
+      block("机制:自动配置的条件链", "@EnableAutoConfiguration→加载各 starter 的 AutoConfiguration.imports→逐个按条件评估(@ConditionalOnClass=类在才配/@ConditionalOnProperty=开关/@ConditionalOnMissingBean=用户自定义优先)——用户 Bean 覆盖自动配置(覆盖路径:自定义 Bean→配置类→自动配置兜底);debug=true 打出条件评估报告(Positive/Negative matches)看谁生效。"),
+      block("反例:Boot 的两种事故", "事故一:自动配置与自定义打架——自定义 Bean 忘了排除自动配置,双实现注入歧义;修复=@ConditionalOnMissingBean 意识+exclude 排除。事故二:starter 版本乱引——绕过 parent 仲裁自带旧版依赖(冲突);修复=统一 parent/dependencyManagement,禁止 starter 内嵌版本号。"),
+      block("取舍:约定优于配置的边界", "约定=80% 场景零配置;非约定场景(特殊容器/特殊路由)要懂底层 Spring 才能覆盖——Boot 降低入门但没降低精通线;排错时仍要回到 Spring 机制(第 38 题流程)——自动配置报告+启动日志是回归底层的入口。"),
+    ],
+    [
+      block("验证:starter 机制的实测走查", "验证:条件装配断言(引 starter→Bean 出现;排除依赖→AutoConfiguration 跳过——debug 报告对照);覆盖断言(自定义同类型 Bean→自动配置让位——@ConditionalOnMissingBean 行为);内嵌容器断言(java -jar 直接起,无外部部署);Actuator 断言(/actuator/health 返回 UP)——四组固化 Boot 行为,本机可复跑。"),
+      block("追问链:Boot 三刀", "一刀:配置加载优先级链=命令行>环境变量>profile 文件>默认(第 40 题)。二刀:@SpringBootApplication=三合一(@ComponentScan/@EnableAutoConfiguration/@SpringBootConfiguration)。三刀:自定义 starter 步骤=autoconfigure 模块(条件类+Properties)+import 文件+starter 模块(纯 pom)——内部 SDK 标准交付形态。"),
+    ],
+    ["自动配置=条件装配,用户优先", "starter=依赖聚合+自动配置", "内嵌容器+Actuator=生产就绪"], [juc, sre],
+  ),
+  "legacy/40": deep(
+    "配置文件加载优先级？多环境 profile 如何切换",
+    "网银多环境沙盘:同一应用跑开发/测试/生产三套数据库——profile 隔离环境配置,命令行/环境变量覆盖文件(运维不改包即可调参)。",
+    [
+      "优先级链(高→低):命令行参数>环境变量>应用外配置(./config)>classpath 内>application-{profile}.yml>application.yml>jar 内默认——核心规律:命令行>环境变量>文件;外置>内置;profile 专属>通用。",
+      "profile 切换:application.yml 的 spring.profiles.active=dev(默认)→命令行 --spring.profiles.active=prod 覆盖→环境变量 SPRING_PROFILES_ACTIVE;按环境加载 application-{env}.yml;@Profile 控 Bean 生效。",
+      "工程实践:application.yml 只放共性+active 默认值;各环境差异进 application-{env}.yml(密码不入库——环境变量或配置中心注入,第 128 题密钥管理);生产用配置中心(Nacos/Apollo)动态下发+热刷新(@RefreshScope,第 23 题动态线程池同源)。",
+    ],
+    [
+      block("机制:为什么命令行/环境变量最高", "运维不可变部署包原则:同一 jar 跑多环境——环境差异必须外部化;命令行/环境变量=部署时注入(不重新打包);配置中心=运行时可变(动态调参)——三层外部化强度:包内固化<环境注入<中心下发,强度越高变更越敏捷。"),
+      block("反例:配置的两种事故", "事故一:生产密码写在 application.yml 提交进 git(密钥泄漏,第 128 题)——历史永久可查;修复=环境变量/密管系统+仓库历史清理。事故二:profile 文件相互引用失效——prod 覆盖 dev 但漏覆盖某 key(新 key 加在 dev 忘加 prod)→生产走了默认值;修复=启动日志打印生效配置摘要+关键 key 清单核对。"),
+      block("边界:优先级的实际用法", "本地调试:命令行覆盖端口/日志级别(不改文件);容器部署:环境变量注入(K8s ConfigMap/Secret);灰度:同一镜像不同环境变量——优先级链不是用来背的,是用来解释“为什么我配了没生效”(被更高层覆盖)。"),
+    ],
+    [
+      block("验证:优先级的实测走查", "验证:覆盖断言(yml 设 8080,命令行 --server.port=8081→8081 生效);profile 断言(active=prod→application-prod.yml 的 key 覆盖通用文件;未覆盖 key 保留通用值);环境变量断言(SPRING_ 前缀注入生效);生效摘要断言(启动打印关键配置清单,人工核对)——四组固化加载链,本机可复跑。"),
+      block("追问链:配置三刀", "一刀:随机值/占位符=${KEY:默认值}(缺省兜底,启动期解析)。二刀:@ConfigurationProperties vs @Value=类型安全绑定(推荐)vs 单值。三刀:动态配置=配置中心+@RefreshScope(热刷新销毁重建 Bean,第 34 题作用域同源)。"),
+    ],
+    ["命令行>环境变量>文件,外置>内置", "profile 文件按环境覆盖", "密码走环境变量/密管,不入 git"], [juc, sre],
+  ),
+  "legacy/41": deep(
+    "MyBatis 中 #{} 与 ${} 区别",
+    "网银动态排序沙盘:order by 列名必须 ${}(表结构名)而条件值必须 #{}(参数)——两者的分界=预编译占位符 vs 字符串拼接;${} 出现 SQL 注入面。",
+    [
+      "#{}:预编译占位符——参数作为 PreparedStatement ? 传入,值不参与 SQL 语法解析(类型安全+防注入);${}:字符串拼接——参数直接替换进 SQL 文本(适合动态表名/列名/排序方向这类“结构”参数——值不能加引号的场景)。",
+      "注入面:${} 把用户输入当 SQL 代码——查询条件/排序字段来自前端时注入(legacy/2 同源:字符串拼接 SQL 的标准漏洞);排序字段的正确防护=白名单校验(传入值必须在允许的列名集合内)或映射(前端传枚举 key,后端映射到列名)。",
+      "实践纪律:默认全部 #{};确需 ${} 的三类(表名/列名/排序方向)+白名单;ResultMap/动态 SQL(<if>/<foreach>)内部也用 #{}——foreach 批量插入 values 用 #{}(占位符展开,安全)。",
+    ],
+    [
+      block("机制:预编译为什么防注入", "PreparedStatement 先发送 SQL 模板(结构固定)再传参数——参数永远被当“数据”(即使包含引号/分号也不会改变语句结构);拼接则让数据混进结构(OR 1=1/分号续写);这是 SQL 防注入的根治手段(比转义可靠——转义有字符集绕过风险)。"),
+      block("反例:${} 的两种事故", "事故一:where name='${name}' 接前端——name=1' OR '1'='1 拖全表(注入复现);修复=#{name}。事故二:order by ${sort} 无白名单——sort=(select sleep(5)) 盲注/报错探查;修复=枚举映射后端白名单(前端只传 key)。事故三(加分):like '%${kw}%' 拼接——既要模糊匹配又防注入=CONCAT('%',#{kw},'%')(#{} 传值,结构仍模板)。"),
+      block("取舍:${} 的合法空间", "表名分表(order by 日期分表/按租户分表)——参数是程序生成的枚举(非用户输入)+白名单;排序方向 ASC/DESC——枚举白名单;除此之外一律 #{}——代码评审把 ${} 当高危标记(必须能说明白为什么不是注入)。"),
+    ],
+    [
+      block("验证:注入面的实测走查", "验证:注入断言(#{} 传 1' OR '1'='1→按字面查(无结果);${} 同值→全表返回——对照立现);预编译断言(开 psqlLog/MySQL general log 看 ? 占位);like 安全断言(CONCAT+#{})——四组固化分界,数据库模块测试可复跑。预期:${} 出现处必有白名单,否则评审拦截。"),
+      block("追问链:MyBatis 三刀", "一刀:动态 SQL 标签=<if>/<choose>/<foreach>/<where>(自动去首 AND)/<set>(去尾逗号)——复杂逻辑仍建议 Java 层组装(规约第 23 条同源)。二刀:一级缓存(SqlSession 级)/二级(namespace 级,脏读风险——分布式下禁用)。三刀:分页=PageHelper 拦截器改写 SQL 或手写 limit #{offset},#{size}(深分页延迟关联,第 48 题)。"),
+    ],
+    ["#{} 预编译防注入,${} 拼接", "${} 仅表名列名排序方向+白名单", "like 用 CONCAT 包 #{}"], [juc, mysql],
+  ),
+  "legacy/42": deep(
+    "事务 ACID 分别是什么",
+    "网银转账沙盘:A 扣 100、B 加 100——两步必须同生同死;ACID 四性各自靠什么机制支撑(undo/redo/锁+MVCC)。",
+    [
+      "原子性:全部成功或全部回滚——undo log(记录反向操作,回滚逆放);一致性:完整性约束不破坏(余额总和不变)——是目的(其余三性+业务规则达成);隔离性:并发互不干扰——锁+MVCC(第 43 题);持久性:提交即落盘——redo log(WAL,崩溃恢复重放)。",
+      "四性的支撑机制分工:undo log=原子性+隔离性快照(回滚+一致性读);redo log=持久性+崩溃恢复(两阶段提交与 binlog 一致,第 28 题数据库基础);锁与 MVCC=隔离性;约束(主键/外键/唯一)与业务校验=一致性兜底。",
+      "一致性最容易误解:它不是引擎单方面保证——转账逻辑写错(A 扣了 B 没加,事务内)事务也“成功”但一致性破坏;C=AID+业务正确性——技术四性只是必要条件。",
+    ],
+    [
+      block("机制:WAL 为什么能同时给 A 和 D", "undo(回滚链)与 redo(重放链)都先于数据页落盘(日志先行)——崩溃后恢复:已提交的重放(redo),未提交的逆放(undo)——把“可能中间态”的磁盘页修复为“全部完成或全部未做”——原子性与持久性是同一套日志机制的两个视角。"),
+      block("反例:一致性的两种事故", "事故一:事务内调外部 API——转账事务里调支付渠道,渠道成功但本地回滚(两边不一致,分布式问题);修复=本地消息表/事务外调用+补偿(第 143 题 banking 同源)。事故二:自增/DDL 隐式提交——事务里误写 DDL→隐式提交前半段;修复=事务内禁 DDL(MySQL 8.0 部分原子 DDL 除外)。"),
+      block("边界:隔离级别与一致性的关系", "隔离级别越低一致性越弱(RC 允许不可重复读)——一致性不是开关而是梯度(第 43 题);业务按读需求选级别(报表 RR/高频写 RC+显式锁),别默认全 RR(间隙锁并发代价,第 95 题同源)。"),
+    ],
+    [
+      block("验证:四性的实测走查", "验证:原子性断言(两步转账中途抛异常→全部回滚,余额复原);持久性断言(提交后 kill -9→重启数据在——redo 重放);隔离性断言(并发读对照:RC 下两次读不同,加锁后一致——第 43 题实验同源);一致性断言(业务规则校验:总账守恒脚本)——四组固化四性,数据库模块实验可复用。"),
+      block("追问链:ACID 三刀", "一刀:分布式事务=CAP 现实里降级为最终一致(2PC/TCC/Saga,第 152 题 architecture)。二刀:Spring 声明式事务=接口层 ACID 化(@Transactional 传播行为/失效场景,第 90 题)。三刀:redo 与 binlog 两阶段提交=内部 XA(prepare→写 binlog→commit),崩溃恢复以 binlog 为准(第 28 题详版)。"),
+    ],
+    ["A 靠 undo,D 靠 redo,I 靠锁+MVCC", "C 是目的=AID+业务正确", "事务内禁 DDL 与外部调用"], [mysql, juc],
+  ),
+  "legacy/43": deep(
+    "四种隔离级别与对应问题（脏读、不可重复读、幻读）？MySQL 默认级别",
+    "网银报表沙盘:并发转账时跑对账报表——脏读/不可重复读/幻读三问题与四级隔离的对应;MySQL InnoDB 默认 RR(可重复读)+间隙锁防幻读。",
+    [
+      "三问题:脏读(读到未提交,对方回滚则数据是错的)/不可重复读(同事务两次读同一行值不同——他人 update 提交)/幻读(同条件两次读行数不同——他人 insert 提交);严重度递减、防护代价递增。",
+      "四级隔离:读未提交(三问题全有,几乎不用)/读已提交 RC(防脏读,Oracle/PG 默认)/可重复读 RR(防脏读+不可重复读,MySQL InnoDB 默认)/串行化(全防,并发归零——读加锁,基本不用);MySQL RR 额外用间隙锁/next-key 锁基本防住幻读(快照读靠 MVCC,当前读靠锁)。",
+      "MVCC 的作用:RC 每次读生成新 Read View(看到最新已提交);RR 首次读生成后复用(整事务看到同一快照)——普通 select 是快照读不加锁,update/delete/current 读是当前读加锁(第 95 题详解)。",
+    ],
+    [
+      block("机制:RR 为什么不是完美防幻读", "快照读(MVCC)看不到新插入行=不幻;但当前读(for update/update)用 next-key 锁锁住范围=防插入;混合使用会“漂移”:先快照读再当前读,两次结果可能不同(快照与当前各自规则)——业务写法要一致(要么全快照+乐观校验,要么关键段当前读+锁)。"),
+      block("反例:隔离级别的两种事故", "事故一:报表用 RC——同事务两次汇总数字对不上(不可重复读);修复=报表走 RR 或单次快照(consistentsnapshot)。事故二:全库 RR+高并发写——间隙锁范围扩大→锁冲突/死锁率升;修复=热点写场景降 RC(无间隙锁)+业务唯一约束兜底(互联网常见取舍,需团队评审)。"),
+      block("取舍:级别选择的决策树", "默认 RR(_innodb 默认,与 binlog 强一致恢复配合);写密集+锁冲突高→RC(评估后);报表/对账→RR 或独立只读实例;绝对正确优先(资金核算)→当前读+显式锁(而非串行化)。"),
+    ],
+    [
+      block("验证:三问题的实测走查", "验证:脏读断言(RU 下读到未提交值,回滚后值“消失”);不可重复读断言(RC 下两次 select 结果不同;RR 下相同);幻读断言(RR 快照读行数稳定;当前读被 next-key 阻塞——数据库模块隔离级别实验可复用);死锁对照(RR 间隙锁 vs RC 记录锁的冲突率)——四组固化级别语义。预期:MySQL 默认 RR 且快照读防幻。"),
+      block("追问链:隔离三刀", "一刀:Read View 生成时机=RC 每语句/RR 首次(第 95 题 MVCC 详解)。二刀:间隙锁只在 RR 且当前读出现——RC 无间隙锁(死锁少的原因)。三刀:锁等待与超时=innodb_lock_wait_timeout(默认 50s,业务要设短+重试策略,第 137 题重试同源)。"),
+    ],
+    ["脏读/不可重复读/幻读对应四级", "MySQL 默认 RR+间隙锁", "快照读 MVCC,当前读加锁"], [mysql, r.isolation],
+  ),
+  "legacy/44": deep(
+    "索引的作用与分类？聚簇与非聚簇索引区别",
+    "网银账户查询沙盘:百万行按身份证查——无索引全表扫(秒级)有索引 B+ 树(毫秒);聚簇=叶子存整行,非聚簇=叶子存主键(回表)。",
+    [
+      "作用:把全表扫描 O(n) 变为树查找 O(log n)——B+ 树矮胖(3 层≈千万行,每层一次页 IO);代价=占空间+写放大(插入/更新维护树,第 93 题结构对比)。",
+      "分类:物理上=聚簇索引(主键,叶子存整行,表本身)/二级索引(叶子存索引列+主键);逻辑上=主键/唯一(约束+索引)/普通/联合(最左前缀)/前缀(长文本截断)/全文(倒排);按用途=查询加速/排序消除(filesort)/覆盖避免回表。",
+      "聚簇 vs 非聚簇:InnoDB 主键索引=聚簇(数据按主键组织,B+ 树叶子即数据页);二级索引查非覆盖列→先查二级树得主键→再查主键树取整行(回表,两次树查找);覆盖索引(查询列全在二级索引)免回表(Extra: Using index)——联合索引设计=把高频列打包覆盖。",
+    ],
+    [
+      block("机制:回表与覆盖的代价差", "回表=二级树查找+主键树查找(2×log n);覆盖=单树查找(1×log n)——批量查询差距放大(select * vs select id,name where name=xxx);联合索引列序=(a,b) 支持 a/a+b,不支持 b(最左前缀)——设计=按查询模式排序列(等值列在前,范围列在后)。"),
+      block("反例:索引的两种事故", "事故一:每列都建单列索引——优化器只能用一个(索引合并少见),空间浪费+写放大;修复=按查询组合建联合索引。事故二:大字段进索引前缀过长——前缀选择性不足(区分度低)等于没建;修复=前缀长度按选择性实测(前 n 字符唯一率)或哈希列。"),
+      block("取舍:主键的选择(第 49 题延伸)", "聚簇按主键组织——自增主键=顺序写入(页尾追加,无分裂);UUID 随机=页中间插入(频繁分裂+碎片,第 49 题对比);主键越短越好(二级索引叶子都存主键副本——主键大=全部索引跟着大)。"),
+    ],
+    [
+      block("验证:回表的实测走查", "验证:explain 断言(type=ref/rows 数/Extra=Using index 覆盖 vs 无覆盖无 Using index);耗时对照(覆盖索引查询 vs 回表查询——百万行下毫秒级差异);页结构断言(innodb_space 或诊断页看叶子存整行 vs 主键);树高断言(3 层千万行的估算:16KB 页×每页约 15 行数据+千级指针)——数据库模块索引实验可复用。"),
+      block("追问链:索引三刀", "一刀:失效场景族=函数/隐式转换/前导模糊/OR 混合/最左缺失(第 45 题专答)。二刀: Online DDL=加索引在线(INPLACE+锁短暂)但大表仍要低峰+gh-ost(第 147 题)。三刀:cardinality 统计=优化器选错索引的来源(统计过期→analyze table;强制索引 hint 是最后手段)。"),
+    ],
+    ["聚簇叶子整行,二级叶子主键", "回表两次查找,覆盖免回表", "主键短且自增,索引才省"], [mysql, r.create || mysql + "create-index.html", r.explain],
+  ),
+  "legacy/45": deep(
+    "什么情况下索引失效",
+    "网银慢查询沙盘:索引建了却全表扫——函数包装/隐式转换/前导模糊/最左缺失/OR 混合/优化器改道六类失效;explain type=ALL 一眼识别。",
+    [
+      "列被加工:where date(created)=今天(函数包装)/where id+1=10(运算)/where cast(...)=——索引存的是原值,加工后无法按树查找;修复=范围改写(created>=今天 0 点 and <明天)/把运算移到常量侧。",
+      "类型不一致:字符串列用数字比(where phone=13800000000——隐式转数字,列被包装);字符集/排序规则不一致(join 两侧)同理;修复=类型对齐(phone='13800000000')。",
+      "结构与统计类:like '%x' 前导模糊(树按前缀组织,前导通配无法定位——'%x%' 也一样)/联合索引跳过最左列(where b=1 对 (a,b) 无效)/OR 两边一个有索引一个无(退化为全扫)/优化器判断回表代价高于全扫(低选择性——性别列)+统计过期(cardinality 不准→改道);修复=覆盖索引/联合列序/analyze table。",
+    ],
+    [
+      block("机制:失效的共同根因=有序性破坏", "B+ 树加速的前提=索引列值有序可二分——任何“把列变换后比较”(函数/运算/隐式转换)都是拿变换后的值查未变换的树=无序可比;前导模糊=前缀未知无法定位分支;OR 混合=无法单树收窄;优化器改道=树虽可用但代价模型判全扫更快(这不是“失效”而是“主动不用”——区分两类)。"),
+      block("反例:失效的两种事故", "事故一:日期函数包装——报表慢查询(全表扫);修复=范围条件(索引可用)。事故二:隐式转换——phone varchar 用数字查(MySQL 8 对字符串列=数值比较会转 double 全扫)+精度坑(大数字转 double 丢精度);修复=对齐类型。事故三(加分):统计过期——数据分布变了优化器仍用旧 cardinality 选错索引;修复=analyze table(或 forced index 应急)。"),
+      block("取舍:改写的通用套路", "函数包装→范围条件;运算→常量侧;前导模糊→全文索引/搜索引擎/倒排(ES,第 152 题);跳过最左→补齐最左或建新索引;OR 混合→union 两支各自走索引;低选择性→联合(与高选择性列组合)或不用索引。"),
+    ],
+    [
+      block("验证:失效场景的实测走查", "验证:explain 对照组(每种失效场景建一次 explain——type 从 ref 变 ALL;函数包装/隐式转换/前导模糊/最左缺失/OR 混合逐一复现+修复后恢复 ref);range 断言(范围改写后 type=range)——六场景断言组固化失效语义,数据库模块 explain 实验可复用。预期:每条失效都有 explain 证据与修复对照。"),
+      block("追问链:失效三刀", "一刀:隐式转换细则=字符串列与数字比→列转数字(失效);数字列与字符串比→常量转数字(不失效)——方向决定生死。二刀:order by 与索引=排序列与索引一致免 filesort(Using filesort 出现=排序没走索引)。三刀:limit 深分页=offset 大→扫描浪费(延迟关联:先覆盖索引取主键再回表,第 48 题)。"),
+    ],
+    ["加工列=失效,改写为范围", "字符串列与数字比失效", "explain type=ALL 是识别器"], [mysql, r.explain],
+  ),
+  "legacy/46": deep(
+    "drop、delete、truncate 区别",
+    "网银数据清理沙盘:清空日志表用 truncate(快)删部分用 delete(可回滚)删表结构用 drop——三者的 DML/DDL 属性与回滚能力差异。",
+    [
+      "delete:DML——逐行删除(逐行记 undo/binlog)可 where 过滤可回滚;触发触发器;自增不清零;速度慢(大表删除锁行+日志量大);空间不立即回收(碎片,需 optimize/重建回收)。",
+      "truncate:DDL——整表重建(删除数据页重新初始化)不可 where 不可回滚(MySQL 8.0 前 DDL 无原子性,8.0 后原子 DDL 但仍不可回滚到事务);速度快(不逐行);自增复位;触发器不触发;binlog 记为语句(主从一致依赖 row 格式细节)。",
+      "drop:DDL——连表带结构删除(索引/权限/触发器全删);不可回滚(8.0 原子 DDL 保证“要么删成要么没删”但删成就是没了);释放空间;恢复只能靠备份/回收站(如部署了回收站机制)。",
+    ],
+    [
+      block("机制:为什么 truncate 快且不可回滚", "delete 按行维护 undo(每行可逆)——代价是日志量与锁;truncate 直接重置表空间(页级别操作,无逐行 undo)——没有“回到中间态”的路径=不可回滚;DDL 隐式提交(事务里执行 delete 后 truncate,前半段也被提交——第 42 题事故同源)。"),
+      block("反例:三种删除的事故", "事故一:生产手滑 truncate 大业务表——不可回滚只能 PITR 恢复(第 151 题备份演练);修复=高危 SQL 工单+权限隔离(drop/truncate 只 DBA)。事故二:大表 delete 清理历史——一次删 5000 万行→长事务+undo 膨胀+主从延迟;修复=分批删除(小事务+间隔,第 137 题分批同源)。事故三(加分):delete 后磁盘没降——空间碎片未回收;修复=optimize table(锁表代价)或 pt-online-schema-change。"),
+      block("取舍:选择决策树", "删结构=drop;清全表(临时表/日志表)=truncate;条件删除=delete(分批);高频清空场景(日志表)→按时间分表(整表 drop 分区,免 delete)——分区表或按月建表是“删大表”的工程解。"),
+    ],
+    [
+      block("验证:三种删除的实测走查", "验证:回滚断言(delete 后 rollback→数据回;truncate 后 rollback→数据仍空——对照立现);自增断言(delete 保留,truncate 复位);速度对照(百万行 truncate 秒级 vs delete 分钟级);隐式提交断言(事务中 delete+truncate→delete 部分已提交不可回滚)——四组固化差异,数据库模块实验可复跑。"),
+      block("追问链:删除三刀", "一刀:软删除=逻辑删除标志位(deleted_at)——审计友好但查询全要带条件+唯一约束变复杂(唯一索引+软删冲突)。二刀:闪回=binlog/undo 恢复误删(delete 可用闪回工具,truncate/drop 只能备份)。三刀:归档=历史数据迁移归档库(生产库瘦身)——比删除更常用(可追溯)。"),
+    ],
+    ["delete 行级可回滚,truncate 页级不可", "drop 连结构全删", "大表清理用分批或分区"], [mysql, r.ddl || mysql + "innodb-online-ddl-operations.html"],
+  ),
+  "legacy/47": deep(
+    "内连接与外连接？where 与 having 区别",
+    "网银对账报表沙盘:订单 join 用户——inner 只留匹配行,left 保左表全量(无匹配补 null);where 过滤行(分组前)having 过滤组(分组后)。",
+    [
+      "连接类型:inner join(两表匹配行)/left join(左表全量+右匹配或 null)/right join(镜像)/cross join(纯笛卡尔);on=连接条件,where=结果过滤——left join 时右表条件写在 on 与 where 语义不同(on 先滤再连,where 连完再滤,left 变 inner)。",
+      "where vs having:where 过滤“行”(分组/聚合前,不能用聚合函数);having 过滤“组”(分组后,可用聚合)——执行顺序:from→join→where→group by→having→select→order by→limit;where 不满足的行根本不进聚合(性能好),having 是聚合后再砍(代价高)。",
+      "实践:能用 where 过滤绝不留到 having(having sum(amount)>100 中能在 where 用 amount>100 先滤);left join + where 右表条件=隐式 inner(需要“保留左表”时用 on 或 where 条件放 OR is null 分支)。",
+    ],
+    [
+      block("机制:执行顺序为什么决定语义", "on 在连接时逐行评估(决定配不配对),where 在连接结果上评估(决定留不留)——left join 的“左全量”承诺在 on 阶段定,where 阶段砍掉 null 行=承诺作废(变 inner);having 在聚合后(组已形成,只能按组指标砍)——顺序不是背条目,是理解承诺的时点。"),
+      block("反例:join 的两种事故", "事故一:left join 右表条件写 where——统计报表突然少行(left 语义丢失);修复=条件移 on 或显式 or 右表 is null。事故二:join 后 where 无索引列过滤——笛卡尔中转大(驱动表选择错);修复=驱动表走索引+小表驱动(第 48 题优化同源)。"),
+      block("取舍:having 的合法场景", "聚合指标过滤(having count(*)>10/sum>100)是 having 本职;非聚合条件都该进 where;分页+聚合(having 内 limit)注意语义(limit 作用于聚合结果行);报表 SQL 的可读性=CTE 子查询分步(每步一个语义)优于单条巨 SQL。"),
+    ],
+    [
+      block("验证:join/where 语义的实测走查", "验证:left 语义断言(右表条件在 on→左表全量保留 null;在 where→行数减少=inner 化——对照立现);聚合断言(where 先滤再聚合 vs having 聚合后滤——count 数值不同);执行顺序断言(别名可用性:where 不能用 select 别名,having 可以——顺序的可见证据)——三组固化语义,数据库模块 join 实验可复跑。"),
+      block("追问链:SQL 三刀", "一刀:join 算法=NLJ(嵌套循环,索引驱动)vs Hash Join(MySQL 8.0.18+ 等值 join 内存哈希)——无索引 join 的救星。二刀:笛卡尔事故=join 条件漏写→百万×百万;评审=join 必有 on。三刀:去重=distinct(全行)vs group by(分组)vs 窗口函数 row_number(取组内最新——第 48 题优化同源)。"),
+    ],
+    ["inner 留匹配,left 保左全量", "on 定配对,where 定留存", "where 过滤行,having 过滤组"], [mysql, r.select || mysql + "select.html"],
+  ),
+  "legacy/48": deep(
+    "常见 SQL 优化手段",
+    "网银慢查询沙盘:报表接口 8 秒——explain 定位(全扫/filesort/深分页)→索引/改写/结构三层优化;先测量再动手(explain 是起点)。",
+    [
+      "索引层:补索引(查询列组合建联合,等值在前范围在后);覆盖索引免回表(Extra: Using index);排序与分组消除 filesort(索引序与 order by 一致);前缀索引处理长文本;删除冗余索引(写放大+优化器困惑)。",
+      "SQL 改写层:select * →按需列(覆盖机会+带宽);深分页 offset→延迟关联(先覆盖索引取主键再回表)或游标(where id>last limit n);函数包装改范围(第 45 题);OR 拆 union;join 小表驱动+被驱动表走索引;count(*) 大表→估算(explain rows)或计数表。",
+      "结构层:大表分区(按时间,查询裁剪分区);冷热分离(历史归档,第 46 题归档同源);读多写少加缓存(第 152 题);汇总表/宽表(预计算,报表走数仓);分库分表(容量与并发上限的最后手段,第 155 题)。",
+    ],
+    [
+      block("机制:explain 怎么读", "type 优劣序:const>eq_ref>ref>range>index>ALL(ALL=全扫,range 起算合格);key=实际用的索引;rows=预估扫描数(越小越好);Extra:Using index(覆盖)/Using where(服务层过滤)/Using filesort(排序没走索引)/Using temporary(临时表——group by/distinct 代价);慢日志(slow_query_log)圈定嫌疑,explain 逐条确诊——测量先行,不猜。"),
+      block("反例:优化的两种事故", "事故一:无测量乱建索引——建了十个单列索引没一个命中(查询是多列组合);修复=explain 确认访问路径再建联合。事故二:优化过度——索引建太多写性能崩(每次 insert 维护全部索引);修复=索引审计(使用率视图 sys.schema_unused_indexes)定期清理。"),
+      block("取舍:优化的投入边界", "优化顺序=索引>SQL 改写>缓存>结构>架构(投入递增);达到业务可接受(接口 P99<500ms)即停(过度优化=维护成本);慢查询治理常态化=监控告警(pt-query-digest 周报)+上线前 SQL 评审(第 151 题质量闸同源)。"),
+    ],
+    [
+      block("验证:优化效果的实测走查", "验证:基线断言(优化前 explain+耗时);索引断言(建联合索引→type ref/rows 降/耗时降——前后对照);延迟关联断言(limit 100000,20 改写后耗时对照——毫秒级 vs 秒级);filesort 消除断言(排序列进索引→Extra 无 filesort)——四组量化优化收益,数据库模块优化实验可复用。"),
+      block("追问链:优化三刀", "一刀:慢日志参数=long_query_time(0.5s 起)+log_queries_not_using_indexes(注意噪声)。二刀:join 算法演进=NLJ→BNL(块嵌套,无索引缓冲)→Hash Join(8.0.18+)——无索引 join 从灾难变可用但仍要索引。三刀:窗口函数(MySQL 8.0)=row_number/rank 取组内 top(替代自关联子查询,可读性+性能双优)。"),
+    ],
+    ["explain 先行:type/rows/Extra", "索引>改写>缓存>结构", "深分页用延迟关联或游标"], [mysql, r.explain],
+  ),
+  "legacy/49": deep(
+    "主键选择：自增、UUID、雪花算法的优缺点",
+    "网银分库沙盘:单库自增爽、分库后冲突——UUID 全局唯一但乱序页分裂,雪花=有序+分布式(时钟回拨是唯一坑);聚簇索引决定主键形态影响写放大。",
+    [
+      "自增(auto_increment):优点=短(8B)/顺序追加(聚簇页尾写,无分裂)/索引紧凑;缺点=单库唯一(分库分表冲突)/依赖数据库(迁移难)/暴露业务量(订单号可被推算)/扩容 merge 数据冲突。",
+      "UUID v4(随机):优点=全局唯一无中心/生成零成本;缺点=36 字符长(存储+索引膨胀)/完全乱序→B+ 树页中间插入(频繁页分裂+碎片+写放大,第 44 题)/不可读;UUIDv7(时间有序)改善有序性(新标准,可考虑)。",
+      "雪花(Snowflake):64bit=时间戳(41)+机器 id(10)+序列(12)——趋势递增/分布式唯一/毫秒内有序;缺点=依赖机器时钟(回拨→重复/乱序,需回拨保护:等待/告警/序列兜底)/机器 id 分配需中心协调(注册中心/DB 分配)/每毫秒 4096 个上限(超限自旋)。",
+    ],
+    [
+      block("机制:为什么有序性对 InnoDB 如此重要", "聚簇索引按主键物理组织——有序主键=永远追加最后一页(顺序写,buffer pool 友好);随机主键=每页都可能被写(随机 IO)+页满分裂(分裂后原页半空,碎片率升,buffer pool 命中率降)——写入吞吐与缓存效率双降;这就是“主键要趋势递增”的物理根源(第 44 题取舍)。"),
+      block("反例:主键选择的两种事故", "事故一:分库后仍用自增——各库从 1 起号,合并/同步冲突;修复=号段模式(各库领段)/雪花/步长错开。事故二:订单号用 UUID 展示给用户+做主键——泄露生成时间不可推(还行)但索引碎片化;修复=内部主键用雪花/自增,对外单号另设(展示号与主键解耦)。"),
+      block("取舍:决策树", "单库且无暴露诉求→自增(最简);分库分表/多活→雪花(趋势递增+去中心);已有 UUID 遗留→新表用雪花,旧表接受碎片(重建优化);极端写入量→号段模式(DB 批发号段,应用内存分配——美团 Leaf 方案)——主键是数据架构的地基,变更成本极高,设计期选定。"),
+    ],
+    [
+      block("验证:写入形态的实测走查", "验证:页分裂对照(自增/雪花顺序写 vs UUID 随机写——同量插入耗时与 innodb 页碎片率对照;数据库模块 13 题页分裂实验同源);雪花断言(并发生成无重复/趋势递增;时钟回拨注入→保护逻辑触发——等待或序列兜底);id 长度对照(索引体积:8B vs 36 字符)——三组固化选型依据,本机可复跑。"),
+      block("追问链:主键三刀", "一刀:时钟回拨防护=最近回拨等待/回拨超阈值告警+拒绝发号/备用位记录回拨次数(美团 Leaf-snowflake 的 zookeeper 方案)。二刀:号段模式=双 buffer 预取(当前段用一半时异步取下一段)——DB 压力摊平。三刀:业务单号与主键解耦=内部主键(递增)+对外单号(带业务语义/校验位/加密序号)——两套诉求两套号。"),
+    ],
+    ["自增短且顺序,分库不可用", "UUID 乱序页分裂,写放大", "雪花趋势递增,防时钟回拨"], [mysql, pod],
+  ),
+  "legacy/50": deep(
+    "varchar 与 char 区别？金额为什么用 decimal 或以分为单位的 long",
+    "网银资金沙盘:金额用 float 算出 0.30000000000000004——浮点二进制误差不可用于资金;decimal 精确十进制,分存储 long 是工程惯例。",
+    [
+      "char vs varchar:char(N) 定长(不足补空格,尾空格检索剥离——MySQL)恒 N 字符,适合可预测长度(国家码/状态码);varchar(N) 变长(1-2 字节长度前缀+内容),N=字符数(UTF8MB4 下 1 字符最多 4 字节);超页部分溢出页存储。",
+      "金额不用 float/double:二进制浮点无法精确表示多数十进制小数(0.1=无限循环二进制)——累加/比较出现误差(0.1+0.2!=0.3),对账必崩;decimal(M,D) 精确十进制(M 总位数 D 小数位,金额常用 decimal(18,2) 或 (20,4));运算规则:sum/avg 精确,乘除注意 scale 扩展。",
+      "以分为单位的 long:整数分(×100)存储——运算无精度问题/8B 紧凑/与支付渠道对账常以最小货币单位交割(银行/微信/支付宝接口都是分)——展示层格式化(分→元);换汇/利息等需要小数比例时用 decimal(比例不做金额本体)。",
+    ],
+    [
+      block("机制:为什么二进制浮点必然误差", "IEEE 754 用二进制科学计数法——十进制 0.1 在二进制是无限循环(0.000110011...)只能截断存储→表示值≈0.1000000000000000055;单次误差微小,累加/乘除放大,等值比较必失败——资金场景“差一分”就是事故;精确十进制=BCD 思路(decimal 按位存十进制数字)无表示误差。"),
+      block("反例:金额的两种事故", "事故一:double 累加账户余额——万笔后分位漂移(对账差异);修复=decimal/long 分。事故二:parseFloat 比较金额——0.1+0.2!=0.3 判断成立导致重复支付校验误判;修复=BigDecimal(Java)/long 分,比较用 compareTo 而非 equals(scale 敏感)。事故三(加分):varchar 存金额——排序按字符串序(“100” 排在 “99” 前的错序);金额永远数值类型。"),
+      block("取舍:decimal vs long 分", "long 分=运算快/存储小/接口对齐(推荐默认);decimal=业务需要小数金额(换算/计息/分成比例)/与 DB 列直接对应;混合用(主体 long,计息明细 decimal)——统一货币单位(分)+统一精度纪律(展示格式化在视图层,计算永远最小单位)。"),
+    ],
+    [
+      block("验证:精度与长度的实测走查", "验证:浮点误差断言(0.1+0.2!=0.3/累加 1 万次 0.1 偏差可见——复现事故);decimal 断言(同运算精确);long 分断言(同运算精确+无舍入);char/varchar 断言(存储与尾空格行为:char 检索剥离/varchar 保留;超长截断与严格模式报错)——四组固化类型语义,数据库与 Java 模块实验可复跑。"),
+      block("追问链:类型三刀", "一刀:varchar(N) 的 N=字符数,字节上限受行限制(65535 行级/UTF8MB4 4 字节/字符)——N 按业务上限设,勿一律 255。二刀:BigDecimal 的坑=equals 含 scale(1.0 vs 1.00 不等)/构造用字符串(=new BigDecimal(0.1) 已带浮点误差)。三刀:金额字段审计=金额变更流水表(每笔动账可追,资金对账的基石,第 158 题金融同源)。"),
+    ],
+    ["char 定长,varchar 变长按字符", "浮点误差必崩对账", "金额=decimal 或 long 分"], [mysql, jls17],
+  ),
+
+
+  // ---- x-leg3-p2 ----
+"legacy/51": deep(
+    "TCP 与 UDP 区别？三次握手、四次挥手，为什么是三次",
+    "网银连接沙盘:TCP(连接/可靠/有序)vs UDP(无连接/不可靠/低延迟)——金融交易走 TCP(可靠),行情推送可走 UDP(容忍丢失);三次握手=双向确认+ISN 同步的最小次数。",
+    [
+      "TCP:连接导向(三次握手)——可靠(确认/重传/排序)+流量控制(滑动窗口)+拥塞控制(慢启动/拥塞避免);UDP:无连接——不可靠但低延迟(无握手/确认/重传开销),适合实时音视频/DNS/行情推送。",
+      "三次握手:SYN→SYN+ACK→ACK——双向确认+ISN 同步;两次不够(服务端无法确认客户端可收);四次多余(SYN+ACK 可合并)——ISN 随机防旧报文+防序列号预测(network Q3 ISN 双目的)。",
+      "四次挥手:FIN→ACK→FIN→ACK——TCP 全双工(每个方向独立关闭);TIME_WAIT(主动关闭方 2MSL,防旧报文污染新连接,第 6 题)。",
+    ],
+    [
+      block("机制:金融交易选 TCP 的理由", "交易必须可靠到达且有序(TCP 保证);UDP 丢包=交易丢失(不可接受);TCP 重传确保到达——代价=延迟,但金融可靠性>延迟。行情推送容忍丢包→UDP 可选。"),
+      block("反例:TCP/UDP 误用两种事故", "事故一:UDP 做交易——丢包=交易丢失,应用层重传=重新发明 TCP;修复=交易走 TCP。事故二:TCP 做实时推送——Nagle+确认增加延迟;修复=TCP_NODELAY 或 UDP 组播。"),
+      block("取舍:连接管理", "长连接复用(省握手,第 8 题)+连接池;TIME_WAIT 堆积(短连接高频,第 6 题);三次握手延迟(1-RTT,HTTPS 加 TLS 再加 1-2 RTT,第 1 题)——连接复用是性能主线。"),
+    ],
+    [
+      block("验证:TCP/UDP 的走查核对", "验证:N3 实验(超时/拒绝/读取三形态);N4 实验(复用 0.29ms vs close 0.9ms);N2 实验(TIME_WAIT=30/CLOSE_WAIT 随 close 消失)——network 批次实验可复用。验证:握手状态机断言可程序化(netstat)。"),
+      block("追问链:TCP 三刀", "一刀:拥塞控制=慢启动→拥塞避免→快重传→快恢复(第 17 题)。二刀:TCP 粘包=应用层分帧(长度前缀/分隔符,第 4 题)。三刀:TIME_WAIT 优化=连接池+tcp_tw_reuse(第 6 题)。"),
+    ],
+    ["TCP 可靠有序,UDP 低延迟", "三次=最小充分解", "金融交易走 TCP,行情可 UDP"], [sre, owasp],
+  ),
+  "legacy/52": deep(
+    "HTTP 与 HTTPS 区别？HTTPS 握手过程简述",
+    "网银 API 沙盘:HTTP(明文)vs HTTPS(HTTP+TLS 加密+认证+完整性)——TLS 1.2 握手 2-RTT,TLS 1.3 优化为 1-RTT(第 19 题TLS 详解)。",
+    [
+      "HTTPS=HTTP over TLS——三问题:加密(对称加密)、身份认证(证书链到 CA)、完整性(MAC 防篡改);TLS 1.2 握手 2-RTT,TLS 1.3 优化为 1-RTT(合并+仅前向安全 ECDHE)。",
+      "TLS 1.2 握手:ClientHello→ServerHello+Certificate+KeyExchange→Client KeyExchange→Finished;TLS 1.3:合并握手+移除 RSA 密钥传输——更快且更安全。",
+      "性能代价:握手 1-2 RTT+对称加解密 CPU(硬件 AES-NI 可忽略)+证书链校验——缓解:连接复用/会话恢复/TLS 1.3/OCSP Stapling(第 19 题)。",
+    ],
+    [
+      block("机制:混合加密的分工", "非对称(RSA/ECDHE)密钥交换(安全协商对称密钥)+对称(AES/ChaCha20)数据传输(性能高)——用非对称交换钥匙,用对称开锁。TLS 1.3 仅保留 ECDHE(前向安全)。"),
+      block("反例:HTTPS 两种事故", "事故一:关闭证书校验——中间人攻击(第 19 题事故链);修复=信任库+到期监控+私有 CA。事故二:TLS 版本过老(1.0/1.1)——已知漏洞;修复=强制 TLS 1.2+。"),
+      block("取舍:HTTPS 性能优化", "会话恢复(ticket)+TLS 1.3(1-RTT)+OCSP Stapling+AES-NI 硬件加速——HTTPS 性能已不是主要瓶颈(第 19 题故障链),握手成本被复用摊薄。"),
+    ],
+    [
+      block("验证:HTTPS 握手的走查核对", "验证:TLS 1.2 握手 2-RTT 实测(N3 实验);TLS 1.3 1-RTT 对照;证书链校验(leaf→intermediate→root);OCSP Stapling 断言;复用后延迟降低(N4 实验同构)。验证:握手断言可程序化(sslscan/wireshark)。"),
+      block("追问链:HTTPS 三刀", "一刀:ECDHE(前向安全)vs RSA 密钥传输(无前向安全)——TLS 1.3 仅 ECDHE。二刀:HTTP/2 要求 HTTPS(浏览器强制);HTTP/2 多路复用减少连接数(第 17 题)。三刀:证书过期→30/60 天告警+ACME 续期+OCSP 刷新(第 19 题故障链)。"),
+    ],
+    ["HTTPS=TCP+TLS(加密+认证+完整性)", "TLS 1.3=1-RTT+前向安全", "性能:复用+1.3+硬件加速"], [sre, owasp],
+  ),
+  "legacy/53": deep(
+    "常见 HTTP 状态码？GET 与 POST 区别",
+    "网银 API 沙盘:2xx(成功)/3xx(重定向)/4xx(客户端错)/5xx(服务端错)——GET(幂等查询)与 POST(非幂等提交)的语义区别。",
+    [
+      "状态码:2xx(200/201/204)、3xx(301/302/304)、4xx(400/401/403/404/429)、5xx(500/502/503)——每种=一种错误类型信号(第 12 题状态码纪律);GET=幂等查询(参数在 URL,可缓存);POST=非幂等提交(参数在 body)。",
+      "RESTful 状态码:200(返回数据)/201(创建+Location)/204(无内容)/400(参数)/401(未认证)/403(无权)/404(不存在)/409(冲突)/429(限流)——状态码+响应体错误码配合(第 12 题)。",
+      "GET 幂等=多次调用结果相同(可安全重试/缓存);POST 非幂等=多次调用产生多次副作用(需幂等键保护,第 119 题)——动词的幂等性决定客户端重试策略。",
+    ],
+    [
+      block("机制:GET 幂等的工程含义", "GET 幂等=可安全重试/缓存/收藏;POST 非幂等=需要幂等键保护(防止重复提交);RESTful 设计:GET 查询/PUT 幂等更新/DELETE 幂等删除/POST 非幂等创建——动词的幂等性决定客户端重试策略(第 119 题)。"),
+      block("反例:状态码误用两种事故", "事故一:所有错误返回 200+错误码——前端无法用 HTTP 状态码判断;修复=HTTP 状态码+业务错误码双层。事故二:POST 用于查询——绕过 GET 缓存/日志;修复=查询用 GET(语义正确)。"),
+      block("取舍:GET 长度限制与 POST 上传", "GET URL 限制(浏览器 2KB);POST body 限制(multipart max-file-size,第 44 题)——复杂查询条件用 POST body 规避长度限制(但失去缓存)。"),
+    ],
+    [
+      block("验证:状态码的走查核对", "验证:状态码断言(200/201/204/301/302/304/400/401/403/404/429/500 各自行为);GET 幂等断言(多次结果一致);POST 非幂等断言(多次创建多条);缓存断言(GET 可缓存/POST 不缓存)——四组固化 HTTP 语义(第 12 题)。"),
+      block("追问链:HTTP 三刀", "一刀:HTTP/2 对 GET/POST 的影响=多路复用(传输层优化,语义不变)。二刀:PUT vs POST=PUT 幂等(完整替换)/POST 非幂等(创建)——RESTful 语义。三刀:HTTP 状态码自定义=不可(IANA 标准);业务错误码在 body 中自定义(双层配合)。"),
+    ],
+    ["2xx 成功 3xx 重定向 4xx 客户端 5xx 服务端", "GET 幂等可缓存,POST 非幂等", "状态码+业务码双层配合"], [sre, owasp],
+  ),
+  "legacy/54": deep(
+    "Cookie 与 Session 区别？分布式 Session 方案",
+    "网银会话沙盘:Cookie(客户端存储,自动携带)vs Session(服务端存储,依赖 Cookie 传 SessionID)——分布式部署下 Session 共享三方案(复制/Sticky/集中存储)。",
+    [
+      "Cookie:客户端存储(浏览器管理,4KB 限制,自动携带同域请求)——安全性低(可篡改/窃取);Session:服务端存储(依赖 Cookie 传 SessionID)——安全性高(数据在服务端)——分布式部署问题:Session 在一个节点→请求路由到其他节点→Session 丢失。",
+      "分布式 Session 三方案:Session 复制(节点间同步,小集群)/Sticky 会话(LB 按用户路由,节点故障丢会话)/集中存储(Redis Session,所有节点读写同一 Redis——最常用,Spring Session)。",
+      "Cookie 安全属性:HttpOnly(JS 不可读,防 XSS 窃取)+Secure(仅 HTTPS 传输)+SameSite(Strict/Lax/None——CSRF 防御,第 23 题)——三属性=Cookie 安全的基础配置。",
+    ],
+    [
+      block("机制:Session 的本质=服务端状态存储", "Cookie 是门票(SessionID),Session 是保险箱(数据在服务端);Cookie 被偷=SessionID 泄露(会话劫持)——Cookie 安全属性(HttpOnly/Secure/SameSite)是基础防线(第 23 题 CSRF)。"),
+      block("反例:Session 管理的两种事故", "事故一:分布式部署用本地 Session——LB 轮询到其他节点→Session 找不到→用户被踢出;修复=Spring Session Redis(集中存储)。事故二:Cookie 未设 HttpOnly——JS 可读 SessionID(XSS 窃取会话);修复=HttpOnly+Secure+SameSite。"),
+      block("取舍:JWT vs Session 的选择", "JWT:无状态(不查存储)+跨域友好+撤销难(黑名单,第 22 题);Session:有状态(查存储)+撤销即时+分布式需集中存储——选择=撤销需求+部署架构+运维能力(第 22 题选择框架)。"),
+    ],
+    [
+      block("验证:Cookie/Session 的走查核对", "验证:Cookie 属性断言(HttpOnly/Secure/SameSite);Session 共享断言(多实例 Redis Session 可用);互踢断言(新登录踢旧);Cookie 安全断言(XSS 场景 HttpOnly 防 JS 读)——四组固化会话管理(第 129 题认证体系)。"),
+      block("追问链:会话三刀", "一刀:Cookie SameSite=Strict/Lax/None(CSRF 浏览器层防御,第 23 题)。二刀:Session 超时=服务端 web.xml/配置+Cookie Max-Age(独立配置,第 129 题)。三刀:分布式 Session 一致性=Redis 集中存储(强一致)vs Session 复制(最终一致,第 24 题)。"),
+    ],
+    ["Cookie=门票,Session=保险箱", "分布式 Session=集中存储最常用", "JWT vs Session 按撤销需求选"], [owasp, sre],
+  ),
+  "legacy/55": deep(
+    "常见设计模式：单例（手写双重检查）、工厂、代理、观察者、策略",
+    "网银支付沙盘:渠道选择(策略)+结果通知(观察者)+网关(代理)+处理器(单例)+渠道创建(工厂)——设计模式在支付场景的自然映射。",
+    [
+      "单例:全局唯一实例——手写双重检查锁(volatile+两次判空)或枚举;替代=DI 容器单例(Spring @Component);风险=全局状态(测试难)+并发初始化(双重检查,第 8 题 java-language)。",
+      "工厂:封装创建逻辑——简单工厂(按参数创建)/工厂方法(每产品一个工厂)/抽象工厂(产品族);支付场景:PaymentFactory.create(\"alipay\") 返回渠道实例——新增渠道只加工厂+产品类(开闭原则)。",
+      "代理:控制目标对象访问——静态代理/JDK 动态代理(接口)/CGLIB(类代理,第 87 题);Spring AOP=代理模式;支付场景:日志/重试/熔断包裹真实支付调用(第 135 题)。",
+      "观察者:一对多依赖,主题变化通知所有观察者——支付成功通知库存/通知/积分;Spring 事件机制(ApplicationEvent+@EventListener,第 91 题);执行顺序与异常处理(一个失败不影响其他)。",
+      "策略:定义算法族,运行时切换——支付渠道选择(微信/支付宝/银联各一个策略);消除 if-else(策略选择交给工厂或配置);与状态模式区别(策略=客户端选择,状态=内部驱动切换)。",
+    ],
+    [
+      block("机制:设计模式=经验的命名", "设计模式=可复用的解决方案模板(不是必须使用的规则,是描述架构决策的共同语言)——说“策略模式”=对方立刻理解“算法族+运行时切换”——沟通效率的提升,评审的共同词汇。"),
+      block("反例:模式滥用的两种事故", "事故一:为模式而模式——所有类都套单例/工厂(过度设计,第 49 题);修复=简单场景直接 new。事故二:单例存可变状态——线程安全风险(第 47 题);修复=状态放 prototype/session scope。"),
+      block("取舍:模式的应用原则", "模式=解决已出现的问题,不是预防可能的问题(YAGNI);先写简单代码,出现重复/耦合/扩展难再重构为模式(重构有据)——评审要点=是否解决真实问题+是否引入额外复杂度(第 49 题)。"),
+    ],
+    [
+      block("验证:设计模式的走查核对", "验证:单例断言(双重检查锁并发下实例唯一);工厂断言(新增渠道不改调用方——开闭原则);代理断言(代理前后行为一致+横切增强);观察者断言(事件触发→多观察者各自执行);策略断言(运行时切换渠道)——五组断言可用单元测试覆盖。"),
+      block("追问链:模式三刀", "一刀:Spring 中的设计模式=单例(默认 scope)/工厂(BeanFactory)/代理(AOP)/观察者(Event)/策略(Resource)/模板方法(JdbcTemplate)——Spring 是设计模式的教科书。二刀:设计模式与 SOLID=开闭原则→策略;单一职责→聚焦;依赖倒置→工厂+接口——模式是 SOLID 的实现手段。三刀:过度使用=三层嵌套工厂+五层代理(第 49 题);引入时机=痛点出现(重复/耦合/扩展难)再重构。"),
+    ],
+    ["模式=经验的命名,不是规则", "支付场景:策略+工厂+代理+观察者", "痛点出现再重构,不为模式而模式"], [pod, sre],
+  ),
+  "legacy/56": deep(
+    "Git：merge 与 rebase 区别？冲突如何处理",
+    "网银团队沙盘:feature 分支合入 main——merge(保留分支历史,合并节点)vs rebase(线性历史,变基)——团队选择=历史可读性 vs 安全性。",
+    [
+      "merge:创建合并节点(两个父节点)——保留完整分支历史;历史非线性(分叉)但安全(不改变已有提交);适合公共分支(main/release)合入。rebase:将提交搬到目标分支末尾(重写哈希)——历史线性;危险=改变已推送提交(重复提交);适合个人 feature 分支。",
+      "冲突处理:两边修改同一行→Git 标记冲突(<<<<<<< HEAD ======= >>>>>>>)→人工选择/融合→git add 标记解决→继续——冲突预防=小步提交+频繁 rebase(减少 divergence)。",
+      "团队工作流:Git Flow(master+develop+feature+release+hotfix)vs GitHub Flow(main+feature)vs Trunk Based(主干+短命分支)——按发布频率+团队规模+回滚需求选(第 39 题灰度)。",
+    ],
+    [
+      block("机制:merge 与 rebase 的历史观差异", "merge 保留事实(确实在分支开发的);rebase 保留整洁(历史像一次完成的)——两种历史观各有价值:merge 的分叉真实反映开发过程;rebase 的线性更易阅读(bisect/cherry-pick 方便)。类比历史书:编年体 vs 纪事本末体。"),
+      block("反例:Git 操作的两种事故", "事故一:公共分支 rebase——改写已推送提交→其他人分支出现幽灵提交(冲突+重复);修复=黄金法则:已推送的公共分支不 rebase。事故二:merge 前未 pull——基于旧 main 合并→合并后又需再 merge;修复=merge 前先 pull(或 rebase)。"),
+      block("取舍:Git Flow vs GitHub Flow", "Git Flow(多分支:master/develop/feature/release/hotfix)适合版本发布周期;GitHub Flow(main+feature)适合持续部署;Trunk Based(主干+短命分支)适合高频部署+特性开关——按发布频率+回滚需求选。"),
+    ],
+    [
+      block("验证:Git 操作的走查核对", "验证:merge 断言(合并节点+分支历史保留);rebase 断言(提交哈希改变+线性历史);冲突断言(冲突标记+解决后 continue);rebase 危险断言(已推送分支 rebase+force push 导致协作者问题)——四组固化 Git 操作语义。"),
+      block("追问链:Git 三刀", "一刀:squash merge=多个提交合并为一个(合入 main 时只留一个)——保持整洁但丢失细粒度历史。二刀:cherry-pick=从其他分支摘取特定提交(不合并整个分支)——适合只想要某个 fix。三刀:Git hook=pre-commit(提交前检查)/pre-push/post-merge——与 CI/CD 联动(第 151 题质量闸)。"),
+    ],
+    ["merge 保留历史,rebase 线性整洁", "公共分支不 rebase(黄金法则)", "冲突预防=小步提交+频繁 rebase"], [pod, sre],
+  ),
+  "legacy/57": deep(
+    "什么是大模型？token 是什么",
+    "网银 AI 沙盘:大模型(LLM)=大规模预训练语言模型(GPT/Claude/GLM)——token=文本切分单位(不是词,是子词);token 是计费与上下文长度的计量单位(第 57 题 ai-production)。",
+    [
+      "大模型(LLM):基于 Transformer 的大规模预训练语言模型——参数量(十亿到万亿)+训练数据(海量文本)+能力(生成/理解/推理/对话);LLM 不是数据库(不能查询事实),是语言模型(基于训练分布生成文本——第 31 题知识归 RAG)。",
+      "token:模型处理文本的最小单位——中文≈1-2 字/token,英文≈1 词/1-3 token;计费与上下文窗口都按 token 计(第 22 题预算);token 计数≠字符数(第 57 题 ai-production)。",
+      "上下文窗口:模型一次能处理的最大 token 数(GPT-4 128K/Claude 200K)——窗口内所有内容(系统提示+检索片段+对话历史+用户问题)共享窗口;超出→截断或压缩(第 32 题压缩方案)。",
+    ],
+    [
+      block("机制:LLM 的知识来自训练分布", "LLM 的知识=训练数据的压缩表示(参数中的统计模式)——不是查询而是生成(基于上下文预测下一个 token);训练截止后的知识=不知道(幻觉风险)——RAG 解决(检索最新知识注入上下文,第 31 题职责分离)。"),
+      block("反例:LLM 理解偏差的两种事故", "事故一:把 LLM 当搜索引擎——帮我查最新利率→用旧数据回答(过时);修复=RAG 注入最新数据。事故二:把 token 当字——中文与 token 不是 1:1;计费与窗口估算按 token 而不是字符数(第 22 题)。"),
+      block("取舍:模型选型的维度", "能力(通用/代码/数学)+窗口大小(4K/32K/128K/200K)+成本(输入/输出单价)+延迟(首 token/生成速度)+合规(数据出境/私有化,第 45 题)——模型选型=多维矩阵(第 35 题量化矩阵同构),用业务评测集实测(第 1 题)。"),
+    ],
+    [
+      block("验证:LLM 概念的走查核对", "验证:token 计数断言(中文/英文 token 数与字符数不同——tokenizer 实测);上下文窗口断言(超窗口→截断或报错);知识截止断言(训练后事件→不知道);幻觉断言(要求输出不存在的事实→可能编造)。验证:概念断言可程序化(调用 API 实测);Y1 成本模型的 token 计量可复用。"),
+      block("追问链:LLM 三刀", "一刀:temperature=0 确定性(结构化输出)>0 随机性(创意)——温度低→稳定。二刀:大模型 vs 小模型=能力强+成本高 vs 能力弱+成本低——路由(第 22 题)按复杂度分配。三刀:私有化部署 vs API=数据不出域 vs 能力强+成本线性(第 45 题混合路由)。"),
+    ],
+    ["LLM=生成模型,不是搜索引擎", "token 计量≠字符数", "知识截止→RAG 补充最新知识"], [rag, paged],
+  ),
+  "legacy/58": deep(
+    "上下文窗口是什么？超出了怎么办",
+    "网银长文档沙盘:50 页制度文档(约 50K token)+系统提示+对话历史=超出 32K 窗口——处理=压缩(第 32 题)/检索(只送相关片段)/分批(分段处理)。",
+    [
+      "上下文窗口=模型一次能处理的 token 上限——窗口内:系统提示+检索片段+对话历史+用户问题,共享窗口;窗口外=模型看不到(完全消失,不是截断后可搜索)。",
+      "超窗口解法:检索(只送相关片段——RAG 核心思想)/压缩(摘要化低分证据,第 32 题)/分批(长文档分段处理,每段独立回答后汇总)/选更大窗口模型(成本↑)。",
+      "窗口预算分配:系统提示(固定)+检索证据(按重排分数排序,第 26 题)+对话历史(第 23 题保留策略)+用户问题——各部分预算按对答案的贡献度分配(第 26 题排布)。",
+    ],
+    [
+      block("机制:窗口与 KV Cache 的关系", "窗口大小决定 KV Cache 内存(第 33 题乘积:并发×上下文×层×头×维×2)——窗口越大→单请求 KV 越大→同显存并发越少——窗口=成本×质量×并发的三角(第 33 题容量)。"),
+      block("反例:窗口管理的两种事故", "事故一:全量塞入——整个文档(50K)塞入→KV 巨大+注意力稀释(第 26 题位置效应);修复=RAG 检索相关片段(只送 2-5K)。事故二:截断丢关键证据——按 token 截断(不是按证据边界)→关键条款被截;修复=按证据块截断(第 8 题结构切分)。"),
+      block("取舍:窗口大小选型", "大窗口(128K/200K):装更多但成本高+注意力稀释;小窗口(4K/8K):精细检索+压缩——按任务需要的证据量选(大多数问答 8K 足够);窗口=成本×质量×并发三角(第 33 题)。"),
+    ],
+    [
+      block("验证:窗口管理的走查核对", "验证:窗口预算断言(四部分 token 总和≤窗口);超窗口断言(压缩或截断——不静默丢内容);RAG 断言(检索片段总 token<窗口 50%);压缩断言(压缩后忠实度不跌破阈值,第 32 题)。验证:token 计数可程序化(tokenizer API);窗口管理验收=答案质量(第 49 题)。"),
+      block("追问链:窗口三刀", "一刀:长文档→切分→嵌入→检索相关片段(RAG,第 7 题)——不是全文塞入。二刀:多轮对话窗口→历史累积→压缩或丢弃早期轮次(第 23 题);约束类信息进摘要。三刀:窗口与模型选型=长文档选大窗口,短对话选小窗口(第 57 题)——窗口=成本×质量×并发三角。"),
+    ],
+    ["窗口=系统提示+证据+历史+问题,共享上限", "超窗口→检索/压缩/分批", "窗口=成本×质量×并发三角"], [lingua, middle],
+  ),
+  "legacy/59": deep(
+    "什么是幻觉？temperature 的作用",
+    "网银 AI 沙盘:模型自信输出不存在的内容(幻觉=概率生成的固有特性)——temperature 控制随机性(0=确定性,1=创造性);幻觉检测=RAG+忠实度评估(第 24 题)+人工复核(第 28 题)。",
+    [
+      "幻觉的机制:LLM 基于训练分布生成文本——上下文不足或问题超出训练分布时,模型编造看似合理的答案(语言流畅但事实错误);幻觉不是 bug,是概率生成模型的固有特性(第 59 题 ai-production)。",
+      "幻觉分类:事实幻觉(编造不存在的事实——虚构法条/日期)、忠实度幻觉(检索内容存在但答案不符——过度推断)、指令幻觉(编造引用编号,第 28 题)——每类的检测与防御不同(第 24 题)。",
+      "temperature:采样温度——0=贪心解码(确定性输出);<1=保守(倾向高概率 token);>1=多样(倾向低概率 token);温度影响幻觉概率(高温增加,低温减少但可能重复)——金融问答 temperature=0-0.3(确定性优先)。",
+    ],
+    [
+      block("机制:幻觉为什么流畅且自信", "LLM 训练目标=预测下一个 token(语言流畅),不是验证事实正确——幻觉文本的语言特征与正确文本相同(流畅/有逻辑/自信),区别只在事实层面——需要事实校验(检索比对)而非语言特征判断(第 24 题)。"),
+      block("反例:幻觉的两种事故", "事故一:数字幻觉——利率/金额编造(金融资损级);修复=RAG+忠实度评估+数字人工复核(第 28 题)。事故二:引用幻觉——编造引用编号(第 28 题);修复=程序化校验(编号∈上下文清单)+引用定位(第 27 题)。"),
+      block("取舍:temperature 场景化设置", "结构化输出(JSON/代码):temperature=0(格式稳定);创意写作:0.7-1.0(多样性);金融问答:0-0.3(确定性优先)——temperature 的选择也是质量门禁参数(第 49 题:不同温度评测对照)。"),
+    ],
+    [
+      block("验证:幻觉与 temperature 的走查核对", "验证:幻觉检测断言(语料无答案的问题→模型可能编造→忠实度评估拦截);temperature 对照断言(同 prompt 不同温度的输出多样性);RAG 断言(检索注入后幻觉率下降);拒答断言(temperature=0+忠实约束→我不知道而非编造)。验证:幻觉率可程序化(忠实度评估+人工抽检);temperature 对照可复跑。"),
+      block("追问链:幻觉三刀", "一刀:RAG 不能完全消除幻觉(检索到正确证据+模型仍可能过度推断——忠实度幻觉,第 24 题)。二刀:幻觉检测手段=断言级忠实度评估+人工抽检+一致性检验(多轮对比)——全自动检测有漏检。三刀:幻觉的业务影响分级=数字/日期/法规=高风险(资金/合规);描述性=低风险——影响决定防御强度(第 28 题复核触发器)。"),
+    ],
+    ["幻觉=概率生成的固有特性", "temperature 0=确定性,高=多样", "RAG 减少知识缺失型,不消除推理型"], [rag, judge],
+  ),
+  "legacy/60": deep(
+    "平时用哪些 AI 工具？如何验证它生成的代码",
+    "网银开发沙盘:AI 辅助编程(Copilot/ChatGPT/Claude)提升效率——生成代码不可盲信:验证=编译+逻辑审查+安全扫描+测试覆盖,四道闸缺一即漏(第 151 题质量闸)。",
+    [
+      "AI 工具用途:代码补全(Copilot)/代码解释/bug 排查/文档生成/测试生成——每个用途的验证标准不同;AI 生成代码=不可信输入(与第三方代码同级,第 25 题思维)。",
+      "验证四道闸:编译(语法正确)+逻辑(人工审查——AI 可能逻辑错误)+安全(扫描——可能生成有漏洞代码)+测试(单测覆盖)——AI 代码与人工代码走同样质量闸(第 151 题),不因 AI 生成降低标准。",
+      "AI 工具边界:擅长(样板代码/常见模式/文档/测试脚手架)+不擅长(业务逻辑/架构设计/安全敏感/需要上下文的改动)——AI 是加速器不是替代者(开发者需理解并验证 AI 产出)。",
+    ],
+    [
+      block("机制:AI 代码=不可信输入", "AI 生成的代码与第三方开源代码同级(不可信输入)——需要走同等验证流程;AI 训练数据可能包含过时模式(旧 API)或不安全模式(SQL 注入)——生成≠正确。"),
+      block("反例:AI 代码的两种事故", "事故一:AI 生成 SQL 注入代码——字符串拼接 SQL 未被发现直接上线;修复=静态扫描+安全审查(第 151 题)。事故二:AI 生成依赖版本过时——使用已废弃 API→运行时异常;修复=编译验证+依赖审计。"),
+      block("取舍:AI 工具的效率与风险平衡", "高效率:样板代码(POJO/DTO/配置)+文档生成+测试脚手架;低效率:核心业务逻辑+安全敏感(认证/加密/权限)+架构决策——AI 是加速器不是替代者(第 158 题场景评分)。"),
+    ],
+    [
+      block("验证:AI 代码的走查核对", "验证:编译断言(AI 代码编译通过);审查断言(人工审查发现逻辑错误);安全断言(静态扫描发现 SQL 注入/XSS);测试断言(单测覆盖核心逻辑)——四道闸与人工代码同标准(第 151 题)。验证:四道闸的门禁可程序化(CI/CD 集成)。"),
+      block("追问链:AI 工具三刀", "一刀:AI 生成的测试怎么验=AI 可能测了个寂寞(断言过弱)——人工审查断言强度(第 151 题)。二刀:AI 工具的提示词=上下文充分+约束明确(第 116 题提示词工程)。三刀:AI 工具的数据安全=可能上传代码到云端(数据出境/隐私,第 8 题发送范围)——企业场景审查 AI 工具的数据策略。"),
+    ],
+    ["AI 生成=不可信输入,走同等质量闸", "编译+审查+扫描+测试,四道闸", "AI 是加速器,验证不能省"], [owasp, sre],
+  ),
+
+  // ---- x-leg2-p3 ----
+'legacy/61': deep(
+    'HashMap 扩容过程？链表转红黑树的条件（链表长度≥8 且数组≥64）？JDK7 头插法死循环问题',
+    '网银缓存沙盘:HashMap 扩容(容量×2+rehash 迁移)+树化(链长≥8 且桶≥64)+JDK7 头插法并发死循环——collections 61 题的完整版(容量规划/树化/并发安全详见 collections 模块)。',
+    [
+      '扩容过程:put 时 size>容量×负载因子(默认 0.75)→resize(容量×2)→JDK 8 按 (hash & oldCap) 位拆高低链表(单桶 O(1) 迁移,不是全部重 hash)——扩容代价=全表迁移(尾延迟抖动)。',
+      '树化条件:链长≥8(TREEIFY_THRESHOLD)且桶数≥64(MIN_TREEIFY_CAPACITY)——桶数<64 时优先扩容(稀释)而非树化(第 4 题 collections);退化:节点≤6(扩容拆分)或 remove 导致树过小(removeTreeNode)。',
+      'JDK 7 头插法死循环:并发扩容时头插法导致链表成环(e→next→e)→get 自旋 100% CPU;JDK 8 改尾插(新节点追加到尾部)消除环——但 JDK 8 并发 put 仍有数据丢失(只是不死循环,第 2 题 collections)。',
+    ],
+    [
+      block('机制:扩容的 rehash 迁移', 'JDK 8 的 rehash 优化:每个节点的新位置要么是原位置,要么是原位置+oldCap(hash & oldCap 决定高低位)——拆分后只需链表操作,不用重新计算 hash;JDK 7 需要对每个节点重新 hash(性能差+头插法反转链表顺序)。'),
+      block('反例:HashMap 的三种事故', '事故一:并发 put 数据丢失——JDK 8 并发 put 同桶→互相覆盖(无锁);修复=ConcurrentHashMap。事故二:初始容量不足——频繁扩容(每次全表迁移);修复=按"元素数/0.75 取 2 的幂"预分配(第 1 题 collections 容量规划)。事故三:自定义键的 hashCode 不一致——equals 相等但 hashCode 不同→哈希容器中"丢失";修复=hashCode 与 equals 一致(第 2 题 collections 契约)。'),
+      block('取舍:HashMap vs ConcurrentHashMap 的选型', 'HashMap:单线程/方法内局部变量/只读共享(不可变包装);ConcurrentHashMap:多线程读写共享;Collections.synchronizedMap:低并发+兼容旧 API(第 2 题 collections 的选型)——判据一句话:并发读写选 CHM,只读选不可变包装,别让 HashMap 出现在共享可变位置。'),
+    ],
+    [
+      block('验证:HashMap 行为的走查核对', '验证:本机 C 系列实验——容量规划(C1:1000→1024 桶,768 触发扩容);树化(C4:16 桶 30 键→64 桶才树化;128 桶 12 键直接树化);并发丢失(C2:HashMap 并发 put size<预期);JDK7 死循环(标注:JDK 7 环境复现,17 上不存在)。验证:扩容/树化/并发的断言可程序化(--add-opens 反射读 table)。'),
+      block('追问链:HashMap 三刀', '一刀:"负载因子为什么是 0.75?"——空间与时间的折中:负载因子高(0.9)→空间省但冲突多查询慢;低(0.5)→冲突少但内存浪费——0.75 是泊松分布的经验值(链长>8 的概率极低,第 4 题)。二刀:"树的退化条件?"——扩容拆分≤6(UNTREEIFY_THRESHOLD)+remove 导致树过小(removeTreeNode 内检查)——两条退化路径(第 4 题 collections 详解)。三刀:"HashMap 的 null key?"——允许一个 null key(hash=0,存在桶 0)——CHM 不允许 null key/value(第 18 题 collections)。'),
+    ],
+    ['扩容×2,高低位拆分 O(1) 迁移', '树化=链 8+桶 64 双条件', 'JDK7 死循环已修,并发仍不安全'], [jls17, api('java/util/HashMap')],
+  ),
+  'legacy/62': deep(
+    'ConcurrentHashMap：JDK7 分段锁与 JDK8 CAS + synchronized 的区别？size 如何统计',
+    '网银计数沙盘:CHM 的并发演进(JDK7 Segment 分段锁→JDK8 CAS+synchronized)+size 的弱一致(CounterCell 分散计数)——collections 15/19 题的完整版。',
+    [
+      'JDK 7 Segment:默认 16 段,每段一把 ReentrantLock——并发度=段数(16);JDK 8:取消 Segment,桶空=CAS 插入(casTabAt),桶非空=synchronized(锁链头 Node)——并发度=桶数(更细粒度)。',
+      'size 的弱一致:CounterCell 分散计数(baseCount+多个 cell,线程绑 cell)→size=遍历求和(无锁快照)——求和瞬间 cell 可能未并入(弱一致,第 19 题 collections);精确控制用 Semaphore/AtomicLong(不是 CHM.size)。',
+      '扩容:多线程协助扩容(helpTransfer——ForwardingNode 标记已迁移桶,写线程遇到则协助搬移)——扩容与读写并行(CHM 的独特能力,HashMap 扩容阻塞读写)。',
+    ],
+    [
+      block('机制:Segment→CAS+synchronized 的演进原因', 'JDK 7 的 Segment 粒度粗(16 段,每段一把锁)——并发度上限 16;JDK 8 的桶级锁:锁粒度=单桶(不同桶并行)+空桶 CAS(无锁插入)——并发度=桶数(更细粒度且消除段结构)。演进的本质=锁粒度从"段"细化到"桶"。'),
+      block('反例:CHM 的两种事故', '事故一:computeIfAbsent 函数内递归修改同 map——IllegalStateException/死锁;修复=函数内不改同 map(先 putIfAbsent 占位再异步完成,第 17 题 collections)。事故二:函数内长 IO——桶头锁被占,同桶操作全部阻塞(第 17 题 collections);修复=占位+异步完成(putIfAbsent(key, future) 模式)。'),
+      block('取舍:CHM vs HashMap vs synchronizedMap', 'CHM:并发读写(读无锁+写桶锁)——读多写多首选;HashMap:单线程/局部;Collections.synchronizedMap:全表锁(串行化,第 2 题 collections)——性能:CHM 91ms vs synchronizedMap 233ms(本机 C2 实测,2.5 倍差距)——判据一句话:并发读写选 CHM。'),
+    ],
+    [
+      block('验证:CHM 的走查核对', '验证:本机 C2 实验(8 线程 40 万 ops,CHM 91ms vs synchronizedMap 233ms);C4 实验(树化轨迹:16→32→64 才树化);弱一致(C19:size 限流穿透——105 并发请求全通过);原子 API(C15:putIfAbsent 并发只执行一次加载)。验证:并发吞吐/原子性/弱一致断言可程序化。'),
+      block('追问链:CHM 三刀', '一刀:"CHM 的 null 键值?"——不允许(null 在并发下歧义:不存在还是值为 null);修复=哨兵对象或 Optional(第 18 题 collections)。二刀:"CHM 的迭代器?"——弱一致(不抛 CME,反映创建时或之后的部分更新)——遍历统计要容忍弱一致(第 19 题)。三刀:"CHM 的树化?"——同 HashMap(链 8+桶 64)——并发下的树化由桶头锁保护(第 4 题 collections 的树化追问)。'),
+    ],
+    ['JDK7 Segment→JDK8 桶级锁', 'size 弱一致,精确用 Semaphore', '扩容与读写并行(helpTransfer)'], [juc, api('java/util/concurrent/ConcurrentHashMap')],
+  ),
+  'legacy/63': deep(
+    'CAS 原理？ABA 问题与 AtomicStampedReference',
+    '网银无锁沙盘:CAS(compare-and-swap)=CPU 原子指令(cmpxchg)——乐观并发(失败重试不排队);ABA 问题(值从 A→B→A,CAS 无法感知中间变化)→版本戳解决。',
+    [
+      'CAS 的三操作数:内存位置 V/预期值 A/新值 B——V==A 则设 V=B(成功),否则失败(重试或放弃);CAS 是 CPU 原子指令(x86 lock cmpxchg,并发基础 13 题),JDK 的 Atomic 类底层依赖 Unsafe.compareAndSwap。',
+      'ABA 问题:值从 A→B→A,CAS 只比较当前值(A==A 成功)——中间变化未感知;危害:引用被复用(无锁栈的节点被回收再分配)→结构损坏;解决:AtomicStampedReference(版本戳,每次修改 stamp+1——CAS 同时比较引用与戳记)。',
+      'CAS vs 锁:CAS(无锁,无上下文切换,高争用下 CPU 空转)+锁(有挂起/唤醒,高争用下排队)——低争用 CAS 优于锁;高争用下 LongAdder 分片(并发基础 13 题)优于 AtomicLong 单值竞争。',
+    ],
+    [
+      block('机制:ABA 的危害依赖"引用复用"', 'ABA 的危害=引用被回收又重新使用(对象池/手写无锁结构/离堆内存)——看似没变的引用背后结构已经变了;GC 语言的"新建不复用"就能规避(被弹出节点的内存不会被第三方重用,AtomicReference 的栈就是这么规避的,并发进阶 14 题)。'),
+      block('反例:CAS 的两种事故', '事故一:高争用 AtomicLong——128 线程累加,CPU 飙升(重试空转,并发基础 13 题);修复=LongAdder 分片。事故二:自旋无退避——CAS 失败立即重试(CPU 100%);修复=退避(yield/park 短暂)或限制重试次数。'),
+      block('取舍:CAS vs 锁的决策', '低争用+单变量:CAS(Atomic 类,快);高争用计数:LongAdder(分片);多变量一致性:锁(原子性);引用复用+无锁结构:AtomicStampedReference(版本戳)——"竞争强度×变量数×是否复用"三维决定。'),
+    ],
+    [
+      block('验证:CAS 的走查核对', '验证:CAS 原子性断言(并发 incrementAndGet=精确计数);ABA 复现(AtomicReference 无法感知 A→B→A——结构损坏);StampedReference 断言(版本戳拦截 ABA);LongAdder 对照(高争用下吞吐优于 AtomicLong,并发基础 13 题对照)。验证:并发实验可程序化(线程数可控+计数断言)。'),
+      block('追问链:CAS 三刀', '一刀:"CAS 的 ABA 在计数场景要担心吗?"——纯计数只关心数值不关心历史(ABA 无害);需要"中间没变过"语义(无锁栈节点复用)才需要版本戳(并发进阶 14 题边界)。二刀:"CAS 与 volatile?"——volatile 保证可见性但不保证原子性(i++ 仍不安全);CAS=volatile+原子性(底层 lock 前缀保证可见性+原子性)。三刀:"CAS 失败重试的退避?"——立即重试(CPU 空转)vs 指数退避(yield/park)——低争用立即重试,高争用退避(LongAdder 的 Cell 迁移是另一种解法)。'),
+    ],
+    ['CAS=CPU 原子指令,乐观并发', 'ABA 需版本戳(引用复用场景)', '低争用 CAS,高争用分片或锁'], [juc, api('java/util/concurrent/atomic/AtomicStampedReference')],
+  ),
+  'legacy/65': deep(
+    'AQS 原理（state + CLH 队列）？ReentrantLock 与 synchronized 区别',
+    '网银锁沙盘:AQS(队列同步器)=state(原子状态)+CLH 变体队列(等待线程)+模板方法(tryAcquire/tryRelease)——ReentrantLock 与 synchronized 的底层差异(AQS vs ObjectMonitor)。',
+    [
+      'AQS 核心:volatile int state(CAS 修改)+CLH 变体双向队列(等待线程)+模板方法(子类实现 tryAcquire/tryRelease);独占模式(ReentrantLock)与共享模式(Semaphore/CountDownLatch,tryAcquireShared 返回 int,并发进阶 2 题)',
+      'ReentrantLock:可重入(state 计数)+公平/非公平(是否检查队列)+tryLock(限时)+lockInterruptibly(可中断)+Condition(多条件);synchronized:JVM 内置(ObjectMonitor)+自动释放+不可中断+无公平(并发基础 23 题)。',
+      'CLH 队列的节点状态:waitStatus 四态(CANCELLED/SIGNAL/CONDITION/PROPAGATE)——独占流程:获取失败→shouldParkAfterFailedAcquire(前驱置 SIGNAL)→park;释放→unpark 后继(并发进阶 2 题详解)。',
+    ],
+    [
+      block('机制:AQS 为什么是"模板方法模式"', 'AQS 定义了"队列管理+挂起唤醒+取消+超时"的骨架(不变),子类只需实现 tryAcquire/tryRelease(获取/释放的状态协议)——ReentrantLock 的 tryAcquire=state 0→1+CAS;Semaphore 的 tryAcquireShared=state>0 则减 1——一个框架承载两种模式(并发进阶 2 题的"模板方法"分析)。'),
+      block('反例:锁选择的两种事故', '事故一:synchronized 无法 tryLock——锁竞争激烈时线程永久阻塞(无法限时获取);修复=ReentrantLock.tryLock(timeout)。事故二:ReentrantLock 忘记 unlock——finally 中未 unlock→锁永久占用(其他线程永久等待);修复=finally{lock.unlock()}(synchronized 自动释放的优势)。'),
+      block('取舍:ReentrantLock vs synchronized 的选型', '需要高级功能(tryLock/可中断/公平/Condition)→ReentrantLock;简单互斥(synchronized 简洁+不易漏解锁)→synchronized;synchronized 的性能(JDK 6 后偏向锁/轻量级锁优化,并发基础 23 题)——大多数场景 synchronized 足够,ReentrantLock 的价值在高级功能。'),
+    ],
+    [
+      block('验证:AQS 的走查核对', '验证:可重入断言(同线程多次 lock→holdCount 递增);公平/非公平断言(公平锁先到先得,非公平锁插队);Condition 断言(await/signal 的队列对应,第 26 题并发基础);AQS 队列断言(jstack 观察 WAITING 线程的 park 调用栈)。验证:锁行为断言可程序化(AQS 的功能覆盖测试)。'),
+      block('追问链:AQS 三刀', '一刀:"AQS 的 PROPAGATE 状态?"——共享模式的"迟到的传播信号"(防止唤醒在链中间丢失,并发进阶 2 题)——共享源码最难读的一段,但理解它=理解共享模式的精髓。二刀:"Condition 与 Object.wait?"——Condition 支持"多条件队列"(notFull/notEmpty 各一个队列,精准唤醒);Object.wait 只有一条队列(notify 随机挑人,第 26 题并发基础)。三刀:"AQS 的可重入实现?"——state 计数(同线程 acquire→state+1)+owner 线程记录(ExclusiveOwnerThread)——release 时 state-1 到 0 才真正释放。'),
+    ],
+    ['AQS=state+CLH 队列+模板方法', 'ReentrantLock 高级功能,synchronized 简洁', 'CLH 队列 waitStatus 四态'], [juc, api('java/util/concurrent/locks/AbstractQueuedSynchronizer')],
+  ),
+  'legacy/66': deep(
+    '公平锁与非公平锁？读写锁、StampedLock 的适用场景',
+    '网银锁沙盘:非公平锁吞吐高(插队)但可能饥饿;公平锁有序但慢——读写锁读写分离(读并发写互斥);StampedLock 乐观读(无锁读,校验戳)。',
+    [
+      '公平 vs 非公平:公平=严格 FIFO(先到先得,防止饥饿,吞吐略低——每次获取都检查队列);非公平=新请求可插队(吞吐高但可能饥饿);ReentrantLock 默认非公平(吞吐优先),公平模式构造参数指定(true)。',
+      'ReentrantReadWriteLock:读锁共享(多线程并发读)+写锁独占(写互斥)——读写分离的收益前提="读临界区足够长且真正只读"(读太短时锁簿记比临界区还贵,并发基础 25 题);写饥饿:读者源源不断→写者拿不到锁(非公平模式下)。',
+      'StampedLock:乐观读(先取版本戳→读→校验戳是否变化——不加锁!)→失败则升级读锁重读;不可重入+乐观读期间不能写共享状态;性能优于 ReentrantReadWriteLock(读侧无锁),但 API 易错(并发基础 25 题)。',
+    ],
+    [
+      block('机制:非公平锁的"插队"为什么提升吞吐', '非公平锁:释放锁后,新到的线程可直接 CAS 抢(不等队列)——省去"唤醒队列线程+上下文切换"的成本(唤醒延迟);公平锁:严格按队列顺序(每个新请求都入队等)——吞吐低但无饥饿。类比银行:VIP 客户可插队(非公平,整体吞吐高)vs 严格叫号(公平,但所有人都等)。'),
+      block('反例:锁模式的两种事故', '事故一:非公平锁饥饿——写线程长期拿不到读锁(读源源不断);修复=公平模式或写优先策略。事故二:StampedLock 不可重入死锁——同线程二次获取→自锁自己;修复=不用 StampedLock(需要重入时用 ReentrantReadWriteLock)或小心设计(乐观读内不获取其他锁)。'),
+      block('取舍:三种锁的适用矩阵', 'ReentrantLock:需要 tryLock/可中断/Condition 时;ReentrantReadWriteLock:读多写少+读临界区较长+需要重入;StampedLock:读极多写极少+不需要重入+性能敏感——三者按"功能需求+性能需求"选(并发基础 25 题的取舍矩阵)。'),
+    ],
+    [
+      block('验证:锁模式的走查核对', '验证:公平/非公平断言(公平锁 FIFO,非公平锁插队——并发压测的获取顺序统计);读写锁断言(读并发/写互斥/写饥饿);StampedLock 乐观读断言(校验失败→升级读锁→重读);不可重入断言(同线程二次获取死锁)。验证:锁行为的断言可程序化(并发压测+线程转储分析)。'),
+      block('追问链:锁模式三刀', '一刀:"读写锁的升级?"——读锁升级写锁(ReentrantReadWriteLock 不支持——读锁释放后重新获取写锁,中间可能被插入);降级支持(写锁降读锁——保持原子性)。二刀:"StampedLock 的 tryOptimisticRead?"——返回非零戳(无锁);validate(stamp) 校验——期间有写则校验失败→升级读锁;乐观读是"无锁的读"。三刀:"锁的公平性对性能的影响?"——公平锁吞吐低于非公平(上下文切换多,并发基础 23 题)——非公平是默认(吞吐优先),公平按"饥饿风险"决定是否开启。'),
+    ],
+    ['非公平吞吐高,公平防饥饿', '读写锁=读并发+写互斥', 'StampedLock 乐观读无锁但不可重入'], [juc, api('java/util/concurrent/locks/StampedLock')],
+  ),
+  'legacy/67': deep(
+    'CountDownLatch、CyclicBarrier、Semaphore 区别与场景',
+    '网银并行沙盘:等待 N 个子任务完成(CountDownLatch)、N 个线程互相等( CyclicBarrier)、限制并发数(Semaphore)——三个并发工具的语义差异与选型。',
+    [
+      'CountDownLatch:一次性倒计数(countDown→0 后所有 await 放行)——"等 N 个任务完成再继续"(主任务等待子任务);不可重置(用完即弃);AQS 共享模式(state=count,countDown 递减,await 等到 0)。',
+      'CyclicBarrier:可循环的屏障(N 个线程互相等,全部到齐后一起继续)——"N 个线程互相等到达同一屏障点";可重置(循环使用)+回调动作(屏障打开时执行);broken(一个线程超时/中断→全部 broken)。',
+      'Semaphore:信号量(permits 计数,acquire 消耗/release 释放)——"限制并发数"(N 个许可,acquire 获取 release 归还);公平/非公平模式(排队 vs 插队);一次性 vs 可重用:CountDownLatch 一次性,CyclicBarrier/Semaphore 可重用。',
+    ],
+    [
+      block('机制:三工具的语义差异', 'CountDownLatch=倒计时门闩(等 N 件事完成);CyclicBarrier=集合点(N 个线程互相等);Semaphore=限流阀(N 个许可控制并发)——核心区别=谁是"等待的发起者":Latch=主任务等子任务;Barrier=线程互相等;Semaphore=限制进入数。'),
+      block('反例:并发工具的两种事故', '事故一:CountDownLatch 计数不匹配——countDown 次数<count→await 永远阻塞;修复=计数与任务数精确匹配(或 tryAwait 带超时)。事故二:Semaphore 泄漏——acquire 后异常路径未 release(许可泄漏→可用许可减少);修复=finally{release} 或 tryAcquire+finally 模式。'),
+      block('取舍:CompletableFuture vs CountDownLatch', 'CompletableFuture:异步编排(thenCompose/thenCombine 链式)+异常处理(exceptionally)+回调非阻塞;CountDownLatch:简单等待(计数到零)+阻塞式——简单等待场景 Latch 够用;复杂编排(依赖链/异常传播)用 CompletableFuture(并发进阶 29 题结构化并发)。'),
+    ],
+    [
+      block('验证:并发工具的走查核对', '验证:CountDownLatch 断言(N 个 countDown→await 放行);CyclicBarrier 断言(N 线程到齐→屏障打开→可重用);Semaphore 断言(N permits→acquire 获取/release 释放→超限阻塞);公平断言(Semaphore 公平模式 FIFO)。验证:三工具的行为断言可程序化(并发测试)。'),
+      block('追问链:工具三刀', '一刀:"Semaphore 的 acquire 与 tryAcquire?"——acquire 阻塞直到有许可;tryAcquire 立即返回(成功/失败)——限流场景用 tryAcquire(快速拒绝,不排队,第 126 题限流)。二刀:"CyclicBarrier 的回调?"——barrierAction 在屏障打开时执行(由最后到达的线程执行)——汇总/统计/日志的钩子;回调异常→barrier broken(所有等待者异常)。三刀:"Phaser?"——CyclicBarrier 的增强版(动态注册/多阶段)——比 CyclicBarrier 灵活但复杂度高;多数场景 CyclicBarrier 够用。'),
+    ],
+    ['Latch=等 N 件完成(一次性)', 'Barrier=N 线程互相等(可循环)', 'Semaphore=限并发(可重用)'], [juc, api('java/util/concurrent/CountDownLatch')],
+  ),
+  'legacy/68': deep(
+    'JMM、happens-before、指令重排；volatile 如何靠内存屏障保证可见性',
+    '网银并发沙盘:JMM(Java Memory Model)定义可见性规则——happens-before 是"证据链"(同步动作配对→可见性保证);volatile 靠内存屏障禁止重排(并发基础 2 题的完整版)。',
+    [
+      'JMM 的核心:主内存(共享)与工作内存(线程私有副本)——线程操作工作内存,写回主内存的时机不确定(可见性问题的根源);happens-before 规则定义了"哪些操作保证可见"(程序顺序/监视器锁/volatile 写读/线程 start-join/传递性)。',
+      '指令重排:编译器和 CPU 为优化而重排指令顺序(单线程语义不变,多线程可见性受影响)——as-if-serial(单线程看起来按序)在多线程下不成立——重排的解决=内存屏障(volatile/synchronized/final)。',
+      'volatile 的内存语义:写=StoreStore+StoreLoad 屏障(写前不能重排写,写后不能重排读);读=LoadLoad+LoadStore 屏障——volatile 保证可见性(写立即可见)+禁止重排,但不保证原子性(i++ 仍不安全,并发基础 1 题)。',
+    ],
+    [
+      block('机制:happens-before 是"契约"不是"时间戳"', 'happens-before=A 操作的结果对 B 可见(通过同步动作配对建立)——不是"A 在时间上先于 B"(墙钟时间),是"B 能看到 A 的写入效果"(可见性承诺);并发基础 2 题的"证据链"类比:签收记录证明你拿到哪版,不证明寄件先后。'),
+      block('反例:JMM 的两种事故', '事故一:测试一万次都正常就断言安全——重排是概率事件(窗口小/编译层次变化都会影响,并发基础 50 题);修复=规范推理(JMM 有同步动作)+jcstress 压力测试。事故二:volatile 代替锁——volatile 不保证复合操作原子性(i++ 仍不安全);修复=volatile 只用于"单写多读的标志位",复合操作用锁或 CAS。'),
+      block('取舍:volatile vs synchronized vs Atomic', 'volatile:可见性+禁止重排(轻量,不互斥,适合标志位);synchronized:互斥+可见性(重量,适合复合操作);Atomic:原子性+可见性(CAS,适合计数/引用替换)——选择=需要什么保证(可见性/互斥/原子性),不是"哪个更强"。'),
+    ],
+    [
+      block('验证:JMM 的走查核对', '验证:本机实验——volatile 可见性(停止标志:普通 boolean 循环不退出 vs volatile 退出,并发基础 1 题);重排推演(x=1;y=1→r1=y,r2=x 可能 r1=1,r2=0——无同步时);指令重排的 jcstress 验证(并发进边 50 题"运行一万次都正常"的陷阱)。验证:JMM 行为的断言=规范推理+压力测试(单测无法覆盖交错空间)。'),
+      block('追问链:JMM 三刀', '一刀:"happens-before 的完整规则清单?"——程序顺序/监视器锁解锁先于加锁/volatile 写先于读/start 先于 run/所有动作先于 join/传递性(并发基础 2 题)+final 的安全发布(JLS 17.5)——完整清单进评测(第 49 题)。二刀:"内存屏障的种类?"——LoadLoad/StoreStore/LoadStore/StoreLoad 四种(不同处理器选择性发射,第 12 题并发进阶)——业务代码消费 happens-before 契约,不直接写屏障。三刀:"DCL 为什么需要 volatile?"——new Object() 三步(分配/初始化/赋值)可能重排(赋值先于初始化)→另一线程拿到非 null 但未初始化的对象→volatile 禁止重排(并发基础 8 题 DCL)。'),
+    ],
+    ['JMM=可见性规则,HB=证据链', 'volatile 禁止重排,不保证原子性', '内存屏障是 JVM 实现层,业务消费契约'], [jls17, juc],
+  ),
+  'legacy/69': deep(
+    '线程池参数如何设置？队列怎么选？如何监控与动态调整',
+    '网银线程池沙盘:corePoolSize(核心线程)/maximumPoolSize(最大)/keepAliveTime(空闲回收)/workQueue(队列)/handler(拒绝策略)——五参数+队列选型+动态调参(第 16/17/18 题并发基础的完整版)。',
+    [
+      '五参数:corePoolSize(常驻,CPU 密集=核数,IO 密集更高)/maximumPoolSize(上限)/keepAliveTime(空闲回收)/workQueue(有界防堆积,无界掩盖过载,第 17 题)/handler(拒绝策略:Abort 快速失败/CallerRuns 背压/Discard 静默/自定义)。',
+      '队列选型:有界队列(LinkedListBlockingQueue——过载显形,推荐)/无界队列(永不拒绝但掩盖过载+内存涨,第 17 题)/SynchronousQueue(零容量,直接移交——newCachedThreadPool,第 17 题追问)/优先级队列(PriorityBlockingQueue——按优先级执行)。',
+      '动态调参:setCorePoolSize/setMaximumPoolSize(运行时改——"参数改规则不改存量",第 16 题)——监控驱动(队列长度/活跃线程/拒绝数,第 42 题健康检查)+按下游容量比例调整(第 9 题排队年龄)。',
+    ],
+    [
+      block('机制:execute 的提交决策链', '四步:线程数<corePoolSize→新建核心线程;corePoolSize 满→尝试入队(offer);队列满且线程数<maximumPoolSize→新建非核心线程;线程数达 max→拒绝——无界队列的 offer 恒成功永远停在第二步(第 17 题并发基础,饱和策略被队列绕过)。'),
+      block('反例:线程池的三种事故', '事故一:无界队列——队列 10 万条+内存涨+过载不显形;修复=有界+拒绝策略。事故二:CallerRunsPolicy 在 Web 线程——提交线程(Tomcat 线程)自己执行任务→HTTP 请求挂起(第 18 题并发基础);修复=Abort+上游快速失败或自定义策略。事故三:线程池未 shutdown——应用关闭时线程泄漏(JVM 不退出);修复=优雅关闭(shutdown+awaitTermination)。'),
+      block('取舍:线程池的隔离(舱壁)', '核心/非核心业务分池(独立线程池——一个慢下游不拖其他,D3 实测:共享池 967ms vs 独立 1ms)——隔离的粒度=按下游依赖分池(每个慢依赖一个池);全局池=全局故障域(第 11 题网关隔离同构)。'),
+    ],
+    [
+      block('验证:线程池的走查核对', '验证:参数断言(corePoolSize/maxPoolSize/queueCapacity 按压测校准);拒绝策略断言(Abort 抛异常/CallerRuns 由提交线程执行/自定义记录+降级);动态调参断言(setCorePoolSize 生效——新任务按新参数);监控断言(活跃线程/队列长度/拒绝数/排队年龄)。验证:第 9 题排队年龄+第 16 题动态调参+第 17 题队列选型的实测可复用。'),
+      block('追问链:线程池三刀', '一刀:"ThreadLocal 在线程池的泄漏?"——线程复用→ThreadLocal 不清理→旧任务的值泄漏给新任务(第 72 题 ThreadLocal 专项);修复=finally{threadLocal.remove()}。二刀:"线程池的优先级?"——PriorityBlockingQueue(按优先级执行)+自定义 ThreadFactory(命名线程,便于排查)——优先级反转的护栏(第 34 题批处理)。三刀:"虚拟线程(JDK 21)?"——虚拟线程把"执行槽位"与"下游容量"解耦(第 16 题并发进阶)——传统线程池的调参在很多场景直接失去意义(版本边界)。'),
+    ],
+    ['五参数+有界队列+拒绝策略', 'CallerRuns 在 Web 线程有风险', '动态调参=改规则不改存量'], [juc, api('java/util/concurrent/ThreadPoolExecutor')],
+  ),
+  'legacy/70': deep(
+    'CompletableFuture 的编排与异常处理',
+    '网银并行调用沙盘:并行调三个下游(订单/库存/物流)→汇总结果——CompletableFuture 的编排(supplyAsync→thenCombine→allOf)+异常处理(exceptionally/handle)+超时(orTimeout)。',
+    [
+      '编排模式:thenApply(转换)/thenCompose(扁平化,避免嵌套 Future)/thenCombine(合并两个结果)/allOf(等待全部)/anyOf(任意完成)——编排的"依赖图":A→B→C 串行,A→B+C 并行合并;allOf 后 get 各 Future(等待全部完成)。',
+      '异常处理:exceptionally(异常时降级返回默认值)、handle(无论成功失败都处理——类似 finally)、whenComplete(观察但不改变结果)——异常传播:一个环节异常→后续环节跳过(直到 exceptionally/handle 拦截);未处理的异常在 join 时抛 CompletionException。',
+      '超时控制:orTimeout(timeout, unit)(JDK 9+——超时后 exceptionally 异常)或 completeOnTimeout(default, timeout)(超时返回默认值)——每个环节设超时(第 12 题超时预算)+整体 deadline(第 12 题)。',
+    ],
+    [
+      block('机制:CompletableFuture 的"回调地狱"与编排', 'CompletableFuture 用回调(thenApply/thenCompose)替代回调地狱(嵌套匿名类)——链式调用类似 Stream(声明式);编排的核心=依赖关系建模(哪些可并行/哪些有依赖/哪里合并)——类比电路:串联(thenCompose)与并联(thenCombine+allOf)。'),
+      block('反例:CompletableFuture 的两种事故', '事故一:默认线程池 ForkJoinPool.commonPool 被占用——IO 操作用 commonPool(线程少,阻塞 IO 占满)→其他并行流也卡(第 24 题并发进阶);修复=自定义线程池(supplyAsync(supplier, executor))。事故二:异常被吞——链中某环节异常未处理→后续环节不执行→结果为 null(无报错);修复=链尾 handle 或 exceptionally(确保异常显式处理)。'),
+      block('取舍:CompletableFuture vs 结构化并发(JDK 21)', 'CompletableFuture:灵活(自由编排)+复杂(手动管理取消/超时/异常);结构化并发(StructuredTaskScope,JDK 21 预览):作用域管理(子任务生命周期对齐)+取消传播(自动)+错误聚合(统一收集)——结构化并发是"框架级约束",CompletableFuture 是"自由编排"(并发进阶 29 题)。'),
+    ],
+    [
+      block('验证:CompletableFuture 的走查核对', '验证:编排断言(并行三下游→allOf 等待→合并结果);异常处理断言(exceptionally 降级返回默认值——链不断);超时断言(orTimeout 超时触发降级);线程池断言(自定义 executor 而非 commonPool)。验证:编排+异常+超时的断言可程序化(mock 下游延迟/失败);SD1 延迟任务实验可复用。'),
+      block('追问链:CF 三刀', '一刀:"thenApply vs thenCompose?"——thenApply 返回值直接包装(返回 T→CompletableFuture<T>);thenCompose 返回 CompletableFuture(扁平化,避免嵌套)——flatMap vs map 的函数式类比。二刀:"取消 CompletableFuture?"——cancel 不中断正在执行的任务(只标记为 cancelled)——真正取消需要 interrupt(第 16 题断连取消)+任务内响应中断。三刀:"CompletableFuture 与虚拟线程?"——虚拟线程(JDK 21)让"同步阻塞写法"获得"异步性能"——CompletableFuture 的异步复杂度(回调链)在虚拟线程下可用同步写法替代(第 69 题虚拟线程)。'),
+    ],
+    ['编排:thenApply/Compose/Combine/allOf', '异常:exceptionally/handle 显式处理', '超时:orTimeout 每环节设预算'], [juc, api('java/util/concurrent/CompletableFuture')],
+  ),
+  'legacy/71': deep(
+    '死锁的四个条件？如何排查（jstack）与避免',
+    '网银转账沙盘:A→B 与 B→A 并发转账,两个事务分别先锁 A 后锁 B 与先锁 B 后锁 A——互相等待死锁;四条件(互斥/持有并等待/不可剥夺/循环等待)破坏任意一条即可避免。',
+    [
+      '四条件:互斥(资源不能共享)+持有并等待(持有 A 等 B)+不可剥夺(锁不能被第三方强制释放)+循环等待(A 等 B,B 等 A)——破坏任意一条:一次性申请(破坏持有并等待)/tryLock 超时(破坏不可剥夺)/固定加锁顺序(破坏循环等待)。',
+      '排查:线程转储(jstack/jcmd Thread.print)找"Found one Java-level deadlock"段——BLOCKED 线程的 waiting to lock 与持有者的 locked 串成环;Arthas thread --state BLOCKED 过滤+thread -b 定位阻塞源头(并发基础 32 题排查工具链)。',
+      '避免:固定加锁顺序(按账户 ID 排序,lockInOrder 工具方法)+tryLock 带超时(拿不到就退回)+缩小锁范围(锁外不调远程,短事务)+数据库死锁(InnoDB wait-for 图自动回滚一方,重试+幂等键)。',
+    ],
+    [
+      block('机制:死锁的成因=加锁顺序不一致', '转账场景:事务 1 先锁 A 后锁 B,事务 2 先锁 B 后锁 A→两事务互相等待;修复=所有事务按相同顺序加锁(按 ID 排序)——顺序一致则不可能成环(数学证明:有向图无环)。数据库死锁=InnoDB wait-for 图检测自动回滚一方(兜底不是设计,banking 7 题锁序)。'),
+      block('反例:死锁排查的两种事故', '事故一:看到 BLOCKED 就报死锁——可能只是长事务阻塞(非死锁,可自行解除);修复=看 jstack 是否有"Found one Java-level deadlock"段。事故二:死锁后盲目重启——重启清空所有事务(排队任务丢失,第 9 题);修复=先止血(重启)后根因(锁序审计)。'),
+      block('取舍:锁顺序 vs tryLock 的选择', '固定顺序:零运行时开销,默认选择(维护顺序规则);tryLock:灵活(不阻塞)但引入重试循环与退避策略;一把大锁(全局锁):消灭死锁但并发归零(低频管理操作);数据库死锁:InnoDB 自动检测+回滚+应用重试(banking 7 题)。'),
+    ],
+    [
+      block('验证:死锁的走查核对', '验证:死锁复现(两个线程 transfer(A,B) 与 transfer(B,A) 各 sleep 10ms→jstack 报死锁);修复验证(lockInOrder 排序后同脚本零死锁);Arthas 验证(thread --state BLOCKED 过滤+thread -b 定位);数据库死锁(InnoDB 死锁日志的等待环解读,banking 7 题锁序)。验证:复现与修复的断言可程序化(并发测试+死锁检测)。'),
+      block('追问链:死锁三刀', '一刀:"活锁与死锁的区别?"——死锁=停着不动(CPU 空闲);活锁=忙着让路(CPU 满转,重试-回滚循环,并发基础 33 题)——活锁靠随机退避打破对称(并发基础 33 题)。二刀:"数据库死锁与 JVM 死锁的排查?"——JVM:jstack/Arthas;DB:SHOW ENGINE INNODB STATUS(LATEST DETECTED DEADLOCK 段,第 101 题数据库死锁)——两套体系按锁层次分别查。三刀:"锁顺序的"序"用什么定?"——稳定且全局一致的字段(数据库主键/唯一 ID);任何随时间变化的序(哈希遍历/列表下标)不同时刻不同顺序=等于没定(banking 7 题锁序)。'),
+    ],
+    ['四条件破坏任意一条即避免', 'jstack 找死锁段,0x 地址串环', '固定加锁顺序写进代码,不靠约定'], [juc, sre],
+  ),
+  'legacy/72': deep(
+    'ThreadLocal 在线程池中的问题，如何避免',
+    '网银请求沙盘:ThreadLocal 存用户上下文,线程池复用线程——上一个请求的值残留给下一个请求(数据串号);线程池中的 ThreadLocal 必须 remove(并发进阶 28 题的完整版)。',
+    [
+      '泄漏机制:ThreadLocalMap 的 Entry key 是弱引用(ThreadLocal 实例被 GC 后 key=null)但 value 是强引用(仍被线程的 ThreadLocalMap 持有)——线程池线程永不死亡→value 永远可达→泄漏(value 无法被 GC 回收)。',
+      '线程池的串号:线程复用前未 remove→新任务读到旧任务的值(数据串号,安全风险)——修复=任务完成后 finally{threadLocal.remove()}(确定性清理)。',
+      '内存放大:每个线程一份 ThreadLocalMap——百万线程×12 个 ThreadLocal 条目×40 字节/条目=数百 MB(虚拟线程场景,并发进阶 28 题);治理:减少 ThreadLocal 使用+显式 remove+虚拟线程一次性回收(规模风险替代泄漏风险)。',
+    ],
+    [
+      block('机制:弱引用 key 与强引用 value 的泄漏链', 'Thread → ThreadLocalMap → Entry(key=null) → value——ThreadLocal 实例被回收后 key 变 null(弱引用),但 value 仍沿强引用链可达(线程活着→map 活着→value 活着)——设计意图:key 弱引用让 map 能探测过期条目(expungeStaleEntry 清理);value 强引用是局限(map 不知道业务何时不再需要)。'),
+      block('反例:ThreadLocal 的两种事故', '事故一:线程池忘记 remove——下个请求读到上个请求的用户上下文(数据串号);修复=finally remove 或拦截器统一清理(框架级:Spring 的 RequestContextHolder 已内置清理)。事故二:InheritableThreadLocal 在线程池——ITL 在线程创建时复制(不是任务提交时)→线程池中的"子线程"读到"创建线程池线程"的父值(不是提交任务的父值,并发基础 12 题)。'),
+      block('取舍:ThreadLocal vs 显式传参 vs ScopedValue', 'ThreadLocal:隐式传递(改代码少)+泄漏风险+测试难;显式传参:显式(每个方法带上下文参数)+改动大但可测试;ScopedValue(JDK 21):作用域绑定+不可变+自动消失(无泄漏)——推荐:请求上下文用框架管理(Spring RequestContextHolder)或显式传参;ThreadLocal 限基础设施(事务资源句柄)。'),
+    ],
+    [
+      block('验证:ThreadLocal 的走查核对', '验证:泄漏断言(线程池 100 个任务不 remove→堆转储中 ThreadLocalMap 的 value 可达);串号断言(任务 1 set "userA"→任务 2 不 set→读到 "userA"——串号复现);remove 断言(finally remove→任务 2 读到 null——正确清理);并发进阶 28 题的虚拟线程对照(百万线程×ThreadLocal 的内存放大)。验证:泄漏/串号/清理断言可程序化。'),
+      block('追问链:ThreadLocal 三刀', '一刀:"ThreadLocalMap 的清理机制?"——expungeStaleEntry(探测式:发现 null key 条目→清理 value)+cleanSomeSlots(启发式:抽样清理)——被动清理(依赖后续 set/get/remove 触发),不可靠;主动清理(finally remove)是唯一可靠手段。二刀:"InheritableThreadLocal 的复制时机?"——Thread 创建时复制 parent 的 ITL 值(不是任务提交时)——线程池中线程已创建→ITL 值=创建线程池时刻的父值(过期);修复=TransmittableThreadLocal(TTL,阿里开源)或显式传递。三刀:"虚拟线程的 ThreadLocal?"——百万虚拟线程×ThreadLocal=内存放大(并发进阶 28 题);ScopedValue(不可变+作用域绑定+自动消失)是替代方向(JEP 446)。'),
+    ],
+    ['弱 key 强 value=泄漏链', '线程池必须 finally remove', '虚拟线程场景用 ScopedValue 替代'], [juc, api('java/lang/ThreadLocal')],
+  ),
+
+
+  // ---- x-leg2-p4 ----
+'legacy/73': deep(
+    'G1 原理？Region、Young GC、Mixed GC、停顿预测；与 CMS 区别',
+    '网银 GC 沙盘:G1 将堆切为等大 Region(1-32MB)——Young GC(新生代复制)+Mixed GC(新生代+部分老年代 region)+停顿预测(MaxGCPauseMillis 驱动 CSet 圈选)——jvm-advanced 2/3 题的完整版。',
+    [
+      'Region 化:堆切成等大分区(角色 Eden/Survivor/Old/Humongous 动态分配)——回收单位从"整代"变为"region 集合"(CSet),暂停时间由 region 数量调节(可预测性的来源)。',
+      'Young GC:Eden 满→存活对象复制到 Survivor/Old region→Eden 清空;Mixed GC:并发标记完成后,选择"垃圾比例高的老年代 region"加入 CSet 一起回收——G1 独有(Parallel/CMS 没有选择性回收老年代)。',
+      '停顿预测:G1 记录每个 region 的回收耗时预测值→按 MaxGCPauseMillis 目标圈定 CSet(预计暂停≤目标);预测是统计中位数(非逐次承诺,第 3 题 jvm-advanced:80ms Full 完全无视 5ms 目标)。',
+    ],
+    [
+      block('机制:G1 与 CMS 的核心区别', 'CMS:标记-清除(碎片)+连续老年代(不可预测 Full)+并发标记/清除;G1:标记-复制(新生代)+标记-整理(老年代 region,无碎片)+region 化(可预测 CSet)+失败降级 Full(第 6 题 evacuation failure)——G1 的核心创新=region 化使"选择性回收"成为可能。'),
+      block('反例:G1 的两种事故', '事故一:MaxGCPauseMillis 设过小(5ms)→每次只回收少量 region→GC 频率飙升→吞吐下降(第 3 题 jvm-advanced);修复=从当前 P99 出发设温和目标。事故二:to-space exhausted→Full GC(第 6 题:855 次 exhausted→Full);修复=G1ReservePercent 提升+Humongous 治理。'),
+      block('取舍:G1 vs CMS vs Parallel', 'G1:大堆(>4GB)+暂停目标可调+无碎片(推荐默认,第 14 题 JVM);CMS:老堆(4-8GB)已移除(JDK 14);Parallel:吞吐优先(批处理,暂停不敏感)——按"堆大小+暂停要求+吞吐要求"选,不是"最新=最好"。'),
+    ],
+    [
+      block('验证:G1 的走查核对', '验证:本机 hum.log(Humongous regions 29→15→54→0)+pause.log(young 中位 3ms,Full 80ms)+evac.log(855 次 To-space exhausted→Full)——三份 GC 日志覆盖 G1 的核心场景;jvm-advanced 2/3/6 题的实测数据可复用。验证:GC 日志的断言(region 大小/暂停分布/Humongous 计数)可程序化。'),
+      block('追问链:G1 三刀', '一刀:"G1 的 SATB 是什么?"——Snapshot-At-The-Beginning:并发标记开始时拍快照(标记存活对象)——并发期间新分配的对象默认存活;写屏障记录引用变更(SATB vs CMS 的增量更新)。二刀:"IHOP 是什么?"——Initiating Heap Occupancy Percent:触发并发标记的堆占用阈值(默认 45%)——IHOP 过高→Mixed GC 来不及→to-space exhausted;过低→并发标记过于频繁。三刀:"G1 的字符串去重?"——-XX:+UseStringDeduplication:GC 期间合并内容相同的 String 底层数组(第 36 题 JVM 实测:Deduplicated 98.4%)——G1 特有(ZGC 17 不支持)。'),
+    ],
+    ['Region 化=选择性回收+可预测', 'Young GC+Mixed GC+Full 兜底', 'MaxGCPauseMillis=统计引导非承诺'], [g1tun, jvms2],
+  ),
+  'legacy/74': deep(
+    '类加载过程与双亲委派？如何打破',
+    '网银类加载沙盘:类加载=加载→验证→准备→解析→初始化五步;双亲委派(先委托父加载器,父无法加载才自己加载)保证核心类安全;打破=自定义加载器覆写 loadClass 或 SPI(Thread.currentThread().getContextClassLoader)。',
+    [
+      '类加载五步:加载(读字节码→生成 Class 对象)→验证(字节码安全检查)→准备(静态变量分配内存+默认值)→解析(符号引用→直接引用,可延迟)→初始化(执行 <clinit>:静态变量赋值+static 块)——初始化触发:首次 new/访问静态成员/反射/子类初始化触发父类。',
+      '双亲委派:AppClassLoader→PlatformClassLoader(扩展)→BootstrapClassLoader(核心 rt.jar)——先委托父加载器加载(父能加载就不自己加载);保证:核心类(java.lang.String)始终由 Bootstrap 加载(安全——防自定义 java.lang.String 覆盖核心类)。',
+      '打破双亲委派:SPI(java.sql.Driver——接口在 Bootstrap,实现在 classpath→父加载器看不到子加载器的类→Thread.contextClassLoader);OSGi/热部署(每个模块独立加载器);Tomcat(WebappClassLoader 先自己加载再委托——Web 应用隔离)。',
+    ],
+    [
+      block('机制:双亲委派的"安全性"', '双亲委派的核心=防止核心类被篡改:自定义 java.lang.String→委托到 Bootstrap→Bootstrap 已加载 String→返回核心类(自定义的不会被加载)——保证核心类唯一性。类加载器也是命名空间:不同加载器加载的同一个类文件=不同的 Class 对象(第 37 题 JVM 类泄漏)。'),
+      block('反例:类加载的两种事故', '事故一:NoClassDefFoundError vs ClassNotFoundException——前者=编译时存在运行时缺失(依赖版本变更);后者=运行时动态加载失败;排查=类路径审计+依赖树分析。事故二:同类不同加载器——热部署环境下同一类被两个加载器加载→instanceof false→ClassCastException(第 37 题 JVM);修复=确保类只由一个加载器加载或共享父加载器。'),
+      block('取舍:自定义加载器的场景', '热部署(不重启更新类——每个版本独立加载器)、隔离(插件系统——插件间类隔离)、加密(自定义类文件格式解密后加载)——自定义加载器的成本=双亲委派的复杂性(需要处理委托/缓存/类冲突),不是"随便覆写 findClass"。'),
+    ],
+    [
+      block('验证:类加载的走查核对', '验证:双亲委派断言(String 的 classLoader=null→Bootstrap 加载);打破断言(Thread.contextClassLoader 加载 SPI 实现);初始化顺序断言(静态变量→静态块→构造器);类卸载断言(加载器被 GC→其加载的类卸载,第 37 题 JVM 代理类卸载)。验证:类加载的断言可程序化(Class.forName/getResourceAsStream)。'),
+      block('追问链:类加载三刀', '一刀:"类的初始化顺序?"——父类静态→子类静态→父类构造→子类构造;静态变量赋值+静态块按源码顺序执行。二刀:"类加载器的层次?"——Bootstrap(核心)→Platform(扩展)→Application(classpath)→自定义——每层可以访问自己+父层的类,不能访问子层的。三刀:"Metaspace 泄漏与类加载器?"——类加载器被泄漏→其加载的所有类无法卸载→Metaspace 增长(第 37 题 JVM;CGLIB 代理类泄漏的场景)。'),
+    ],
+    ['五步:加载→验证→准备→解析→初始化', '双亲委派保核心类安全', '打破:SPI contextClassLoader'], [jvms2, javaman],
+  ),
+  'legacy/75': deep(
+    '垃圾回收器如何选型？ZGC 有什么特点',
+    '网银 GC 沙盘:Serial/Parallel/CMS(移除)/G1/ZGC/Shenandoah——选型=按堆大小+暂停要求+吞吐要求,不是"最新的最好"(第 14 题 JVM 与 75 题 JVM 的选型完整版)。',
+    [
+      '回收器光谱:Serial(单线程,小堆,客户端)→Parallel(多线程,吞吐优先,批处理)→G1(region 化,大堆,暂停可调,JDK 9+ 默认)→ZGC/Shenandoah(并发整理,亚毫秒暂停,超大堆)——光谱的轴=暂停时间(从百 ms 到亚 ms),代价=吞吐与内存。',
+      'ZGC 的特点:染色指针(64 位指针元数据位)+读屏障(自愈)+并发整理(STW 仅根集扫描,实测 0.005-0.017ms)+TB 级堆支持;代价=读屏障 CPU 开销+堆余量要求(Allocation Stall 59ms 当堆满,第 7 题 jvm-advanced 实测)。',
+      '选型决策:堆<4GB+吞吐优先→Parallel;堆 4-32GB+暂停<100ms→G1(默认);堆>16GB+暂停<10ms→ZGC(JDK 17 单代/JDK 21 分代,第 7 题 jvm-advanced 17/21 的版本边界);批处理→Parallel(暂停无所谓)。',
+    ],
+    [
+      block('机制:ZGC 的染色指针与并发整理', 'ZGC 用 64 位指针的高位存元数据(Marked0/Marked1/Remapped/Finalizable)——读屏障检查指针颜色,过期则在读时修正(自愈);并发整理不暂停应用(代价=读屏障内联+堆余量,第 7 题 jvm-advanced 实测:暂停亚毫秒但堆满时 Allocation Stall 59ms)。'),
+      block('反例:GC 选型的两种事故', '事故一:ZGC 用在小堆(256MB)——ZGC 的堆余量要求+读屏障开销在小堆上得不偿失(G1 更合适);修复=按堆大小+暂停要求选型。事故二:JDK 17 上期望分代 ZGC——JDK 17 的 ZGC 不分代(每次周期扫全堆);分代 ZGC 是 JDK 21 的 JEP 439——版本边界要先核对(第 7 题 jvm-advanced)。'),
+      block('取舍:GC 选型的矩阵', '堆大小(小/中/大/超大)×暂停要求(不敏感/<100ms/<10ms)×吞吐要求(高/中/低)——三维矩阵选回收器:Parallel(吞吐优,暂停差)/G1(平衡)/ZGC(暂停优,吞吐略损)——选型后用自己的负载实测(第 147 题压测),不按理论选。'),
+    ],
+    [
+      block('验证:GC 选型的走查核对', '验证:本机对照实验(G1 vs ZGC 同负载:g1.log young 中位 2.948ms vs zgc.log Pause 0.005-0.017ms;ZGC Allocation Stall 59.822ms)——jvm-advanced 7/8 题的实测数据;选型决策=暂停分布+吞吐+内存三维对照(不是单指标)。验证:GC 对照的断言可程序化(GC 日志分析)。'),
+      block('追问链:GC 选型三刀', '一刀:"G1 到 ZGC 的迁移?"——参数变更(UseZGC)+行为差异(读屏障/不分代)+回归测试(同负载对照);第 8 题 jvm-advanced 的对照实验模板可复用。二刀:"Shenandoah 与 ZGC?"——两者都是并发整理(亚毫秒暂停);Shenandoah 用转发指针(Brooks pointer),ZGC 用染色指针;Shenandoah 由 Red Hat 维护,ZGC 由 Oracle——生态与支持的 JDK 版本不同。三刀:"GC 日志怎么读?"——-Xlog:gc*(G1)/-Xlog:gc(ZGC)→分析工具(GCEasy/GCViewer)——关键指标:暂停分布(P99/P999)/吞吐(GC 时间占比)/频率(每分钟次数)/特殊事件(Full/Exhausted/Stall)。'),
+    ],
+    ['Serial→Parallel→G1→ZGC:暂停递减', 'ZGC 染色指针+读屏障自愈', '选型后用自己负载实测验证'], [g1tun, hnsw],
+  ),
+  'legacy/76': deep(
+    '常用 JVM 参数？堆大小怎么定',
+    '网银运维沙盘:JVM 参数分类(内存/GC/诊断/行为)与堆大小的确定(不是拍脑袋,是按负载画像+压测校准,第 76 题 JVM 的完整版)。',
+    [
+      '参数分类:-X 系列(-Xms/-Xmx/-Xss)、-XX 系列(-XX:+UseG1GC 等)、系统属性(-D);常用:-Xms=-Xmx(生产相等)/-Xss/-XX:MaxMetaspaceSize/-XX:+HeapDumpOnOutOfMemoryError(OOM 转储)/-XX:MaxDirectMemorySize(堆外)。',
+      '堆大小的确定:基线=稳态内存占用(常驻对象+缓存)+峰值波动(突发分配)+GC 余量(年轻代+GC 工作空间)——压测校准(第 147 题:压测到目标流量观测实际堆使用→1.5-2 倍余量)——不是"内存多就设大"(GC 扫描时间与堆成正比)。',
+      '诊断参数:-XX:+HeapDumpOnOutOfMemoryError+-XX:HeapDumpPath(自动转储)+-Xlog:gc*(GC 日志)+-XX:NativeMemoryTracking=summary(NMT)+-XX:+UnlockDiagnosticVMOptions(诊断命令)——生产必备(出了问题没 dump=没证据)。',
+    ],
+    [
+      block('机制:参数的"打印与验证"', '-XX:+PrintFlagsFinal(打印所有参数最终值——验证参数是否生效)/-XX:+PrintFlagsInitial(初始值)——参数的验证=PrintFlagsFinal 对照(确认 JML 参数被正确设置,而不是"以为设置了");jcmd VM.flags(运行时查看)——参数的审计=变更后 diff FlagsFinal(第 50 题升级排查的基础)。'),
+      block('反例:JVM 参数的两种事故', '事故一:-Xms≠-Xmx——堆动态扩缩容(扩容=暂停+抖动);修复=生产环境 Xms=Xmx(避免动态扩容)。事故二:参数堆积不加区分——从网上复制的"调优参数"盲用(与新 JDK 版本不兼容或已移除);修复=PrintFlagsFinal 验证+按 JDK 版本核对(第 50 题升级的三层排查)。'),
+      block('取舍:参数的"默认优先"原则', 'JDK 默认值经过大量测试(大多数场景够用)——不要盲目覆盖默认值(每个覆盖都引入维护成本);只调"有明确依据的参数"(压测发现瓶颈→针对性调整);参数变更=一次发布(走评测门禁,第 49 题)。'),
+    ],
+    [
+      block('验证:JVM 参数的走查核对', '验证:PrintFlagsFinal 断言(参数生效——diff 变更前后的 FlagsFinal);堆大小断言(jcmd GC.heap_info 查看堆布局);OOM 转储断言(构造 OOM→HeapDumpPath 有 dump 文件);NMT 断言(NMT summary 的各区域能耗与理论一致,第 11 题 JVM 实测)。验证:参数验证的断言可程序化(jcmd 命令集)。'),
+      block('追问链:参数三刀', '一刀:"容器环境的 JVM 参数?"——容器内存限制(cgroup)与 JVM 堆的关系(JVM 感知容器内存,JDK 10+ UseContainerSupport)——堆+元空间+栈+堆外+Code Cache < 容器 limit(第 19 题 jvm-advanced 容器 OOMKilled)。二刀:"-XX:+UseCompressedOops 的条件?"——堆<32GB 时可用(>32GB 自动关闭,引用变 8 字节→内存跳涨)——堆从 31GB 调到 33GB 可用内存反而变少(压缩指针失效)。三刀:"参数的优先级?"——命令行>环境变量>配置文件>JVM 默认——冲突时高优先级覆盖;参数的来源要可追溯(第 10 题配置审计)。'),
+    ],
+    ['生产:Xms=Xmx+OOM 转储+GC 日志', '堆大小=压测校准,不拍脑袋', 'PrintFlagsFinal 验证参数生效'], [jvms2, g1tun],
+  ),
+  'legacy/77': deep(
+    'OOM 完整排查流程',
+    '网银值班沙盘:OOM: Java heap space 告警→排查五步:确认 OOM 类型→获取 heap dump→分析 dominator tree→定位引用链→修复验证——jvm-advanced 77 题的完整版(内存泄漏/缓存/大对象分类排查)。',
+    [
+      '排查五步:一,确认子类型(heap/Metaspace/native thread——路径不同,第 32 题);二,获取 dump(-XX:+HeapDumpOnOutOfMemoryError 或 jmap);三,MAT 分析(dominator tree+Leak Suspects);四,定位引用链;五,修复+压测验证。',
+      'heap dump 的分析:MAT(Memory Analyzer Tool)的 dominator tree(按"保留大小"排序——谁持有了最多的内存);shallow heap vs retained heap(对象自身大小 vs 可释放的总大小)——泄漏=retained heap 大但业务不需要的对象。',
+      '没有 dump 的情况:-XX:+HeapDumpOnOutOfMemoryError 未设置(没 dump 可分析)→jcmd GC.heap_dump(运行时获取,如果进程还活着)或重启前尽快获取(jmap 可能失败如果堆太大)。',
+    ],
+    [
+      block('机制:OOM 的"根因分类"', '内存泄漏(对象不再使用但可达——静态集合/监听器/ThreadLocal/连接未关闭)+内存不足(数据量增长/缓存膨胀——需要扩容或优化)+大对象(一次性加载全量数据——流式处理替代)——三类根因的修复方向完全不同:泄漏→修代码、不足→扩容、大对象→改架构。'),
+      block('反例:OOM 排查的两种事故', '事故一:OOM 后直接重启——没有获取 dump→证据丢失→无法定位根因→下次再发;修复=HeapDumpOnOutOfMemoryError+重启前先 jmap。事故二:MAT 分析只看大对象——大对象可能是缓存(正常),泄漏的小对象集合(百万 Entry)才是根因;修复=dominator tree 看 retained heap(不是 shallow heap)。'),
+      block('取舍:dump 的时机与方式', 'OOM 时自动 dump(HeapDumpOnOutOfMemoryError——准确但可能 OOM 时 dump 失败)+运行时手动 dump(jcmd GC.heap_dump——进程存活时)+定期 dump 对比(泄漏的增量分析)——dump 的选择=进程状态(活/死)与时机(及时/事后)。'),
+    ],
+    [
+      block('验证:OOM 排查的走查核对', '验证:OOM 复现→HeapDumpOnOutOfMemoryError 自动转储→MAT 分析→dominator tree 定位→引用链修复→压测确认——完整流程走查(第 19 题容器 OOMKilled 的 NMT 实测可复用);OOM 子类型的区分排查(heap/metaspace/native 各不同)。验证:OOM 排查的效率=从告警到根因定位的时长(演练计时)。'),
+      block('追问链:OOM 三刀', '一刀:"MAT 的 Leak Suspects 准确吗?"——MAT 的 Leak Suspects=启发式分析(准确率高但有误报)——最终确认靠引用链的代码审查(不是只看 MAT 报告)。二刀:"OOM 与 GC overhead limit exceeded?"——后者=GC 时间>98% 但回收<2%(GC 空转)——通常是泄漏的前兆(快 OOM 了);排查路径同 heap OOM。三刀:"NMT 怎么辅助?"——NMT(native memory tracking)看堆外内存(元空间/线程栈/Code Cache/Direct)——heap OOM 走 dump,native OOM 走 NMT(第 19 题 JVM 实测:NMT 三种口径互不相等)。'),
+    ],
+    ['五步:类型→dump→MAT→引用链→修复', 'HeapDumpOnOutOfMemoryError 必配', '泄漏/不足/大对象三类根因'], [jvms2, g1tun],
+  ),
+  'legacy/78': deep(
+    'Full GC 频繁怎么排查',
+    '网银 GC 沙盘:Full GC 每小时 3 次(正常应该 0)——排查=确认 Full GC 类型(调用/碎片/promotion failed)→分析根因→修复,第 78 题 JVM 的完整版。',
+    [
+      'Full GC 的触发类型:一,System.gc()调用(RMI/代码显式调);二,Metaspace 满(类加载泄漏);三,晋升失败(老年代空间不足→Promotion Failed);四,碎片(标记-清除后大对象无连续空间→Compact);五,Humongous 分配失败(G1 to-space exhausted→Full)。',
+      '排查流程:GC 日志分析(-Xlog:gc*→Full GC 的触发原因:System.gc/Promotion Failed/Metaspace)→堆使用画像(老年代增长速率/晋升速率→是泄漏还是不足)→内存分析(dump→MAT)→修复验证。',
+      '修复方向:System.gc→禁用(-XX:+DisableExplicitGC)或 RMI 参数调;Metaspace→类加载器泄漏排查(第 37 题 JVM);晋升失败→扩老年代或降低晋升速率;碎片→G1 或 CMS 碎片整理;Humongous→增大 region 或拆分大对象(第 6 题 jvm-advanced)。',
+    ],
+    [
+      block('机制:Full GC 的"降级"性质', 'G1 的 Full GC=evacuation failure 的降级(并发回收失败→STW 全堆压缩)——不是"常规操作"而是"兜底";Full GC 频繁=G1 的并发回收出了问题(晋升太快/Humongous 过多/碎片)——排查 Full GC 的本质=排查"为什么并发回收失败了"。'),
+      block('反例:Full GC 的两种事故', '事故一:忽略 Full GC 触发原因——看到 Full GC 就调 -Xmx(如果根因是 System.gc 或 Metaspace 泄漏,调堆无效);修复=看 GC 日志的触发原因分类处置。事故二:Full GC 频繁但 P99 正常——Full GC 虽然暂停长但频率低(如每天 1 次)→业务影响有限(夜间发生);修复=监控+定期处理,不等同于紧急事故。'),
+      block('取舍:Full GC 的容忍度', 'Full GC 的容忍度=暂停时长×频率对业务的影响——P999 敏感的系统(实时交易):Full GC=不可接受(必须消除);批处理系统:Full GC 暂停 2s 可接受(不在线上交易)——容忍度是业务参数不是技术参数。'),
+    ],
+    [
+      block('验证:Full GC 的走查核对', '验证:GC 日志断言(Full GC 的触发原因分类——System.gc/Promotion Failed/To-space exhausted 各自对应);频率统计(每小时次数+每次耗时);修复验证(消除触发原因→Full GC 消失);evac.log 实验(855 次 exhausted→Full,第 6 题 jvm-advanced)。验证:Full GC 的频率与耗时断言可程序化(GC 日志分析工具)。'),
+      block('追问链:Full GC 三刀', '一刀:"System.gc 是谁调的?"——RMI 的分布式 GC(定时调用,可 -XX:+DisableExplicitGC 禁用)+NIO 的 DirectByteBuffer 清理(可 -XX:+ExplicitGCInvokesConcurrent 改为并发)+业务代码——需要按调用来源区分处置。二刀:"Metaspace 导致的 Full GC?"——Metaspace 满→Full GC 卸载类→如果类加载器泄漏则卸载失败→Full GC 反复;排查=GC 日志的 Metaspace 使用+类计数(jcmd GC.class_stats)。三刀:"Full GC 频繁但是年轻代导致的?"——Young GC 晋升失败(老年代空间不足)→触发 Full GC——根因=老年代空间不足或晋升速率过高( Survivor 偏小→动态年龄晋升,第 44 题)。'),
+    ],
+    ['Full GC=降级不是常规操作', '触发原因分类:gc/metaspace/晋升/碎片', '容忍度=业务参数不是技术参数'], [g1tun, jvms2],
+  ),
+  'legacy/79': deep(
+    '对象晋升老年代的条件？空间分配担保是什么',
+    '网银 GC 沙盘:对象晋升老年代的四条件(年龄达阈值/动态年龄/大对象/Survivor 放不下)+空间分配担保(老年代是否装得下新生代晋升对象)——第 44 题 JVM 的完整版。',
+    [
+      '晋升四条件:一,年龄达 MaxTenuringThreshold(默认 15,每次 Minor GC 存活+1);二,动态年龄(同龄对象>Survivor 一半→提前晋升,第 44 题详解);三,大对象直接老年代(Humongous,超 region 一半);四,Survivor 放不下(Minor 后存活>Survivor→直接老年代)。',
+      '空间分配担保(Minor GC 前):老年代连续空间>新生代所有对象总大小(极端假设全晋升)或>历次晋升平均大小→担保成功(Minor GC 安全执行);失败→Full GC(先腾老年代空间)——JDK 6+ 默认有担保(HandlePromotionFailure=true),但担保失败仍可能触发 Full GC。',
+      '动态年龄的精确定义:GC 后按年龄从小到大累计Survivor 中对象大小,超过 TargetSurvivorRatio(默认 50%)×Survivor 容量的年龄成为新的晋升阈值——阈值动态计算(每轮 GC 后重算,不是固定的"50%"——第 44 题:参数是可调的不是死值)。',
+    ],
+    [
+      block('机制:晋升与老年代压力', '晋升速率=每秒晋升到老年代的字节数——晋升过快→老年代快速填充→Mixed GC 频率增加或 Full GC;晋升过慢→Survivor 放不下(空间分配担保失败)→直接进老年代——晋升速率是 GC 调优的核心观测量(GC 日志中的 promotion rate)。'),
+      block('反例:晋升的两种事故', '事故一:大对象频繁晋升——报表生成 50MB byte[]每次都直接进老年代→老年代碎片+Full GC;修复=流式处理或对象池(第 45 题 jvm-advanced 大对象)。事故二:Survivor 太小→动态年龄提前晋升——存活率高的应用(缓存预热后)Survivor 不够→过早晋升→老年代压力;修复=增大 Survivor 或调整 TargetSurvivorRatio。'),
+      block('取舍:MaxTenuringThreshold 的调优', '阈值高(15):对象在 Survivor 存活更久(减少过早晋升)但 Survivor 压力大;阈值低(1):快速晋升(减少 Survivor 复制成本)但老年代压力大——阈值的选择=Survivor 容量与老年代容量的平衡(G1 下由 region 动态决定,参数含义变化,第 44 题取舍)。'),
+    ],
+    [
+      block('验证:晋升的走查核对', '验证:晋升断言(年龄达阈值→晋升到老年代,jmap -histo:live 前后对比);动态年龄断言(Survivor 同龄对象>50%→提前晋升);大对象断言(Humongous 直接进老年代);空间担保断言(极端晋升→担保失败→Full GC)。验证:GC 日志中的晋升速率与晋升年龄可程序化(GC 日志分析,第 44 题实测:MaxTenuringThreshold=15 但对象几次就进老年代)。'),
+      block('追问链:晋升三刀', '一刀:"晋升速率怎么监控?"——GC 日志的 promotion(每 GC 的晋升字节数)+趋势分析(晋升速率上升=老年代压力增加)——晋升速率是 GC 调优的核心观测量。二刀:"G1 的 Humongous 回收?"——Humongous 对象在并发标记时如果不可达→可被 Young GC 回收(部分)——但分配时的连续 region 需求→碎片风险(第 45 题)。三刀:"晋升与分代回收器的匹配?"——G1 的 Humongous 直接进老年代 region(不经过 Survivor);Serial/Parallel 的大对象也直接进老年代(Tenured);不同回收器的晋升行为有差异——按回收器文档核对。'),
+    ],
+    ['晋升四条件:年龄/动态/大对象/Survivor 放不下', '空间担保失败→Full GC', 'TargetSurvivorRatio 是可调参数'], [g1tun, jvms2],
+  ),
+  'legacy/80': deep(
+    '逃逸分析、标量替换、JIT 编译分别做了什么',
+    '网银 JIT 沙盘:逃逸分析(对象是否逃出方法/线程)→标量替换(未逃逸对象拆为标量,不分配)+锁消除(未逃逸的 synchronized 移除)+JIT 编译(C1/C2 分层编译)——第 80 题 JVM 的完整版。',
+    [
+      '逃逸分析(Escape Analysis):分析对象的作用域——未逃逸(不逃出方法/不逃出线程)→可优化;逃逸(被返回/存入静态字段/传入方法/赋给字段)→不可优化;逃逸分析是 JIT 的前置分析(决定是否做标量替换/锁消除)。',
+      '标量替换:未逃逸对象拆解为标量(基本类型局部变量)——不分配堆内存(对象不存在,只有局部变量);锁消除:未逃逸对象的 synchronized 移除(无竞争不需要锁)——两者都是逃逸分析的红利(JIT 日志可观测)。',
+      'JIT 分层编译:0 解释→3 C1+profiling→4 C2 深度优化(默认路径)——C1 快速出活,C2 深度优化(内联/逃逸分析/向量化);去优化:假设失效(类型 profile 变化)→回退到解释器(第 24 题 JVM OSR);JIT 的触发=调用计数+回边计数达到阈值(第 24 题 OSR)。',
+    ],
+    [
+      block('机制:逃逸分析→优化的决策链', '逃逸分析的结果决定后续优化:未逃逸→标量替换(不分配)+锁消除(不需要);全局逃逸→无法优化(对象在堆分配);参数逃逸→部分优化(内联后可能不逃逸)——逃逸分析本身有开销(分析阶段),JIT 只在 C2 层做(高频方法才值得分析)。'),
+      block('反例:JIT 的两种事故', '事故一:基准测试不预热——JIT 未介入(解释器模式),性能低(第 25 题微基准预热);修复=JMH 预热或多轮 iteration。事故二:去优化循环——单态假设失效(新类型出现)→去优化到解释器→重新 profiling→重新编译(性能锯齿,第 27 题 JVM 去优化);修复=避免多态热点(或接受锯齿)。'),
+      block('取舍:JIT 参数的调优边界', '-XX:CICompilerCount(编译线程数)/-XX:FreqInlineSize(内联阈值)/-XX:MaxInlineSize(小方法内联)——JIT 参数的调优=压测验证(第 147 题),不是理论推导;JIT 的行为随 JDK 版本变化(第 50 题升级的隐式契约——JIT 优化是版本相关的)。'),
+    ],
+    [
+      block('验证:JIT 的走查核对', '验证:J1 实验(装箱 6ns vs 原始 1ns——JIT 内联后差距缩小);PrintInlining 实验(small inline hot/big callee too large——内联决策可观测,第 80 题 JVM 实测);JFR 的 Compilation/Deoptimization 事件(JIT 的编译与去优化全记录);OSR 断言(长循环中途切换到编译版,第 24 题 JVM)。验证:JIT 行为的断言可程序化(-Xlog:jit+compilation=info)。'),
+      block('追问链:JIT 三刀', '一刀:"逃逸分析能消除所有堆分配吗?"——不能:逃逸的对象(返回/存储/传入)无法消除;分析本身有成本(只在 C2 层);标量替换有条件(对象简单/字段少)——逃逸分析是优化机会不是保证。二刀:"JIT 与反射?"——反射调用无法被 JIT 内联(间接调用);MethodHandle 可以被 JIT 优化(invokeExact 直接调用);LambdaMetafactory 生成类可被内联(第 19 题 java-language 的性能对照)。三刀:"JIT 的去优化触发?"——类型 profile 变化(单态→多态)/分支预测失效/OSR 编译假设失效——去优化不是 bug 而是"假设验证失败"的正常回退(第 27 题 JVM)。'),
+    ],
+    ['逃逸分析→标量替换+锁消除', 'JIT C1 快速出活,C2 深度优化', '去优化=假设验证失败的正常回退'], [jvms2, api('java/lang/invoke/MethodHandle')],
+  ),
+  'legacy/81': deep(
+    'CPU 飙高排查',
+    '网银值班沙盘:CPU 100% 告警——排查=top 找进程→top -Hp 找线程→printf 转 16 进制→jstack 定位线程栈→分析热点(业务/GC/JIT/锁)。',
+    [
+      '排查五步:一,top 找高 CPU 进程(PID);二,top -Hp PID 找高 CPU 线程(TID);三,printf "%x" TID 转 16 进制(nid);四,jstack PID | grep nid=0xXX -A 30(定位线程栈);五,分析栈(业务代码/GC 线程/JIT 编译线程/锁竞争)。',
+      'CPU 高的常见分类:业务代码(死循环/正则回溯/大量序列化)、GC(GC 线程 CPU 高——内存不足/GC 风暴)、JIT(C2 编译线程,启动期)、锁竞争(自旋/CAS 空转,第 13 题并发基础)——分类决定处置方向(业务/内存/等待/代码)。',
+      '火焰图(Async-profiler/Arthas profiler):CPU 采样的可视化——宽度=CPU 占比,高度=调用深度——比 jstack 单次采样更准确(多次采样聚合);火焰图的判读=从顶向下找宽块(热点函数)。',
+    ],
+    [
+      block('机制:CPU 高的"消耗模型"', 'CPU=用户态+内核态:用户态高=业务代码在计算(死循环/序列化);内核态高=系统调用密集(IO/锁/内存分配)——用户态与内核态的比例缩小排查范围(用户态→应用层,内核态→IO/锁/GC)。'),
+      block('反例:CPU 排查的两种事故', '事故一:jstack 一次采样定位——线程可能在采样间隙切换了(非热点线程被抓到);修复=多次采样取交集(3 次以上,栈顶一致的线程=真热点)。事故二:CPU 高就重启——重启后 CPU 正常(内存也清了)→根因未定位(下次复发);修复=先采集证据(jstack/火焰图/JFR)再重启。'),
+      block('取舍:CPU 排查的工具选择', 'jstack:轻量(线程快照)但单次(可能错过);Arthas:在线无侵入(trace/watch/profiler);Async-profiler:火焰图(采样精确,需要安装);JFR:持续 profiling(低开销,事后回看)——按"问题的偶发性"选工具(偶发用 JFR,持续用 Arthas)。'),
+    ],
+    [
+      block('验证:CPU 排查的走查核对', '验证:注入 CPU 高(死循环/正则回溯/GC 风暴)→五步排查走查(top→top -Hp→printf→jstack→分析)——每步的输出可验证(top 确认进程/jstack 确认线程栈);火焰图对照(热点函数占比);GC 线程 CPU 高的区分(jstack 中 GC 线程名含 GC)。验证:排查流程的效率=从告警到定位的时长(演练计时)。'),
+      block('追问链:CPU 三刀', '一刀:"CPU 高与 Load 高的区别?"——CPU=实际计算;Load=等待队列长度(含 IO 等待)——Load 高 CPU 低=IO 瓶颈(不是 CPU 问题,第 81 题 JVM 的 CPU/Load 区分)。二刀:"容器 CPU throttling?"——容器 CPU limit 被 cgroup 限制(throttling 指标单独看)——CPU limit 内的 CPU 高=正常(限流≠故障,第 81 题 JVM 容器)。三刀:"CPU 高的自动化处理?"——确定性故障(死循环)→自动化摘实例+取证;非确定性(偶发慢)→告警人工排查——自动化按确定性分级(第 145 题止损动作分级)。'),
+    ],
+    ['top→top -Hp→printf→jstack→分析', '多次采样取交集,单次不可靠', '火焰图比 jstack 更精确'], [sre, jvms2],
+  ),
+  'legacy/82': deep(
+    '内存泄漏的典型场景',
+    '网银内存沙盘:堆持续增长,Full GC 后不回落——内存泄漏的六类典型场景(静态集合/监听器/ThreadLocal/连接/缓存/内部类)与排查(jmap 对比+MAT)。',
+    [
+      '六类典型泄漏:一,静态集合(put 后不 remove,第 28 题可达性);二,监听器未注销(事件源持有引用);三,ThreadLocal 不 remove(池线程 value 可达,第 72 题);四,连接未关闭(数据库/HTTP/文件句柄);五,缓存无淘汰(只加不删);六,非静态内部类隐式持有外部 this。',
+      '排查流程:监控发现(堆持续增长+Full GC 后不回落)→jmap dump(两个时点对比)→MAT 分析(对比直方图的增量对象+dominator tree 的引用链)→定位泄漏源(代码中的引用链)→修复(remove/close/WeakReference)+验证(堆增长平稳)。',
+      '预防:代码评审(关注 static 集合的生命周期/监听器的注销/ThreadLocal 的清理)、静态扫描(SonarQube 的泄漏检测规则)、运行时监控(堆增长趋势告警,第 42 题健康检查)——预防优于排查。',
+    ],
+    [
+      block('机制:泄漏的"可达性"本质', '内存泄漏=对象不再使用但仍然可达(GC 无法回收)——可达性分析从 GC Roots 出发:静态集合/活跃线程(线程池)/加载器/JNI 是可达的"根"——泄漏=业务逻辑断了引用,但 GC Roots 的链没断。修复=断开 GC Roots 的引用链(remove/close/null)。'),
+      block('反例:泄漏排查的两种事故', '事故一:堆增长就判断泄漏——可能只是缓存增长(正常行为,有上限)或数据量增长(业务需要);修复=对比 Full GC 后的堆使用(泄漏=Full GC 后不回落;正常=Full GC 后回落到基线)。事故二:MAT 只看大对象——泄漏的对象集合可能每个对象很小(百万个小 Entry)但总量大;修复=按类分组看实例数(instance count 增长)。'),
+      block('取舍:泄漏检测的自动化程度', '手动排查(MAT 分析):准确但耗时;自动化(堆增长告警+自动 dump 对比):及时发现但可能有误报(正常增长被误判);生产推荐:堆增长趋势告警(基线偏离)+定期自动 dump 对比+人工确认——自动发现+人工确认。'),
+    ],
+    [
+      block('验证:内存泄漏的走查核对', '验证:六类泄漏场景各构造一个复现——静态 Map 不断 put→堆增长→Full GC 后不回落;ThreadLocal 不 remove→线程池中泄漏;监听器不注销→事件源持有→泄漏;MAT 对比两个 dump 的增量(泄漏类 instance count 增长)——每个场景的复现与排查流程固化;第 19 题 JVM 的容器 OOM 实测可复用。'),
+      block('追问链:泄漏三刀', '一刀:"内存泄漏与内存溢出的关系?"——泄漏→持续增长→最终 OOM(泄漏是因,溢出是果);溢出也可能无泄漏(数据量增长/堆太小)——OOM 不一定是泄漏,泄漏不一定立即 OOM。二刀:"堆外内存的泄漏?"——DirectByteBuffer 不受 GC 直接管理(Cleaner 兜底)+NMT 监控(第 33 题 JVM)——堆外泄漏的排查=Netty ByteBuf/DirectByteBuffer 的引用计数。三刀:"泄漏的修复验证?"——修复后压测(同负载运行 24h)→堆增长平稳(不泄漏)→确认修复;修复的验证需要时间(短时间看不出)。'),
+    ],
+    ['六类场景:静态/监听/ThreadLocal/连接/缓存/内部类', 'Full GC 后不回落=泄漏信号', '预防(评审+扫描+监控)优于排查'], [jvms2, g1tun],
+  ),
+
+
+  // ---- x-leg2-p5 ----
+'legacy/83': deep(
+    'Bean 完整生命周期？BeanPostProcessor 的作用',
+    '网银框架沙盘:Bean 生命周期=实例化→属性注入→Aware→BPP.before→初始化(@PostConstruct→afterPropertiesSet→init-method)→BPP.after(代理化)→销毁——spring-basics 6 题的完整版(BPP 的作用=每个 bean 创建过程中插入自定义逻辑)。',
+    [
+      '生命周期:实例化(构造器)→属性注入→Aware 回调(BeanName/BeanFactory/ApplicationContext)→BPP.before→@PostConstruct→afterPropertiesSet→init-method→BPP.after(代理化)→就绪→销毁(@PreDestroy/destroy-method)。',
+      'BPP 的作用:在每个 bean 初始化前后插入逻辑——before 修改 bean;after 代理化(AbstractAutoProxyCreator 在此包裹 @Transactional/@Async 代理,第 87 题)——AOP/校验/注入扩展全靠 BPP(Spring 扩展核心接口)。',
+      'Aware 接口:BeanNameAware( bean 名)/BeanFactoryAware(容器引用)/ApplicationContextAware(上下文)——由 ApplicationContextAwareProcessor(BPP) 在 before 阶段统一调用(第 6 题 spring-basics 的 Aware 驱动)。',
+    ],
+    [
+      block('机制:BPP 是 Spring 的"插件系统"', 'BPP=每个 bean 创建时的钩子(before/after)——Spring 的核心功能(AOP 代理/Autowired 注入/校验)全部通过 BPP 实现:AutowiredAnnotationBeanPostProcessor(注入)、AbstractAutoProxyCreator(代理)、CommonAnnotationBeanPostProcessor(@PostConstruct/@Resource)——BPP 是 Spring 的"微内核"(第 7 题 spring-basics)。'),
+      block('反例:BPP 的两种事故', '事故一:@PostConstruct 捕获 this——代理在 after 阶段才生成,PostConstruct 拿到的是裸对象(事务/缓存失效,第 28 题 spring-advanced);修复=ObjectProvider 延迟取代理。事故二:BPP 影响所有 bean——BPP 不筛选类型→对每个 bean 都调用(性能成本=BPP 数×bean 数,第 7 题 spring-basics);修复=限类型或限 scope。'),
+      block('取舍:BPP 与 BeanFactoryPostProcessor 的边界', 'BPP=实例级(每个 bean 创建后修改实例);BFPP=定义级(所有 definition 加载后修改 BeanDefinition,不涉及实例)——BFPP 在 BPP 之前(定义先于实例);BeanDefinitionRegistryPostProcessor(可注册新 definition)先于普通 BFPP(第 7 题 spring-basics 的 refresh 阶段)。'),
+    ],
+    [
+      block('验证:生命周期的走查核对', '验证:时序断言(构造→注入→Aware→BPP.before→@PostConstruct→afterPropertiesSet→init-method→BPP.after→就绪,日志顺序断言);BPP 断言(AbstractAutoProxyCreator 的代理生成——类名含 CGLIB/$Proxy);Aware 断言(ApplicationContextAware 拿到上下文)。验证:本机 BeanPhasesExample 真值(spring-basics Q7:definition:instance);本机 Q28 PostConstruct 捕获=裸类。'),
+      block('追问链:生命周期三刀', '一刀:"@PostConstruct 与 afterPropertiesSet 的顺序?"——@PostConstruct 先(JSR-250 注解,CommonAnnotationBeanPostProcessor 处理)→afterPropertiesSet 后(InitializingBean 接口)→init-method 最后——三者同"初始化阶段"但顺序固定(spring-basics 6 题)。二刀:"循环依赖的代理提前?"——正常路径=after 阶段代理化;循环引用路径=getEarlyBeanReference 提前代理化(三级缓存第 8 题 spring-basics);@PostConstruct 时"是否已代理"取决于是否有循环依赖。三刀:"销毁的顺序?"——与创建相反:@PreDestroy→DisposableBean.destroy→destroy-method——销毁顺序=创建顺序的逆序(第 38 题 spring-advanced)。'),
+    ],
+    ['十一步生命周期,BPP 贯穿', 'BPP.after=代理化(事务/AOP)', '@PostConstruct 先于代理化'], [sre, pod],
+  ),
+  'legacy/84': deep(
+    '循环依赖如何解决？三级缓存分别存什么？为什么需要三级',
+    '网银框架沙盘:A 依赖 B,B 依赖 A(属性注入)——三级缓存解决:一级(singletonObjects 成品)/二级(earlySingletonObjects 半成品)/三级(singletonFactories ObjectFactory 工厂)——spring-basics 8 题的完整版。',
+    [
+      '三级缓存:一级 singletonObjects(完整 bean——初始化完成);二级 earlySingletonObjects(提前暴露的半成品——实例化完成但未初始化);三级 singletonFactories(ObjectFactory——可生成早期引用的工厂,调用 getEarlyBeanReference)。',
+      '解决流程:A 实例化→三级缓存放 A 的工厂→A 注入 B→B 实例化→B 注入 A(从三级缓存拿 A 的早期引用,升级到二级)→B 初始化完成→A 完成注入→A 初始化完成——A/B 各自完成(三级缓存的工厂在"第一次被需要"时调用并升级到二级)。',
+      '为什么需要三级:二级缓存只能存"一种形态"的早期引用(裸对象或代理);三级缓存存 ObjectFactory(延迟决定"是否代理"——只有 AOP 需要时才生成代理)——"不知道是否需要代理"→存工厂(延迟决策,第 8 题 spring-basics 的延迟决策)。',
+    ],
+    [
+      block('机制:构造器循环为什么无法解决', '构造器循环:A 构造需要 B,B 构造需要 A——两者都没完成实例化(无半成品可暴露)→三级缓存的工厂无法调用(工厂需要实例化后的对象);属性注入循环=A 实例化(构造完成)→三级缓存暴露→注入 B 可获取早期引用——构造器循环=无解(鸡生蛋蛋生鸡),属性注入=可解。'),
+      block('反例:循环依赖的两种事故', '事故一:Boot 3 默认禁止循环——升级后存量循环集中暴露(BeanCurrentlyInCreationException);修复=重构解循环(抽公共依赖/事件解耦,不是 allowCircularReferences=true)。事故二:AOP+循环依赖——代理在 getEarlyBeanReference 中提前创建(可能不同于最终代理——微妙行为高发区,第 31 题 spring-advanced);修复=避免 AOP+循环依赖的组合(重构优先)。'),
+      block('取舍:allowCircularReferences 的取舍', '默认 true(spring-basics/spring-framework 传统):容忍设计债;Boot 3 默认 false:启动期暴露循环(强制修复);设 true=掩盖设计问题(第 37 题)——判据:循环依赖=职责边界模糊(第 2 题 distributed),解循环=架构治理。'),
+    ],
+    [
+      block('验证:三级缓存的走查核对', '验证:spring-advanced 31 题实验——属性注入循环默认自解=true;构造器注入循环拒绝(BeanCurrentlyInCreationException);三级缓存的断言(工厂调用后升级到二级缓存);AOP 代理断言(有 AOP 时三级缓存工厂生成代理而非裸对象——getEarlyBeanReference)。验证:循环依赖的断言可程序化(启动成功/异常对照)。'),
+      block('追问链:三级缓存三刀', '一刀:"二级缓存为什么不够?"——二级存早期引用(一种形态);三级存工厂(延迟决定代理或裸)——如果只有二级:所有 bean 提前代理(改变生命周期)或循环场景拿到裸对象(与最终类型不一致)。二刀:"三级缓存的清空?"——bean 完成后:三级移除(工厂已调用)+二级移除(升级到一级成品)——最终只有一级有完整 bean。三刀:"循环依赖与性能?"——循环依赖的解析过程=多次从缓存获取+工厂调用(启动性能略降)——大量循环依赖=启动性能+设计质量双重问题。'),
+    ],
+    ['一级成品+二级半成品+三级工厂', '工厂延迟决定是否代理', '构造器循环无解,属性注入可解'], [sre, pod],
+  ),
+  'legacy/85': deep(
+    '事务传播行为',
+    '网银事务沙盘:@Transactional 的 7 种传播行为(REQUIRED/REQUIRES_NEW/NESTED/SUPPORTS/NOT_SUPPORTED/MANDATORY/NEVER)——最常用的三种(REQUIRED/REQUIRES_NEW/NESTED)与连接占用差异(spring-advanced 2/3 题)。',
+    [
+      'REQUIRED(默认):有事务则加入,无则新建——最常用(大部分操作都在同一事务);REQUIRES_NEW:挂起当前事务,新建独立事务(两连接,外层等内层完成)——审计/通知"无论主事务成败都留痕";NESTED:保存点(内层回滚不影响外层,同一连接)——"部分回滚"(批量导入的单行失败,第 3 题 spring-advanced)。',
+      '其他四种:SUPPORTS(有则加入无则非事务运行)/NOT_SUPPORTED(挂起当前,非事务运行)/MANDATORY(必须有事务否则异常)/NEVER(必须无事务否则异常)——低频使用(边界控制)。',
+      '连接占用:REQUIRED=1 连接(内外共用);REQUIRES_NEW=2 连接(外层+内层各持一连接——池容量=并发×2);NESTED=1 连接(保存点,不额外占池)——REQUIRES_NEW 的连接翻倍是池耗尽的常见原因(spring-advanced 2 题实测:REQUIRED=1,REQUIRES_NEW=2)。',
+    ],
+    [
+      block('机制:REQUIRES_NEW 的挂起模型', '挂起=把外层的 ConnectionHolder 从 ThreadLocal 解绑(连接仍被外层持有,不归还池)→从池取新连接给内层→内层独立提交/回滚→解绑内层→恢复外层(重新绑定)——挂起的代价=连接翻倍+外层锁持有时间被内层放大(spring-advanced 2 题的精确化)。'),
+      block('反例:传播行为的两种事故', '事故一:REQUIRES_NEW 的连接互等死锁——外层锁了行 A,内层(REQUIRES_NEW)也要更新行 A→外层持锁等内层,内层等外层释放行 A→死锁(spring-advanced 2 题的"自己等自己");修复=内层不访问外层已锁定的行。事故二:rollback-only 异常——内层(REQUIRED)标记 rollback-only,外层提交时 UnexpectedRollbackException(内层吞了异常但标记了回滚);修复=内层异常要么传播要么 catch 后不标 rollback-only。'),
+      block('取舍:传播行为的选型', '默认 REQUIRED(大多数场景);审计/通知→REQUIRES_NEW 或 AFTER_COMMIT 事件(第 91 题);批量导入部分回滚→NESTED(保存点);边界控制→MANDATORY/NEVER(强制约束);Spring Data Repository 的查询→SUPPORTS(可事务可不事务)。'),
+    ],
+    [
+      block('验证:传播行为的走查核对', '验证:spring-advanced 2 题实验(计数 DataSource:REQUIRED=1,REQUIRES_NEW=2)+3 题实验(NESTED 保存点:[1]:[2] 外层保住)+4 题实验(rollback-only:true:0 双行全回滚)——三组实测固化传播行为;第 19 题 spring-advanced 安全上下文(DelegatingSecurityContextCallable)。验证:传播行为断言可程序化(事务边界日志)。'),
+      block('追问链:传播三刀', '一刀:"REQUIRES_NEW 内层访问外层未提交数据?"——另一个连接看不到未提交数据(隔离级别)→读到旧值或锁等待——"看不到自己刚写的数"是 REQUIRES_NEW 的常见坑(spring-advanced 2 题)。二刀:"NESTED 与保存点?"——DataSourceTransactionManager 支持 JDBC 保存点;JPATransactionManager 不支持(用 REQUIRES_NEW 替代)——事务管理器的实现决定 NESTED 是否可用。三刀:"传播与代理?"——传播行为由 TransactionInterceptor 根据注解读取并传给 PlatformTransactionManager——自调用绕过代理(第 87 题)→传播行为也不生效。'),
+    ],
+    ['REQUIRED 默认,REQUIRES_NEW 独立', 'NESTED 保存点,连接不翻倍', 'REQUIRES_NEW 连接×2,池耗尽常见原因'], [sre, pod],
+  ),
+  'legacy/86': deep(
+    '事务失效的场景',
+    '网银交易沙盘:@Transactional 不生效——自调用绕过代理/方法非 public/类被 new 出来/异常被捕获不回滚/传播行为误配/多数据源管理器错配——spring-basics/advanced 的完整汇总版。',
+    [
+      '六大失效:一,自调用(this.pay() 绕过代理——spring-advanced 1 题实测);二,方法非 public(Spring 6 不读非 public 注解);三,类不是 bean(new 出来的无代理);四,异常被吞(默认只回滚 RuntimeException);五,传播误配(NOT_SUPPORTED 挂起);六,事务管理器绑错数据源。',
+      '排查顺序:打印 getClass().getName()(含 CGLIB/$Proxy=代理路径)→查方法可见性(public)→查 bean 来源(容器交付还是 new)→查异常处理(是否捕获)→查传播行为与事务管理器绑定(spring-advanced 6 题的排查顺序)。',
+      '最佳实践:@Transactional 方法 public+由容器交付(不 new)+不自调用(拆 bean 或 ObjectProvider)+事务方法只做 DB 操作(不夹 RPC,第 10 题分布式事务)+rollbackFor 显式声明(不依赖默认规则的记忆)。',
+    ],
+    [
+      block('机制:事务是 AOP 代理实现的', '@Transactional 的生效=TransactionInterceptor 拦截(调用必须经过代理)——自调用 this.pay() 不经过代理(拦截器不在调用链上)→事务开关没执行;new 出来的对象没有经过容器的 BPP→无代理→注解是摆设——"注解本身永远没错,错在调用路径"(spring-advanced 6 题)。'),
+      block('反例:事务失效的两种事故', '事故一:同类内调用@Transactional 方法——事务不生效(自调用绕过代理,spring-advanced 1 题实测=0);修复=拆 bean/ObjectProvider/self-injection/AopContext。事故二:catch 后不标 rollback——内层 catch 异常不传播→外层不知道该回滚→部分提交(脏数据);修复=catch 后 setRollbackOnly 或重新 throw。'),
+      block('取舍:事务边界的设计', '事务方法薄(只做 DB 操作)+业务逻辑下沉(无注解的内部方法)+远程调用移出事务(第 39 题事务长度)——事务边界的设计=缩小事务范围(短事务,连接占用少,锁持有短,banking 7 题锁序)。事务不是"加个注解"就完了,是"边界设计"的一部分。'),
+    ],
+    [
+      block('验证:事务失效的走查核对', '验证:spring-advanced 1 题实测(自调用事务生效=0,代理调用=1)+28 题(PostConstruct 捕获=裸类)+6 题(排查入口 this.getClass().getName());验证:每个失效场景的断言可程序化(事务标志=TransactionSynchronizationManager.isActualTransactionActive)。'),
+      block('追问链:失效三刀', '一刀:"@Transactional 加在类上?"——类级对全部 public 方法生效;方法级覆盖类级;接口上的注解在 CGLIB 模式不生效(代理不是接口实现)——注解放实现类。二刀:"Spring 6 对非 public 的 warn?"——启动日志有 warn(非 public 方法的事务注解被忽略)——很多团队日志级别看不到 warn;静态检查(ArchUnit)更可靠。三刀:"事务管理器选错?"——事务"正常开关"但管的是另一个数据源——最难排查的形态(多数据源必须显式绑定 TransactionManager,spring-advanced 7 题)。'),
+    ],
+    ['六大场景:自调用/non-public/new/捕获/传播/管理器', '排查=代理身份+可见性+来源+管理器', '事务方法薄,远程调用移出'], [sre, pod],
+  ),
+  'legacy/87': deep(
+    'JDK 动态代理与 CGLIB 区别？为什么自调用时 AOP 不生效',
+    '网银代理沙盘:JDK 代理(实现接口,Proxy.newProxyInstance)vs CGLIB(继承目标类,Enhancer+Objenesis)——自调用(this.method())绕过代理因为 this 是目标不是代理(spring-basics 9/10 题的完整版)。',
+    [
+      'JDK 动态代理:实现目标接口(代理=接口的实现)——可代理方法=接口声明的方法;目标必须实现接口;Proxy.newProxyInstance(类加载器,接口列表,InvocationHandler)——代理对象≠目标对象(字段在 target,代理的字段全 null,第 19 题 spring-advanced)。',
+      'CGLIB:继承目标类(代理=目标子类)——可代理=非 final 非 private 非 static 方法;无需接口;Enhancer.setSuperclass+MethodInterceptor;Objenesis 跳过父类构造器(第 10 题 spring-basics 修正版)。',
+      '自调用不生效的机制:代理的拦截发生在"外部调用经代理对象"时;自调用 this.method() 是在目标对象内部直接调用(this 是目标不是代理)——拦截器链不在调用路径上;两种代理的自调用都绕过(JDK 代理的 this=目标,CGLIB 的 this=代理子类但内部方法调用不走拦截器链)。',
+    ],
+    [
+      block('机制:代理的两层对象', 'Spring 容器返回的是代理对象(内部持有 target 引用)——外部调用=经过代理(拦截器先执行再调 target);自调用=在 target 内部直接调 this.method()(this=target,不经代理)——两层对象(代理+目标)是理解自调用失效的关键;AopContext.currentProxy()(exposeProxy=true)可获取代理引用解决。'),
+      block('反例:代理的两种事故', '事故一:@Transactional 方法自调用——事务失效(spring-advanced 1 题实测:生效=0);修复=拆 bean/注入自身代理/AopContext.currentProxy/TransactionTemplate。事故二:CGLIB 代理读字段——代理对象的字段全 null(字段在 target);修复=经 target 读字段(不在代理上读)。'),
+      block('取舍:代理方式的选型', 'JDK 代理:有接口+性能略优(反射调用);CGLIB:无接口或 proxyTargetClass=true(统一代理方式)+final 方法失效;Boot 默认 CGLIB(spring.aop.proxy-target-class=true)——统一代理方式避免"有接口和没接口的行为差异"(第 10 题 spring-basics)。'),
+    ],
+    [
+      block('验证:代理的走查核对', '验证:spring-basics 9 题真值(ProxyBoundaryExample:proxy.run() intercepted=1,target.run() intercepted=0,累计 1:2);spring-advanced 1 题(自调用事务生效=0,代理调用=1);spring-advanced 19 题(代理字段全 null,经 target 读正确);类名断言(getClass 含 CGLIB/$Proxy)。验证:代理的断言可程序化(真值测试持续执行)。'),
+      block('追问链:代理三刀', '一刀:"CGLIB 的 final 方法?"——CGLIB 无法覆写 final 方法→@Transactional 标在 final 方法→事务失效(静默,无报错);修复=final 方法不加事务注解或去掉 final(spring-basics 10 题)。二刀:"Spring 的代理创建时机?"——AbstractAutoProxyCreator 在初始化后(postProcessAfterInitialization)包裹;循环引用时 getEarlyBeanReference 提前创建(第 8 题 spring-basics 三级缓存)。三刀:"代理与序列化?"——CGLIB 代理不可序列化(含合成字段)——返回 DTO 而非代理实体(spring-basics 10 题)。'),
+    ],
+    ['自调用=this 是目标不是代理', 'JDK 限接口,CGLIB 限非 final', 'Boot 默认 CGLIB 统一代理'], [sre, pod],
+  ),
+  'legacy/88': deep(
+    'Spring Boot 自动装配原理',
+    '网银框架沙盘:引入 spring-boot-starter-web 无需配置即可启动 Web 服务——自动装配=@EnableAutoConfiguration→spring.factories/AutoConfiguration.imports→条件注解(@ConditionalOnClass/@ConditionalOnMissingBean)筛选→注册 BeanDefinition。',
+    [
+      '自动装配三步:一,@SpringBootApplication 含 @EnableAutoConfiguration;二,ImportSelector 读 AutoConfiguration.imports(Boot 3);三,条件筛选(@ConditionalOnClass/@ConditionalOnMissingBean——用户优先)注册 Bean。',
+      '条件注解族:@ConditionalOnClass(classpath 有此类才装配)+@ConditionalOnMissingBean(用户未自定义才装配——用户优先)+@ConditionalOnProperty(配置属性匹配)+@ConditionalOnWebApplication(Web 环境才装配)——条件的组合=精细的装配控制。',
+      '自定义 starter:一,自动配置类(@Configuration+@Bean+条件注解);二,META-INF/spring/...AutoConfiguration.imports(注册配置类);三,可选属性类(@ConfigurationProperties——绑定配置);四,打包为 jar→其他项目引入即生效(第 92 题详述)。',
+    ],
+    [
+      block('机制:自动装配的"约定优于配置"', 'Spring Boot 的核心理念=classpath 有什么→自动装配什么(有 spring-web→配 DispatcherServlet;有数据源驱动→配 DataSource)——"约定优于配置"的实现=条件注解(探测 classpath/已有 bean/配置属性)+starter 聚合依赖(一个 starter 带来一组依赖+一组自动配置)。'),
+      block('反例:自动装配的两种事故', '事故一:自动配置与用户配置冲突——用户定义了 DataSource 但自动配置也注册了一个→冲突(@ConditionalOnMissingBean 保证用户优先——用户定义了就跳过自动配置);修复=理解"用户优先"的机制(第 88 题排序)。事故二:自动装配不可控——不需要的功能也装配了(多余 bean);修复=排除(@SpringBootApplication(exclude=...))+--debug 条件评估报告(第 49 题诊断)。'),
+      block('取舍:starter 的粒度', '粗粒度 starter(一个 starter 包含全部相关依赖):使用简单但可能引入不需要的依赖;细粒度 starter(按功能拆分):精确控制但 starter 数量多——按"依赖的聚合力"定(同一功能域的依赖打包在一起)。'),
+    ],
+    [
+      block('验证:自动装配的走查核对', '验证:条件评估断言(--debug 输出每个自动配置的匹配/不匹配——第 49 题诊断);@ConditionalOnMissingBean 断言(用户定义 DataSource→自动配置跳过);starter 断言(引入 starter→相关 bean 自动注册);排除断言(exclude→不装配)。验证:自动装配的断言可程序化(Spring Boot 测试切片:@WebMvcTest/@DataJpaTest 的条件装配)。'),
+      block('追问链:装配三刀', '一刀:"自动装配的顺序?"——用户 bean 先注册→自动配置评估(@ConditionalOnMissingBean 看用户是否有)→自动配置的 bean 注册——用户优先=配置顺序的关键(第 88 题排序)。二刀:"Spring Boot 3 的变化?"——spring.factories→AutoConfiguration.imports(文件路径变化)+Jakarta EE( javax→jakarta)+GraalVM Native 支持——升级时注意自动配置文件路径变化。三刀:"自动装配的调试?"——--debug(条件评估报告)+actuator/beans(所有 bean 列表)+actuator/conditions(条件报告)——排障的三把钥匙(第 49 题诊断)。'),
+    ],
+    ['@EnableAutoConfiguration→imports 文件→条件筛选', '@ConditionalOnMissingBean=用户优先', 'starter=依赖聚合+自动配置'], [sre, pod],
+  ),
+  'legacy/89': deep(
+    '拦截器与过滤器的区别？执行顺序',
+    '网银 Web 沙盘:Filter(Servlet 规范,所有请求)vs HandlerInterceptor(Spring MVC,仅 Controller)——执行顺序=Filter 前置→Servlet→Interceptor 前置→Controller→Interceptor 后置→Filter 后置(洋葱模型)。',
+    [
+      'Filter(Servlet 层):所有请求(包括静态资源)——不依赖 Spring MVC(纯 Servlet 规范);由容器(Tomcat)管理;HandlerInterceptor(MVC 层):只拦截 Controller(不拦截静态资源);依赖 Spring 上下文(可注入 bean)。',
+      '执行顺序(洋葱):Filter.before→[Servlet→Interceptor.before→Controller→Interceptor.after(视图渲染前)]→Interceptor.afterCompletion(渲染完成后)→Filter.after——Filter 包裹整个请求,Interceptor 包裹 Controller 处理。',
+      '选择:横切所有请求(编码/CORS/安全)→Filter;仅拦截 MVC(登录/权限/日志)→Interceptor;Filter 拿不到 Handler 信息,Interceptor 异常进 ControllerAdvice(第 18 题),Filter 异常不进(需独立处理)。',
+    ],
+    [
+      block('机制:洋葱模型的两层包裹', 'Filter 与 Interceptor 是"两层洋葱":Filter(外层,包裹整个请求含静态资源)→DispatcherServlet→Interceptor(内层,包裹 Controller)→Controller——请求从外到内穿,响应从内到外穿;Filter 的 doFilter(request,response,chain) 中 chain.doFilter() 前后是"前置与后置"的分界。'),
+      block('反例:Filter/Interceptor 的两种事故', '事故一:Filter 中抛异常不处理——Filter 异常不进 ControllerAdvice(错误格式不一致,第 18 题 spring-basics);修复=Filter 异常自行处理(catch+统一格式输出)。事故二:Interceptor 做 Filter 的事(如编码)——编码应在 Filter(更早,所有请求含静态资源);修复=按"拦截范围"选层(第 18 题选择依据)。'),
+      block('取舍:Filter 与 Interceptor 的选择', '需要 Handler 信息(哪个 Controller/方法)→Interceptor(preHandle 拿到 HandlerMethod);需要操作原始请求/响应(包装 request)→Filter;需要 Spring 上下文(注入 bean)→Interceptor(Filter 中注入 bean 需要 DelegatingFilterProxy);纯 Servlet 规范(不依赖 Spring)→Filter。'),
+    ],
+    [
+      block('验证:执行顺序的走查核对', '验证:顺序断言(Filter.before→Interceptor.preHandle→Controller→Interceptor.postHandle→Filter.after,日志顺序);异常路由断言(Filter 异常不进 Advice/Controller 异常进 Advice);静态资源断言(Filter 拦截静态资源/Interceptor 不拦截)。验证:顺序断言可程序化(日志顺序+mock 请求);洋葱模型的时间线可视化。'),
+      block('追问链:Filter 三刀', '一刀:"Filter 的顺序?"——@Order 注解或 FilterRegistrationBean.setOrder(数值小先执行)——安全 Filter(Security)通常最先(第 17 题 spring-basics 的 Filter 链)。二刀:"Filter 的异步?"——Servlet 3.0 异步(startAsync)→Filter 的 after 在 async 完成后执行(不是 doFilter 返回后)——异步请求的 Filter 生命周期变化。三刀:"OncePerRequestFilter?"——保证每次请求只执行一次(转发/include 不重复执行)——需要"严格一次"语义的 Filter 继承 OncePerRequestFilter。'),
+    ],
+    ['Filter=Servlet 层全部请求', 'Interceptor=MVC 层仅 Controller', '洋葱模型:Filter 包 Interceptor 包 Controller'], [sre, pod],
+  ),
+  'legacy/90': deep(
+    'MyBatis 执行流程？一二级缓存？延迟加载',
+    '网银 ORM 沙盘:MyBatis 的执行流程(SqlSession→Executor→StatementHandler→ResultSetHandler)+一级缓存(SqlSession 级)+二级缓存(Namespace 级)+延迟加载(代理+按需加载关联)。',
+    [
+      '执行流程:SqlSessionFactory→SqlSession→Executor(Simple/Reuse/Batch)→StatementHandler(建 Statement+参数)→数据库→ResultSetHandler(映射为对象)——Mapper 接口=JDK 动态代理(MapperProxy 把方法调用转为 SqlSession 操作)。',
+      '一级缓存:SqlSession 级(默认开启,同一 SqlSession 的相同查询命中缓存)——作用域小(一次数据库会话);Spring 整合后每请求新 SqlSession→一级缓存几乎无效(每次新会话);清空条件:增删改/close/clearCache。',
+      '二级缓存:Namespace 级(跨 SqlSession,默认关闭,需 <cache> 开启)——序列化存储(对象要实现 Serializable);风险:多表查询时脏读(A 表更新不会清 B 表的 Namespace 缓存)——推荐关闭二级缓存,用 Redis 等外部缓存替代(可控性更好)。',
+      '延迟加载:关联对象(association/collection)在首次访问时才加载(代理+CGLIB/Javassist)——aggressiveLazyLoading(默认 false,调用任何方法即触发加载)vs 按需加载(访问关联属性才触发)——延迟加载的 N+1 问题(循环触发 N 次查询,第 29 题 MyBatis 延迟加载)。',
+    ],
+    [
+      block('机制:一级缓存的"会话级"设计', '一级缓存的 key=statement ID+参数+分页+SQL——同一 SqlSession 的相同查询命中缓存(避免重复查 DB);Spring 整合后 SqlSession 的生命周期=请求(每次请求新建)→一级缓存只在"同一请求内的相同查询"生效;增删改清空缓存(防止脏读)。'),
+      block('反例:MyBatis 缓存的两种事故', '事故一:二级缓存的脏读——Namespace A 的缓存被 Namespace B 的更新污染(多表 JOIN 的缓存失效问题);修复=关闭二级缓存或确保单表操作。事故二:N+1 查询——延迟加载的关联在循环中逐个触发查询(100 条记录×每次关联查询=N+1 次);修复=JOIN 一次查询或 BatchExecutor(第 29 题 MyBatis)。'),
+      block('取舍:MyBatis vs JPA 的选型', 'MyBatis:SQL 可控(手写 SQL)+动态 SQL 灵活(<if>/<foreach>)+学习成本低——适合复杂查询/报表/SQL 优化;JPA:对象关系映射自动化+数据库无关——适合简单 CRUD+对象模型清晰;混合使用:复杂查询用 MyBatis,简单 CRUD 用 Spring Data JPA(共存可行)。'),
+    ],
+    [
+      block('验证:MyBatis 的走查核对', '验证:执行流程断言(MapperProxy 动态代理→SqlSession→Executor→DB);一级缓存断言(同 SqlSession 相同查询只执行一次 SQL);二级缓存风险断言(多表更新后缓存脏读);延迟加载断言(未访问关联属性→不触发 SQL;访问后触发)。验证:MyBatis 的断言可程序化(SQL 日志计数+缓存命中统计)。'),
+      block('追问链:MyBatis 三刀', '一刀:"#{} 与 ${} 的区别?"——#{}=PreparedStatement 参数(防 SQL 注入);${}=字符串替换(有 SQL 注入风险——仅用于表名/列名等非值场景,且白名单校验,第 48 题数据库)。二刀:"Mapper 接口的原理?"——MapperProxy(JDK 动态代理)将接口方法映射为 SQL(MapperMethod 解析注解/XML)→SqlSession 执行——接口无需实现类(代理实现)。三刀:"批量操作?"——ExecutorType.BATCH(批量提交,减少网络往返)+foreach 标签(SQL 拼接,注意 SQL 长度限制)——批量插入的两种方式与性能对照(第 39 题批处理)。'),
+    ],
+    ['SqlSession→Executor→Statement→ResultSet', '一级缓存会话级,二级 Namespace 级', '延迟加载防 N+1,批量查询替代'], [sre, pod],
+  ),
+  'legacy/91': deep(
+    'Spring 事件机制；@Async 原理与线程池配置',
+    '网银事件沙盘:支付成功→发布事件→库存/通知/积分各自监听——Spring 事件(ApplicationEvent+@EventListener)+@Async 异步监听(AFTER_COMMIT 事务事件,第 91 题 spring-advanced 的完整版)。',
+    [
+      'Spring 事件:publishEvent(event)→@EventListener 接收——同步(默认同线程)与异步(@Async+@EventListener);事务事件:@TransactionalEventListener(AFTER_COMMIT——事务提交后才执行)。',
+      '@Async 原理:代理拦截→提交线程池→新线程执行,调用方立即返回(Future/void);需 @EnableAsync;默认池=SimpleAsyncTaskExecutor(每次新建线程,无上限)→必须自定义 ThreadPoolTaskExecutor(第 24 题同源)。',
+      'AFTER_COMMIT 的坑:事务提交后执行——事务内修改的数据此时可见(对外可见);AFTER_COMMIT 中不能再操作同一事务(事务已结束——需新事务 REQUIRES_NEW 或 @Async);afterCommit 不触发(如果事务回滚了——Transactional 测试的盲区,第 42 题 spring-basics)。',
+    ],
+    [
+      block('机制:同步事件与异步事件的选择', '同步事件(默认):同线程执行(事务上下文共享,异常可传播到发布者)——适合"紧耦合的后续处理"(同事务);异步事件(@Async):新线程执行(事务上下文丢失,异常不传播)——适合"解耦的后续处理"(通知/审计,不需要同事务);AFTER_COMMIT:事务成功后执行——适合"事务成功后的副作用"(发通知/更新缓存)。'),
+      block('反例:事件机制的两种事故', '事故一:同步事件阻塞主流程——事件监听器执行 3 秒→调用方等 3 秒(事件本意是解耦但实际阻塞);修复=@Async 异步监听(解耦)。事故二:AFTER_COMMIT 中访问事务内数据——事务已提交,数据对外可见,但 AFTER_COMMIT 中修改的数据不在原事务内(需要新事务);修复=AFTER_COMMIT 中只读不写或用 @Async(REQUIRES_NEW)。'),
+      block('取舍:事件 vs 直接调用的选择', '事件:解耦(发布者不感知观察者)+可扩展(新增观察者不改发布者)+单向(发布者不知道结果);直接调用:可控(返回值/异常)+事务一致(同事务)——核心业务用直接调用(需要结果),后续处理用事件(解耦)——"是否需要结果"决定用事件还是调用。'),
+    ],
+    [
+      block('验证:事件机制的走查核对', '验证:同步事件断言(发布→监听器同线程执行);异步事件断言(@Async 监听器在新线程执行);AFTER_COMMIT 断言(事务提交后才触发——事务内不触发);Transactional 测试盲区断言(AFTER_COMMIT 在自动回滚测试中不触发——第 42 题盲区)。验证:事件时序断言可程序化(日志顺序+线程名)。'),
+      block('追问链:事件三刀', '一刀:"事件的有序执行?"——@EventListener 的 order 属性(数值小先执行)或 SmartApplicationListener(支持泛型+排序)——多观察者的执行顺序可控制。二刀:"事件的异步线程池?"——@Async 的线程池=AsyncConfigurer.getAsyncExecutor(全局配置)或 @Async("beanName")(指定池)——不同事件用不同池(隔离,第 11 题)。三刀:"事件的事务传播?"——@TransactionalEventListener(phase=AFTER_COMMIT, propagation=REQUIRES_NEW)——AFTER_COMMIT 中默认 REQUIRES_NEW(新事务,否则无事务上下文)。'),
+    ],
+    ['同步=同线程,异步=新线程', 'AFTER_COMMIT=事务成功后执行', '@Async 必须自定义线程池'], [sre, pod],
+  ),
+  'legacy/92': deep(
+    '如何自定义一个 starter',
+    '网银框架沙盘:团队有通用的"审计日志"能力(每个项目都要接)——自定义 starter=打包"依赖+自动配置+属性类"为独立 jar,引入即用(约定优于配置,第 88 题)。',
+    [
+      'starter 三件套:一,autoconfigure 模块(@Configuration+条件注解+@ConfigurationProperties 属性类);二,starter 模块(纯 pom 聚合依赖);三,注册文件(META-INF/spring/…AutoConfiguration.imports——Boot 3 路径)。',
+      '命名约定:官方=spring-boot-starter-XXX;自定义=XXX-spring-boot-starter(audit-spring-boot-starter)——区分官方与第三方;属性前缀=@ConfigurationProperties(prefix=audit)——配置项 audit.enabled 等。',
+      '条件注解:@ConditionalOnClass(类在 classpath 才装配)+@ConditionalOnMissingBean(用户未自定义才装配——用户优先)+@ConditionalOnProperty(配置开关 audit.enabled=true)——三条件组合=精细控制(第 88 题条件族)。',
+    ],
+    [
+      block('机制:starter 的"封装即复用"', 'starter=把"依赖+配置+自动装配"打包为可复用单元:使用者引入 starter+配置属性即可(无需理解内部实现);starter 的价值=消除"每个项目重复配置"的劳动(约定优于配置的实践)。类比工具箱:starter=工具箱(打开即用),内部工具(autoconfigure)自动组装。'),
+      block('反例:starter 的两种事故', '事故一:starter 缺条件注解——无条件注册 bean(与其他 starter 冲突或覆盖用户配置);修复=@ConditionalOnMissingBean(用户优先)+@ConditionalOnClass(依赖存在才装配)。事故二:starter 的属性无默认值——使用者必须配置所有属性才能启动;修复=@ConfigurationProperties 的默认值(合理默认,减少配置负担)。'),
+      block('取舍:starter 的内部复杂度', '简单的 starter(一个配置类+一个 bean):够用就好;复杂的 starter(多个配置类+条件组合+生命周期管理):按需求递增——starter 的复杂度=使用者"少配置"与开发者"多实现"的交换;starter 的文档(README:配置项/条件/示例)是使用者的第一入口。'),
+    ],
+    [
+      block('验证:starter 的走查核对', '验证:引入 starter 断言(bean 自动注册——actuator/beans 可查);条件断言(缺依赖→不装配+条件评估报告说明);属性绑定断言(配置项正确绑定到 @ConfigurationProperties);用户优先断言(用户自定义 bean→starter 不覆盖)。验证:starter 的断言可程序化(Spring Boot 测试:ApplicationContextRunner 模拟不同条件)。'),
+      block('追问链:starter 三刀', '一刀:"autoconfigure 与 starter 分开?"——autoconfigure(代码)与 starter(依赖聚合)分两个模块——使用者引 starter(包含 autoconfigure+依赖);开发者只依赖 autoconfigure(测试)。二刀:"starter 的版本管理?"——starter 与 autoconfigure 版本独立(自动配置变更→autoconfigure 版本升;依赖变更→starter 版本升)——版本解耦。三刀:"starter 的测试?"——ApplicationContextRunner(模拟不同条件:有/无依赖/有/无用户 bean/不同属性值)——starter 的自动化测试(Spring Boot 官方测试工具)。'),
+    ],
+    ['三件套:autoconfigure+starter+imports', '@ConditionalOnMissingBean=用户优先', '属性默认值,减少配置负担'], [sre, pod],
+  ),
+
+
+  // ---- x-leg3-p9 ----
+"legacy/64": deep(
+    "synchronized 锁升级（无锁 → 偏向 → 轻量 → 重量）",
+    "网银单账户并发沙盘:无竞争(偏向)→交替(轻量自旋)→激烈(重量 monitor)——Mark Word 记录锁状态,JVM 按竞争烈度逐级升级且只升不降(偏向锁 JDK15 起废弃)。",
+    [
+      "对象头 Mark Word(64 位 JVM 下 8 字节)存锁状态:无锁(hashCode+分代年龄)/偏向锁(线程 id+epoch)/轻量级(栈上 Lock Record 指针)/重量级(ObjectMonitor 指针)+2 位标志位区分——同一时刻只有一种状态,升级路径:无锁→偏向→轻量→重量(只升不降,GC 撤销除外)。",
+      "偏向锁:第一个线程 CAS 写入线程 id——之后同线程进入只比对 id(零成本,无 CAS);另一线程竞争→到达安全点撤销偏向→升级轻量级。轻量级:线程栈 Lock Record+CAS 把 Mark Word 换成指向它的指针——竞争失败自旋(适合持有时间短/交替访问);自旋超过阈值或第三个线程参与→膨胀重量级。",
+      "重量级:Monitor(ObjectMonitor,OS mutex)——未抢到的线程挂起(内核态,上下文切换成本)+等待队列;适合持有时间长/竞争激烈的场景;JVM 自适应自旋(根据历史自旋成功率动态调整自旋次数)在轻量与重量之间平衡。",
+    ],
+    [
+      block("机制:为什么逐级升级而不是一步到位", "锁的实际竞争分布:大多数锁从未竞争(偏向)/短暂交替(轻量自旋就够)/少数激烈(才需要挂起)——升级路径=按需付出成本:偏向=一次 CAS 后零成本,轻量=用户态自旋(不进内核),重量=内核挂起(最贵但适合长持有);一步到位重量级=把最贵的成本摊给所有锁(浪费);JDK15 废弃偏向锁(JEP 374):维护成本>收益(撤销要安全点,批量重偏向复杂)+现代应用竞争模式变化。"),
+      block("反例:锁升级的两种事故", "事故一:hashCode 与偏向锁冲突——无锁对象调 hashCode()(未重写 identity hash)后无法进入偏向(Mark Word 没地方放)→直接轻量级;不需要背细节,需要知道“调用过 hashCode 的对象不会偏向”。事故二:长自旋浪费 CPU——锁持有时间长+轻量自旋——自旋空转烧 CPU(等价忙等);JVM 自适应会及时膨胀,但业务侧修复=缩短临界区或换 ReentrantLock(可中断)。"),
+      block("取舍: synchronized vs 显式锁的底层视角", "synchronized 的升级机制使其在无竞争/轻竞争场景接近无锁成本——这是“普通互斥优先 synchronized”的底层依据(第 21 题);ReentrantLock 的优势在语义(tryLock/公平/多 Condition/可中断)而非性能——需要高级语义才用,不为性能换。"),
+    ],
+    [
+      block("验证:锁行为的实测走查", "验证:jol(ObjectLayout)打印 Mark Word——无锁→偏向(同线程重入后标志位变化)→另一线程竞争后变轻量(指向 Lock Record)→多线程激烈竞争变重量(指向 monitor);偏向延迟断言(JVM 启动后 4 秒内偏向未启用——biased locking startup delay);无竞争吞吐断言(单线程 synchronized 方法≈无同步性能)——锁升级实验已在 JVM 批次验证,本机可复跑。预期:升级路径与竞争烈度一一对应。"),
+      block("追问链:锁三刀", "一刀:锁消除=逃逸分析发现对象未逃逸→JIT 删掉 synchronized(第 27 题同源)。二刀:锁粗化=循环内反复获释同一锁→JIT 合并为一次。三刀:替代方案谱系=CAS 原子类(无锁)/读写锁(读多)/StampedLock(乐观读)/LongAdder(热点计数分桶,第 8 题)——按竞争模式选,不默认。"),
+    ],
+    ["Mark Word 记状态,只升不降", "偏向零成本,轻量自旋,重量挂起", "偏向锁 JDK15 已废弃(JEP 374)"], [jvms2, javaman],
+  ),
+  "legacy/93": deep(
+    "B+ 树为什么适合做索引？对比 B 树、红黑树、哈希",
+    "网银索引结构沙盘:千万行数据的等值+范围查询——B+ 树 3 层搞定(每次 IO 16KB 页装千级指针);B 树数据占节点太高、红黑树层数爆炸、哈希无范围。",
+    [
+      "磁盘 IO 是核心约束:索引查询每层一次页 IO(16KB)——B+ 树矮胖:非叶子只存键+指针(16KB 装约千级指针)→千万行 3 层(千×千×每叶几百行);叶子存数据且双向链表串联——范围查询/排序沿链表顺序扫(一次定位+顺序读);非叶子不存数据=每页容纳更多键(更矮)。",
+      "vs B 树:B 树数据存在所有节点(非叶子也存)→每页键数少→树更高(4-5 层)→IO 更多;范围查询要中序回溯(跨层跳转);B+ 树数据全在叶子+链表=范围天然高效——数据库几乎都选 B+ 变体(InnoDB/PG)。",
+      "vs 红黑树/哈希:红黑树=二叉(每节点 2 分支)→千万行 23 层→23 次 IO(磁盘场景不可接受——内存结构才适合);哈希=等值 O(1) 但无序(范围/order by/最左前缀全废)+冲突处理+不支持部分匹配——MySQL Memory 引擎才用,InnoDB 自适应哈希只是热点页加速(不是索引本体)。",
+    ],
+    [
+      block("机制:16KB 页与树高的定量推导", "主键 bigint 8B+指针 6B=14B/键——16KB 页≈1170 个键(非叶子);叶子页按每行 1KB 存≈16 行/页→3 层容量=1170×1170×16≈2190 万行——3 次 IO 查任意一行(根节点常驻内存+中层大概率在 buffer pool→实际 1 次 IO 常见);这是“千万行=3 层”的完整推导(第 44 题引用的估算)。"),
+      block("反例:结构误用的两种事故", "事故一:红黑树做磁盘索引(面试自造)——层数=IO 次数爆炸;修复=理解树高×IO 的关系,B+ 树的矮胖是为页结构服务。事故二:哈希索引做报表——范围查询全表扫;修复=等值场景用哈希(内存/缓存键),范围场景 B+ 树——结构选型跟着查询模式走(第 48 题优化同源)。"),
+      block("取舍:页大小与树的调参", "页越大=键越多=树越矮=IO 越少,但单次 IO 读的内容更多(随机访问浪费)+写放大;16KB=InnoDB 折中;LSM 树(RocksDB/ bolts)走另一条路:内存写+批量刷盘(写优化,读放大)——TP 场景 B+ 树(读均衡),写吞吐极致场景 LSM(第 152 题 architecture 存储选型同源)。"),
+    ],
+    [
+      block("验证:树高的实测走查", "验证:页结构断言(innodb_space/诊断工具看页类型:非叶子 NODE 页只存键+指针,叶子 LEAF 页存行+双向链表指针);树高断言(千万行表 index tree height=3——information_schema INNODB_SYS_INDEXES 或诊断页);范围扫描断言(叶子链表顺序读——explain range+页读取模式);哈希对照(Memory 引擎等值快/范围扫全表)——数据库模块 B+ 树实验可复用。预期:树高与容量推导吻合。"),
+      block("追问链:索引结构三刀", "一刀:LSM 树=写优化(先写 memtable+WAL→批量刷 SSTable→后台 compaction)——读需多层查找(布隆过滤器缓解);B+ vs LSM=读优化 vs 写优化。二刀:页分裂与合并=插入中间→分裂(50/50);删除过半→合并——随机主键的分裂代价(第 49 题主键同源)。三刀:索引下推 ICP=where 条件部分在索引层先过滤(减少回表——EXTRA: Using index condition)。"),
+    ],
+    ["非叶子只存键,叶子存数据带链表", "千万行 3 层,IO 决定树形", "红黑树内存用,哈希无范围"], [mysql, r.explain],
+  ),
+  "legacy/95": deep(
+    "MVCC 实现原理？Read View 是什么",
+    "网银并发读沙盘:报表读不阻塞转账写——InnoDB 版本链(undo log)+Read View 可见性判定;RC 每语句新快照,RR 首读复用(第 43 题隔离级别同源)。",
+    [
+      "三个组件:隐藏列(trx_id=最后修改事务 id,roll_pointer=指向 undo 旧版本)+undo log 版本链(每行历史版本串联,最新→旧遍历)+Read View(事务快照:m_ids=生成时活跃事务集合,min/max_trx_id=低/高水位,creator_trx_id=本事务)。",
+      "可见性判定(沿版本链从新到旧找第一个可见版本):trx_id==creator→可见(自己的修改);trx_id<min→可见(快照前已提交);trx_id>=max→不可见(快照后开启);min<=trx_id<max→查 m_ids:在活跃集=不可见(未提交),不在=可见(已提交)——不可见则沿 roll_pointer 找上一版本继续判。",
+      "RC vs RR 的差别只在 Read View 生成时机:RC=每条语句生成新 Read View(总能看到最新已提交→不可重复读);RR=事务首次快照读生成并复用(整事务同一快照→可重复读)——MVCC 机制相同,快照时机不同(第 43 题实验对照的原理根)。",
+    ],
+    [
+      block("机制:MVCC 为什么读不阻塞写", "读走版本链(快照读,无锁)与写(当前读,加锁)并行——读写不互斥=并发度大增;代价=旧版本存储(undo 膨胀:长事务期间旧版本不能清理→undo 表空间涨+清理线程被拖慢)——“长事务是 MVCC 的天敌”:事务开 1 小时,这 1 小时的所有历史版本都得留着(第 137 题长事务监控同源)。"),
+      block("反例:MVCC 的两种事故", "事故一:长事务+高频写表——undo 持续膨胀(磁盘涨/查询变慢——沿版本链遍历变长);修复=拆小事务+information_schema INNODB_TRX 监控长事务告警。事故二:误以为 MVCC 全程无锁——快照读无锁,但 update/for update 是当前读(加锁)——MVCC 只优化“读”,写并发仍靠锁(第 43 题混合读写的漂移问题同源)。"),
+      block("取舍:快照时机的设计含义", "RC=新鲜度优先(每次看最新已提交,适合读最新状态的短查询);RR=稳定性优先(同一快照,适合报表/对账/一致读);业务把关键读写进同一事务+显式当前读(for update)才强一致——MVCC 提供“不阻塞的一致读”,不替代“强一致的写序”。"),
+    ],
+    [
+      block("验证:可见性的实测走查", "验证:RC 断言(A 事务两次读同一行,B 中间提交修改→两次值不同);RR 断言(同场景两次值相同——快照复用);活跃集断言(B 未提交时 A 的 Read View 判其不可见,B 提交后新语句(RC)可见);版本链断言(锁分析/undo 空间观测:长事务期间 undo 不回收——数据库模块 19 题 Read View 实验同源可复跑)。预期:四条判定规则与两级别对照全部成立。"),
+      block("追问链:MVCC 三刀", "一刀:undo 回收=purge 线程清理无 Read View 引用的版本——长事务阻塞 purge(历史列表长度监控)。二刀:幻读的 MVCC 面=快照读防幻(新插入行 trx_id>=max 不可见);当前读防幻靠 next-key 锁(第 43 题)。三刀:大事务定位=INNODB_TRX 的 trx_started/trx_rows_locked+performance_schema——长事务治理的日常抓手。"),
+    ],
+    ["隐藏列+版本链+Read View 三件套", "判定:自己的/已提交的可见", "RC 每语句新快照,RR 首读复用"], [mysql, r.isolation],
+  ),
+
+
+  // ---- x-leg2-p6 ----
+'legacy/94': deep(
+    '联合索引的最左前缀？覆盖索引？索引下推',
+    '网银查询沙盘:联合索引 (a,b,c)——查询 WHERE a=? AND b=? 走索引;WHERE b=? 不走(缺最左前缀);SELECT a,b,c 覆盖索引(不回表);ICP 索引下推(存储引擎层先过滤,减少回表)。database-advanced 2/6 题的完整版。',
+    [
+      '最左前缀:联合索引按 (a,b,c) 排序——查询条件必须从最左列开始连续匹配(a=?/a=? AND b=?/a=? AND b=? AND c=? 均可;a=? AND c=? 部分使用;仅 b=? 或 c=? 不走)——范围条件(>,<,BETWEEN)后的列不再参与索引定位(但可参与 ICP 过滤)。',
+      '覆盖索引:查询的所有列都在索引中(SELECT a,b,c,索引 (a,b,c) 覆盖)→无需回表(EXPLAIN Extra=Using index)——覆盖索引避免回表的随机 IO,性能提升显著;设计:将高频查询列加入索引(空间换时间)。',
+      '索引下推(ICP):MySQL 5.6+——查询条件部分列在索引中→存储引擎层先过滤(减少回表次数)→EXPLAIN Extra=Using index condition;ICP 只对二级索引生效(聚簇索引即整行,无需下推)——条件列必须在索引列中(第 6 题 database-advanced)。',
+    ],
+    [
+      block('机制:索引的 B+ 树结构与最左前缀', '联合索引 (a,b,c) 的 B+ 树按 a→b→c 排序:先按 a 排,a 相同按 b 排,b 相同按 c 排——跳过 a 直接查 b=树的排列不对(无法二分)→不走索引;类比字典:按"姓→名"排序,跳过姓查名=要遍历全字典。'),
+      block('反例:索引使用的两种事故', '事故一:范围条件后索引失效——WHERE a=1 AND b>5 AND c=3——b 范围后 c 无法精确定位(但 ICP 可过滤);修复=调整索引列顺序(把等值条件放前,范围放后)。事故二:隐式类型转换——varchar 列接数字字面量→类型转换→索引失效(EXPLAIN type=ALL);修复=统一类型(database-advanced 2 题)。'),
+      block('取舍:索引的设计权衡', '索引越多→写入越慢(每个索引都要维护)+空间越大;索引越少→查询慢——按"查询频率×查询模式"设计索引(高频查询的组合条件→联合索引);冗余索引(单列索引被联合索引前缀覆盖)清理(第 50 题数据库索引优化)。'),
+    ],
+    [
+      block('验证:索引的走查核对', '验证:EXPLAIN 走查——type(ref/range/index/ALL)+key(使用的索引)+Extra(Using index condition/Using index/Using filesort);四场景断言(最左前缀匹配/覆盖索引不回表/ICP 减少回表/范围后失效)——database-advanced 2/6 题的实测可复用;EXPLAIN ANALYZE 的 actual rows 对照(第 11 题数据库)。'),
+      block('追问链:索引三刀', '一刀:"索引列顺序的影响?"——等值列在前,范围列在后(等值可精确定位,范围后失效);排序列跟随(GROUP BY/ORDER BY 列加入索引避免 filesort)。二刀:"前缀索引?"——长字符串列(如 URL)用前缀索引(col(20))节省空间——但前缀索引无法覆盖索引(不包含完整列值);选择性(不同前缀值的区分度)决定前缀长度。三刀:"索引的维护成本?"——每个索引增加 INSERT/UPDATE/DELETE 的开销(维护 B+ 树)——索引不是免费的,按查询频率设计(第 50 题数据库)。'),
+    ],
+    ['最左前缀,跳过左列不走索引', '覆盖索引不回表,ICP 引擎层过滤', '索引设计=查询频率×维护成本'], [r.explain, pod],
+  ),
+  'legacy/96': deep(
+    '间隙锁、临键锁？幻读如何解决',
+    '网银事务沙盘:RR 隔离级别下 SELECT FOR UPDATE 对范围查询加 next-key 锁(记录锁+间隙锁)——防止幻读(其他事务插入范围内新行);RC 下无间隙锁但有幻读。database-basics 22 题的完整版。',
+    [
+      '三种锁:记录锁(Record Lock,锁单条索引记录)、间隙锁(Gap Lock,锁索引记录之间的间隙——防插入,不锁记录本身)、临键锁(Next-Key Lock=记录锁+间隙锁,左开右闭区间)——RR 下默认 next-key;RC 下只有记录锁(无间隙锁→有幻读)。',
+      '幻读解决:RR 快照读靠 MVCC(Read View 一次建立);当前读(SELECT FOR UPDATE/UPDATE)靠 next-key 锁(间隙锁防插入)——两种读不同机制(database-basics 17 题);写偏差 RR 仍可能(第 25 题 database-advanced)。',
+      '唯一索引的退化:等值命中唯一索引已有记录→退化为纯记录锁(不需要间隙锁——记录存在,无间隙可插入);等值未命中→间隙锁(防止插入相同值)——database-basics 22 题的区间形状与退化规则。',
+    ],
+    [
+      block('机制:间隙锁的"防插入"语义', '间隙锁锁的不是记录而是"间隙"(索引中相邻记录之间的空隙)——防止其他事务在间隙中插入新行(防幻读);间隙锁之间不冲突(两个事务可同时持有同一间隙的间隙锁——都只防插入不防读取);间隙锁与插入意向锁冲突(插入意向锁等待间隙锁释放)。'),
+      block('反例:间隙锁的两种事故', '事故一:不必要的间隙锁——RC 级别够用的场景用 RR→间隙锁增加死锁风险与锁范围;修复=按业务一致性需求选隔离级别(第 103 题转账隔离)。事故二:间隙锁导致的死锁——两个事务都持间隙锁→都尝试插入→互相等待(间隙锁不冲突但插入意向锁冲突)→死锁;修复=统一插入顺序或改 RC。'),
+      block('取舍:RR vs RC 的选择', 'RR:间隙锁防幻读+一致性读(快照稳定)——但锁范围大(间隙锁)+死锁风险高;RC:无间隙锁(锁范围小,并发好)+有幻读——大多数互联网公司用 RC(阿里规范);金融核心用 RR(一致性优先,第 103 题)——选择=一致性要求vs并发吞吐的权衡。'),
+    ],
+    [
+      block('验证:间隙锁的走查核对', '验证:database-basics 22 题——键 10/20/30,RR 下 FOR UPDATE 锁定范围;另一连接尝试插入 15(阻塞)/25(阻塞)/35(取决于边界);RC 下同样操作(不阻塞——无间隙锁);SHOW ENGINE INNODB STATUS 查看 LOCK WAIT 结构;performance_schema.data_locks 查看锁详情。验证:锁范围断言与幻读行为断言可程序化(MySQL 实测)。'),
+      block('追问链:锁三刀', '一刀:"next-key 的区间怎么定?"——(负无穷,10],(10,20],(20,30],(30,+无穷)——"记录及其前方间隙"合为一体;等值命中的退化规则(唯一命中→记录锁;未命中→间隙锁;普通索引→next-key+下一区间间隙,第 22 题 database-basics)。二刀:"插入意向锁?"——INSERT 前获取的间隙锁类型(与间隙锁冲突→等待);多个插入意向锁之间不冲突(同一间隙可多事务等待插入)。三刀:"锁的监控?"——performance_schema.data_locks/data_lock_waits(当前锁与等待)+SHOW ENGINE INNODB STATUS(LATEST DETECTED DEADLOCK,第 101 题数据库死锁排查)。'),
+    ],
+    ['记录锁+间隙锁=next-key(左开右闭)', 'RR 快照读 MVCC,当前读 next-key', 'RC 无间隙锁,有幻读但并发好'], [r.lock, r.isolation],
+  ),
+  'legacy/97': deep(
+    'redo log、undo log、binlog 各自作用？两阶段提交',
+    '网银日志沙盘:redo(InnoDB 崩溃恢复,物理日志,循环写)、undo(回滚+MVCC,逻辑日志)、binlog(Server 层,复制+时间点恢复)——两阶段提交(redo prepare→binlog→redo commit)保证 redo 与 binlog 一致。database-basics 28 题的完整版。',
+    [
+      'redo log:InnoDB 引擎层,物理日志(页的修改)——WAL(Write-Ahead Logging,先写日志再写数据页)保证持久性;循环写(ib_logfile0/1 固定大小,checkpoints 推进);崩溃恢复:重启后重放 redo(已提交未刷盘的恢复)。',
+      'undo log:InnoDB 引擎层,逻辑日志(反向操作)——事务回滚(撤销修改)+MVCC(历史版本链,第 19 题数据库);insert 的 undo=删除标记,update 的 undo=旧值;purge 线程清理(长事务阻止清理,第 20 题数据库)。',
+      'binlog:Server 层,逻辑日志(变更事件)——复制(主→从)+时间点恢复(PITR)+审计;三种格式:statement(SQL 语句)/row(行变更)/mixed(自动选择)——两阶段提交:redo prepare→写 binlog→redo commit(崩溃恢复按 redo 状态+binlog 完整性决定)。',
+    ],
+    [
+      block('机制:两阶段提交的一致性保证', '崩溃场景:redo prepare 后崩溃——如果 binlog 完整→提交(复制需要这条)→否则回滚——"redo 与 binlog 要么都写要么都不写"(一致性保证);如果只用 redo 不用两阶段:redo 提交但 binlog 缺失→从库缺数据(不一致)。类比快递:包裹打包(redo prepare)→快递单生成(binlog)→发货(redo commit)——缺快递单=收件方不知道收到了什么。'),
+      block('反例:日志的两种事故', '事故一:innodb_flush_log_at_trx_commit=0——每秒刷盘(而非每事务)→断电丢 1 秒数据;修复=1(每事务刷盘)+sync_binlog=1(binlog 也刷盘)——性能与持久性的权衡(第 29 题数据库)。事故二:undo 长事务阻止清理——长事务持有旧 Read View→purge 无法清理历史版本→undo 膨胀;修复=监控长事务(information_schema.innodb_trx)+拆分长事务(第 20 题数据库)。'),
+      block('取舍:binlog 格式的选择', 'statement:日志量小但非确定性函数(NOW/UUID)主从不一致;row:日志量大但精确(行变更);mixed:自动选择(默认 statement,不安全时切 row)——金融场景推荐 row(精确+可审计)+binlog_row_image=FULL(全列)或 MINIMAL(变更列,省空间)。'),
+    ],
+    [
+      block('验证:三种日志的走查核对', '验证:redo 断言(崩溃后重启→redo 重放恢复——理论推演,未实际断电);undo 断言(回滚事务→数据还原);binlog 断言(binlog 格式与事件内容——mysqlbinlog 工具查看);两阶段提交断言(崩溃恢复按 redo 状态+binlog 判断——database-basics 28 题的内部两阶段提交)。验证:日志断言可程序化(MySQL 实测+崩溃模拟)。'),
+      block('追问链:日志三刀', '一刀:"redo 的 WAL 为什么快?"——WAL 先写日志(redo,顺序写)再写数据页(随机写)——顺序写比随机写快数倍;数据页延迟刷盘(合并多次修改)——WAL=将随机写转化为顺序写。二刀:"binlog 与 redo 的区别?"——binlog=Server 层,逻辑日志(所有引擎共用),追加写;redo=InnoDB 层,物理日志(仅 InnoDB),循环写——分工:redo 管崩溃恢复,binlog 管复制与 PITR。三刀:"undo 的 MVCC 链?"——每行隐藏列 trx_id+roll_pointer→undo log 的历史版本链→Read View 沿链判断可见性(第 19 题数据库 MVCC 版本链与可见性判定)。'),
+    ],
+    ['redo 恢复,undo 回滚+MVCC,binlog 复制', '两阶段提交保证 redo-binlog 一致', 'WAL=顺序写替代随机写'], [r.redo, r.binlog],
+  ),
+  'legacy/98': deep(
+    '慢 SQL 排查流程？explain 关键字段',
+    '网银 DBA 沙盘:慢查询日志(slow_query_log)捕获慢 SQL→EXPLAIN 分析执行计划(type/key/rows/Extra)→优化(索引/改写/架构)→验证(执行时间对比)——database-advanced 2/11 题的完整版。',
+    [
+      '排查五步:一,慢查询日志(long_query_time+log_queries_not_using_indexes)捕获;二,EXPLAIN(type=ALL 全扫/key=NULL 未走索引/rows/Extra=filesort/temporary);三,优化(索引/改写/结构);四,验证(EXPLAIN 对照+耗时);五,持续监控。',
+      'EXPLAIN 关键字段:type(const>eq_ref>ref>range>index>ALL)、key(实际索引)、rows(预估扫描数)、Extra(Using index 覆盖/Using filesort 排序/Using temporary 临时表/ICP)——四个字段定位 90% 问题(第 48 题详版)。',
+      '优化方向:加索引(联合索引按最左前缀,第 94 题)/SQL 改写(子查询→JOIN/OR→UNION,第 2 题数据库)/分页优化(游标替代 OFFSET,第 14 题 database-advanced)/架构(读写分离/缓存,第 137 题)——每步优化后 EXPLAIN 验证(不是"加了索引就行")。',
+    ],
+    [
+      block('机制:EXPLAIN 的"成本估算"与"实际执行"', 'EXPLAIN=优化器的成本估算(type/rows/key——基于统计信息,可能不准);EXPLAIN ANALYZE=实际执行(MySQL 8.0.18+,actual rows/actual time/loops)——估算与实际的偏差=统计信息失真的信号(ANALYZE TABLE 更新统计);database-basics 11 题详解 TREE 输出。'),
+      block('反例:慢 SQL 的两种事故', '事故一:只加索引不改 SQL——SQL 写法导致索引失效(隐式转换/函数操作列/前导通配,第 2 题数据库)——索引加了但没用上;修复=改写 SQL(让条件可走索引)。事故二:索引加了但优化器不走——统计信息过时(表数据变化后未 ANALYZE)→优化器误判成本;修复=ANALYZE TABLE 更新统计或 force index(最后手段,第 2 题数据库取舍)。'),
+      block('取舍:SQL 优化与应用层的分工', 'SQL 层优化:索引/改写/参数(数据库层面);应用层优化:缓存(第 20 题缓存)/异步(第 39 题)/批量(第 125 题批处理)/分页(游标)——SQL 优化有上限(数据量太大SQL 也慢),应用层优化无上限——按"优化成本与收益"分层。'),
+    ],
+    [
+      block('验证:慢 SQL 的走查核对', '验证:慢查询日志断言(long_query_time=1 捕获>1s 的 SQL);EXPLAIN 断言(type/key/rows/Extra 各字段解读);EXPLAIN ANALYZE 断言(actual rows vs 估算 rows——偏差=统计失真);优化验证断言(加索引后 type 从 ALL→ref+rows 减少+执行时间下降)。验证:database-advanced 2/11 题的实测可复用(EXPLAIN ANALYZE 对照)。'),
+      block('追问链:SQL 三刀', '一刀:"慢 SQL 的根因分类?"——索引缺失(全表扫)/索引失效(写法导致不走)/数据量(单表太大)/锁等待(第 101 题死锁)/服务器资源(CPU/IO)——分类决定优化方向(加索引/改 SQL/分库/调参)。二刀:"EXPLAIN 的 Extra 详解?"——Using index(覆盖)/Using where(服务器过滤)/Using index condition(ICP)/Using filesort(额外排序)/Using temporary(临时表)——每种 Extra 对应不同的优化方向。三刀:"慢 SQL 的预防?"——SQL 审计上线前(第 151 题代码评审的 SQL 检查)+慢查询日志持续监控+性能基线(EXPLAIN ANALYZE 基线,第 49 题)——预防优于排查。'),
+    ],
+    ['慢 SQL 五步:日志→EXPLAIN→优化→验证→监控', 'type=ALL 全表扫,Extra 看细节', '每步优化后 EXPLAIN 验证'], [r.explain, sre],
+  ),
+  'legacy/99': deep(
+    '深分页如何优化',
+    '网银报表沙盘:LIMIT 1000000, 20——MySQL 需扫描前 1000020 行丢弃前 1000000 行(OFFSET 越深越慢);优化=游标分页(WHERE id > last_id LIMIT 20)或覆盖索引子查询。database-advanced 14 题的完整版。',
+    [
+      '深分页的问题:LIMIT offset, size→MySQL 扫描 offset+size 行→丢弃 offset 行→返回 size 行——OFFSET=1000000→扫描 1000020 行(绝大多数被丢弃);耗时随 offset 线性增长(第 14 题 database-advanced 的"数数vs坐标"类比)。',
+      '游标分页(推荐):WHERE id > last_seen_id ORDER BY id LIMIT 20——从上次位置继续(索引定位精确,不扫描丢弃行)——条件=id 单调递增(自增主键/时间+id 复合游标);不支持跳页(只支持"下一页/上一页")。',
+      '覆盖索引子查询:SELECT * FROM t INNER JOIN (SELECT id FROM t WHERE 条件 ORDER BY id LIMIT 1000000,20) AS tmp ON t.id=tmp.id——子查询走覆盖索引(不回表,只扫 ID)→外层按 ID 精确查找——支持跳页,但 OFFSET 依然随页深增加。',
+    ],
+    [
+      block('机制:OFFSET 的成本为什么随页深线性增长', 'LIMIT 1000000,20=扫描前 1000020 行→丢前 1000000 行→返回 20 行——扫描量=offset+size,offset 越大扫描越多;游标分页=索引定位到 last_id→扫描 20 行(常数成本)——OFFSET 的成本是"从第一行开始数数",游标是"从书签开始读"(database-advanced 14 题的类比)。'),
+      block('反例:深分页的两种事故', '事故一:OFFSET 1000000→30 秒超时(运营报表翻到深页);修复=游标分页或覆盖索引子查询。事故二:游标分页的游标失效——游标参数(last_id)由客户端伪造(跳到非授权数据);修复=游标参数由服务端下发(客户端透传)+游标绑定查询条件(第 10 题database-advanced)。'),
+      block('取舍:游标 vs OFFSET 的产品边界', '游标:成本恒定但不支持跳页(产品允许时优先);OFFSET:支持跳页但深页慢(限最大页深);搜索引擎(Elasticsearch):search_after(游标)或 scroll(快照)——产品与技术的协同:产品侧限制深翻页(导出替代)。'),
+    ],
+    [
+      block('验证:深分页的走查核对', '验证:OFFSET 对照(LIMIT 1000000,20 vs LIMIT 0,20 的耗时——前者显著慢);游标断言(WHERE id>last_id LIMIT 20 的耗时恒定);覆盖索引断言(子查询走索引不回表);database-advanced 14 题的实测(同秒 100 条的漏读+游标修复)。验证:耗时对照可程序化(同环境不同方案计时)。'),
+      block('追问链:分页三刀', '一刀:"排序键的选择?"——游标排序键必须唯一且有序(created_at,id 复合——同秒并列由 id 补齐);不唯一的排序键=漏读或重读。二刀:"总页数怎么显示?"——游标分页不支持总页数(需要 COUNT 全表——成本高);产品侧"下一页/上一页"替代页码跳转(第 14 题 database-advanced)。三刀:"ES 的深分页?"——from+size 也有限制(默认 10000);search_after(游标)+PIT(时间点快照)——ES 与 MySQL 的深分页策略同构。'),
+    ],
+    ['OFFSET 扫描丢弃,成本随页深线性', '游标分页恒定成本,不支持跳页', '覆盖索引子查询是折中方案'], [r.select, pod],
+  ),
+  'legacy/100': deep(
+    '主从复制原理？主从延迟的原因与处理 - 要点：binlog → relay log → 重放；延迟原因：大事务、从库压力大、单线程回放；处理：并行复制、拆大事务、关键读走主库',
+    '网银高可用沙盘:主库 binlog→从库 I/O 线程接收→relay log→SQL 线程回放——主从延迟=网络+回放耗时(大事务/从库压力/单线程回放);处理=并行复制/拆大事务/关键读走主库(第 137 题读写分离的完整版)。',
+    [
+      '复制三线程:主库 binlog dump thread(发送 binlog)→从库 I/O thread(接收写 relay log)→从库 SQL thread(回放 relay log)——复制是异步的(主库不等从库,提交即返回);延迟=从库回放跟不上主库写入。',
+      '延迟的原因:大事务(一个事务回放需要与执行等长时间——主库 10s 的事务从库也要 10s)、从库压力大(从库还承担读查询)、单线程回放(MySQL 5.6 前 SQL 线程单线程——MySQL 5.7+ 并行复制按库/事务并行)。',
+      '处理:并行复制(MYSQL 5.7+: slave_parallel_type=LOGICAL_CLOCK——基于组提交的并行回放)/拆大事务(批量更新拆小批)/关键读走主库(写后读一致性,第 137 题)/监控(Seconds_Behind_Master+pt-heartbeat 更精确)。',
+    ],
+    [
+      block('机制:为什么主从延迟"不可避免"', '异步复制=主库不等从库(性能优先,不做 2PC)——延迟=主库提交速度-从库回放速度的差值累积;半同步复制(至少一个从库确认)减少丢失风险但仍不等所有从库;组复制(MGR)多数派确认(更强但更慢)——复制模式的选择=RPO 与写延迟的权衡(第 137 题)。'),
+      block('反例:主从延迟的两种事故', '事故一:改密码后从库读——读到旧密码→登录失败(写后立读走主库,第 137 题);修复=会话粘滞或关键读走主。事故二:延迟 30 秒无告警——从库延迟飙升无人知(报表数据全错);修复=延迟监控告警(阈值=业务可接受窗口)+pt-heartbeat(比 Seconds_Behind_Master 更准确)。'),
+      block('取舍:延迟的容忍度与业务分档', '容忍延迟的场景:报表/分析/搜索(分钟级延迟可接受);不容忍:交易确认/登录验证(写后立读)——按查询场景分档(第 26 题一致性分档同构)——分档的结果决定路由策略(关键读走主,展示读走从)。'),
+    ],
+    [
+      block('验证:主从延迟的走查核对', '验证:延迟测量(主库写入时间戳→从库读到时间戳的差值);Seconds_Behind_Master 对照(pt-heartbeat 更准确——SBM 只测量 SQL 线程的滞后);并行复制对照(开启 slave_parallel_workers 后延迟下降);写后读一致性断言(交易确认走主库)。验证:延迟的断言可程序化(MySQL 实测,第 137 题声明本机未运行 MySQL)。'),
+      block('追问链:延迟三刀', '一刀:"binlog 格式对延迟的影响?"——row 格式日志量大(I/O+网络开销增)但精确;statement 日志量小但非确定性函数不一致(第 97 题 binlog 格式)——row 是当前主流(准确性优先)。二刀:"从库还能怎么用?"——报表/分析(从库专用)/备份(从库做备份不影响主)/延迟从库(特意延迟 N 小时的从库,防误操作恢复)——从库的角色不只是"读分流"。三刀:"GTID?"——全局事务标识(自动定位复制位点——替代手动 file+position);GTID 简化主从切换与故障恢复(自动找位点)。'),
+    ],
+    ['异步复制=延迟不可避免', '大事务=回放等长时间', '关键读走主,展示读走从'], [sre, pod],
+  ),
+  'legacy/101': deep(
+    '死锁如何产生、如何排查 - 要点：加锁顺序不一致；show engine innodb status 查看；统一加锁顺序、缩小事务范围、失败重试',
+    '网银事务沙盘:事务 A 锁行 1 等行 2,事务 B 锁行 2 等行 1——InnoDB wait-for 图检测→回滚代价小的一方→应用重试;排查=SHOW ENGINE INNODB STATUS 的 LATEST DETECTED DEADLOCK 段(第 101 题数据库死锁的完整版)。',
+    [
+      '死锁的产生:加锁顺序不一致(事务 A 按行 1→2,事务 B 按行 2→1)+并发(两个事务同时执行)→循环等待;InnoDB 的检测=wait-for 图(是否有环)→选择回滚代价小的事务(undo 量少的一方)。',
+      '排查:SHOW ENGINE INNODB STATUS→LATEST DETECTED DEADLOCK 段列两个事务的 SQL/持有锁/等待锁/锁模式——两段对照=还原谁先拿的谁在等(第 101 题 database-basics 详解)。',
+      '避免:统一加锁顺序(按 ID 排序)+缩小事务范围(短事务)+索引优化(减少锁范围)+失败重试(捕获 deadlock/lock-wait 错误→退避重试,第 119 题幂等键)。',
+    ],
+    [
+      block('机制:死锁检测的代价', 'wait-for 图检测:每次锁等待时检查是否有环(锁等待频繁时检测开销增加);innodb_deadlock_detect=ON(默认)可关闭(高并发如热点行更新时关闭死锁检测+依赖锁等待超时 innodb_lock_wait_timeout)——关闭检测的代价=死锁不会被自动回滚(靠超时解锁)——热点行更新场景的取舍(第 122 题热点账户)。'),
+      block('反例:死锁的两种事故', '事故一:死锁重试无幂等——回滚的事务重试时重复执行副作用(第 119 题幂等键缺失);修复=重试携带幂等键。事故二:死锁频率高但被忽略——偶发死锁被"系统繁忙"掩盖(未审计);修复=死锁日志监控(频率告警)+锁序审计(第 101 题 database-basics 的锁序审计)。'),
+      block('取舍:死锁检测开与关的权衡', '开启(默认):自动回滚死锁(应用需处理重试);关闭(热点行场景):减少检测开销,死锁靠锁等待超时解锁——innodb_lock_wait_timeout 默认 50s(太长,热点行场景建议调短如 3-5s)——关闭检测的前提=有超时兜底+应用处理超时重试。'),
+    ],
+    [
+      block('验证:死锁的走查核对', '验证:死锁复现(两个事务反向锁定→InnoDB 检测回滚一方);日志解读断言(LATEST DETECTED DEADLOCK 段的两事务对照);重试断言(捕获 1213 ER_LOCK_DEADLOCK→退避重试→成功);锁序修复断言(统一顺序后零死锁)。验证:database-basics 26 题的锁报告解读+banking 7 题锁序实验可复用。'),
+      block('追问链:死锁三刀', '一刀:"死锁与锁等待超时的区别?"——死锁=循环等待(InnoDB 检测回滚);锁等待超时=等待时间超 innodb_lock_wait_timeout(不一定死锁,可能只是慢)——两种失败的重试策略不同(死锁重试,超时需先诊断)。二刀:"间隙锁死锁?"——两个事务都持间隙锁→都尝试插入→插入意向锁冲突→死锁(间隙锁不冲突但插入冲突,第 96 题间隙锁);修复=RC 或统一插入顺序。三刀:"热点行更新的死锁?"——热点行(秒杀库存)大量并发更新→锁排队(非死锁但吞吐低,第 122 题)+死锁(不同顺序触达多行)——热点行的解法=Redis 预扣/影子账户/排队(第 122 题)。'),
+    ],
+    ['InnoDB wait-for 图自动检测回滚', 'LATEST DETECTED DEADLOCK 两事务对照', '锁序统一+幂等重试=死锁防线'], [r.deadlock, sre],
+  ),
+  'legacy/102': deep(
+    '大表 DDL、加索引如何不影响线上',
+    '网银 DBA 沙盘:2 亿行大表加索引——MySQL 8.0 Online DDL(ALGORITHM=INPLACE, LOCK=NONE)+gh-ost(触发器替代,可控暂停)+pt-online-schema-change——三种方案的选择与风险。',
+    [
+      'Online DDL(MySQL 8.0):INPLACE(不重建表,索引直接在原表上构建)+LOCK=NONE(允许并发 DML)——大多数 ADD INDEX/ADD COLUMN 支持 INPLACE;例外:改列类型/缩短列长度=需要 COPY(锁表)——先查 ALGORITHM 支持矩阵。',
+      'gh-ost:Ghost(影子表+binlog 同步+原子切换)——不使用触发器(pt-osc 用触发器有性能开销)→解析 binlog 同步变更;可暂停/限速/切换控制——大表(亿级)推荐 gh-ost(可控性最好)。',
+      'pt-online-schema-change:触发器同步(原表触发器→影子表)+rename 原子切换——触发器开销(每行写两份)+锁风险;gh-ost 的优势=无触发器(用 binlog)+可限速(保护主库)。',
+    ],
+    [
+      block('机制:Online DDL 的"并行"原理', 'ADD INDEX 的 INPLACE:构建临时索引文件→同时应用 DML 变更(online log)→合并(重建索引末尾应用 DML log)——DML 与 DDL 并行(InnoDB 的 online log 保证不丢);MDL 锁(Metadata Lock)在 DDL 开始与结束时短暂获取(如果长事务持 MDL→DDL 等待→后续所有查询阻塞——DDL 前查长事务)。'),
+      block('反例:DDL 的两种事故', '事故一:长事务阻塞 DDL——DDL 需要 MDL 排他锁→长事务持有 MDL 共享锁→DDL 等待→后续所有查询排在 DDL 后面(全库阻塞);修复=DDL 前检查长事务(information_schema.innodb_trx)+设 lock_wait_timeout(超时放弃)。事故二:DDL 大事务产生的 binlog 回放慢——从库回放 DDL 的时间=主库执行时间(大表 DDL 从库延迟飙升,第 100 题);修复=gh-ost 的可控限速+从库延迟监控。'),
+      block('取舍:三种方案的选择', 'Online DDL:MySQL 原生+简单(DDL 语句直接跑)+风险=MDL 锁+不可暂停;gh-ost:可控(暂停/限速/切换)+无触发器+风险=额外存储+延迟(通过 binlog 同步);pt-osc:成熟工具+触发器开销+大表性能差——按表大小(千万以下 Online DDL,亿级 gh-ost)+可控性需求选。'),
+    ],
+    [
+      block('验证:DDL 的走查核对', '验证:Online DDL 断言(ALGORITHM=INPLACE 成功+DML 并行执行不阻塞);gh-ost 断言(限速生效/暂停/切换原子);MDL 风险断言(长事务+DDL→后续查询阻塞——复现并预防);从库延迟断言(DDL 期间从库延迟+gh-ost 限速后缓解)。验证:DDL 的断言可在测试环境复现(生产 DBA 评审执行)。'),
+      block('追问链:DDL 三刀', '一刀:"DDL 的 ALGORITHM 有哪些?"——COPY(重建表,锁表)/INPLACE(原表修改,不锁)/INSTANT(仅元数据,秒级——ADD COLUMN MySQL 8.0.12+)——优先 INSTANT>INPLACE>COPY(ALGORITHM=INPLACE 显式声明,不支持则报错不静默降级)。二刀:"列类型变更的风险?"——改列类型可能需要 COPY(锁表)+数据截断风险(长度缩小)+索引重建——类型变更=最高风险 DDL,需 DBA 评审+备份+回滚方案。三刀:"DDL 的回滚?"——Online DDL 的回滚=执行反向 DDL(加的索引删掉)+耗时(与正向相同);gh-ost 的回滚=切回原表(秒级)——gh-ost 的回滚更可控(大表场景)。'),
+    ],
+    ['Online DDL:INPLACE+LOCK=NONE', 'gh-ost=无触发器+可控暂停+限速', 'DDL 前查长事务,防 MDL 阻塞'], [sre, pod],
+  ),
+  'legacy/103': deep(
+    '转账场景下事务隔离级别怎么选？SELECT ... FOR UPDATE 如何使用',
+    '网银核心沙盘:转账的隔离级别=REPEATABLE READ(InnoDB 默认)+SELECT FOR UPDATE(悲观锁锁定账户行)——隔离级别的选择=一致性与并发吞吐的权衡(banking 场景的一致性优先)。',
+    [
+      '转账的隔离级别:REPEATABLE READ(InnoDB 默认)——快照读(MVCC)+当前读(FOR UPDATE 的 next-key 锁)防幻读;READ COMMITTED:并发更好(无间隙锁)但不可重复读(两次读可能不同)——转账的一致性要求=RR(余额不变式:扣款与入账在同一事务的同一快照)。',
+      'SELECT FOR UPDATE:悲观锁(锁定 SELECT 的行,其他事务阻塞)——用法:BEGIN→SELECT FOR UPDATE(锁定账户行)→检查余额→UPDATE→COMMIT——FOR UPDATE 必须在事务内(否则锁立即释放无意义);条件=WHERE id=?(精确匹配,不走索引则锁全表)。',
+      '替代:条件 UPDATE(SET balance=balance-? WHERE id=? AND balance>=?——检查与扣减合一,原子);乐观锁(版本号条件 UPDATE,冲突重试,第 122 题)——FOR UPDATE 适合先查后判,条件 UPDATE 适合直接扣减。',
+    ],
+    [
+      block('机制:FOR UPDATE 与条件 UPDATE 的选择', 'FOR UPDATE=先读后写(需要读取数据做业务判断——如检查账户状态/风控规则);条件 UPDATE=直接写(扣减逻辑简单——余额足够即扣)——条件 UPDATE 更高效(单条语句原子,无额外锁持有时间);FOR UPDATE 更灵活(读取后复杂判断)——按"业务逻辑的复杂度"选。'),
+      block('反例:转账事务的两种事故', '事故一:FOR UPDATE 不走索引——WHERE 无索引列→锁全表扫描的所有行(锁升级为表级效果);修复=WHERE 条件走索引(主键/唯一索引)。事故二:事务中夹远程调用——FOR UPDATE 锁住账户行→调用外部接口(2s)→锁持有 2s→并发排队雪崩(第 10 题分布式事务的阻塞窗口);修复=远程调用移出事务。'),
+      block('取舍:RR vs RC 在转账场景的选择', 'RR(默认):一致性读稳定+next-key 锁防幻读——但间隙锁增加死锁风险(第 96 题);RC:并发好(无间隙锁)但不可重复读——转账场景的一致性要求=RR(余额在同一事务内不变);互联网公司用 RC(阿里规范)+条件 UPDATE(避免 FOR UPDATE 的间隙锁)——选择=一致性等级(金融 RR)vs并发(RC)。'),
+    ],
+    [
+      block('验证:转账事务的走查核对', '验证:FOR UPDATE 断言(锁定后其他事务 SELECT 阻塞→UPDATE 提交后释放);条件 UPDATE 断言(余额不足→受影响行数=0);隔离级别断言(RR 下两次读一致/RC 下可读新值);并发扣减断言(500 并发→条件 UPDATE 零超卖,第 122 题实测)。验证:database-basics 22/26 题的锁行为+banking 7 题锁序实验可复用。'),
+      block('追问链:转账三刀', '一刀:"转账的幂等?"——唯一流水号+唯一索引(第 119 题)+状态机(处理中→成功/失败——条件迁移)——幂等是转账的底线(重复请求不重复扣款)。二刀:"跨行转账的一致性?"——跨行=外部系统(人行/银联)→无法用数据库事务(第 120 题)——本地事务(扣款)+outbox+渠道确认+对账(第 120/123 题)——跨行一致性=最终一致+对账兜底。三刀:"转账的风控?"——实时限额(第 126 题规则引擎)+行为风控(新收款人+大额→增强验证)+延时到账(大额 24h 可撤销,第 159 题转账系统)。'),
+    ],
+    ['转账=RR+FOR UPDATE 或条件 UPDATE', 'FOR UPDATE 必须在事务内+走索引', '远程调用移出事务,不持锁等待'], [r.lock, r.isolation],
+  ),
+  'legacy/104': deep(
+    'Redis 数据类型与应用场景？为什么快',
+    '网银缓存沙盘:Redis 五大数据类型(String/Hash/List/Set/ZSet)+特殊类型(Bitmap/HyperLogLog/Stream/Geo)——快的原因=内存存储+单线程无锁+IO 多路复用+高效数据结构。',
+    [
+      '五大数据类型:String(缓存/计数器/分布式锁 SETNX)、Hash(对象/购物车)、List(LPUSH/BRPOP 队列/时间线)、Set(去重/共同好友 SINTER/抽奖)、ZSet(排行榜/延迟队列 ZADD/ZRANGEBYSCORE)。',
+      '特殊类型:Bitmap(签到/在线状态——SETBIT/BITCOUNT,百万用户仅 125KB)、HyperLogLog(基数统计——UV 估算,0.81% 误差,12KB 固定内存)、Stream(消息队列——XADD/XREADGROUP,消费者组)、Geo(地理位置——GEOADD/GEOSEARCH)。',
+      'Redis 为什么快:一,内存存储(内存访问 vs 磁盘 IO);二,单线程无锁竞争(命令队列,无上下文切换——6.0 IO 多线程但命令仍单线程);三,IO 多路复用(epoll——单线程处理数万连接);四,高效数据结构(SDS 动态字符串/跳表 ZSet/压缩列表 ziplist→listpack)。',
+    ],
+    [
+      block('机制:每种类型的底层数据结构', 'String=SDS(简单动态字符串——预分配+惰性释放,二进制安全);Hash=ziplist(小哈希,紧凑)或 hashtable(大哈希);List=quicklist(双向链表+ziplist 节点);Set=intset(整数集合)或 hashtable;ZSet=ziplist 或 skiplist+hashtable(跳表+哈希双结构)——编码转换由元素数与值大小自动决定(小数据省内存,大数据保性能)。'),
+      block('反例:Redis 使用的两种事故', '事故一:大 key(第 142 题热 key/大 key)——100MB JSON→GET 卡 Redis 2 秒;修复=拆分(Hash field)或压缩。事故二:无过期时间的缓存——缓存只加不删→内存耗尽→淘汰策略触发(误删其他 key);修复=SET EX(带 TTL)+maxmemory-policy(allkeys-lru)。'),
+      block('取舍:Redis vs Memcached vs 本地缓存', 'Redis:丰富数据结构+持久化+主从+集群——功能最全;Memcached:纯 KV+多线程(高并发简单 KV)——无持久化/无丰富结构;本地缓存(Caffeine):最快(无网络)+不一致(多实例各自缓存)——多级缓存(L1 本地+L2 Redis)是常见组合(第 142 题热 key)。'),
+    ],
+    [
+      block('验证:Redis 的走查核对', '验证:五类型断言(String SET/GET/INCR;Hash HSET/HGETALL;List LPUSH/BRPOP;Set SADD/SINTER;ZSet ZADD/ZRANGE);性能断言(benchmark:Redis 10 万 QPS vs DB 5000 QPS);特殊类型断言(Bitmap BITCOUNT/HyperLogLog PF COUNT 误差);本机 cache-messaging 批次的 Redis 实验可复用。'),
+      block('追问链:Redis 三刀', '一刀:"Redis 的持久化?"——RDB(快照,恢复快但丢数据)+AOF(追加,丢数据少但文件大)——混合持久化(aof-use-rdb-preamble:RDB 头+AOF 尾,第 107 题 Redis 详解)。二刀:"Redis 的分布式锁?"——SET NX PX+Lua 解锁+看门狗续约(第 108 题Redis 分布式锁详解)。三刀:"Redis 的热 key/大 key?"——热 key=本地缓存+加盐分片(第 142 题);大 key=拆分+UNLINK(异步删除)——发现是治理的前提(--hotkeys/rdb-tools)。'),
+    ],
+    ['内存+单线程+epoll+高效结构=快', '五类型+特殊类型按场景选', '持久化+过期+淘汰是运维三件套'], [sre, pod],
+  ),
+  'legacy/105': deep(
+    '缓存穿透、击穿、雪崩的区别与解决',
+    '网银缓存沙盘:穿透(查不存在的数据→缓存永远 miss→DB 被打)、击穿(热点 key 过期→瞬间大量请求打到 DB)、雪崩(大量 key 同时过期或 Redis 宕机→DB 崩溃)——cache-messaging 批次的专项详解(第 15/33 题)。',
+    [
+      '穿透(查不存在):请求的数据在缓存和 DB 都不存在→每次都打到 DB(缓存永远 miss);解决:布隆过滤器(快速判断"肯定不存在",第 30 题 collections)+缓存空值(不存在的数据也缓存短 TTL)+参数校验(入口拦截非法 ID)。',
+      '击穿(热点 key 过期):热点 key 过期瞬间→大量并发同时 miss→同时打 DB(singleflight 场景);解决:互斥锁(单线程重建缓存,其他等待——分布式 D6:200 并发合并后 1 次)+逻辑过期(物理不过期,值内含过期时间——过期后异步更新)+永不过期(热点数据)。',
+      '雪崩(大量 key 同时过期/Redis 宕机):多个 key 同时过期(同批设置相同 TTL)→DB 瞬间被打;Redis 宕机→全量请求打到 DB;解决:过期时间加随机(TTL±随机偏移)+Redis 高可用(哨兵/集群)+多级缓存(L1 本地+L2 Redis)+限流兜底(第 45 题)。',
+    ],
+    [
+      block('机制:三种场景的"缓存失效"模式', '穿透=缓存"永远 miss"(数据不存在);击穿=热点 key "瞬间 miss"(过期);雪崩=大量 key "同时 miss"(批量过期/宕机)——三者的根因不同(不存在/过期/宕机),解法也不同(布隆过滤器/互斥锁/高可用+随机 TTL)——统一的目标=保护 DB(缓存是 DB 的挡箭牌,箭牌碎了 DB 就暴露)。'),
+      block('反例:缓存防护的两种事故', '事故一:布隆过滤器不更新——删除数据后布隆过滤器仍判"可能存在"→缓存空值占内存;修复=定期重建或计数布隆(第 30 题 collections)。事故二:互斥锁无超时——锁等待超过 DB 恢复时间→请求堆积;修复=锁超时+降级(等待超时→返回默认值或旧缓存)。'),
+      block('取舍:防护的投入与收益', '穿透防护(布隆过滤器):内存成本(布隆过滤器)+误判率(1%);击穿防护(互斥锁/逻辑过期):复杂度增加;雪崩防护(高可用+随机 TTL):运维成本——按"DB 的承受力"决定防护等级(DB 能扛 1000 QPS→穿透 500 QPS 需要防护)。'),
+    ],
+    [
+      block('验证:三场景的走查核对', '验证:穿透断言(查不存在 ID 100 次→DB 查询 100 次→加布隆过滤器后 0 次);击穿断言(热点 key 过期→200 并发同时 miss→加互斥锁后 DB 只查 1 次);雪崩断言(1000 key 同 TTL 同过期→DB 突增→加随机 TTL 后平滑);cache-messaging D6 实验(200 并发同键合并后 1 次)。验证:三种场景的 DB 压力断言可程序化(计数器)。'),
+      block('追问链:缓存三刀', '一刀:"缓存预热?"——上线前主动加载热点数据到缓存(避免上线瞬间穿透);预热的数据源=历史热点+业务预测——预热也是"主动填缓存"(不是等用户触发)。二刀:"多级缓存的一致性?"——L1 本地(应用内存)+L2 Redis:更新时先失效 L2 再失效 L1(广播/版本号)——多级缓存的一致性窗口更大(第 24 题)。三刀:"缓存的监控?"——命中率(hit rate)/ miss 率/DB 回源 QPS/缓存大小——命中率下降=缓存失效问题(穿透/击穿/雪崩的前兆);命中率是缓存的核心指标。'),
+    ],
+    ['穿透=布隆,击穿=互斥,雪崩=高可用+随机 TTL', '统一目标=保护 DB', '命中率是缓存的核心指标'], [sre, owasp],
+  ),
+  'legacy/106': deep(
+    '缓存与数据库一致性方案',
+    '网银缓存沙盘:DB 更新后缓存未同步→读到旧值——方案对比:先更新 DB 再删缓存(Cache-Aside 推荐)/延迟双删/订阅 binlog(Canal)/版本号比对——每种方案的一致性窗口与复杂度不同。',
+    [
+      'Cache-Aside(旁路缓存,推荐):读=缓存 miss→查 DB→回填缓存;写=更新 DB→删除缓存(不是更新缓存)——"先更新 DB 再删缓存"(主流方案,一致性窗口=删除到下次读的间隔);"先删缓存再更新 DB"=并发读回填旧值(SD5 实验:旧值驻留到 TTL)。',
+      '延迟双删:先删缓存→更新 DB→延迟 N ms 后再删一次(删除"并发读回填的旧值")——延迟时间=业务读耗时+缓冲(经验值 500ms-1s);复杂度增加但一致性窗口缩小(SD5 实验的 C 场景:延迟双删后脏窗口收敛到毫秒级)。',
+      '订阅 binlog(Canal/Debezium):DB 变更→binlog→Canal 解析→更新/删除缓存——解耦(应用不感知缓存更新)+可靠(binlog 是 DB 的事实源)+延迟(binlog 传输+解析=秒级);适合"缓存更新逻辑统一收口"的场景(多服务写同一 DB)。',
+    ],
+    [
+      block('机制:为什么"更新缓存"不如"删除缓存"', '更新缓存=并发写时两个写线程交叉(缓存值取决于写入顺序——可能旧值覆盖新值);删除缓存=下次读时回填最新值(天然一致);"更新缓存"还有"更新了但 DB 更新失败"(缓存有值 DB 无值=脏缓存)的风险——删除比更新更安全(lazy 加载语义)。'),
+      block('反例:一致性的两种事故', '事故一:删除缓存失败——DB 更新成功但缓存删除失败(网络/Redis 故障)→脏缓存直到 TTL;修复=重试队列(删除失败→MQ 重试)+TTL 兜底+订阅 binlog(第 106 题 Canal 最终一致)。事故二:并发写+读——写线程 1 更新 DB(A)→写线程 2 更新 DB(B)→删缓存(线程 2)→线程 1 删缓存(顺序反了——缓存=B 但 DB=A?);修复=版本号/分布式锁(强一致场景)或接受短暂不一致(最终一致+TTL)。'),
+      block('取舍:一致性等级的选择', '强一致:分布式锁(写串行)+版本号(读校验)——性能差;最终一致:先更 DB 再删缓存+TTL 兜底+binlog 订阅——秒级窗口(大多数场景可接受);按业务容忍度选(资金=强一致/展示=最终一致,第 26 题分档)。'),
+    ],
+    [
+      block('验证:一致性方案的走查核对', '验证:SD5 实验(先删后更=旧值驻留/先更后删=一致/残余窗口+延迟双删=收敛)——三方案的对照实测;Canal 断言(binlog 订阅→缓存更新——延迟与可靠性);版本号断言(缓存带版本→版本不匹配则回源)。验证:一致性窗口的断言可程序化(写入时间戳与缓存时间戳的差值分布)。'),
+      block('追问链:一致性三刀', '一刀:"读写分离+缓存的一致性?"——缓存+从库(双重延迟:缓存 TTL+主从延迟)→不一致窗口更大;关键读走主库+缓存(第 137 题)。二刀:"多级缓存的一致性?"——L1 本地+L2 Redis:更新时先失效 L2 再广播失效 L1(MQ/版本号)——L1 的失效需要跨实例通知(第 24 题)。三刀:"缓存的 TTL 策略?"——TTL=兜底(最终一致的保证)+随机偏移(防雪崩)+关键数据短 TTL(减少脏窗口)+非关键长 TTL(减少回源)——TTL 是"一致性与性能"的旋钮。'),
+    ],
+    ['先更新 DB 再删缓存(推荐)', '延迟双删缩小脏窗口', 'binlog 订阅=统一收口最终一致'], [sre, pod],
+  ),
+  'legacy/107': deep(
+    'Redis 持久化 RDB 与 AOF？过期与淘汰策略',
+    '网银运维沙盘:RDB(快照,恢复快但丢数据)+AOF(追加命令,丢数据少但文件大)→混合持久化(aof-use-rdb-preamble);过期(惰性+定期)+淘汰(maxmemory-policy 8 种)。',
+    [
+      'RDB:定期快照(save 阻塞/bgsave fork 子进程)——恢复快(直接加载二进制)+文件小;丢数据(最后一次快照后的变更丢失);fork 的代价=bgrewriteaof 时的内存复制(COW)——大实例 fork 耗时(秒级,主线程暂停)。',
+      'AOF:追加写命令(appendonly yes)——丢数据少(everysec 最多丢 1 秒/always 不丢但性能差/no 由 OS 决定)+文件大(AOF 重写 bgrewriteaof 压缩);AOF 重写=根据当前数据生成最小命令集(替代历史命令堆积)。',
+      '混合持久化(aof-use-rdb-preamble=yes,4.0+默认):AOF 文件=RDB 快照头+AOF 增量尾——恢复时先加载 RDB(快)再重放 AOF 增量(丢数据少)——兼得两者优点(Redis 4.0+)。',
+      '过期策略:惰性(访问时检查,过期则删)+定期(周期抽样过期 key 删除——每 100ms 抽样);淘汰策略(maxmemory 达到后):noeviction(默认,拒绝写)/allkeys-lru/allkeys-lfu/allkeys-random/volatile-lru/lfu/random/ttl(仅有过期 key 的子集)。',
+    ],
+    [
+      block('机制:RDB 的 fork 与 COW', 'bgsave 时 fork 子进程(共享父进程内存页——写时复制 COW);父进程修改数据→COW 复制修改的页(子进程看到的是快照);fork 的耗时=页表复制(内存越大越慢,100GB≈秒级)——大实例的 fork 是 RDB 的主要风险(主线程暂停)。'),
+      block('反例:持久化的两种事故', '事故一:AOF everysec 丢 1 秒——金融场景不可接受(交易数据);修复=always(每命令 fsync,性能降 10 倍)或 Redis 只做缓存+DB 做主存储(数据不丢)。事故二:混合持久化未开启——AOF 文件巨大(重写慢)+恢复慢(逐命令重放);修复=开启混合(RDB 头+AOF 尾)。'),
+      block('取舍:持久化策略的选择', '纯缓存(可丢失):RDB 或不持久化(重启从 DB 加载);持久存储(Redis 当主存):AOF always+主从+哨兵(数据安全);混合(缓存+部分持久):混合持久化+everysec——按"Redis 中数据的可丢失程度"选持久化策略(第 104 题Redis 的角色)。'),
+    ],
+    [
+      block('验证:持久化的走查核对', '验证:RDB 断言(bgsave→dump.rdb 生成→重启后数据恢复);AOF 断言(appendonly yes→命令追加→重启重放);混合断言(AOF 文件头=RDB 格式→恢复速度快);过期断言(TTL 到期→惰性/定期删除);淘汰断言(maxmemory→allkeys-lru→LRU key 被逐出)。验证:持久化与过期的断言可程序化(Redis CLI+配置)。'),
+      block('追问链:持久化三刀', '一刀:"AOF 重写的触发?"——auto-aof-rewrite-percentage(100%,文件翻倍时)+auto-aof-rewrite-min-size(64MB 最小值)——重写时 fork(同 RDB 的 COW);重写期间新命令写新旧两个 AOF 缓冲。二刀:"Redis 集群的持久化?"——每个节点独立持久化(RDB/AOF)——节点故障=该节点数据可能丢失(从节点接管,但异步复制可能丢);持久化策略按"节点角色"调整(主节点 AOF everysec,从节点可 RDB)。三刀:"主从+哨兵+持久化的组合?"——哨兵(自动故障转移)+主从(数据冗余)+持久化(重启恢复)——三层高可用:哨兵管切换、主从管冗余、持久化管恢复(第 141 题高可用)。'),
+    ],
+    ['RDB 快照+AOF 追加+混合持久化', 'fork COW=大实例的风险', '淘汰策略=内存满时的行为选择'], [sre, owasp],
+  ),
+  'legacy/108': deep(
+    'Redis 分布式锁：实现、过期时间、误删、Redisson 看门狗',
+    '网银分布式锁沙盘:SET key value NX PX ttl(原子加锁)+Lua 比对 value 删除(原子解锁)+看门狗续约(防业务超时锁过期)+Redlock(多节点,第 108 题Redis 分布式锁的完整版)。',
+    [
+      '基本实现:加锁=SET lock:key uniqueValue NX PX 30000(NX=不存在才设/PX=过期时间);解锁=Lua 脚本(GET 比对 value→相等则 DEL——原子,防误删他人锁);value=持有者标识(UUID+线程 ID——防实例 A 删实例 B 的锁)。',
+      '过期时间的困境:TTL 太短→业务未完成锁过期→另一实例获锁→双持锁(互斥失效);TTL 太长→持有者崩溃后锁长期占用(其他实例等);解决=看门狗(定期续约 TTL——业务完成前锁不过期)——Redisson 的 watchdog 默认 30s,每 10s 续约。',
+      'Redisson:RLock(可重入锁)+watchdog(自动续约)+RLock.tryLock(waitTime, leaseTime)(限时+自动续约)——Redisson 封装了 Lua 解锁/续约/可重入等细节;Redlock=向 N 个独立 Redis 实例同时加锁(过半成功)——解决单点主从切换丢锁(但有争议,第 14 题缓存消息)。',
+    ],
+    [
+      block('机制:主从切换时锁丢失的问题', 'Redis 主从是异步复制:主库 SET NX 成功→未同步到从库→主库宕机→从库晋升→新主库无此锁→另一实例获锁→双持锁——Redis 锁的"不安全窗口"=主从切换瞬间;Redlock(多节点过半)缓解但不能完全解决(Kleppmann 的批评:时钟假设+假死窗口,第 14 题)——结论:Redis 锁做效率层(挡 99%)+资源端 fencing 做正确层(挡最后 1%)。'),
+      block('反例:Redis 锁的三种事故', '事故一:解锁不比对 value——直接 DEL(删了别人的锁);修复=Lua 脚本比对+删除原子操作。事故二:无看门狗——TTL 30s 但任务 60s→30s 后锁过期→双跑;修复=Redisson watchdog 或手动续约(定时延长 TTL)。事故三:锁内调用 RPC 超时——锁在 TTL 内但 RPC 5s 超时→看门狗续约→锁一直持有→其他实例永久等待;修复=RPC 超时预算+锁的 TTL 上限(续约次数限制)。'),
+      block('取舍:Redis 锁 vs ZK 锁 vs 数据库锁', 'Redis:吞吐高(AP,主从切换可能丢锁)+看门狗续约;ZK:可靠(CP,会话断开自动释放)+吞吐低;数据库:SELECT FOR UPDATE+事务释放(最简单+性能最差)——定时任务互斥→Redis 锁(吞吐够+偶发双跑可容忍→幂等兜底);强互斥(资金)→ZK 或数据库锁(可靠性优先)。'),
+    ],
+    [
+      block('验证:Redis 锁的走查核对', '验证:加锁断言(SET NX 成功/重复加锁失败);解锁断言(Lua 比对 value→只删自己的锁);看门狗断言(TTL 自动续约→业务完成前锁不过期);误删断言(实例 A 的锁过期→实例 B 获锁→A DEL→B 的锁不受影响);双持锁推演(主从切换窗口——标注推演,第 14 题)。验证:锁的断言可程序化(Redis CLI+Lua 脚本);D15 租约/栅栏实验(旧 token 写入被拒)。'),
+      block('追问链:锁三刀', '一刀:"Redisson 的 watchdog 细节?"——默认 lockWatchdogTimeout=30s;每 lockWatchdogTimeout/3=10s 续约一次;业务完成后 cancel watchdog+释放锁——看门狗的前提=Redisson 客户端活着(进程崩溃=看门狗停止=锁过期)。二刀:"锁的粒度?"——按资源粒度(lock:order:12345)+按操作类型(lock:order:12345:update)——粒度过粗(全局锁)=不必要的阻塞;过细(每字段一锁)=锁爆炸。三刀:"锁与幂等的关系?"——锁=互斥(同一时刻一个);幂等=重复执行安全(多次执行结果相同)——锁失效时幂等兜底(纵深防线,第 119 题幂等+第 38 题查单先行);锁是优化,幂等是防线。'),
+    ],
+    ['SET NX PX+Lua 解锁+看门狗续约', '主从切换可能丢锁→fencing 兜底', '锁是优化,幂等是防线'], [owasp, sre],
+  ),
+  'legacy/109': deep(
+    'MQ 如何保证消息不丢失、不重复、有序',
+    '网银消息沙盘:消息不丢失(生产者确认+broker 持久化+消费者 ACK)+不重复(幂等消费)+有序(分区单线程)——三个问题的责任在"全链路"而不是单点。',
+    [
+      '消息不丢失三段:生产端(confirm/acks=all+失败重试)、broker 持久化(durable queue+persistent message+副本)、消费端手动 ACK(处理完成才确认,未确认重投)——acks=all+min.insync.replicas≥2+手动 ACK=标准配置(21 题详解)。',
+      '消息不重复:MQ 的投递语义=at-least-once(至少一次——不丢但可能重)→消费者幂等(业务键去重表/唯一索引/状态机,第 22 题+第 119 题)——exactly-once(精确一次)=事务消息+幂等消费的组合(不是 MQ 单方面保证)。',
+      '消息有序:分区内有序(Kafka 的 partition 内有序)——需要有序的消息发送到同一 partition(按业务 key 分区)→单分区单消费者(或内存队列排序)——全局有序=单分区(牺牲吞吐);局部有序=按 key 分区(同 key 有序,跨 key 无序)——"有序"的定义=业务需要的有序范围。',
+    ],
+    [
+      block('机制:不丢失的"三段论"', '消息丢失的三个阶段=生产(发送失败)→存储(broker 宕机)→消费(处理失败但已 ACK)——每阶段有对应的防线:生产=确认机制(同步等待 broker 确认+失败重试);存储=持久化+副本(acks=all 写入 ISR);消费=手动 ACK(处理完成后确认)——三段全保障=不丢;任何一段缺失=丢失风险。'),
+      block('反例:消息可靠性的两种事故', '事故一:自动 ACK——消费者收到消息立即 ACK(处理失败也 ACK)→消息丢失;修复=手动 ACK(处理成功才确认)。事故二:重试无幂等——消费失败重试→重复消费→业务重复(第 119 题);修复=幂等键(去重表)。'),
+      block('取舍:性能与可靠性的权衡', 'acks=all+手动 ACK:最可靠但延迟高(等待确认);acks=1:性能好但可能丢(leader 挂未复制);acks=0:最快但可能丢(不等确认)——按"消息的业务价值"分级(交易消息=可靠,日志消息=性能)——分级配置,不是全局一刀切。'),
+    ],
+    [
+      block('验证:消息可靠性的走查核对', '验证:不丢失断言(生产确认+broker 持久化+消费手动 ACK→kill broker→消息恢复);重复断言(重投→幂等消费→零副作用);有序断言(同 key 消息按序消费);cache-messaging D11 实验(outbox 9955 条原子落库+relay 投递=9955,分叉 0)。验证:三段可靠性的断言可程序化(每段注入故障)。'),
+      block('追问链:MQ 三刀', '一刀:"事务消息(RocketMQ)?"——半消息(先发半消息→执行本地事务→commit/rollback 半消息)——本地事务与消息发送的原子性(outbox 的 MQ 版);RocketMQ 的事务回查(broker 查询生产者事务状态)。二刀:"消息的 TTL 与死信?"——消息超时未消费→死信队列(DLQ)→人工处理或延迟重投——死信是"兜底"不是"垃圾桶"(死信也要处理,第 22 题死信)。三刀:"顺序消费的实现?"——Kafka 同 partition+单消费者线程(分区内有序);RocketMQ MessageQueueSelector(按业务 key 选 queue);消费端单线程或内存队列排序(分区并行但分区内串行)。'),
+    ],
+    ['不丢=生产确认+broker 持久化+消费 ACK', '不重=消费者幂等', '有序=分区+单消费者'], [sre, pod],
+  ),
+  'legacy/110': deep(
+    '消息积压如何处理？Kafka 与 RocketMQ 区别',
+    '网银消息沙盘:消费速度<生产速度→消息积压(MQ 堆积百万条)——处理=扩容消费者+跳过/降级+源头限流;Kafka vs RocketMQ 的差异=存储模型/事务/延迟消息/生态。',
+    [
+      '积压的根因:消费速度不足(消费者故障/处理慢/并发不足)或生产暴增(上游突发)——定位=消费 lag(积压量=生产 offset-消费 offset)增长速率+消费者健康(线程/异常/慢日志)。',
+      '处理:一,扩容消费者(增加实例——Kafka consumer group 自动 rebalance,注意 partition 数≥consumer 数);二,批量消费(一次拉取多条批量处理——提高单次吞吐);三,跳过(非关键消息丢弃或降级——batch 消费标记+后续补偿);四,新 topic 分流(积压的旧消息转到新 topic 用更多消费者处理)。',
+      'Kafka vs RocketMQ:Kafka(高吞吐日志流/分区+消费组/无延迟消息(需扩展)/生态丰富——大数据领域标配)/RocketMQ(事务消息/延迟消息/消息轨迹/Java 生态——电商金融场景)——选型=吞吐要求+功能需求(事务/延迟)+运维能力(第 109 题 MQ 可靠性)。',
+    ],
+    [
+      block('机制:积压的"水位管理"', '积压=队列水位上升(生产>消费的差值累积)——水位管理=控制生产(源头限流)+增加消费(扩容)+溢出处理(跳过/分流)——类比水库:上游来水(生产)>下游放水(消费)→水位上升→开闸泄洪(扩容)+上游限流+溢洪道(跳过)。'),
+      block('反例:积压处理的两种事故', '事故一:盲目扩容消费者——partition 数=4 但 consumer=8→4 个 consumer 空闲(Kafka 消费者数≤partition 数);修复=先增 partition 再增 consumer(或减少 consumer)。事故二:跳过消息无记录——跳过的消息没有存档(数据丢失无法追溯);修复=跳过的消息存到"跳过 topic"或文件(后续补偿)。'),
+      block('取舍:积压预防 vs 积压处理', '预防:生产限流(上游限流,第 134 题)+消费监控(lag 告警)+弹性扩容(自动扩 consumer,第 34 题动态批处理);处理:积压发生后的应急(扩容/跳过/分流)——预防优于处理(积压的处置成本>预防成本);监控 lag 告警(阈值=SLA 窗口×消费速率)是预防的核心。'),
+    ],
+    [
+      block('验证:积压处理的走查核对', '验证:积压复现(生产速率>消费速率→lag 增长);扩容验证(增加 consumer→lag 下降);跳过验证(非关键消息跳过→lag 清理+存档);partition 扩容验证(Kafka partition 4→8+consumer 4→8→吞吐翻倍)。验证:lag 曲线的断言可程序化(监控 lag 随时间的变化)。'),
+      block('追问链:MQ 三刀', '一刀:"Kafka 的 rebalance?"——consumer 加入/退出→partition 重新分配(rebalance)→rebalance 期间消费暂停(STW)——频繁 rebalance=消费不稳定(心跳超时/处理超时导致)→参数调优(session.timeout/max.poll.interval)。二刀:"RocketMQ 的延迟消息?"——内置延迟级别(1s/5s/10s...2h)或任意延迟(5.0+ 定时消息)——延迟队列的实现(Redis ZSet/时间轮/RocketMQ 延迟消息,第 67 题延迟队列场景)。三刀:"MQ 的选型?"——Kafka(高吞吐日志流+大数据生态)/RocketMQ(事务消息+延迟消息+金融场景)/RabbitMQ(路由灵活+低吞吐)/Pulsar(存算分离+多租户)——按"吞吐+功能+运维+生态"四维选型(第 147 题容量评估)。'),
+    ],
+    ['积压=生产>消费的差值累积', '扩容/跳过/分流,三选组合', 'Kafka 吞吐,RocketMQ 功能'], [sre, pod],
+  ),
+
+
+  // ---- x-leg3-p112 ----
+"legacy/112": deep(
+    "线程安全单例、生产者消费者",
+    "网银手写并发沙盘:两道经典编码题——DCL 单例(volatile 防半初始化)与生产者消费者(BlockingQueue 或 wait/notifyAll+while);写对的关键点与常见丢分处。",
+    [
+      "DCL 单例:双重检查+volatile——第一次判空(免加锁)/synchronized/第二次判空(防重复创建)/volatile(禁止半初始化暴露——new 三步:分配→初始化→赋值,无 volatile 可能先赋值后初始化,并发基础 23 题);Holder 或枚举是更稳替代(类加载天然安全)。",
+      "生产者消费者:生产者队列满时等待,消费者队列空时等待——标准版=BlockingQueue(put/take 内部条件队列自动阻塞,无手写锁);手写版=同一把锁+两个条件(不满足 while 等待,操作后 signalAll)+数组循环缓冲;while 判条件(防虚假唤醒)+signalAll(防丢通知)是两个必考点(第 20 题详解)。",
+      "常见丢分点:DCL 少 volatile(半初始化,偶现字段默认值)/第二次判空漏掉(重复创建);生产者消费者用 if 判条件(虚假唤醒后越界)/notify 只唤醒一个(两条件丢通知)/锁对象不一致(生产者消费者没锁同一对象=没有互斥)。",
+    ],
+    [
+      block("机制:两道题考的是什么", "DCL 考 JMM 与重排序(volatile 的必要性=可见性+有序性而非原子性,第 22 题);生产者消费者考条件队列(wait/notify 与锁的配对)或 BlockingQueue 的内部实现(ArrayBlockingQueue=两把锁两条件/LinkedBlockingQueue=两锁提高吞吐)——两题都是“用正确的原语组合出并发正确性”。"),
+      block("反例:手写的两种事故", "事故一:DCL 无 volatile——压测下字段读到默认值(对象引用非 null 但字段未初始化);修复=volatile 或 Holder。事故二:生产者消费者 notify 丢失——两条件(空/满)共用锁时 notify 唤醒错方→永久等待;修复=notifyAll 或 Lock+两个 Condition 精准唤醒(ArrayBlockingQueue 实现)。"),
+      block("取舍:手写 vs 标准库", "面试手写=展示并发理解;生产=BlockingQueue(Disruptor 高性能场景另说)/单例=Holder 或枚举(零手写风险)——手写版本的评审点=volatile/wait 语义/条件判断三处,缺一即错;标准库把正确性封装好,只在实现库时才手写。"),
+    ],
+    [
+      block("验证:两题的实测走查", "验证:DCL 断言(并发 getInstance 返回同一实例/反射验证字段无默认值场景——复杂,常靠代码评审;Holder 版天然安全);生产者消费者断言(多生产者多消费者跑 10 万条目无丢失/无越界/结束干净;notifyAll 版与 BlockingQueue 版对照)——并发模块实验可复用。预期:BlockingQueue 版在所有压力下正确,手写版错误点可复现。"),
+      block("追问链:并发编码三刀", "一刀:DCL 为什么两次判空=第一次免锁/第二次防竞态——顺序不可换。二刀:BlockingQueue 家族=Array(有界两锁)/Linked(可选有界)/Synchronous(零容量交接)/Priority(优先级)——容量与交接语义选型。三刀:中断配合=put/take 响应中断(优雅停机的钩子——关闭时中断+队尾消费完)。"),
+    ],
+    ["DCL=两次判空+volatile", "生产者消费者=BlockingQueue 或 while+notifyAll", "手写考点:volatile/条件/锁配对"], [juc, api("java/util/concurrent/array/ArrayBlockingQueue")],
+  ),
+  "legacy/150": deep(
+    "接口设计规范：版本兼容、错误码、幂等、重试",
+    "网银开放 API 沙盘:对外接口演进时不 breaking(版本兼容)、错误可程序化处理(错误码)、重复请求不重复扣款(幂等)、失败自动恢复(重试)——四件套是接口契约的完整闭环。",
+    [
+      "版本兼容:URL 路径(/v1/orders→/v2)/请求头(Accept 版本)——兼容性原则:新增字段可选(旧客户端忽略)/删除或改语义字段=breaking(升版本)/字段类型不变(字符串数字别互转);deprecation 流程=新旧并存+响应头标记废弃(Sunset/Deprecation)+迁移窗口+下线公告(第 119 题幂等同篇)。",
+      "错误码双层:HTTP 状态码(传输层语义:4xx 客户端/5xx 服务端)+业务错误码 body(精确原因:ACCOUNT_FROZEN/INSUFFICIENT_BALANCE)——错误响应统一结构(code/message/traceId/details);message 给人看(可变文案),code 给程序看(稳定不变——文案随版本变,码永远不变)。",
+      "幂等:重复请求只产生一次效果——天然幂等(查询/删除)/条件幂等(带唯一键:Idempotency-Key 头或业务单号,服务端去重表+状态机)/非幂等改造(支付接口带 out_trade_no);重试:只重试幂等接口或确保幂等前提——超时/5xx/限流 429 可重试(指数退避+抖动,第 137 题),4xx 参数错不重试(重试必错)。",
+    ],
+    [
+      block("机制:幂等与重试为什么绑定", "重试的前提=第一次可能已成功(超时后结果未知)——不幂等接口重试=重复扣款;幂等键让“重试”安全:服务端记录键→结果,重复请求返回首次结果(不重新执行)——重试策略(退避/次数/熔断)只解决“怎么重”,幂等解决“能不能重”——两者是同一问题(失败恢复)的两半(第 137 题可靠性同源)。"),
+      block("反例:接口设计的两种事故", "事故一:v2 改字段语义不升版本——amount 从分改元,旧客户端少算百倍(资损);修复=breaking 必升版本。事故二:错误码=文案——前端按 message 包含“余额不足”判断(文案一改判断失效);修复=稳定 code+文档化错误码表(OpenAPI 枚举,第 158 题契约同源)。事故三(加分):重试无幂等——网络抖动重试导致重复下单;修复=业务单号幂等+重试白名单。"),
+      block("取舍:版本策略的选择", "路径版本(/v1)最直观(路由/网关/监控都可见——推荐);头版本更 REST 纯但调试难;同版本内向后兼容演进(加字段)是常态——API 设计=先定兼容原则(永远不 breaking 现有字段语义),再定版本机制;内部接口用消费端兼容(容忍未知字段),对外接口用显式版本+废弃流程。"),
+    ],
+    [
+      block("验证:接口契约的实测走查", "验证:兼容断言(旧客户端请求新版本——未知字段被忽略/缺失字段走默认);错误码断言(同错误同 code,文案变化不影响程序判断);幂等断言(同 Idempotency-Key 重放→返回首次结果,服务端只执行一次——第 119 题实验同源);重试断言(模拟超时→指数退避重试成功且只扣款一次)——四组固化契约,本机可复跑。"),
+      block("追问链:接口三刀", "一刀:OpenAPI 契约先行=spec 驱动生成文档/SDK/校验(第 158 题场景评分同源)。二刀:traceId 贯穿=错误响应携带 traceId+日志关联(排错入口,第 129 题可观测同源)。三刀:限流与错误码配合=429+Retry-After 头(客户端可编程退避,第 51 题限流信号同源)。"),
+    ],
+    ["breaking 必升版本,加字段可选", "code 稳定给程序,message 给人", "幂等键让重试安全"], [owasp, sre],
+  ),
+
 };

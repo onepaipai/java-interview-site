@@ -12,9 +12,9 @@ const assignments = await json('content/explanations/assignments.json');
 const manifest = await json('content/explanations/manifest.json');
 const status = await json('content/explanations/review-status.json');
 assert.deepEqual(status.modules.find(item => item.module === 'database-basics'), {
-  module: 'database-basics', total: 59, questionSpecific: 59, sampleSpecific: 0, sharedTopic: 0,
+  module: 'database-basics', total: 44, questionSpecific: 44, sampleSpecific: 0, sharedTopic: 0,
 });
-assert.equal(Object.keys(answers).length, 53);
+assert.equal(Object.keys(answers).length, 44);
 assert.equal(Object.values(answers).filter(value => value.format === 'deep').length, 12);
 const cases = new Set();
 for (const [key, value] of Object.entries(answers)) {
@@ -41,7 +41,6 @@ assert.match(answers['database-basics/49'].answer.join(''), /不能直接判断�
 const examples = [
   ['database-basics/15', [[['3'], ['2']]], []],
   ['database-basics/24', [[['4', '1']]], [1, 0]],
-  ['legacy/47', [[['1', '1'], ['2', '0']], [['1', '1']], [['1', '1']]], []],
 ];
 for (const [key, queries, updates] of examples) {
   const file = key.replace('/', '-');
@@ -52,4 +51,4 @@ for (const [key, queries, updates] of examples) {
   assert.deepEqual(record.queries, queries);
   assert.deepEqual(record.updates, updates);
 }
-console.log('PASS: all 59 database basics answers independent; 53 new cases, 12 deep answers, 3 exact SQL examples executed on H2. MySQL plans and locks remain separately unverified.');
+console.log('PASS: all 44 database basics answers independent; 44 new cases, 12 deep answers, 2 exact SQL examples executed on H2. MySQL plans and locks remain separately unverified.');

@@ -10,23 +10,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. StackOverflowError 多见于递归无终止或调用深度过大。
-2. 堆 OOM 可能是泄漏、真实容量不足或分配峰值过高。
-3. 按异常区域取证，先修对象保留或递归问题，再评估 Xss 与 Xmx。
+<!-- explanation:deep -->
+
+> 场景与约束：网银故障沙盘:SOE(栈满,递归无终止)vs OOM: Java heap space(堆满)——区域不同(栈 vs 堆),成因与排查完全不同(第 32 题 JVM 的完整版)。
+
+1. SOE:虚拟机栈满——递归无终止/深度过大/栈帧过大;排查=栈顶方法(stack trace 第一个重复帧);配置=-Xss(默认 512K-1M)。
+2. Heap OOM:堆满——泄漏(不再使用但可达)/大对象批量分配/堆太小;排查=heap dump(MAT dominator tree);配置=-Xmx 或修泄漏。
+3. 其他 OOM:Metaspace(类泄漏)/unable to create native thread(线程数)/Direct buffer memory(堆外)——每种排查路径不同(第 77 题 JVM 详解)。
 
 ## 参考分析
 
-1. 增加栈会提高单线程预算并降低可用线程数。
-2. 内存不足可能来自泄漏、容量不足或突发大对象。
+### 机制:栈与堆的物理位置
+
+栈=线程私有(每线程独立,大小 -Xss);堆=线程共享(全局,大小 -Xmx);栈总量=线程数×栈大小(第 11 题实测:4000/20000 线程均 2s 建完——保留≠提交)。
+
+### 反例:OOM 混淆的两种事故
+
+事故一:SOE 误判为堆 OOM——看到 OutOfMemoryError 就调 -Xmx(实际是递归);修复=看错误子类型。事故二:线程 OOM 误调 -Xmx——unable to create native thread(线程栈空间不足)调堆无效;修复=区分 OOM 子类型。
+
+### 取舍:-Xss 的设置
+
+大=递归深但总线程少(内存=线程数×栈大小);小=可创建更多线程但递归受限——默认 512K-1M 足够绝大多数场景;深递归业务→改迭代或增大 -Xss,同时监控线程总量。
 
 ## 案例
 
-1. 场景（教学示例）：序列化双向对象关系发生无限递归。
-2. 处理：检查重复栈帧，打断对象环并设深度上限；堆问题另保留诊断快照。
+### 验证:两种 OOM 的走查核对
 
-3. 验证：深度超限返回可控错误；不以盲目增大 Xss 或 Xmx 掩盖循环。
+验证:SOE 复现(无限递归→stack trace 重复帧);Heap OOM 复现(无限 new→OOM: heap space,heap dump);线程 OOM 复现(大量线程→OOM: native thread)——三种 OOM 形态与排查路径完全不同(第 32 题 JVM)。
+
+### 追问链:OOM 三刀
+
+一刀:OOM 子类型=heap/Metaspace/native thread/direct buffer——各走不同排查路径。二刀:-Xss 默认=512K-1M(Linux x64 1MB);大部分方法栈帧<1KB。三刀:SOE 可 catch(Throwable 子类)但栈已满,再调方法可能再 SOE——catch SOE 通常无意义(修代码)。
 
 ## 总结点
 
-1. 异常先分区域。
-2. 递归先查退出条件。
+1. SOE=栈满看栈顶,Heap OOM=堆满看转储
+2. 子类型不同排查路径不同
+3. -Xss 管栈深,-Xmx 管堆大小

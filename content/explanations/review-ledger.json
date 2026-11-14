@@ -44736,7 +44736,7 @@
     {
       "sourceKey": "fdcdf8221d990d40c58d3ba68bb76bca2410a522c98d3df7f90dc67dc105b040",
       "title": "基本类型与包装类区别？Integer 缓存范围（-128\\~127）与装箱的坑",
-      "answerSha256": "9149bd23a0d18b86c5a1566c367dd0e797531dbc236fc6202afe0a9001bd8529",
+      "answerSha256": "a5450be7dbbc09d257efd612e39f4862a9ef62665389e5a62f7f886f1c482838",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44749,12 +44749,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9149bd23a0d18b86c5a1566c367dd0e797531dbc236fc6202afe0a9001bd8529",
+          "title": "基本类型与包装类区别？Integer 缓存范围（-128\\~127）与装箱的坑",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "142dcdcf311c11f133bd21b3cd453bd3c53a5942501b181e20d4478f3c083164",
       "title": "== 与 equals 区别？重写 equals 为什么必须重写 hashCode",
-      "answerSha256": "f02fa0ef87fd9aacc3dfa3f68b45dfd14e2d3fa96b9a7114a26ef14fb0a77391",
+      "answerSha256": "7d502247b48ec36822a1cff98c03eb06402435473d6b3550f193d5c3946a784b",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44767,12 +44783,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f02fa0ef87fd9aacc3dfa3f68b45dfd14e2d3fa96b9a7114a26ef14fb0a77391",
+          "title": "== 与 equals 区别？重写 equals 为什么必须重写 hashCode",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "be099d2d0cffb138c5dceb860bf362f2842cc74b925df712cdc8e0178932cdc5",
       "title": "String / StringBuilder / StringBuffer 区别？String 为什么不可变",
-      "answerSha256": "1b560e8c8c2f69ab63c98a092942b8944a332e8b035a02997620dca15550ac6b",
+      "answerSha256": "991e30056316ea347bf9e6dc95bff979612583390748b21a5a679517f20c635d",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44785,12 +44817,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1b560e8c8c2f69ab63c98a092942b8944a332e8b035a02997620dca15550ac6b",
+          "title": "String / StringBuilder / StringBuffer 区别？String 为什么不可变",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fcf1a1ad2fdb618ed7148ce1b23e6f41fadc0a9e23eee49ff393af85e19b830c",
       "title": "final、finally、finalize 区别",
-      "answerSha256": "3a48c4a178db0a78b664a00e9e411c6f57efbadf675aa05378960198317539fb",
+      "answerSha256": "048ef0f7a78380505c487b050d7e4bca0903d8e490512f3da7523541fe6aeba5",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44803,12 +44851,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3a48c4a178db0a78b664a00e9e411c6f57efbadf675aa05378960198317539fb",
+          "title": "final、finally、finalize 区别",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5984a05154930884318e770379f58ac32ce4edbaa55d79dac2216687344bdf53",
       "title": "抽象类与接口区别？Java 8 接口的 default、static 方法",
-      "answerSha256": "ab318c1e205e20284391e778c9bad83f7f930c6619080f712683cad3a0da9d42",
+      "answerSha256": "052a628c606acb570ac807cbc7304f9d0a9c9e5258c6ba918471d2088faf7656",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44821,12 +44885,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ab318c1e205e20284391e778c9bad83f7f930c6619080f712683cad3a0da9d42",
+          "title": "抽象类与接口区别？Java 8 接口的 default、static 方法",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1a312a656d59fd24dc86383d921357a40f70777511f81775a18eae54dd66aeea",
       "title": "重载与重写区别",
-      "answerSha256": "25208ace5e0e1719cfd62bf0b863fc6e0d5e655ac43aaa5f51b7969aaeba19a3",
+      "answerSha256": "08f8b22a8f03609dad5a2cc4c402fd4d77a9b42044ade27110e37061bd48a4af",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44839,12 +44919,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "25208ace5e0e1719cfd62bf0b863fc6e0d5e655ac43aaa5f51b7969aaeba19a3",
+          "title": "重载与重写区别",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9d61e5c9f26b76fe74e9ec75ce15bb798b2f7ba895716c689b05286eb3729a2a",
       "title": "异常体系：checked 与 unchecked？try-finally 中 return 的执行顺序",
-      "answerSha256": "82cf6edfc99b183aaa402e9ef08690a27faddfb54b507313972bacb88e4e29f6",
+      "answerSha256": "82ad9cab380b83f3cf5c4c8d52aef0eea8de34d976e9fe1046a1f4224e892de2",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44857,12 +44953,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "82cf6edfc99b183aaa402e9ef08690a27faddfb54b507313972bacb88e4e29f6",
+          "title": "异常体系：checked 与 unchecked？try-finally 中 return 的执行顺序",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "6fc0639f69fee218435f642d85a2003d5072c877f31866e6b2e85a18b99b5495",
       "title": "泛型的作用与类型擦除",
-      "answerSha256": "23a8b9108ba605304c4c0da4def4061bfa20a78afd7bc9be64c110bc76eb1fb2",
+      "answerSha256": "51d0147f3a94dd97f95c1f64bf0d15f2d771e26a7e7ece279b465507ae05f74e",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44875,12 +44987,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "23a8b9108ba605304c4c0da4def4061bfa20a78afd7bc9be64c110bc76eb1fb2",
+          "title": "泛型的作用与类型擦除",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "52cfa43e96959b0e1184a8720a4f93f4132ff12a0a749c281000b9b9f540f22a",
       "title": "反射是什么？使用场景与性能代价",
-      "answerSha256": "ff1f0a3c608129fa6a69a2f6db06cf8a63274de319aa52cc0a10a2a93ff1ec83",
+      "answerSha256": "d2fddf74ec6d96e9a93de242b5c27c515ef4c4d6354944771eebedc851759a71",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44893,12 +45021,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ff1f0a3c608129fa6a69a2f6db06cf8a63274de319aa52cc0a10a2a93ff1ec83",
+          "title": "反射是什么？使用场景与性能代价",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ce856d7a789cb95c597a99a5b53fd2064d43dad16934c8ab5c8fd0289ab08ac7",
       "title": "深拷贝与浅拷贝",
-      "answerSha256": "4a26303e21f723ff4b66c632dcc0765b7a2ecd1a70c19190b1ac2bca5a5a403d",
+      "answerSha256": "475bdcc657f484448521f87c3b5babfa7bdaadc16cb073615c3f42338fae43ff",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44911,12 +45055,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4a26303e21f723ff4b66c632dcc0765b7a2ecd1a70c19190b1ac2bca5a5a403d",
+          "title": "深拷贝与浅拷贝",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cedf01e22ec1050692bd8dea9d314728f4c8b2b0f3026d40a51aa9c8044bc267",
       "title": "Java 8：Lambda、Stream、Optional 的基本用法",
-      "answerSha256": "bad6aa4ce87d6c69735fc99b3a7302f29591c500abf86075ae1a02b91c8a23f6",
+      "answerSha256": "bb90b31a3869b8b414deda8341cfaa40f40c086198d3a4a8e6185d61483df448",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -44929,7 +45089,23 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "bad6aa4ce87d6c69735fc99b3a7302f29591c500abf86075ae1a02b91c8a23f6",
+          "title": "Java 8：Lambda、Stream、Optional 的基本用法",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fb48c5dc27238c55be8b23bc765a8932ee7fa4f806d050d207fae100091bf023",

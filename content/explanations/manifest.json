@@ -13032,7 +13032,7 @@
       "sourceKey": "38966716350b92b2bbb267f5100391b2fd7624441f1f1738c8e5e72ec02f84b8",
       "title": "内连接与外连接？where 与 having 区别",
       "baselineAnswerSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "answerSha256": "96738f74d66c233fc8e728927473340d8ba539fd29968415ed427bfeaf423981",
+      "answerSha256": "fea5ea3cf45a3b1300e785347ff1fa408204f150a7e737367b9e976e59deccfe",
       "file": "published/5bbd628fb49d30ee8dc035042ec11d9761d0e194b52f2f2b2e9adc95b29a85e7/legacy-47.md",
       "topic": "legacy-join",
       "references": [

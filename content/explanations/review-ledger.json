@@ -48456,7 +48456,7 @@
     {
       "sourceKey": "38966716350b92b2bbb267f5100391b2fd7624441f1f1738c8e5e72ec02f84b8",
       "title": "内连接与外连接？where 与 having 区别",
-      "answerSha256": "96738f74d66c233fc8e728927473340d8ba539fd29968415ed427bfeaf423981",
+      "answerSha256": "fea5ea3cf45a3b1300e785347ff1fa408204f150a7e737367b9e976e59deccfe",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48466,7 +48466,7 @@
         "status": "verified",
         "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 legacy 全量批次)",
         "evidence": [
-          "https://dev.mysql.com/doc/refman/8.4/en/"
+          "https://dev.mysql.com/doc/refman/8.4/en/join.html"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -48499,6 +48499,23 @@
             "applicableVersion": "",
             "evidence": [],
             "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "96738f74d66c233fc8e728927473340d8ba539fd29968415ed427bfeaf423981",
+          "title": "内连接与外连接？where 与 having 区别",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "verified",
+            "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 legacy 全量批次)",
+            "evidence": [
+              "https://dev.mysql.com/doc/refman/8.4/en/"
+            ],
+            "reviewer": "zcode-review-20261114"
           },
           "manualMerge": "not-assessed"
         }

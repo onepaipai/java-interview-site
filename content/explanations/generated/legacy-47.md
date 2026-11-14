@@ -34,6 +34,26 @@ on 在连接时逐行评估(决定配不配对),where 在连接结果上评估(�
 
 ## 案例
 
+### 实证:H2 会话表三查询对照
+
+以下 SQL 在 H2(MODE=MySQL)实际执行(后端 DatabaseBasicsExamplesTest 真值测试同源)——三段查询依次输出 (1,1)(2,0)、(1,1)、(1,1):每对是部门及有效人数;ON 过滤保留空部门、WHERE 过滤丢失空部门、HAVING 按分组计数筛选。
+```sql
+CREATE TEMPORARY TABLE department_example(id INT PRIMARY KEY);
+CREATE TEMPORARY TABLE employee_example(id INT PRIMARY KEY, dept_id INT, enabled INT);
+INSERT INTO department_example VALUES(1),(2);
+INSERT INTO employee_example VALUES(10,1,1),(11,1,0);
+SELECT d.id, COUNT(e.id) AS active_count FROM department_example d
+LEFT JOIN employee_example e ON e.dept_id = d.id AND e.enabled = 1
+GROUP BY d.id HAVING COUNT(e.id) >= 0 ORDER BY d.id;
+SELECT d.id, COUNT(e.id) AS active_count FROM department_example d
+LEFT JOIN employee_example e ON e.dept_id = d.id
+WHERE e.enabled = 1 GROUP BY d.id ORDER BY d.id;
+SELECT d.id, COUNT(e.id) AS active_count FROM department_example d
+LEFT JOIN employee_example e ON e.dept_id = d.id AND e.enabled = 1
+GROUP BY d.id HAVING COUNT(e.id) >= 1 ORDER BY d.id;
+```
+验证:执行结果与理论语义一致,ON/WHERE 位置差异可复现;H2 样本结果不代表已验证 MySQL 执行计划。
+
 ### 验证:join/where 语义的实测走查
 
 验证:left 语义断言(右表条件在 on→左表全量保留 null;在 where→行数减少=inner 化——对照立现);聚合断言(where 先滤再聚合 vs having 聚合后滤——count 数值不同);执行顺序断言(别名可用性:where 不能用 select 别名,having 可以——顺序的可见证据)——三组固化语义,数据库模块 join 实验可复跑。

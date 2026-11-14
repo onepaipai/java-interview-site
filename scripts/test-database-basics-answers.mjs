@@ -12,10 +12,10 @@ const assignments = await json('content/explanations/assignments.json');
 const manifest = await json('content/explanations/manifest.json');
 const status = await json('content/explanations/review-status.json');
 assert.deepEqual(status.modules.find(item => item.module === 'database-basics'), {
-  module: 'database-basics', total: 44, questionSpecific: 44, sampleSpecific: 0, sharedTopic: 0,
+  module: 'database-basics', total: 49, questionSpecific: 49, sampleSpecific: 0, sharedTopic: 0,
 });
-assert.equal(Object.keys(answers).length, 44);
-assert.equal(Object.values(answers).filter(value => value.format === 'deep').length, 12);
+assert.equal(Object.keys(answers).length, 49);
+assert.equal(Object.values(answers).filter(value => value.format === 'deep').length, 49);
 const cases = new Set();
 for (const [key, value] of Object.entries(answers)) {
   const assignment = assignments.find(item => item.key === key);
@@ -51,4 +51,4 @@ for (const [key, queries, updates] of examples) {
   assert.deepEqual(record.queries, queries);
   assert.deepEqual(record.updates, updates);
 }
-console.log('PASS: all 44 database basics answers independent; 44 new cases, 12 deep answers, 2 exact SQL examples executed on H2. MySQL plans and locks remain separately unverified.');
+console.log('PASS: all 49 database basics answers independent; 49 new cases, 49 deep answers, 2 exact SQL examples executed on H2. MySQL plans and locks remain separately unverified.');

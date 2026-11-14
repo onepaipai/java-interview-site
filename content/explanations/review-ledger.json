@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "packVersion": "explanations-v36",
+  "packVersion": "explanations-v37",
   "meaning": "结构校验、案例执行、事实核验和业务库人工合并独立记录；正文摘要变化使旧审核证据失效。业务库人工改动由 /api/admin/publications/status 动态判断。",
   "entries": [
     {
@@ -11908,20 +11908,38 @@
     {
       "sourceKey": "595be067abfefb842ea982be5fd33171c499bb796a5f4055bae94bc9c1b47b8b",
       "title": "主键选择为什么会影响 InnoDB 的整表存储？",
-      "answerSha256": "9be000f6d8ee8c75f0531d2988f3161d11752657b71e892ab1c023979c560a6b",
+      "answerSha256": "0158f08b6a70288a7fd06b95a01757cba60409232fa3e2df5ba51109abeb1c42",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9be000f6d8ee8c75f0531d2988f3161d11752657b71e892ab1c023979c560a6b",
+          "title": "主键选择为什么会影响 InnoDB 的整表存储？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "452f84cb3c173075483d04b70735df051a4e730e38e0d5f82b5dcc973546f669",
@@ -11933,10 +11951,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/multiple-column-indexes.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11975,40 +11995,75 @@
     {
       "sourceKey": "ab220cfd1557a8e3ab30e5fc61834c1bce6dd86cd9af0a07cfd4c7e540de0e12",
       "title": "最左前缀原则为什么不能机械理解为后续列完全无用？",
-      "answerSha256": "4e03d67191c4b8a194d05643a66d27b360e9614f546d944afde499d41c0e660d",
+      "answerSha256": "1f0f35ca1bafde8840e46a6d2d77542020c1bd94accbcc11848fcc1e5ef066df",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4e03d67191c4b8a194d05643a66d27b360e9614f546d944afde499d41c0e660d",
+          "title": "最左前缀原则为什么不能机械理解为后续列完全无用？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "3dc3e7d1720da396ccec1f4a67b40317f7123553de6a42467a7135f651588941",
       "title": "覆盖索引为什么能减少查询开销？",
-      "answerSha256": "6b082fa2271877e4154a87df8f63fdce284ab4aca9e76fed416dbe7bd33dd0f7",
+      "answerSha256": "a40615ad9b9ca81e938284b380dfd2b8ace331950a1941c3f072b3ae8f2e5c67",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "d8fc696fee75d41c0494bf8c0f294f7c88fc36dd8e108aa3d33a3f662cf1d988",
+          "title": "覆盖索引为什么能减少查询开销？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "6b082fa2271877e4154a87df8f63fdce284ab4aca9e76fed416dbe7bd33dd0f7",
           "title": "覆盖索引为什么能减少查询开销？",
           "example": {
             "status": "pending",
@@ -12027,22 +12082,39 @@
     {
       "sourceKey": "df08c386c7e5585d201b3d839b972f43802eb0442852d50ead9f16f3b49597af",
       "title": "回表次数多为什么会放大随机访问成本？",
-      "answerSha256": "e91da723f5400b55b4f17879a74aa42c40a9a5da13f4b226e40d4e714664e16f",
+      "answerSha256": "b16694403e575bcd5828c965bb2346feb2eaf591ef005878dce1e62e5f1d4160",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "1f1d1ce4c7718181edbfe80e0bf4409e82dd812eab2d2111d36c83b86b49bfa7",
+          "title": "回表次数多为什么会放大随机访问成本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "e91da723f5400b55b4f17879a74aa42c40a9a5da13f4b226e40d4e714664e16f",
           "title": "回表次数多为什么会放大随机访问成本？",
           "example": {
             "status": "pending",
@@ -12132,10 +12204,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/type-conversion.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12174,22 +12248,39 @@
     {
       "sourceKey": "daed2413643d7cbe43a2a1d1377ea23511aa465651959fafabe5901379e1df3c",
       "title": "LIKE 的前导通配符为何常难以利用普通索引定位？",
-      "answerSha256": "08a1bcb23c0fad08458ddf55c2cbcfc01934a20498106063b469db1af88ef0a1",
+      "answerSha256": "5bf88545dd82ce7afd5935bde7e250e04b57b01b6d4dcf7e2631c70ce4c14f74",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "4aae1fc72418f54c3724c180e581c5671e9ae00ba1b013bc181058156a59a6b2",
+          "title": "LIKE 的前导通配符为何常难以利用普通索引定位？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "08a1bcb23c0fad08458ddf55c2cbcfc01934a20498106063b469db1af88ef0a1",
           "title": "LIKE 的前导通配符为何常难以利用普通索引定位？",
           "example": {
             "status": "pending",
@@ -12208,22 +12299,39 @@
     {
       "sourceKey": "ebce82b7ae757cb7c652d40158b2088727dcc3087d3afa42a670d8a622bf95ca",
       "title": "SELECT 星号为什么可能造成性能和兼容问题？",
-      "answerSha256": "6ea50c27f4738e95b96d92904586abc5c339b0220f08e41f9fadbd233027edb1",
+      "answerSha256": "534799dc842a55039fd343bb7e6b253ab54dcd4b4cfc0e27f8fd8bda6724906f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "d5e66756868f00322323cb3bc0e02017fd659011d3a4813fa97bf8e43dd379cc",
+          "title": "SELECT 星号为什么可能造成性能和兼容问题？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "6ea50c27f4738e95b96d92904586abc5c339b0220f08e41f9fadbd233027edb1",
           "title": "SELECT 星号为什么可能造成性能和兼容问题？",
           "example": {
             "status": "pending",
@@ -12242,22 +12350,39 @@
     {
       "sourceKey": "2f47be0c26e9f93659b846b7abcb5de2def6ecd22458bbf9ddc50eaa8ad75e27",
       "title": "EXPLAIN 中哪些信息最值得优先查看？",
-      "answerSha256": "c71613eb6bd4b614633190deee0603c9f99428104fac76fe438b4e7c0989fe28",
+      "answerSha256": "6443d204d389f9e6ada3ae36f7a2e5c8f22bf0aae2c07fdc57a97eb25ee5c58c",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "ab1d11c96a3c6f610e58439f8086dbdd9c3e5e0d9580e99207a315c8c265a5c9",
+          "title": "EXPLAIN 中哪些信息最值得优先查看？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "c71613eb6bd4b614633190deee0603c9f99428104fac76fe438b4e7c0989fe28",
           "title": "EXPLAIN 中哪些信息最值得优先查看？",
           "example": {
             "status": "pending",
@@ -12283,10 +12408,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/explain.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12340,58 +12467,111 @@
     {
       "sourceKey": "430322e87b3b8ee4b2d537a7cdae5a779c8ed36c8c820232b6b2a91485d03749",
       "title": "慢查询优化为什么先看扫描行数而非只加索引？",
-      "answerSha256": "a5abe760968862543f0df90516bd1c3914d59afdff4779557a37c00dae1d62f9",
+      "answerSha256": "9b4799b72583a06481c429b39e53b0328b99d2fb576ee2713056626c14c77a9a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a5abe760968862543f0df90516bd1c3914d59afdff4779557a37c00dae1d62f9",
+          "title": "慢查询优化为什么先看扫描行数而非只加索引？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d429022cf465fabc93981fcdbdf2fae01846a688a4dfe2736af0962a941fca7e",
       "title": "COUNT 星号与 COUNT 某列有什么语义差异？",
-      "answerSha256": "ec51a3bd48aa278aebc3466c9d292fe90686dbc34c86ddfcd2a39d7d65e86b0e",
+      "answerSha256": "24be490257b63e6998b6a8404cdb891e1430c43d87b56776298eb850a37f3d7e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ec51a3bd48aa278aebc3466c9d292fe90686dbc34c86ddfcd2a39d7d65e86b0e",
+          "title": "COUNT 星号与 COUNT 某列有什么语义差异？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9870cd58fae82bd7e94c0e67177040a07ce3964cbb80d9456d416102531f4eab",
       "title": "为什么用 OFFSET 做深分页越来越慢？",
-      "answerSha256": "63f8de204ed2b0a026456ecea6134ab8fdcf91bc4f59049930ca0bcf8c17d9e9",
+      "answerSha256": "83736a89ae638873b67b9e6363fd6e5f89f6a36715e4f74b5da0ce506609877a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "40b67fd514b9ec9d22f2954846162006aa95f95da461480d74b9a12dee0f9ea1",
+          "title": "为什么用 OFFSET 做深分页越来越慢？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "63f8de204ed2b0a026456ecea6134ab8fdcf91bc4f59049930ca0bcf8c17d9e9",
           "title": "为什么用 OFFSET 做深分页越来越慢？",
           "example": {
             "status": "pending",
@@ -12417,10 +12597,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/select.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12459,22 +12641,39 @@
     {
       "sourceKey": "6bf7373a5a963437159d56e79e96be2454e4b5e7aee2b763ee7d7d3a1c719cdd",
       "title": "事务的原子性与业务幂等有什么区别？",
-      "answerSha256": "28724a7bb302937e2a3723d5b886b5fa46aea089873058c936bc78378f28c677",
+      "answerSha256": "d4ce8e176c5c9cbaafdc6749f2c447246ce88d04a0682b65b58331ef660f8b1f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "05db3d98cdb9619f17132dae068dd02a9110b3b4352da0613a94780cf944e26c",
+          "title": "事务的原子性与业务幂等有什么区别？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "28724a7bb302937e2a3723d5b886b5fa46aea089873058c936bc78378f28c677",
           "title": "事务的原子性与业务幂等有什么区别？",
           "example": {
             "status": "pending",
@@ -12493,17 +12692,19 @@
     {
       "sourceKey": "602a634194be722a53cb298d19762718b9bf8d031f6bed5620d226fcaba7b0a1",
       "title": "隔离级别应该如何按业务选择？",
-      "answerSha256": "b43976e7bac37a4e59abdaddb8360f2aff6f09aca5b05a6c9fe6172fe9d42226",
+      "answerSha256": "696981d4cd7b3548f6151169e553d4eaeb8aab2f2ba1f69af7d32241717fdee0",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12536,28 +12737,60 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "b43976e7bac37a4e59abdaddb8360f2aff6f09aca5b05a6c9fe6172fe9d42226",
+          "title": "隔离级别应该如何按业务选择？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
     {
       "sourceKey": "cc95842aa26ded959f6ff9bbe72607d9b4f090a6ee179ebec089eba494688892",
       "title": "MVCC 是否意味着查询完全不需要锁？",
-      "answerSha256": "e6beacceccc9b266f3dd50692a2dc2ba7ab3bb3c0bf2deb3db8558089e47ed7d",
+      "answerSha256": "d8a7f17d43eb5804026956611398e301eaab261a56e567407e45d0b6be5fb004",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "a951ea5f12f62ffb6ad8885b96db79580f42d4c4798133980611b68da4e60f24",
+          "title": "MVCC 是否意味着查询完全不需要锁？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "e6beacceccc9b266f3dd50692a2dc2ba7ab3bb3c0bf2deb3db8558089e47ed7d",
           "title": "MVCC 是否意味着查询完全不需要锁？",
           "example": {
             "status": "pending",
@@ -12583,10 +12816,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-consistent-read.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12655,22 +12890,39 @@
     {
       "sourceKey": "cd932a9b458f630d0745830b368be05b615ffe69659fa4225a9879b0b212ee77",
       "title": "为什么长事务会影响 undo 清理？",
-      "answerSha256": "ea4e7d638d542acc34153d219b0287a76934ef85e051c2fe13d98d38332b9e55",
+      "answerSha256": "aa8e12feb0d00111b5ecd0a06ccee1faddbe25eb84e4288cef6d6dac0db4bf24",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "4b44771e7e775c9be1e9de6a0dcfc1eb1f2b652e7bdf14e0a904d978059a77db",
+          "title": "为什么长事务会影响 undo 清理？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "ea4e7d638d542acc34153d219b0287a76934ef85e051c2fe13d98d38332b9e55",
           "title": "为什么长事务会影响 undo 清理？",
           "example": {
             "status": "pending",
@@ -12689,22 +12941,39 @@
     {
       "sourceKey": "4d116fb75b3a1277a9943d0836c61ada615f46e2d7d4644231d281859d49b5a0",
       "title": "行锁为什么需要关注实际访问的索引记录？",
-      "answerSha256": "22f09806f652bd601c3f467ea1086ca608c89045fc004bb07f9092372f006a5c",
+      "answerSha256": "2b0ce80e143614aeecff190db5e96852f0ebb7198331cd432ea46f64cd619299",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "1a9aa8b521db72a0a9cb0a3bb5b5f5a13cca8813d0656298914d93ac630388e2",
+          "title": "行锁为什么需要关注实际访问的索引记录？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "22f09806f652bd601c3f467ea1086ca608c89045fc004bb07f9092372f006a5c",
           "title": "行锁为什么需要关注实际访问的索引记录？",
           "example": {
             "status": "pending",
@@ -12730,10 +12999,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-locking.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12794,10 +13065,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/create-index.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12843,10 +13116,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/update.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12900,22 +13175,39 @@
     {
       "sourceKey": "a3660acf86eac4c33959b732c5d7ef16a555058198c35fb2c4b835b7b9e02179",
       "title": "悲观锁适合哪些高冲突业务？",
-      "answerSha256": "f4482bb46e26c5c4149d9842f7f16c619beaa31c1092d1a3865b2699ef879460",
+      "answerSha256": "71fdb400ee9d69388551ba0b072978b24b89803f9da63f52f86d8289f3977cd1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "3dd22a0a2eda247c38e2c402ee6a51852aa2c0ce3cbe539f52793870fdd1338a",
+          "title": "悲观锁适合哪些高冲突业务？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "f4482bb46e26c5c4149d9842f7f16c619beaa31c1092d1a3865b2699ef879460",
           "title": "悲观锁适合哪些高冲突业务？",
           "example": {
             "status": "pending",
@@ -12941,10 +13233,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12998,22 +13292,39 @@
     {
       "sourceKey": "9c53ab2a5bb17b596b4ada78633c493484749e941fecb1eeba191426f01b5ed2",
       "title": "事务重试为什么必须重做完整业务决策？",
-      "answerSha256": "9edf9c0546cfcbdae10afba5ac926872f08d52f5e73c61f93f8bc99af3a8d844",
+      "answerSha256": "6bc1d39f927d7620a4be1b0d06aa40c3a43909bda24fce3ede72f8ffa78a2a89",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "8b4d234ba4976be1ff315a4af1ba8a2a603bcb0cdc5457e1d727f02becea75af",
+          "title": "事务重试为什么必须重做完整业务决策？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9edf9c0546cfcbdae10afba5ac926872f08d52f5e73c61f93f8bc99af3a8d844",
           "title": "事务重试为什么必须重做完整业务决策？",
           "example": {
             "status": "pending",
@@ -13032,17 +13343,19 @@
     {
       "sourceKey": "1473528da8adc5c59e380c049edf418323db08c1ee6999d2749d0a1c93a213e0",
       "title": "redo log、undo log 和 binlog 的职责有什么不同？",
-      "answerSha256": "0e5beca8332b89a686e851ae73a0d5a374d5695c11b6bdc035c9eb6d7f0f34e5",
+      "answerSha256": "dff15f2eb0fc9927282482b0ce07f5e7d57dfa5a44253222971db8c57b61ee40",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -13075,6 +13388,21 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "0e5beca8332b89a686e851ae73a0d5a374d5695c11b6bdc035c9eb6d7f0f34e5",
+          "title": "redo log、undo log 和 binlog 的职责有什么不同？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
@@ -13088,10 +13416,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html#sysvar_innodb_flush_log_at_trx_commit"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -13130,22 +13460,39 @@
     {
       "sourceKey": "92b05febc0bd676869804d6b801f0d049b5b74c5ca8f213665b2e50368197925",
       "title": "为什么数据库连接要设置获取与执行超时？",
-      "answerSha256": "9c282ce528161e8e6088481b20fd146a6f873529bdeb369896444d6f88b27880",
+      "answerSha256": "107aeea9d4756c01e3e6d9dc4a5d5f62d3a4a6712699730efa3fe1bcb9b4bafd",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "f7c687031745d8dae9e28f690412cb83c7b6dd56e0f06d1732d5340f030e7aa1",
+          "title": "为什么数据库连接要设置获取与执行超时？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9c282ce528161e8e6088481b20fd146a6f873529bdeb369896444d6f88b27880",
           "title": "为什么数据库连接要设置获取与执行超时？",
           "example": {
             "status": "pending",
@@ -13164,22 +13511,39 @@
     {
       "sourceKey": "b01286a45e4b88900b47291e7f04b8b8da98a3e388c5247e466036ab2a98563b",
       "title": "数据库连接池泄漏通常如何表现？",
-      "answerSha256": "c5faa2d9a526653edebec7467dcb2f4fdfeebdf809fa4512b9a452d356df83c2",
+      "answerSha256": "319c9f031648dc4c06ea2be105a5ea174ef0718ba866e856e2e553c8f2effeaa",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "eeb8a3d00898fc65ac615f7faada6bbd98fc4c7d1de35cc14688d998636d9bcd",
+          "title": "数据库连接池泄漏通常如何表现？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "c5faa2d9a526653edebec7467dcb2f4fdfeebdf809fa4512b9a452d356df83c2",
           "title": "数据库连接池泄漏通常如何表现？",
           "example": {
             "status": "pending",
@@ -13198,22 +13562,39 @@
     {
       "sourceKey": "9abdfce70b12dcd51c0d460b0635cb3b1223c7ff03478309245c5e125dccf505",
       "title": "N 加一查询为什么在分页接口中容易被忽略？",
-      "answerSha256": "592ad4145e921a7e093b1b70f28e4fa1d5a0e5a452f3cba1afb35e4e9fa0d602",
+      "answerSha256": "99a722339e77fd9d8ea8d8334d083846085ada888e4b93987fd6a8ad457327f5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "ae31e157aa4edba40aad100de3e579f83698d886b319e15f0a716457015091ff",
+          "title": "N 加一查询为什么在分页接口中容易被忽略？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "592ad4145e921a7e093b1b70f28e4fa1d5a0e5a452f3cba1afb35e4e9fa0d602",
           "title": "N 加一查询为什么在分页接口中容易被忽略？",
           "example": {
             "status": "pending",
@@ -13232,22 +13613,39 @@
     {
       "sourceKey": "24a6b5f5b7e403cb9384351218adc4c0ee7d514e95e78e24bcd2fc6cb9de84d1",
       "title": "JOIN 与应用层多次查询如何取舍？",
-      "answerSha256": "276d555c545a273c7be7347877cc4e966568ba1fb558bfa230ea770c692086ca",
+      "answerSha256": "aaef331a25d1dcb6bd63b49796667180b1823057a128c117e2ec6ee5f83dfd05",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "d2923a322945fa209a725776d1b6f6000383e4a34a7752428e846a24afaed120",
+          "title": "JOIN 与应用层多次查询如何取舍？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "276d555c545a273c7be7347877cc4e966568ba1fb558bfa230ea770c692086ca",
           "title": "JOIN 与应用层多次查询如何取舍？",
           "example": {
             "status": "pending",
@@ -13266,22 +13664,39 @@
     {
       "sourceKey": "918ff5fc329b1d91c5a5a078849feb9d0bdbd6ee569315d507a0195de76dde31",
       "title": "为什么给所有字段建索引不是好方案？",
-      "answerSha256": "a3b5e527f32a580fd5fa577ca1b42fdaebea27fe7d64a590662eb71ad2db737d",
+      "answerSha256": "d043000bf792c778436de51bab3e12757ec32561418dec25076be42d57a23844",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "f89bc1e065dd06e9ce0e3e2fdba6d200d35f75eae204f80380cf5191aeb6ea91",
+          "title": "为什么给所有字段建索引不是好方案？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "a3b5e527f32a580fd5fa577ca1b42fdaebea27fe7d64a590662eb71ad2db737d",
           "title": "为什么给所有字段建索引不是好方案？",
           "example": {
             "status": "pending",
@@ -13300,40 +13715,75 @@
     {
       "sourceKey": "c9c26dc18d5718e67636b9790c0e567e9883b883f108a9d6b34497c631ec63f0",
       "title": "NULL 在比较和唯一约束中有哪些注意点？",
-      "answerSha256": "1fa38d30e0ed016b64c2d54e1c3190c932812c7c55f4feffe786b8d12c23b6ad",
+      "answerSha256": "41f84be928b31581638885a95cd273ececdc1eea49a295f10ca4fc712aa09496",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1fa38d30e0ed016b64c2d54e1c3190c932812c7c55f4feffe786b8d12c23b6ad",
+          "title": "NULL 在比较和唯一约束中有哪些注意点？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4cd95513c29575eb420d7128633c5672e8e380ac6bafcf1a1887087c5838f040",
       "title": "字符集与排序规则如何影响唯一性？",
-      "answerSha256": "a84da5e99113582f2d28ddd883236f89d4c8379c70dbce2fee6b92fac5cfa823",
+      "answerSha256": "b3147637f67e1d6c4c56d345c9c920e97e23fedddcc7aa53f167a8ac1c0f3044",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "66d640bb5760e2127ec0b61735018cca628ddcce48a514f7c8997ce1afc220bc",
+          "title": "字符集与排序规则如何影响唯一性？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "a84da5e99113582f2d28ddd883236f89d4c8379c70dbce2fee6b92fac5cfa823",
           "title": "字符集与排序规则如何影响唯一性？",
           "example": {
             "status": "pending",
@@ -13352,22 +13802,39 @@
     {
       "sourceKey": "d1a914795e257caac58377f75ee152271a66d03c591ef6d1c768c3e7a5940e04",
       "title": "VARCHAR 与 TEXT 的选择依据是什么？",
-      "answerSha256": "322d7ffe32c48def57ebda72e83906b6594c2560b0bbf5f1c6d852d7286e3cfb",
+      "answerSha256": "5275b305cc01a0dbba2703028e3c4b9240ceb97ac71dfd675f1dcfe20f5da3a5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "3940374ecfc762fd339c39edb3c81c72d4f0362f2c78e8c44da25bdcb2149e21",
+          "title": "VARCHAR 与 TEXT 的选择依据是什么？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "322d7ffe32c48def57ebda72e83906b6594c2560b0bbf5f1c6d852d7286e3cfb",
           "title": "VARCHAR 与 TEXT 的选择依据是什么？",
           "example": {
             "status": "pending",
@@ -13386,22 +13853,39 @@
     {
       "sourceKey": "4f43310d08a5a885af6d08724398e59e98cc85842c7ea406b19440e41b185a4c",
       "title": "外键约束与应用层校验怎样配合？",
-      "answerSha256": "f0188bd9f242166ac0640fff64526cd36c6f0d51b353c07f596a321f786e5e58",
+      "answerSha256": "7837a257b340aa7c093043eeb5147e49ef1549252a8231c6b34ea17952e51617",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "a2e08a96d04c6053773f709a59c1e6f86ba96151977f545387e6ede0aa47f06c",
+          "title": "外键约束与应用层校验怎样配合？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "f0188bd9f242166ac0640fff64526cd36c6f0d51b353c07f596a321f786e5e58",
           "title": "外键约束与应用层校验怎样配合？",
           "example": {
             "status": "pending",
@@ -13427,10 +13911,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/create-index.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -13469,22 +13955,39 @@
     {
       "sourceKey": "8ecce5a71dcf66578f97ba0d81fb7cb302acfa4b0e6726f9bfb7e8f84815c965",
       "title": "审计字段的时间应该由谁生成？",
-      "answerSha256": "5a4bd9ab42d56c72432308884dc188efb7677e6c56b44ad5b270e1721f19e785",
+      "answerSha256": "c00fcdea5f65ef2ced7d85d7729cde0a6fe3588fe39b7ff21d257cb31c728373",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "2953f21e7cd4292e63d112f4b050aba725f887d921a3152c801a4c43dffeb1e1",
+          "title": "审计字段的时间应该由谁生成？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "5a4bd9ab42d56c72432308884dc188efb7677e6c56b44ad5b270e1721f19e785",
           "title": "审计字段的时间应该由谁生成？",
           "example": {
             "status": "pending",
@@ -13503,22 +14006,39 @@
     {
       "sourceKey": "31262de359f76090290b5d8d50d519582d8e59ae5ba6005b18a457d738bdf6b0",
       "title": "批量 INSERT 为什么要控制单批大小？",
-      "answerSha256": "de6ab5ff7f42ffea4363f96fd8d06408bd5d8a27f91eace5624b3fa10bba3121",
+      "answerSha256": "44b9efba86bbc99215b5baa4fd5d9c02c07140f1af62a915b0dbe0a3b0a417c7",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "6933022a9e82498ef1a84750b23e1f8d92a654e8399008cccfe1fc7def910d96",
+          "title": "批量 INSERT 为什么要控制单批大小？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "de6ab5ff7f42ffea4363f96fd8d06408bd5d8a27f91eace5624b3fa10bba3121",
           "title": "批量 INSERT 为什么要控制单批大小？",
           "example": {
             "status": "pending",
@@ -13537,22 +14057,39 @@
     {
       "sourceKey": "ab0da58dfbfa98f5ce1315edb0bb3c46524e62efeb3bad1faed1f830811e0d82",
       "title": "批量更新为什么容易造成主从延迟？",
-      "answerSha256": "2c1d49559390da3bf6f11f43696816bc67ff0c4279937178f520b5d1ea09dd5c",
+      "answerSha256": "f36b157be1bafaed22fc214e9feadf382364d34b9a318028764dca2bd1e56172",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "4a1100ed4049cdb7d059d8da1539778db62618b7b186027b93194bb0180d7879",
+          "title": "批量更新为什么容易造成主从延迟？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "2c1d49559390da3bf6f11f43696816bc67ff0c4279937178f520b5d1ea09dd5c",
           "title": "批量更新为什么容易造成主从延迟？",
           "example": {
             "status": "pending",
@@ -13571,22 +14108,39 @@
     {
       "sourceKey": "2a8e656ca76452040e402c74fe46b92c7d970decd895751fb6479b38360c3e65",
       "title": "读取从库为何可能看不到刚写的数据？",
-      "answerSha256": "370589d305a5fb0d224850e115b3933c044ecd00313ec2fde635e43eb3d1b6a4",
+      "answerSha256": "65a15e42bae13532969e1d9fd96337f0ea4b7c446fbbec133178c13dbdee0e30",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "4948b7ad48f2b8532dfba8c987e02ee7ecba2effd2689e9d84279ea9a326fde0",
+          "title": "读取从库为何可能看不到刚写的数据？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "370589d305a5fb0d224850e115b3933c044ecd00313ec2fde635e43eb3d1b6a4",
           "title": "读取从库为何可能看不到刚写的数据？",
           "example": {
             "status": "pending",
@@ -13605,22 +14159,39 @@
     {
       "sourceKey": "72530b36d23fc1fd8cbc7ff54998118164507e1de51ef752360fee1647df7e70",
       "title": "数据库迁移为什么应使用追加版本而非修改历史脚本？",
-      "answerSha256": "9bd23f1f9c7c3cdf2ac1532c4fe0f2d6dc4bc90f30e9dab7897d31694a1231aa",
+      "answerSha256": "7c531c0193ff578f197b2d03484a01e5d30a0b88131c1b2bb25fbd9b3a0ee308",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "a5ad46202ec9cc7ac91358519b51d0d193d2284c8614a3d7c6d0b83e4fb4f963",
+          "title": "数据库迁移为什么应使用追加版本而非修改历史脚本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9bd23f1f9c7c3cdf2ac1532c4fe0f2d6dc4bc90f30e9dab7897d31694a1231aa",
           "title": "数据库迁移为什么应使用追加版本而非修改历史脚本？",
           "example": {
             "status": "pending",
@@ -13639,22 +14210,39 @@
     {
       "sourceKey": "11a8a0ed083214df66d2653e0c6861cb4dc272f0b0f799eeb104b58da54f7921",
       "title": "扩列与删列为什么需要兼容发布顺序？",
-      "answerSha256": "ab4d586fc2f071a254c6afab9f587d3ee54ee9ef71238a1e8c3eeb9ed15a675d",
+      "answerSha256": "4922b175a606e7163e76bbd86cf3c6359db1179f198fabb0a9d8ece1628a84c8",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "9157be5fb33da513c570621dc091f5dca79c31ecbb19f8da4391fe06de372506",
+          "title": "扩列与删列为什么需要兼容发布顺序？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "ab4d586fc2f071a254c6afab9f587d3ee54ee9ef71238a1e8c3eeb9ed15a675d",
           "title": "扩列与删列为什么需要兼容发布顺序？",
           "example": {
             "status": "pending",
@@ -13673,22 +14261,39 @@
     {
       "sourceKey": "1c52eb6a0c8dc51e9507d09327b3cb1069e84cc3a0c204ae0f92a5c34cd0089c",
       "title": "如何验证数据库备份真的可用？",
-      "answerSha256": "c0fdd7cddd4caf3144d5f869084dd844bbce79520b8f030bce5fe31a424949b6",
+      "answerSha256": "bee2d18b564fd8b46b9233014c5781ac1b36922cba5de0733f544c66635dddc8",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "4b0be7fc0a79012a777d28f93c265afbeb8c44c8cf974c3898e62794c5b4a75d",
+          "title": "如何验证数据库备份真的可用？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "c0fdd7cddd4caf3144d5f869084dd844bbce79520b8f030bce5fe31a424949b6",
           "title": "如何验证数据库备份真的可用？",
           "example": {
             "status": "pending",
@@ -13707,22 +14312,39 @@
     {
       "sourceKey": "43fb9bdd800a1095a0bdc953ab19e4157738cb1921ea7a56cd6eb304cb32305c",
       "title": "为什么不能把回滚脚本当作所有迁移的保险？",
-      "answerSha256": "6ee8ba0abaf49a36055d053bd032a15eaccceeacc4bf14c5e3a38191d8e38057",
+      "answerSha256": "59eb621d3a5c66c9299d1314495474266eb4d4b7daff83a1d6e1ddd4dbe29b8e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "d2fbeaf704dbe085e906035c14da2fd0747f37df374fc3febf5ef2a71db6f6b0",
+          "title": "为什么不能把回滚脚本当作所有迁移的保险？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "6ee8ba0abaf49a36055d053bd032a15eaccceeacc4bf14c5e3a38191d8e38057",
           "title": "为什么不能把回滚脚本当作所有迁移的保险？",
           "example": {
             "status": "pending",
@@ -13741,22 +14363,39 @@
     {
       "sourceKey": "8b85eaed6a56c9aaa1ae34f0b3f5adbe1957294647a45281699e4385ed81f914",
       "title": "如何避免动态排序参数引入 SQL 注入？",
-      "answerSha256": "f975ffd46100145546c8922985b3c1ae6a8445eed6c791377dac6a3087ea59a3",
+      "answerSha256": "d945ceb3c560bb06991d3d349ed3d9bc09a997e44cea3682e3463f39200e7068",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "92282caf4b6082d227712e66e4a613ec90726316e20ab74334466fcf85858553",
+          "title": "如何避免动态排序参数引入 SQL 注入？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "f975ffd46100145546c8922985b3c1ae6a8445eed6c791377dac6a3087ea59a3",
           "title": "如何避免动态排序参数引入 SQL 注入？",
           "example": {
             "status": "pending",
@@ -13782,10 +14421,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/commit.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -13824,22 +14465,39 @@
     {
       "sourceKey": "e86aa8d216a06edc148b81a3735005e5d4914cb8de0b53e70c3e1633c15c5aa0",
       "title": "如何证明一次索引优化没有伤害写入？",
-      "answerSha256": "b7ba381f7eaf03805f2a45066e9636783b52871c4544a24f0295fcd3e4d7e836",
+      "answerSha256": "6a601160f5646685ad2cee97e98dbeab8525313be35fdbdad2d54dac355bfcfa",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "af47e9d6217440a84b7d2eea486a9870ded8ef47cb036c2356b3ccff8d412cd5",
+          "title": "如何证明一次索引优化没有伤害写入？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "b7ba381f7eaf03805f2a45066e9636783b52871c4544a24f0295fcd3e4d7e836",
           "title": "如何证明一次索引优化没有伤害写入？",
           "example": {
             "status": "pending",
@@ -29028,902 +29686,1802 @@
     {
       "sourceKey": "9d200b34ae256a25be95e5ee65e232e23315514586b40063cbf6060f27ed97e8",
       "title": "手写 LRU 缓存应怎样保证获取和淘汰效率？",
-      "answerSha256": "5ad846db2ff650150ab22a84be3a67be26a34b89b40a0119add725c7dced9bbb",
+      "answerSha256": "79fd8fe0edc24ffbc24208e5532efa1dc29ce396037bac8eb07dd1cb9c10aa6f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5ad846db2ff650150ab22a84be3a67be26a34b89b40a0119add725c7dced9bbb",
+          "title": "手写 LRU 缓存应怎样保证获取和淘汰效率？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "31f5dd11d702431897654407175a41c0355c441ca590ad55b8d84069c3d61fa3",
       "title": "手写 LFU 时如何处理相同频次的淘汰顺序？",
-      "answerSha256": "ba2f87aa7f462aea23d234c3b3019c29f2fd937d75eca2731baa3c34a7189de6",
+      "answerSha256": "991d15e7c6dd40ec43b5ed96156bcb91dc6f97b915bb5f539e76acb25fa1a9b1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ba2f87aa7f462aea23d234c3b3019c29f2fd937d75eca2731baa3c34a7189de6",
+          "title": "手写 LFU 时如何处理相同频次的淘汰顺序？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "31165f1231e942f5917ef176b08955c3c0d1171d7d908aab5e2489de3fe37657",
       "title": "手写带过期时间缓存如何避免扫描全部键？",
-      "answerSha256": "c31d7dff8e76200a8d4871ac525faba8a6b4f837c55e6e78f2d900cec0a0af51",
+      "answerSha256": "852f87bb8d97e2695abfad137982f4e449dbd8c0d6838098e16037e5d54ab9e0",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c31d7dff8e76200a8d4871ac525faba8a6b4f837c55e6e78f2d900cec0a0af51",
+          "title": "手写带过期时间缓存如何避免扫描全部键？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "bb5915dbec15b062903f5c6d243b5083e814e951b4f8dbd6a56c7ef6b2ab8ef7",
       "title": "手写线程安全 LRU 需要保护哪些组合操作？",
-      "answerSha256": "17e0d5d9e113e4cc1309b5ac99447cade3066d321cc60df28d3d855c4d3ed48b",
+      "answerSha256": "27b404869c485978beef6187ad9d2d21cb5271c88c0ca9cf3a622fad88b73120",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "17e0d5d9e113e4cc1309b5ac99447cade3066d321cc60df28d3d855c4d3ed48b",
+          "title": "手写线程安全 LRU 需要保护哪些组合操作？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "3a4a96891d21107f3cd45e9bdb04fe8046765c7c4175a0c82da6187e4aec1dc8",
       "title": "手写生产者消费者队列如何处理关闭？",
-      "answerSha256": "4c3d167bdf188441d6c864e9e47f169aa332113ea81878c465fe2d01bc07748a",
+      "answerSha256": "fc456618370971a72a811b2f20df50d3cb8b29b20a047a36d0bb9dbfa776f6b8",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4c3d167bdf188441d6c864e9e47f169aa332113ea81878c465fe2d01bc07748a",
+          "title": "手写生产者消费者队列如何处理关闭？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cceaacfb2e741d3c3ee456dc5c422c5dfe08ea85685f2edfb06b41854d97239e",
       "title": "手写循环数组队列如何区分空与满？",
-      "answerSha256": "25192eb839790ea3aaa1bae718b9e47ff087566403369678f094913598b66ed9",
+      "answerSha256": "9519bab7a853e3d1225bdafb1a2e83b70dd137d4c96558cdf9e61988c5c0d4a1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "25192eb839790ea3aaa1bae718b9e47ff087566403369678f094913598b66ed9",
+          "title": "手写循环数组队列如何区分空与满？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4bce673d257facee0694ebcfa9f0b421e3bef0501c1ea0afe69a02035a626455",
       "title": "手写最小栈如何保持所有操作常数复杂度？",
-      "answerSha256": "7ceb6bb0edbab9a68777404ac1b643ccbeb2453dc1fc88cefa8f15715e699d41",
+      "answerSha256": "7b27adb7d017168691a8755d63b3eeb1f2e21b402e5e4e281513f3310faa1c63",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "7ceb6bb0edbab9a68777404ac1b643ccbeb2453dc1fc88cefa8f15715e699d41",
+          "title": "手写最小栈如何保持所有操作常数复杂度？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c51fd3a4bb0b482007791896d65d94225d8c95c00106ec2f525b0e0f19f5007f",
       "title": "用两个栈实现队列怎样分析摊还复杂度？",
-      "answerSha256": "fa3dfb490914277da9e0864c38a36ad01ad4d5aafc5d7b435479c7b308e884b2",
+      "answerSha256": "d80dfe7f651262336c325a7e6fbac443c7eaf16de688781a48a00f90a112625e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fa3dfb490914277da9e0864c38a36ad01ad4d5aafc5d7b435479c7b308e884b2",
+          "title": "用两个栈实现队列怎样分析摊还复杂度？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a9105efd76493d0e518f64e2fc8c61173d2870664692b4dab433b918a216609c",
       "title": "用两个队列实现栈应如何权衡 push 与 pop？",
-      "answerSha256": "87c1452cb5306c6271703ca1c1ebe72162dc081c34a52654d97470ee435923d4",
+      "answerSha256": "cb98e40bb465bf3187a2d3b94834cc8650f92e52df0bad807a57c63747ed3606",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "87c1452cb5306c6271703ca1c1ebe72162dc081c34a52654d97470ee435923d4",
+          "title": "用两个队列实现栈应如何权衡 push 与 pop？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b6fde31d9a4a1f7d2181ba0e5a471c2df45818e94d00b030f771c10fd4651cd6",
       "title": "手写单链表反转为什么要先保存后继？",
-      "answerSha256": "c962d2bb0a91f1910b5bd3643c438b18f6821a38e288db34f22d1dc6bdb759be",
+      "answerSha256": "1351c753598f4a738faf10d2b3077abcc31b453bdb01435c8a3644faac4c2127",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c962d2bb0a91f1910b5bd3643c438b18f6821a38e288db34f22d1dc6bdb759be",
+          "title": "手写单链表反转为什么要先保存后继？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "32eec70e615fd7050b78bd53ffdac455bed4518446c2505ada93a9ddbac2178a",
       "title": "如何原地反转链表的指定区间？",
-      "answerSha256": "8806e0d58220f8bc5030fa9c69fa1bf7f05298591b02c12ae46934614c2b90fe",
+      "answerSha256": "b20b13bf436324128eaea91c51f66d5f8031e6e28fc0f4a000f31017118fe625",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8806e0d58220f8bc5030fa9c69fa1bf7f05298591b02c12ae46934614c2b90fe",
+          "title": "如何原地反转链表的指定区间？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f667252a503b4ba298d2b4a97ce6be7ec7b2c8d7625b7f9abbca2ab7aee842a9",
       "title": "如何检测链表有环并求入口？",
-      "answerSha256": "72f870c7413d10a1e8b93779f9c49767af01c9328e53e8bfb1481312a8e3edf3",
+      "answerSha256": "cac37855b4cb2febaa2fd63b691637c994d30685c2baf7d916d7c2582beaf900",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "72f870c7413d10a1e8b93779f9c49767af01c9328e53e8bfb1481312a8e3edf3",
+          "title": "如何检测链表有环并求入口？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c9524f330f11e84e85b076cc1a327c732ae5f1b5352538644e6ea89cb0aac520",
       "title": "如何找到两个无环链表的相交节点？",
-      "answerSha256": "df060cf439f3859c719daf51f8b1a884928f0b202f3157b287e11435f71f3e09",
+      "answerSha256": "8986b1c3567d25d9627104424ef9082b0a70f4ba6bddd3020b0ed35fd762acc2",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "df060cf439f3859c719daf51f8b1a884928f0b202f3157b287e11435f71f3e09",
+          "title": "如何找到两个无环链表的相交节点？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "498f16e6055915b9d19bc7527ddf22a0a636e6881a77af0d741ff28b79105b73",
       "title": "如何合并 K 个有序链表？",
-      "answerSha256": "ce3bbc9f2572b3d267f72fc48764cc93574ad4fbff82c60e15b41fd139359058",
+      "answerSha256": "9b48677b50a1c8c26bba473607fc4111816a88dbcf9b0fbe389c083a21aebf69",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ce3bbc9f2572b3d267f72fc48764cc93574ad4fbff82c60e15b41fd139359058",
+          "title": "如何合并 K 个有序链表？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "dcbca643cf9c5dc775f5d62f0b73d35933917fd4f0c679c54d8d996ec37c2931",
       "title": "如何在链表中删除倒数第 N 个节点？",
-      "answerSha256": "d12aa203dc12f7ce08944f92a4ed396ea5c68d6be8e4d3e92bce3f8e0f555edf",
+      "answerSha256": "3703f51d0e7c26b55ccd908eeea05527950f5b75bca64757dd4f3ecb92daf842",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "d12aa203dc12f7ce08944f92a4ed396ea5c68d6be8e4d3e92bce3f8e0f555edf",
+          "title": "如何在链表中删除倒数第 N 个节点？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1071d18e536f92779da37840adc6d3c17ef6ffe7875823af729914716b07d32d",
       "title": "如何实现边界可靠的二分查找？",
-      "answerSha256": "62fc5f5456711e9af8fded2f3efca8a1ec2baa160008d0947ba78bd9a5d55677",
+      "answerSha256": "d8fd0aa6e341e8102226d44fe3c0e5351d1488a11f9926e5b82421c247da5893",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "62fc5f5456711e9af8fded2f3efca8a1ec2baa160008d0947ba78bd9a5d55677",
+          "title": "如何实现边界可靠的二分查找？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cfb3cd58666c6cca6b285e3324ba3f69e4915186fa4af0335214ac345477562a",
       "title": "如何查找有序数组中某值的左右边界？",
-      "answerSha256": "4cba4fc05c13a0a78c18555ced9f012ecf29d36bf85d5eb28bc49087f208e4f9",
+      "answerSha256": "200775578252ea73896aecff812d18f8978cc3689651275b92558a5b5e2eeddd",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4cba4fc05c13a0a78c18555ced9f012ecf29d36bf85d5eb28bc49087f208e4f9",
+          "title": "如何查找有序数组中某值的左右边界？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7e5873f1b8012fa78be1790c15d2119c404db48ae6cf0a6e2769436323da68d2",
       "title": "旋转有序数组搜索怎样处理重复元素？",
-      "answerSha256": "dee32f412c96eb26169a4fada29b67dfabda00c6c07a87af9832d0a29b8b9121",
+      "answerSha256": "5ba79d28ef2ca6cd177b8f7593d9fc66ca4fe3ec0185890367a22b4f5dba4fe5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "dee32f412c96eb26169a4fada29b67dfabda00c6c07a87af9832d0a29b8b9121",
+          "title": "旋转有序数组搜索怎样处理重复元素？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0e02e098379b7cde7bd2f4518855bbb804257a3868407daa5c6ccccfc9db9744",
       "title": "如何原地实现快速排序并避免常见退化？",
-      "answerSha256": "650f7952ed20e4b88280d8fcfc04f0421d0febb4aa673996dcf59e7e8e8bbf58",
+      "answerSha256": "de117a7b0079b644e07834ad01b21ddd4983f961b1d6431f00678f28c7f23917",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "650f7952ed20e4b88280d8fcfc04f0421d0febb4aa673996dcf59e7e8e8bbf58",
+          "title": "如何原地实现快速排序并避免常见退化？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4349f80586210128ada28034d554459a8476d56f9cd161c70bc78bd9f8707fef",
       "title": "归并排序为什么适合外部排序思路？",
-      "answerSha256": "1e7b997dad193924add323d21199555f5620e99a3260f6d045b6bee42d789d8c",
+      "answerSha256": "0531e7c2c7353873a95e99cfa51a616f4ca517bf4221df401412a70b34619bf4",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1e7b997dad193924add323d21199555f5620e99a3260f6d045b6bee42d789d8c",
+          "title": "归并排序为什么适合外部排序思路？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "29d195879dad2c134c0c857c0f8b31e53ca3d43e442695b3fc0f5142ac647c65",
       "title": "如何手写堆并实现 Top K？",
-      "answerSha256": "a5cbba0b156f624b163c2b2cc75620dea9965e081cf2c3e31c9b5be62f93510a",
+      "answerSha256": "fd99238fa27b174294aa07ff40a7739bf7864302229ece1c9053a43f96f36feb",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a5cbba0b156f624b163c2b2cc75620dea9965e081cf2c3e31c9b5be62f93510a",
+          "title": "如何手写堆并实现 Top K？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "97ac4d254d37e109b14b0307b807ab7b61046e559f84e8d0ba4caed89ccb4e91",
       "title": "无序数组第 K 大如何用快速选择求解？",
-      "answerSha256": "e231b3792311e7826b2f5a483249ebe306997a66d1fb0bb6c5c2a7b30dc2d576",
+      "answerSha256": "119f07e391754add61bec86d4528d9f10d7cc5b14aee3e7c1bf7e3a7219ef092",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e231b3792311e7826b2f5a483249ebe306997a66d1fb0bb6c5c2a7b30dc2d576",
+          "title": "无序数组第 K 大如何用快速选择求解？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1d9bb1a45f810c601bd38d20a45b281c74d8e46a1f01d603b137fbfb5c2a3355",
       "title": "滑动窗口求最长无重复子串如何避免回退？",
-      "answerSha256": "bbf83983e65d26155c98d3e778895d8324aedf72562a7bbd3e0100c0814d4aac",
+      "answerSha256": "8d4d20b8c657951f634d4d74833ebcdaf3a27df11cbadb68ff89593cc7d2d687",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "bbf83983e65d26155c98d3e778895d8324aedf72562a7bbd3e0100c0814d4aac",
+          "title": "滑动窗口求最长无重复子串如何避免回退？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "dd46b26165c498c2eaec2fbf1068f2bbfe54ba38ac04d4cde3cc2150cbe363da",
       "title": "滑动窗口什么时候不能直接用于和的约束？",
-      "answerSha256": "f6abd6026d55832be900c7297732b09af2737dbd86d4b421df1560ea78625433",
+      "answerSha256": "eda084ba77b18085da66661a626444323d1a5d35506c67b866a31591b7ef8d47",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f6abd6026d55832be900c7297732b09af2737dbd86d4b421df1560ea78625433",
+          "title": "滑动窗口什么时候不能直接用于和的约束？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c0c7cddeebf0cedbc5b939093e7c6a3684e0615ef724f2a5090ff555b8e2bb23",
       "title": "如何用前缀和统计和为 K 的子数组数量？",
-      "answerSha256": "fcb8c429b9155a9878825e5a076068d63154f5d87b7d687bccfb5f206f463a15",
+      "answerSha256": "50015c12409482bea269e95f6331378dfbfcead0834ec2a1e50063db5f405af9",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fcb8c429b9155a9878825e5a076068d63154f5d87b7d687bccfb5f206f463a15",
+          "title": "如何用前缀和统计和为 K 的子数组数量？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ee9a02a8bf7e149a44e3acbdd9bde724a2f6dd03ba72e8cdff7dc65bb24b61f3",
       "title": "单调队列如何计算滑动窗口最大值？",
-      "answerSha256": "75d109bf81f7e7648ddb4ec98e4b766af2f0a7c421a202502386981fc0579f47",
+      "answerSha256": "3ddc4e8a0d0257318f7b9df87547e1da7c04fe1dd295bb958aa610a28c37f94d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "75d109bf81f7e7648ddb4ec98e4b766af2f0a7c421a202502386981fc0579f47",
+          "title": "单调队列如何计算滑动窗口最大值？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "42d07d41eb09a3d6211b906bd5337463e8849490b3909af9dade0b65c33553ec",
       "title": "单调栈如何求每日更高温度或下一个更大元素？",
-      "answerSha256": "fde92755d5dc890c4a452e9da44d858a64e90714e9cca5bd760ec22bc037b8ab",
+      "answerSha256": "8a4e125c6b46493d04c9dc3d46078d778f34f4288dcd88d1bc7403e3d0643d42",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fde92755d5dc890c4a452e9da44d858a64e90714e9cca5bd760ec22bc037b8ab",
+          "title": "单调栈如何求每日更高温度或下一个更大元素？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1f6f13c5a79cec5e5c86822990b3f128984c3d93c39da75c59544ecdc41a5d93",
       "title": "如何求柱状图最大矩形面积？",
-      "answerSha256": "0db6418965d506492781e7ad6800612a65db63d4036a36d8990c6680c7fd7d52",
+      "answerSha256": "f28aae908aee599f0bb55891f8d0f1613b3981158ebe153ca156eb6bde3f0bbc",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0db6418965d506492781e7ad6800612a65db63d4036a36d8990c6680c7fd7d52",
+          "title": "如何求柱状图最大矩形面积？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fc2c76fdb1765df01d49b01e052729d699cfd76c6a024913cf8b2ea651998a3b",
       "title": "区间合并的排序依据与边界如何确定？",
-      "answerSha256": "661b7ee04b075717171c63a4df3ecbd8de9fbde026c36252ff9ff02b8d25c040",
+      "answerSha256": "1b0039f34cf414cf1251a761fcc51ee8ad5abc7d7a9c5f2214e431a5f135605f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "661b7ee04b075717171c63a4df3ecbd8de9fbde026c36252ff9ff02b8d25c040",
+          "title": "区间合并的排序依据与边界如何确定？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "68a8eef637735ead785a85b37cc1ab166b22a63c2d88f7beeb6a0c6b7ca42e62",
       "title": "如何实现支持前缀查询的 Trie？",
-      "answerSha256": "cb72dbb377436a7db11817961a04be0f346fbbadcc492e6d41aed5fecea95dc5",
+      "answerSha256": "5d29841cbaee09f5657ed7c9b6853e0be825ffec890cbe1b2a876afce5f75765",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cb72dbb377436a7db11817961a04be0f346fbbadcc492e6d41aed5fecea95dc5",
+          "title": "如何实现支持前缀查询的 Trie？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7157410aee6fa3670cea549043783ec77df30ad51dc2df69012511f7646769bc",
       "title": "如何手写并查集并分析优化效果？",
-      "answerSha256": "30c0f180d0edc7ba51d3fdb06fc8619f2c9fd059e4a48746aa06b2c64a9c25cb",
+      "answerSha256": "120397f32e46cd55113dbdda5547524c30679eea64ad7000e80fea5931c5027c",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "30c0f180d0edc7ba51d3fdb06fc8619f2c9fd059e4a48746aa06b2c64a9c25cb",
+          "title": "如何手写并查集并分析优化效果？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b3bf13a3965e0fa4ca5ed72558c8db98611bba3d23ea32ed71c537b49256ccd2",
       "title": "如何用并查集判断无向图是否成环？",
-      "answerSha256": "5aa4f3745467e640ab925b06e90d69dca42fce82040e8885a893cd712a536165",
+      "answerSha256": "23d0ecd248a4f8e007b89872fe93d29315a3f874237fb467ecc7ab2f8e4da0d4",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5aa4f3745467e640ab925b06e90d69dca42fce82040e8885a893cd712a536165",
+          "title": "如何用并查集判断无向图是否成环？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "816c2347adf6723ebc32e245813df05e2f0923ec7be5c2ec7dca461f8fd02fca",
       "title": "拓扑排序如何检测依赖循环？",
-      "answerSha256": "07fbb1fc4b1cb67421d6b148105de39a38d037cccbb24be5b6620879db9b001d",
+      "answerSha256": "8b92796e874d69c11c43833f43a21e3b357d9db76a0b848ad6f6e647ea7bc040",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "07fbb1fc4b1cb67421d6b148105de39a38d037cccbb24be5b6620879db9b001d",
+          "title": "拓扑排序如何检测依赖循环？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "6b887ffa726b0604a3f622ea5c03fc5c586ba7fc9b2b6e4b8b19357d5a54353e",
       "title": "有向图 DFS 为什么需要区分访问中与已完成？",
-      "answerSha256": "858cd2ed6be32f9410b88beb3438a58617cc58be970ecdede065cc86d4c04649",
+      "answerSha256": "62b26168ea56316fc47515930427f1b75028e14f6d537f2cea38f7b540f410ef",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "858cd2ed6be32f9410b88beb3438a58617cc58be970ecdede065cc86d4c04649",
+          "title": "有向图 DFS 为什么需要区分访问中与已完成？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2f4e9bbf9982217cb5f75475d1e9c0a755f3b6f95cc6a1272ae4552ef85ca9a7",
       "title": "Dijkstra 算法为什么要求适当的边权条件？",
-      "answerSha256": "cce8ad6560c46efc34ccb96cad5c7ff5b7f35775f7bd0692008f32e91af35867",
+      "answerSha256": "7a9d67246dfc3cfb1efb415fcc05f4551f6f326b5f4e97ec4acd0e60307fe629",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cce8ad6560c46efc34ccb96cad5c7ff5b7f35775f7bd0692008f32e91af35867",
+          "title": "Dijkstra 算法为什么要求适当的边权条件？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b56f59418c02e1537ae7c6e5da75e7524f0e17c0732bf2df7cc7bd603f3abb87",
       "title": "如何为带权网格选择 BFS 或 Dijkstra？",
-      "answerSha256": "3c7d94964ab488a7265ae6e104724bc613cd8472c8df6e652dcd57309d489f7c",
+      "answerSha256": "c703285feaeabf5e54269fd49350cee64a60e52adb813bf0b2d8818ba9a92114",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3c7d94964ab488a7265ae6e104724bc613cd8472c8df6e652dcd57309d489f7c",
+          "title": "如何为带权网格选择 BFS 或 Dijkstra？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "275dee9a65e546ee5d8aef2cf1a5fcd7d2cbc21c23ef0e4bab019b9b0f8111a4",
       "title": "二叉树层序遍历怎样控制每一层边界？",
-      "answerSha256": "13b364e0509695d2f692b1a26a833c8138beac5590ce11b69cd07cbaafebc110",
+      "answerSha256": "6cc09fa8e5520548c7ae039ddecf6b9ee1474886e56e6281ee79ad5768271c58",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "13b364e0509695d2f692b1a26a833c8138beac5590ce11b69cd07cbaafebc110",
+          "title": "二叉树层序遍历怎样控制每一层边界？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "acc7eff8af031dfd06eab6c30f0b37ad99551e0d53cd40af7dff3aabc7e32b4d",
       "title": "如何迭代实现二叉树中序遍历？",
-      "answerSha256": "f43b1dab88524e63538ea95a6942df6ff99c19fdf59eb606edb6ad66f01639bc",
+      "answerSha256": "539e7275dca0392e089344be2f0f5f6329d5e1af7e6c7499c9ad5be74a6f06e1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayDeque.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f43b1dab88524e63538ea95a6942df6ff99c19fdf59eb606edb6ad66f01639bc",
+          "title": "如何迭代实现二叉树中序遍历？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ee34342a8678818fd49ecf04c888d38d8c787e915db9d8b7a1bf583baa4e003e",
       "title": "如何求二叉树最近公共祖先？",
-      "answerSha256": "ac366e4d957386a7d347a492263158b8dcab10186d1f22fa355e1b73326e9bcb",
+      "answerSha256": "6247a373aff6715c395fa77b0352e649ce8e5bcb9a372f974a0e5c3d4b7fcc71",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ac366e4d957386a7d347a492263158b8dcab10186d1f22fa355e1b73326e9bcb",
+          "title": "如何求二叉树最近公共祖先？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "bb05cf70334d90891dc643ad456d5bace0574a4c31d96ce608c1e04ca91276c6",
       "title": "序列化二叉树为什么必须保留空节点信息？",
-      "answerSha256": "a36a1c8b30a20887297aea0af0b0a8f91fd50aeb345eef07998963a680d5755e",
+      "answerSha256": "a034e6194770b044018a14842b5856214b7bd370c5e136ddc9ad2400ab03115a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/StringBuilder.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a36a1c8b30a20887297aea0af0b0a8f91fd50aeb345eef07998963a680d5755e",
+          "title": "序列化二叉树为什么必须保留空节点信息？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d99cb43923faeb66059c4ab826ad656f27f0cd94d706357b36718a88c9e76b0c",
       "title": "动态规划求最长递增子序列有哪些复杂度选择？",
-      "answerSha256": "2ba7caa42c99c23cc570ba0c359a274b4d37e45d0c710b72269e9ebcaf8db5e5",
+      "answerSha256": "d95c50a781003df4ba1633ac9379fe12e637909942e42cad8c174ad03cf9df36",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "2ba7caa42c99c23cc570ba0c359a274b4d37e45d0c710b72269e9ebcaf8db5e5",
+          "title": "动态规划求最长递增子序列有哪些复杂度选择？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "15eeffb3df369e6901fbbb3b4bde6c4a612515ac89383027100fe898c7ed4012",
       "title": "0-1 背包的一维状态为什么通常倒序更新？",
-      "answerSha256": "5a4c8c76a8fc259912c1fe200e522ad1329d994cfd25d8a1d63ca17a5a68e887",
+      "answerSha256": "65ee711eef17465871637b8e633a3dd565bc5bdbd8a47800b1be53a0219fb55d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5a4c8c76a8fc259912c1fe200e522ad1329d994cfd25d8a1d63ca17a5a68e887",
+          "title": "0-1 背包的一维状态为什么通常倒序更新？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4dad3cd24f5aa37e2f2ab529410398d826efa6e69f833280e5992a2bddbc00b1",
       "title": "零钱兑换最少数量如何处理无解状态？",
-      "answerSha256": "87290272c91bfc04e20420d2d2266082d4ec02788dbcbdf7abf3c1a881e1569c",
+      "answerSha256": "1f8ebaf1508669c2fc6a70d000f1bec952839955d2f51fc52a81969c5a0c8867",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "87290272c91bfc04e20420d2d2266082d4ec02788dbcbdf7abf3c1a881e1569c",
+          "title": "零钱兑换最少数量如何处理无解状态？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c7f57eabe30fae5783ff18945c42e83cdbb60592dc195d44f398fd1f8a71b5c8",
       "title": "编辑距离的状态转移怎样解释？",
-      "answerSha256": "f2e77dc171f2affed93105ddc852cbd25262e4661fb1f2eafa99ea0444736a65",
+      "answerSha256": "0bedcc5dee695ac6f151aa42f1544c9c68a8c148622006e83f523b635eeaf1a1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f2e77dc171f2affed93105ddc852cbd25262e4661fb1f2eafa99ea0444736a65",
+          "title": "编辑距离的状态转移怎样解释？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "49de98265addecab5355685b48f1fa5ca1f57cd919e55e4e109596d4ce8aaa5a",
       "title": "如何求两个字符串的最长公共子序列？",
-      "answerSha256": "d13228fd8ba523543c977dbf884f238c34e40cf8c71b26e789b508c466e115bb",
+      "answerSha256": "f66586677eae7831ebe48e8cfcff445e3d08662da4225bd1160536e2388dfe64",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "d13228fd8ba523543c977dbf884f238c34e40cf8c71b26e789b508c466e115bb",
+          "title": "如何求两个字符串的最长公共子序列？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "e444503c618d2b69fb3ff234d26f6dedb9a363a10f8a91a61624056e592e235f",
       "title": "如何设计带重复元素的全排列去重？",
-      "answerSha256": "7fdcc2c5eaac6de6e15f1c4d9dbdb7dc43aa281e9b75612f3965bcec802765f2",
+      "answerSha256": "90cea0c664a07f1c5703a4896ca7d76730c878e5a472dd0455580457d86edf80",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "7fdcc2c5eaac6de6e15f1c4d9dbdb7dc43aa281e9b75612f3965bcec802765f2",
+          "title": "如何设计带重复元素的全排列去重？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "8156da9523115e5f98376e798f6545a7f896f651140740a537079aeb8e9b9e5f",
       "title": "海量文件怎样做精确外部去重？",
-      "answerSha256": "0463399fcfe27060b32436a592c768b78e2ecea93d554757a463038328105e92",
+      "answerSha256": "4a6c2463ec7b4eceb00ab676181daaf758925ed0c3dee0511b2e38467ed7638c",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashSet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0463399fcfe27060b32436a592c768b78e2ecea93d554757a463038328105e92",
+          "title": "海量文件怎样做精确外部去重？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5662eff44aad0afd1b92bbd83c404b5535f58a86d9a410897f6743d06740bfac",
       "title": "如何从数据流中维护中位数？",
-      "answerSha256": "601931169a9344fdb4860dd81bd95d65c839bad23dd83219e368d68894ac37dc",
+      "answerSha256": "1db966b2c5a819d6c9706dcef9c23474d4d4028cbbaf6b2a04a99873ff5d636b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "601931169a9344fdb4860dd81bd95d65c839bad23dd83219e368d68894ac37dc",
+          "title": "如何从数据流中维护中位数？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7dcf93118797d6a66637dba4cb92b3bd8d099880ef624bec6f111a054b5217d7",
       "title": "如何实现带上限的并发任务调度算法？",
-      "answerSha256": "cc8216c3c7e80d7a4a01141d8825adebd600f09d89898b1ba98fc5410cbe1868",
+      "answerSha256": "8d1cc2b605614321cacc269dba120627b340aee8bd7548daddf3439a19de5262",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cc8216c3c7e80d7a4a01141d8825adebd600f09d89898b1ba98fc5410cbe1868",
+          "title": "如何实现带上限的并发任务调度算法？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9277e0b846ba11b3b774bf329fd5f7a20790428d48ebf44f48a9cbb6f4fa0127",
       "title": "手写算法后怎样构造能暴露错误的测试？",
-      "answerSha256": "6d20c39539bc994f6d7c66f7ca8b3cdf40e5a2f983e2f28b04c7df400a877b14",
+      "answerSha256": "54aaa01dc0dfcf4debaa1b737598b84ddda9c9973071a69b8b02467a960381d0",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6d20c39539bc994f6d7c66f7ca8b3cdf40e5a2f983e2f28b04c7df400a877b14",
+          "title": "手写算法后怎样构造能暴露错误的测试？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2415387ce7cf026e8974991a401141f1dccabd737f4dc3c01341f8ca0f5c8229",
@@ -40849,10 +42407,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -40886,10 +42443,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -40923,10 +42479,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html",
-          "https://arxiv.org/abs/2005.11401"
+          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -40960,10 +42515,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://genai.owasp.org/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -40997,10 +42551,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41101,10 +42654,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41138,10 +42690,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41175,10 +42726,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://genai.owasp.org/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41212,10 +42762,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41249,10 +42798,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2309.06180",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2309.06180"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41286,10 +42834,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41323,10 +42870,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://genai.owasp.org/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41360,10 +42906,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://genai.owasp.org/"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41397,10 +42942,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2309.06180"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41434,10 +42978,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2309.06180",
-          "https://genai.owasp.org/"
+          "https://arxiv.org/abs/2309.06180"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41471,10 +43014,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2309.06180",
-          "https://genai.owasp.org/"
+          "https://arxiv.org/abs/2309.06180"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41508,10 +43050,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41545,10 +43086,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41582,10 +43122,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41619,10 +43158,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41656,10 +43194,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2309.06180"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41693,10 +43230,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2310.05736",
-          "https://arxiv.org/abs/2307.03172"
+          "https://arxiv.org/abs/2310.05736"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41730,10 +43266,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41767,10 +43302,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41804,10 +43338,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41841,10 +43374,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41878,10 +43410,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41915,10 +43446,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41952,10 +43482,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -41989,10 +43518,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42026,10 +43554,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42063,10 +43590,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2306.05685"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42100,10 +43626,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://arxiv.org/abs/2005.11401"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42137,10 +43662,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42174,10 +43698,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2309.06180"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42211,9 +43734,8 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
           "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
@@ -42240,7 +43762,7 @@
     {
       "sourceKey": "52c519c4e87b658b633db6c3b3662dcd383b5601b0dcc454cdcc6b11fb8487ac",
       "title": "为什么知识状态接口不应反复重建全部索引？",
-      "answerSha256": "b922b8aa5de8306e7e8fe66cd8d16a693d6f551d311469bbe621d9e3496d19a4",
+      "answerSha256": "b0739bf6cb2cfa813ba8ec05871267e3fb1715f5ce776b2614682d2f37b4b03e",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -42248,14 +43770,32 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/handling-overload/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "b922b8aa5de8306e7e8fe66cd8d16a693d6f551d311469bbe621d9e3496d19a4",
+          "title": "为什么知识状态接口不应反复重建全部索引？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "verified",
+            "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+            "evidence": [
+              "https://sre.google/sre-book/handling-overload/"
+            ],
+            "reviewer": "zcode-review-20261114"
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2008eea29ad8fbc7e60721973832000e4994c44aa38d8fc75a1265d2b1fed1be",
@@ -42268,10 +43808,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2306.05685"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42305,10 +43844,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2306.05685",
-          "https://arxiv.org/abs/2005.11401"
+          "https://arxiv.org/abs/2306.05685"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42342,10 +43880,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://genai.owasp.org/"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42379,10 +43916,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2306.05685"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42416,10 +43952,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://genai.owasp.org/"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42453,10 +43988,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42490,10 +44024,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2309.06180",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://arxiv.org/abs/2309.06180"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42527,10 +44060,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://genai.owasp.org/",
-          "https://sre.google/sre-book/service-level-objectives/"
+          "https://genai.owasp.org/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42564,10 +44096,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://genai.owasp.org/"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42601,10 +44132,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://arxiv.org/abs/2306.05685"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42638,10 +44168,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://sre.google/sre-book/service-level-objectives/",
-          "https://genai.owasp.org/"
+          "https://sre.google/sre-book/service-level-objectives/"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42667,7 +44196,7 @@
     {
       "sourceKey": "40a3e7783976c27dfd7b14dba3a0b58ddbb6f64cd46391d1160570d87e3166dc",
       "title": "资深开发如何总结一个可持续的 AI 工程方案？",
-      "answerSha256": "1e406dd4caf810b65e41fc404cce72be472cf30078e3e2770950b6a9e784a197",
+      "answerSha256": "364b434034f1815a1f954477633a02f26a78770f6603e4d20000224ef4cdb92f",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -42675,12 +44204,9 @@
       },
       "factualReview": {
         "status": "verified",
-        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "applicableVersion": "本机实验锚点+官方文档核读(2026-11-14 compact 升 deep 批次)",
         "evidence": [
-          "https://arxiv.org/abs/2005.11401",
-          "https://arxiv.org/abs/1706.03762",
-          "https://arxiv.org/abs/2106.09685",
-          "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+          "https://arxiv.org/abs/2005.11401"
         ],
         "reviewer": "zcode-review-20261114"
       },
@@ -42698,6 +44224,26 @@
             "applicableVersion": "",
             "evidence": [],
             "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "1e406dd4caf810b65e41fc404cce72be472cf30078e3e2770950b6a9e784a197",
+          "title": "资深开发如何总结一个可持续的 AI 工程方案？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "verified",
+            "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+            "evidence": [
+              "https://arxiv.org/abs/2005.11401",
+              "https://arxiv.org/abs/1706.03762",
+              "https://arxiv.org/abs/2106.09685",
+              "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+            ],
+            "reviewer": "zcode-review-20261114"
           },
           "manualMerge": "not-assessed"
         }

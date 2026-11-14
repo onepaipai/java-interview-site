@@ -9,67 +9,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. 哈希表定位节点，双向链表维护访问顺序；get 命中和 put 更新都移到最近端。
-2. 新键超过容量时淘汰最旧节点，同时删除映射；两个结构必须保持一一对应。
-3. 哈希分布良好时 get、put 平均 O(1)，空间 O(capacity)；遍历链表找键会退化到 O(n)。
-4. 并发时保护查找、移链和淘汰整个组合过程；get 也修改顺序，不能只给 put 加锁。
+<!-- explanation:deep -->
+
+> 场景与约束：网银账户缓存沙盘:热点账户查询走本地缓存,容量 1 万条——get/put 都要 O(1),容量满自动淘汰最久未用;哈希定位+双向链表保序是唯一同时满足两点的结构。
+
+1. 结构=HashMap(key→Node)+双向链表(使用序):get 命中把节点摘下移到链尾(最近使用),put 已存在则更新值并移尾,新 key 尾插;容量满删链头(最久未用)并删哈希映射——两步都 O(1)。
+2. 关键实现细节:节点必须同时存 key(淘汰时反查哈希表删映射,只存 value 会留下孤儿映射)+prev/next 双向指针(摘除 O(1),单链表要先找前驱 O(n));head/tail 用哨兵节点,边界(空表/单节点)不需要特判。
+3. 复杂度:get/put/淘汰全部均摊 O(1);空间 O(capacity);LinkedHashMap(accessOrder=true+重写 removeEldestEntry)是等价速写版,但并发不安全且淘汰策略扩展受限(TTL/权重),生产高并发用 Caffeine(W-TinyLFU)。
+
+## 参考分析
+
+### 机制:为什么必须是哈希+双向链表的组合
+
+只有哈希:能 O(1) 定位但不知道谁最久没用(要遍历);只有链表:知道顺序但查找 O(n)——两个结构各补对方的短板,这是组合式数据结构的教科书案例(哈希给速度,链表给顺序)。访问即移尾保证链表从头到尾=冷到热,淘汰端天然在链头。
+
+### 反例:三种典型事故
+
+事故一:Node 不存 key——淘汰链头后哈希表映射删不掉,内存泄漏且 get(key) 返回已淘汰数据;事故二:先删哈希再找链表节点——顺序反了节点已失联;事故三:用单链表——摘中间节点必须先遍历找前驱,淘汰退化 O(n);修复都是把 key 与双向指针放进 Node。
+
+### 取舍:手写与 JDK/库的边界
+
+LinkedHashMap 五行实现(legacy/111 同源)适合单线程原型;手写版胜在可加 TTL/过期队列/权重/统计;并发场景三者都不够——分段锁化或直接 Caffeine(它连 LRU 都不用,W-TinyLFU 抗扫描污染)。面试手写考的是组合结构与边界,生产选库。
 
 ## 案例
 
-1. 场景（教学示例）：容量为 2，依次放入 A、B，访问 A，再放入 C；应淘汰 B 而不是最早插入的 A。
+### 验证:行为断言组(本机可复跑)
 
-2. 实现：手写哈希表加双向链表；头后为最近访问，尾前为最旧；本例只接收 String 键和 int 值，限单线程。
+验证:顺序断言(put A/B/C 后 get A→淘汰 B 而非 A——A 被访问移尾,集合 C2 实验同源);容量断言(超容后 eldest 被移除且 size 回到容量内);孤儿断言(淘汰后 containsKey(被淘汰 key)==false——验证 Node 存 key 的必要性);哨兵断言(空表 get/单节点淘汰均正常)。预期:四组断言全绿,任何一处结构缺陷立即暴露。
 
-```java
-class Lru {
-    class Node {
-        String key; int value; Node prev, next;
-        Node(String key, int value) { this.key = key; this.value = value; }
-    }
-    final int limit;
-    final java.util.Map<String, Node> map = new java.util.HashMap<>();
-    final Node head = new Node(null, 0), tail = new Node(null, 0);
-    Lru(int limit) {
-        if (limit <= 0) throw new IllegalArgumentException("capacity");
-        this.limit = limit; head.next = tail; tail.prev = head;
-    }
-    void unlink(Node n) { n.prev.next = n.next; n.next.prev = n.prev; }
-    void first(Node n) {
-        n.next = head.next; n.prev = head;
-        head.next.prev = n; head.next = n;
-    }
-    Integer get(String key) {
-        Node n = map.get(key);
-        if (n == null) return null;
-        unlink(n); first(n); return n.value;
-    }
-    void put(String key, int value) {
-        Node n = map.get(key);
-        if (n != null) {
-            n.value = value; unlink(n); first(n); return;
-        }
-        n = new Node(key, value); map.put(key, n); first(n);
-        if (map.size() > limit) {
-            Node old = tail.prev; unlink(old); map.remove(old.key);
-        }
-    }
-}
-var cache = new Lru(2);
-cache.put("A", 1); cache.put("B", 2);
-System.out.println(cache.get("A"));
-cache.put("C", 3);
-System.out.println(cache.get("B"));
-System.out.println(cache.get("C"));
-cache.put("A", 9);
-System.out.println(cache.get("A") + " / " + cache.map.size());
-```
+### 追问链:LRU 三刀
 
-3. 结果：输出 1、null、3、9 / 2；访问 A 后淘汰 B，更新 A 不增加元素数；缺失返回 null，与已存 int 值区分。
-
-4. 验证：补测容量 1、重复更新、未命中、非法容量与尾部淘汰；用随机操作对照参考实现，逐步检查映射数等于链表节点数。
+一刀:并发怎么加锁——整表一把锁(简单,吞吐低)/分段锁(CHM 思路)/读写锁(读多写少)——粒度与正确性的权衡(第 4 题专答并发版)。二刀:LRU 的扫描污染——一次性批量扫库把热点全挤出去,LFU/ W-TinyLFU 按频率抗污染(第 2 题)。三刀:TTL 与容量淘汰正交——生产两者都要,过期队列(时间堆)+双向链表共存。
 
 ## 总结点
 
-1. 哈希定位，双链排序。
-2. 读命中也要刷新位置。
-3. 淘汰同时删表和链。
+1. 哈希给速度,链表给顺序
+2. Node 必须存 key+双向指针
+3. 哨兵节点消灭边界特判

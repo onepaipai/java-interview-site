@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "packVersion": "explanations-v34",
+  "packVersion": "explanations-v35",
   "meaning": "结构校验、案例执行、事实核验和业务库人工合并独立记录；正文摘要变化使旧审核证据失效。业务库人工改动由 /api/admin/publications/status 动态判断。",
   "entries": [
     {
@@ -47374,7 +47374,7 @@
     {
       "sourceKey": "499fe8d5e7c2ff14165f983d4351717bee1f202cc4f4962130e2bde776356cc7",
       "title": "手写 LRU（LinkedHashMap，或双向链表 + HashMap）",
-      "answerSha256": "e6326c59debca3e49b953e70e39b1ff86109ad9197700be7386d96decdf8f01f",
+      "answerSha256": "4e5e3acdab8ddf4e58da308cf26ccbe870a932492183a2121cb37415e1b62a34",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47387,7 +47387,23 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e6326c59debca3e49b953e70e39b1ff86109ad9197700be7386d96decdf8f01f",
+          "title": "手写 LRU（LinkedHashMap，或双向链表 + HashMap）",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ae4a0a0f15138a80785f0e114e440d53e07c52c1c8fe9778d745ae0b8a033a3c",
@@ -47410,7 +47426,7 @@
     {
       "sourceKey": "7f3c895d3dd32947d775ae4594add484fa50bdabc1aecb32992ab8eb4b9493da",
       "title": "链表反转、二叉树层序遍历、两数之和、滑动窗口、合并区间",
-      "answerSha256": "8726034debdc8588015e98fe53ad96b6a0cd61e409b645267f0aad4d558c2f42",
+      "answerSha256": "ac4f91a558270ca4933b67205eb74c408e3a674a1ca8fac05571052c6ad66442",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47423,12 +47439,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8726034debdc8588015e98fe53ad96b6a0cd61e409b645267f0aad4d558c2f42",
+          "title": "链表反转、二叉树层序遍历、两数之和、滑动窗口、合并区间",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "e75ced51612356e104c767e24eae6b4bf206c9467db8db3ac4f5ec8502096fdf",
       "title": "SQL：窗口函数、行转列、连续登录天数、每组前 N 名",
-      "answerSha256": "421e5454764dfbb1c0ba14faf1c60df732ecf4d61425fa6e3ee948301e3c4899",
+      "answerSha256": "9dc9b2b1c87d88e9330fb2a963f6963d9e6791b5a08fac5f7c7f186c09f3a565",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47441,12 +47473,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "421e5454764dfbb1c0ba14faf1c60df732ecf4d61425fa6e3ee948301e3c4899",
+          "title": "SQL：窗口函数、行转列、连续登录天数、每组前 N 名",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "14ebfbb57231d1415087986e7a08a2ae41b7de6f311fe879c44a11a08b9b86d9",
       "title": "RAG 完整流程：切片、Embedding、向量检索、重排、生成",
-      "answerSha256": "63f11fbb19d0d49d47b166216ff0ad85dacdf98313186774eebcba058086f00e",
+      "answerSha256": "a6227aa08fdd615c93771c4bcfeaae368132da115853c5313b5a158b1d6b14dd",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47459,12 +47507,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "63f11fbb19d0d49d47b166216ff0ad85dacdf98313186774eebcba058086f00e",
+          "title": "RAG 完整流程：切片、Embedding、向量检索、重排、生成",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "37ed8287b7c05955dfdc5fae86d2e4d49374ae5e0dc7b7a990636abecb9c5238",
       "title": "Prompt 设计技巧：角色、示例、约束、思维链",
-      "answerSha256": "701cf02d3d5ffc240ace860b42f4e8c04cf00f7669c2ad2512cff423ae953de6",
+      "answerSha256": "4375dce8e3d54314925a457ef3db859dc72bf13b2c032a554ccd6e153e08a37a",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47477,12 +47541,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "701cf02d3d5ffc240ace860b42f4e8c04cf00f7669c2ad2512cff423ae953de6",
+          "title": "Prompt 设计技巧：角色、示例、约束、思维链",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "163cb1de773b87cb1b068cf546e2290c007f4bc44e28c7b9ad1c74ce0eb6d18b",
       "title": "Function Calling 的原理与流程",
-      "answerSha256": "9495f459242457f856fafb0daf98f4fc90d90d25937020bfdae1e9a6e4305913",
+      "answerSha256": "2b9d1dd777f48955d5adb6ff5057cb52dc01c3d7374fa6501c1d3250422dcc81",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47495,12 +47575,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9495f459242457f856fafb0daf98f4fc90d90d25937020bfdae1e9a6e4305913",
+          "title": "Function Calling 的原理与流程",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a275fae16dbe621e92b1dbc586d2c3c81bdd2cad8372d559a7bc3febed439ebc",
       "title": "Java 如何调用大模型？流式输出如何处理",
-      "answerSha256": "d3d5353d81d7eee638973aac15d9544aabd7b0077f0db69a133b115bf7de09c0",
+      "answerSha256": "9198dc2ccd21664e6d0ba69ef03ed8f37825e59c8fec09d9504ed84c2f9839dc",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47513,12 +47609,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "d3d5353d81d7eee638973aac15d9544aabd7b0077f0db69a133b115bf7de09c0",
+          "title": "Java 如何调用大模型？流式输出如何处理",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cd45dc48c8cebdbf51178522e632b5baee7f667eea68db1b46c5cb87c505d5d8",
       "title": "转账如何保证幂等？重复点击、超时重试、MQ 重复消费 - 要点：唯一业务流水号 + 唯一索引 / 去重表 + 状态机，重复请求返回首次结果",
-      "answerSha256": "1d4a11b0010e414f2249c80a55e57333a751d72a684ea05ddda5fbca1acb937e",
+      "answerSha256": "88baa77b910592de461830b91dd0ec33c31478169dd67abfd8be83b9c20bc283",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47531,12 +47643,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1d4a11b0010e414f2249c80a55e57333a751d72a684ea05ddda5fbca1acb937e",
+          "title": "转账如何保证幂等？重复点击、超时重试、MQ 重复消费 - 要点：唯一业务流水号 + 唯一索引 / 去重表 + 状态机，重复请求返回首次结果",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1db8339f58f8f04aa007d57e33a78aa71306cfaafb6b9857e7a99bd8cd3353e9",
       "title": "分布式事务方案对比：2PC、TCC、Saga、本地消息表、最终一致性",
-      "answerSha256": "726abd016bcb586446f4482f7ab273df4f50637aa3c63c96a7c4dfcb2a29a764",
+      "answerSha256": "d5331958ce40ca22867a5daafe26c0bda5a78247444258cc94faa7d09857a409",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47549,12 +47677,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "726abd016bcb586446f4482f7ab273df4f50637aa3c63c96a7c4dfcb2a29a764",
+          "title": "分布式事务方案对比：2PC、TCC、Saga、本地消息表、最终一致性",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "870ae2136b1395c9b2c03c2ca709069844e2896f1f569f5956b781a9047df5f7",
       "title": "扣款成功但入账失败，或超时状态未知，如何处理 - 要点：状态查询、冲正、补偿重试，最终以对账兜底",
-      "answerSha256": "9534938397f3c0e615dca462b1c5207564e32c3a9426cfcf60c1a214afc8bc06",
+      "answerSha256": "8625bb14f43184edc4f0c45f3e5f5873e6e23fab5dfaf8395e75d15146b61207",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47567,12 +47711,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9534938397f3c0e615dca462b1c5207564e32c3a9426cfcf60c1a214afc8bc06",
+          "title": "扣款成功但入账失败，或超时状态未知，如何处理 - 要点：状态查询、冲正、补偿重试，最终以对账兜底",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c3532e276a4df588c276b600d2d9609c2d9b2d2f69695672e7c682f47005f243",
       "title": "余额并发扣减：乐观锁、悲观锁、行锁；热点账户如何处理",
-      "answerSha256": "421d4cc75842c2ba69c480bca13c8a3a29af7fb8fbbf41b4b296dd2ccbc24be7",
+      "answerSha256": "89a4288b2e7e73fdd29e0642d0419e0764110bca57ba1ca58a21f609196fa28d",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47585,12 +47745,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "421d4cc75842c2ba69c480bca13c8a3a29af7fb8fbbf41b4b296dd2ccbc24be7",
+          "title": "余额并发扣减：乐观锁、悲观锁、行锁；热点账户如何处理",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c91d4b7dea5688a2ff674d252f708f80e9b62751876c2224a6957dd446b579f3",
       "title": "对账系统设计：差异类型（长款、短款、金额不一致）、自动修复、人工流程",
-      "answerSha256": "3a19cf79adf01a945880ab0dabcb051f1afc71a6793871db818f291bf4eadbca",
+      "answerSha256": "e2b6377ca73f4d2655c4e2e2a8df2860d909f44b33c5f7c789114008d7a45a6f",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47603,12 +47779,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3a19cf79adf01a945880ab0dabcb051f1afc71a6793871db818f291bf4eadbca",
+          "title": "对账系统设计：差异类型（长款、短款、金额不一致）、自动修复、人工流程",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7cb21ce433fce72d0e5dd3bef7957ef13484cccb5e1b20b89c0541d2d8ac57ba",
       "title": "交易流水号与分布式 ID 方案（雪花、号段、时钟回拨问题）",
-      "answerSha256": "f26d771d414eb63da45538972099e53e1843ebba769f0903cfa963c42deea91a",
+      "answerSha256": "b28eee975896de57a8f3ed53a67a5f5175e17aa226b5e93d0459ef803ebb5a7c",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47621,12 +47813,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f26d771d414eb63da45538972099e53e1843ebba769f0903cfa963c42deea91a",
+          "title": "交易流水号与分布式 ID 方案（雪花、号段、时钟回拨问题）",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cc40852ec4cf8fd13aa46f7c3450933c36a13e205d74fc60342df0757083ebd3",
       "title": "日终批处理：失败重跑、断点续跑、大数据量分片",
-      "answerSha256": "cb8f4b4bc487928cc97e23a81cc86b701c602bac6eb91bffaaab9e11cb94ed8f",
+      "answerSha256": "6aa0e2cbea744728f2889e17723852ea4bc743a0c324fe30cdc9e103f394fade",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47639,12 +47847,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cb8f4b4bc487928cc97e23a81cc86b701c602bac6eb91bffaaab9e11cb94ed8f",
+          "title": "日终批处理：失败重跑、断点续跑、大数据量分片",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "3737eb051969c12c50d86278b843b082f8af80aeacf00a9f747443519ecbec16",
       "title": "限额与风控：规则引擎设计，实时风控与异步风控的区别",
-      "answerSha256": "583e10b0760e11094869a07733e57ba8b61b2760bcffd28952b1846bcb155b1b",
+      "answerSha256": "dc65de0b2412104b493a7037c5333f610f8f157fa3f60122516c2000dc77f772",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47657,12 +47881,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "583e10b0760e11094869a07733e57ba8b61b2760bcffd28952b1846bcb155b1b",
+          "title": "限额与风控：规则引擎设计，实时风控与异步风控的区别",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "16c1ba1208a7b8fe3a798b8781fd11beff6af4238a124f9585ea79674348bacb",
       "title": "资金安全：防重放（时间戳 + nonce）、防篡改（签名）、传输加密",
-      "answerSha256": "95a8115e3d836140c61a883a7f92d4102bf4c79b212150857139e7ecbd01acae",
+      "answerSha256": "416cfb3bc200e85a0e2370e741a90fd76198955ca0964022b151303bf938ceb9",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47675,12 +47915,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "95a8115e3d836140c61a883a7f92d4102bf4c79b212150857139e7ecbd01acae",
+          "title": "资金安全：防重放（时间戳 + nonce）、防篡改（签名）、传输加密",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "986fb0ee30e0ef392d30bf3de8745300bb12c734fdbfc91382d7ca6153778095",
       "title": "敏感数据（卡号、证件、手机号）的加密存储与脱敏；密钥管理",
-      "answerSha256": "27558f6179670ac1436b535e97ec3b82dee024f55bacf7a9673b026929913ca7",
+      "answerSha256": "63e94febd8ba43063f0d7053a69a67a280a9de17d6d21ef21c9f0e8ab5154e46",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47693,12 +47949,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "27558f6179670ac1436b535e97ec3b82dee024f55bacf7a9673b026929913ca7",
+          "title": "敏感数据（卡号、证件、手机号）的加密存储与脱敏；密钥管理",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9af564aee4b70bb30aa90355ea4591179804d0eb405e3c709ce8d9102e3e807d",
       "title": "认证体系：Token / Session、单点登录、短信验证码、U盾 / 动态令牌、多端互踢",
-      "answerSha256": "9106b278ba93173d887efb5530cda9d1c24cb0a7b179615aafd3b19900b62748",
+      "answerSha256": "ad42809da89eb6cf49191fb9d9a7a2a7ae2fab973765dca92ca6f1da0ac35681",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47711,12 +47983,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9106b278ba93173d887efb5530cda9d1c24cb0a7b179615aafd3b19900b62748",
+          "title": "认证体系：Token / Session、单点登录、短信验证码、U盾 / 动态令牌、多端互踢",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c7631309bf1b4699ec40adc911e8d39832f67a09fd81fbee736db21b9c33f0a5",
       "title": "审计日志设计与合规追溯",
-      "answerSha256": "6a23bf7576d214d99c3b733be430c6a60598e6a97c4ec5bc3a9ff4870fa73791",
+      "answerSha256": "a301c2e3a0a72a2e1725ae68485f0d94d82e3b773ea469012d4bfea64660189a",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47729,12 +48017,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6a23bf7576d214d99c3b733be430c6a60598e6a97c4ec5bc3a9ff4870fa73791",
+          "title": "审计日志设计与合规追溯",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "28a2cab0fe433625a381f75114ffbc74c70acb163b49337d0754f5b84da25b31",
       "title": "对接外部系统（核心、银联、人行）的超时、降级、补偿",
-      "answerSha256": "3be84c049b8df08c87e3c129a020691b91e565a1397355bef649428c27852d0e",
+      "answerSha256": "1fa8787e7484bdd4ff8cbde8bc497841ef1b948308db06809bfcc63ae1e01123",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47747,12 +48051,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3be84c049b8df08c87e3c129a020691b91e565a1397355bef649428c27852d0e",
+          "title": "对接外部系统（核心、银联、人行）的超时、降级、补偿",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ffc04244149fb312bd760c6b89ed2043f49ddd72ca278acde6a097754324cf45",
       "title": "渠道与核心系统解耦：报文转换、协议适配",
-      "answerSha256": "b3c4c549a75d2ff22686744985d38c7e5a4fc8033321082d31ddad37afd361ee",
+      "answerSha256": "ea92f7ebe7112ca18cb11804eb9df9731cc902e33259feda4017ddb4a5dd85f7",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47765,12 +48085,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "b3c4c549a75d2ff22686744985d38c7e5a4fc8033321082d31ddad37afd361ee",
+          "title": "渠道与核心系统解耦：报文转换、协议适配",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "6cdccbaf80d04ca860cf222c247eb5a59b0fd01ba45ec0ebef7c5055d2a994ba",
       "title": "CAP 与 BASE 理论，结合业务如何取舍",
-      "answerSha256": "efd3b2a5aa8732a1ded163070f392290a598426ed211684009a4bdc7cd476170",
+      "answerSha256": "d122e7aa6b87beb96310b64291da228e10e09cd5f2a3b3b207a910a703137c9d",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47783,12 +48119,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "efd3b2a5aa8732a1ded163070f392290a598426ed211684009a4bdc7cd476170",
+          "title": "CAP 与 BASE 理论，结合业务如何取舍",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5be7f25c93a0d934567612dc8ecd7eba81d0d18b74e0c8241266eab068be3ff8",
       "title": "限流算法（固定窗口、滑动窗口、令牌桶、漏桶）；分布式限流怎么做",
-      "answerSha256": "c4517209b863f47788dcc33004a5981147a6aa561e5eafc4bf25e0e98b4060c2",
+      "answerSha256": "4af77b320400cd0f40c09f36bc42b2754140ac4cf2e94686af43c93341c73fe9",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47801,12 +48153,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c4517209b863f47788dcc33004a5981147a6aa561e5eafc4bf25e0e98b4060c2",
+          "title": "限流算法（固定窗口、滑动窗口、令牌桶、漏桶）；分布式限流怎么做",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c762f16c5d930f81da3e7a8c6ad775a032730f9c7f6122fd2c859d7485125824",
       "title": "熔断、降级、隔离（Sentinel / Hystrix）的原理",
-      "answerSha256": "1f4fe7aa28f8453844e6e95cd3021343880eee2dd935b9b375d9c44e32ad94e9",
+      "answerSha256": "195b5d00208454d5469035776377b146e6653da8446788ffb0a5ce2d609f26a9",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47819,12 +48187,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1f4fe7aa28f8453844e6e95cd3021343880eee2dd935b9b375d9c44e32ad94e9",
+          "title": "熔断、降级、隔离（Sentinel / Hystrix）的原理",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ad79bdd0fd5f4eb492809718eeac5d0872eb735f21f7fbe718c4fce51ddbe392",
       "title": "分库分表：拆分键选择、跨库查询、全局 ID、平滑迁移",
-      "answerSha256": "6bfb655317b2747a3c1c4d82c3439b26d293b413cd1f900ad17fb3a03cf757eb",
+      "answerSha256": "432b50bd14dde594272c9ae7bece87885e4e84601084d3f346fe230073feb007",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47837,12 +48221,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6bfb655317b2747a3c1c4d82c3439b26d293b413cd1f900ad17fb3a03cf757eb",
+          "title": "分库分表：拆分键选择、跨库查询、全局 ID、平滑迁移",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b44ca56b00b6cd8c18ca6606fe5bc38151593c7685aba92352f2b46694e00333",
       "title": "读写分离与主从延迟引发的问题",
-      "answerSha256": "452d0a351608db0cd7f3176fdc707aa59a1f6a1c6e1f969709d1437df6853905",
+      "answerSha256": "402fc6ef8a8dd4f23c3d27b22cf3c6a8d6e7754ef7dd551d8d46a8d1a1294a3c",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47855,12 +48255,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "452d0a351608db0cd7f3176fdc707aa59a1f6a1c6e1f969709d1437df6853905",
+          "title": "读写分离与主从延迟引发的问题",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fee415830b7b2ac6c3be57749688a23a9fb9101eaf866b3741b5b799b2636ced",
       "title": "Redis 与 ZooKeeper 分布式锁对比",
-      "answerSha256": "9d409aa0b4683b3a052877bf54b994c833fb83c9ac6099c6a8c262fb574cf981",
+      "answerSha256": "543dae2039652ff6221e0251d57de17a0998055791c1b35b653c93ec64593f1f",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47873,12 +48289,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9d409aa0b4683b3a052877bf54b994c833fb83c9ac6099c6a8c262fb574cf981",
+          "title": "Redis 与 ZooKeeper 分布式锁对比",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f8588fca20682782bdd052110e8029cc3b9b4580a8db9b4a037a2bdebc8da5da",
       "title": "注册中心、配置中心、网关选型",
-      "answerSha256": "6210e92de5cf002c5e2eb8374eaa7131e70967624a0361bcf7d883a84f20f330",
+      "answerSha256": "e0455903f753ac327edcdc5467c58d2cbf11abfef08a9aa18bdda0bd228cf8c3",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47891,12 +48323,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6210e92de5cf002c5e2eb8374eaa7131e70967624a0361bcf7d883a84f20f330",
+          "title": "注册中心、配置中心、网关选型",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eabc4b490804112cd69a55746fe3de7cddf63e8933802f6110ddbfd5b3d1b724",
       "title": "分布式链路追踪如何落地",
-      "answerSha256": "203d44c8257a4e6e952759cddba76c2ba7c7a0bcd537b52d03197405781d4c2e",
+      "answerSha256": "9b9a1bd7de7f76f6fc440ced9d5910ae388c716de00261c57c7925187f05a1db",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47909,12 +48357,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "203d44c8257a4e6e952759cddba76c2ba7c7a0bcd537b52d03197405781d4c2e",
+          "title": "分布式链路追踪如何落地",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a72954b0edcaf737f19a24b7d7e2cfc2df4be9b334826dbe7c9499e75ae89068",
       "title": "高可用设计：多活、容灾、故障演练",
-      "answerSha256": "b087a92acaf3d893fa024279633f093851d37bb9386fad4efe45d62e81943944",
+      "answerSha256": "cee3e64d40074742afdd0689305abf4945ebaa29159e6649be4d00d375cdadf8",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47927,12 +48391,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "b087a92acaf3d893fa024279633f093851d37bb9386fad4efe45d62e81943944",
+          "title": "高可用设计：多活、容灾、故障演练",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "e78d8b3e82a619e0f52c9b633a81c47792e738b233e2d01ba6d203bc3c652054",
       "title": "热点 key、大 key 的处理",
-      "answerSha256": "9d24d5608b9dd75ac7672feb6bfb425921a2c7fe5719cf308ac5b34fab9e46f0",
+      "answerSha256": "278d696510013cd8221de90b91901478fad6d355b68f2f949efbbcb1bb8adff2",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47945,12 +48425,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9d24d5608b9dd75ac7672feb6bfb425921a2c7fe5719cf308ac5b34fab9e46f0",
+          "title": "热点 key、大 key 的处理",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "40019d7a3b9db749acd94c95d47cba4da53261fc2ca46067e0bfc2136f14d805",
       "title": "接口突然变慢，如何分层定位（网关 → 应用 → 数据库 → 网络）",
-      "answerSha256": "32a5060c5439b50e261ffd05d588436c3234fa61b21292f8716a6c758db45c1b",
+      "answerSha256": "fcc59ee7739ab80253656845805c5ae611583ac311688e46b2a2deff4084b037",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47963,12 +48459,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "32a5060c5439b50e261ffd05d588436c3234fa61b21292f8716a6c758db45c1b",
+          "title": "接口突然变慢，如何分层定位（网关 → 应用 → 数据库 → 网络）",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "caab352ed6aaa3f6e16e84953167f502ece8b068a5add93aef7cb2031f0b65b4",
       "title": "数据库连接池耗尽、线程池打满怎么办",
-      "answerSha256": "991ed2268aab0bbe7b26109cc720f0cb61c2c92f09c54ea982e75311333bf6bd",
+      "answerSha256": "bb7be45f179eaaa88036362a18aef6d6b839d2c1147f831ca4753c160955fa3d",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47981,12 +48493,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "991ed2268aab0bbe7b26109cc720f0cb61c2c92f09c54ea982e75311333bf6bd",
+          "title": "数据库连接池耗尽、线程池打满怎么办",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9a8332e4203c8fbd3051a8e075e6e0496e341cfc33ce6e95fd953180c91a67fa",
       "title": "一次完整的事故复盘：发现、止血、根因、改进",
-      "answerSha256": "a73280ca4dab0cde47cc953260b53e4cb2aa10a3459c3713374105eed85f438d",
+      "answerSha256": "9660a515168c9baefe2d577d9a5c8e36c351f0871b3c2276f5e805cec0d9d4be",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -47999,12 +48527,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a73280ca4dab0cde47cc953260b53e4cb2aa10a3459c3713374105eed85f438d",
+          "title": "一次完整的事故复盘：发现、止血、根因、改进",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f23e2b2963672c21c3e3a2bde024730be08bc8b77b72bf7286212b1bf55761d9",
       "title": "发布：灰度、蓝绿、回滚；数据库变更如何保证兼容",
-      "answerSha256": "9887b44b7d0663983d004d0c15484fe9fb037eabf5aadf8aaa9ef9e8fc6d6d6d",
+      "answerSha256": "1a8cf30683f791f85e5ea2525bc69e5416ef499995a7ce6ac8334b6d71f87f44",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48017,12 +48561,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9887b44b7d0663983d004d0c15484fe9fb037eabf5aadf8aaa9ef9e8fc6d6d6d",
+          "title": "发布：灰度、蓝绿、回滚；数据库变更如何保证兼容",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ac80dbb997b45bd2ea5c6acd55fc9aead748f6f5a8558ea25d43a181e3be6235",
       "title": "压测与容量评估；监控告警体系怎么搭",
-      "answerSha256": "a72c633c8fe3791f41ed92d5413eedd7200a8b6cad767dd4a761d79fa7767f92",
+      "answerSha256": "d51bf628529f679a0d2901de77f9c0c53ac2dcaddcb4579c36fce5be07e00e1c",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48035,12 +48595,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a72c633c8fe3791f41ed92d5413eedd7200a8b6cad767dd4a761d79fa7767f92",
+          "title": "压测与容量评估；监控告警体系怎么搭",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ef33aa8018325c727eaf72afb0d3fd5a17d3c5a599c9f6580759a326e8f8d356",
       "title": "单体与微服务如何取舍？拆分原则？拆完后带来的问题",
-      "answerSha256": "cbfc30720461f89743c9f7f1026a36d6c4987c2c45c438616123a898ae18bb54",
+      "answerSha256": "136dac9d63a8f0def34db062c26bfa53addac2bb384134f1abcf36b92e52438c",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48053,12 +48629,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cbfc30720461f89743c9f7f1026a36d6c4987c2c45c438616123a898ae18bb54",
+          "title": "单体与微服务如何取舍？拆分原则？拆完后带来的问题",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "be39362da60d8b5acf2e88a04f59276d914831783632c0260f04e0e7916c61e2",
       "title": "DDD 在项目里的实践",
-      "answerSha256": "e0bd09619dfdec8fab856616b95952437bfd5a7a0a1d31b8fecf4e44cbc773b2",
+      "answerSha256": "d6d6b16e54f440501cc548539203f055d23ad1882aaff2791d51ec877db149a3",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48071,7 +48663,23 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e0bd09619dfdec8fab856616b95952437bfd5a7a0a1d31b8fecf4e44cbc773b2",
+          "title": "DDD 在项目里的实践",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "390dc8bd928c288775019a0bd2d122099be0ad6aa21782fbc81bc0f1952c135d",
@@ -48110,7 +48718,7 @@
     {
       "sourceKey": "0bcd67f6532e1c110e01ef778423af8de3355965ba897967e7a43fba279d5496",
       "title": "代码质量保障：评审、单测、静态扫描、技术债",
-      "answerSha256": "64e12c1bfd6dbfc6aae9bf763db973742bfee7745a8500cd96c6566b34f80cc1",
+      "answerSha256": "d3eacf8385b5a31563b84ede90b06f7a26f49656f03daeac723fd5314e66c5a1",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48123,12 +48731,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "64e12c1bfd6dbfc6aae9bf763db973742bfee7745a8500cd96c6566b34f80cc1",
+          "title": "代码质量保障：评审、单测、静态扫描、技术债",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b0595740cdb8c9e14c9e6f437b4830c3b8bbba19e2f8fc28f8f106bdc15b73fb",
       "title": "大数据量导入导出（异步、分片、流式）",
-      "answerSha256": "9952db1f88391b918af0e327f3515ac7a0d174f381e2b75378408ce99dc1616f",
+      "answerSha256": "7275560a5b8e240da1d020c9eaba7103dd11e85e10135bf1f41dd441babe68da",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48141,12 +48765,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9952db1f88391b918af0e327f3515ac7a0d174f381e2b75378408ce99dc1616f",
+          "title": "大数据量导入导出（异步、分片、流式）",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "deb02bccbafc2e357a8c155adae31cf2f7c59bce4833fe39945fc6d9eef003f9",
       "title": "如何评估大模型应用效果？评测集怎么建",
-      "answerSha256": "2af0a55002af39133a5c8745dc877f377eb0cedd8a56eb33b43ef5ebaa57373a",
+      "answerSha256": "bec8ac765fe0aa1311a1a8a1185027150b0982a0408f8fc2d7577c425a7a5d7f",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48159,12 +48799,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "2af0a55002af39133a5c8745dc877f377eb0cedd8a56eb33b43ef5ebaa57373a",
+          "title": "如何评估大模型应用效果？评测集怎么建",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cb0c0b43d9641dd6a4945f6367893e8e9582d660dea41ed0538675a68487eae7",
       "title": "成本与延迟优化：缓存、模型选型、上下文压缩",
-      "answerSha256": "b54ffaf527fdbca33dd057b11f692df3c2b261128377ce784a0a9f2e22795958",
+      "answerSha256": "d746b63d4a4fff27163fe7255d5964f16209cf46825f10ab28f570c0f7e040a4",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48177,12 +48833,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "b54ffaf527fdbca33dd057b11f692df3c2b261128377ce784a0a9f2e22795958",
+          "title": "成本与延迟优化：缓存、模型选型、上下文压缩",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5686686562e9cf0955eec88c1a45612a05c68ff4d5498d8c15197bebbb8573f5",
       "title": "银行场景下的数据脱敏、合规与审计",
-      "answerSha256": "4b17bbe8bc7ca544591222d84af897e4896e3b00de77d61f5e831df631760a0b",
+      "answerSha256": "9feeb90646e3074123f5eeb4e38b8942fbf7d30061a4cf3f0f3e989a0ebe70d3",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48195,12 +48867,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4b17bbe8bc7ca544591222d84af897e4896e3b00de77d61f5e831df631760a0b",
+          "title": "银行场景下的数据脱敏、合规与审计",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "651ff2be3f3bcf92e8cbd55d8cba3c7bb7fe43e9f80297a4cff47f8f568a210a",
       "title": "模型输出不可控时的兜底：校验、人工复核、降级",
-      "answerSha256": "7d4c4fec50cc0420d8ffcffd88a05a95c00d826494135f63c41cbdb7d597c32a",
+      "answerSha256": "2cb2152f7f8bb7ec7d90239a8acfe6b1541a7a7df2da3528185b6a00c46e13e7",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48213,12 +48901,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "7d4c4fec50cc0420d8ffcffd88a05a95c00d826494135f63c41cbdb7d597c32a",
+          "title": "模型输出不可控时的兜底：校验、人工复核、降级",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "777c1c68ee1f988b5e9c8369acd1aacab925c2284642654d57e1c21d02f00a1f",
       "title": "Agent 的基本思路？工具调用的安全边界",
-      "answerSha256": "c082ce562212d9a6ad7d337ff36107df65c1768f5600391572e0a35f016e5264",
+      "answerSha256": "c1cf20dfa9d53ea6fd7e09605b4a44c5aebdfca5638d5c1fb819a305f21c4ce8",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48231,12 +48935,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c082ce562212d9a6ad7d337ff36107df65c1768f5600391572e0a35f016e5264",
+          "title": "Agent 的基本思路？工具调用的安全边界",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eb6938caf23a0345c3cdc3ac580c09b1ec5d2edaf5839b558f005ef7bf6e7c22",
       "title": "你认为 AI 适合银行哪些场景，不适合哪些",
-      "answerSha256": "086c221839dd21d416f7d6807731c6673aea7a6ad6e122033a30cc6e97349df0",
+      "answerSha256": "c75f9bb809fd275b53529daa3510cd33f997ffd9d7274086df89024b2a59acb0",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48249,12 +48969,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "086c221839dd21d416f7d6807731c6673aea7a6ad6e122033a30cc6e97349df0",
+          "title": "你认为 AI 适合银行哪些场景，不适合哪些",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0b99a5a899d807b1e038747ddb73bd32b2ad34d25bf64919ee7733f36eeb78bc",
       "title": "设计手机银行转账系统：需求澄清、容量估算、核心流程、一致性、幂等、对账、风控、监控",
-      "answerSha256": "3b1b2c64cf2ac44818555407a7eec4fdd4755692fdcb127a8712c5c7bb46e564",
+      "answerSha256": "cbb009752cc9281b9a55cb3934affd768636bdcaf0dc98d984bd3fad12bf0cc6",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48267,12 +49003,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3b1b2c64cf2ac44818555407a7eec4fdd4755692fdcb127a8712c5c7bb46e564",
+          "title": "设计手机银行转账系统：需求澄清、容量估算、核心流程、一致性、幂等、对账、风控、监控",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0f546683d09263471ddf63695419a795a76f98d8d02d53e4de3daab8dd9f80b3",
       "title": "设计统一支付网关",
-      "answerSha256": "a13f4ea0bfb737610ed47b4d004b29a167c3d355c3820740d8b1341a6f9fd2bf",
+      "answerSha256": "2cb0697cb5e2bb930e688429ddf1ed2cb3d7fbff340b974c9dbc5aa60f42541c",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48285,12 +49037,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a13f4ea0bfb737610ed47b4d004b29a167c3d355c3820740d8b1341a6f9fd2bf",
+          "title": "设计统一支付网关",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "330d9335998e4f662e43bc23a85b833da90503ef19a2fe958a9eb0649ba21dd0",
       "title": "设计风控规则引擎",
-      "answerSha256": "78cae2388b998777e691c169f5ec10efc81a9116deca7154f678392f436d9cb8",
+      "answerSha256": "a876870ee7d8da9e66bc7723f27cedb07536dabcd527acbb2f2989a1f9d1efd4",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48303,12 +49071,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "78cae2388b998777e691c169f5ec10efc81a9116deca7154f678392f436d9cb8",
+          "title": "设计风控规则引擎",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0b58be89d561abd01861c84952caee231022b3c651508d6947b4e9534dee7021",
       "title": "设计理财产品抢购系统：热点库存、限流、异步下单、防超卖",
-      "answerSha256": "de136c8773847e6fec182ae9b5aa4c4ed24e90a1432c11524fe267c6ffdcb084",
+      "answerSha256": "3538508e767a4c98d27ef7d4180c2d7af14ab4606bab3cb2abca8799d48924c3",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48321,12 +49105,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "de136c8773847e6fec182ae9b5aa4c4ed24e90a1432c11524fe267c6ffdcb084",
+          "title": "设计理财产品抢购系统：热点库存、限流、异步下单、防超卖",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b5d44a63ac971bec02098eee99543d258e5bb40c8324dcd1e70089ea5f9adf6d",
       "title": "通用追问：依赖挂了怎么办？数据量涨 10 倍怎么办？怎么灰度？怎么回滚？",
-      "answerSha256": "b93fec71b58516332cd84bd432ca2f8f9c010156a6b3fef0638e4f9921e56019",
+      "answerSha256": "983e2784470fdeb408cc94e06b91a7026bb38fab3f9df952afc6bc1119e20461",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48339,12 +49139,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "b93fec71b58516332cd84bd432ca2f8f9c010156a6b3fef0638e4f9921e56019",
+          "title": "通用追问：依赖挂了怎么办？数据量涨 10 倍怎么办？怎么灰度？怎么回滚？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "049e3c87210e2740d4b5e2e71610d30fcf6a6268572c2f0c70cc5060d9b2a660",
       "title": "对现有系统架构演进的评价与下一步方向；金融科技趋势（信创、云原生、AI）",
-      "answerSha256": "0a1b6880828eb78369b5224d82f1e02a4dc4a7d10a591ee31f26ad5d273c0d35",
+      "answerSha256": "38b701752d8c93e7e300019decd7f052ef573f029d61292505af671c50f27477",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48357,12 +49173,28 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0a1b6880828eb78369b5224d82f1e02a4dc4a7d10a591ee31f26ad5d273c0d35",
+          "title": "对现有系统架构演进的评价与下一步方向；金融科技趋势（信创、云原生、AI）",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0089acb5a598a45dc83f78c1ef9363cc75b86f684687bc986c762fae6e03e4f0",
       "title": "重做一遍项目，你会改什么",
-      "answerSha256": "6672e56090cb533cbcecbbd95e99ec22ff44cdf83dbdcaf08f302e284dab1653",
+      "answerSha256": "3a4f004c0ff5a5f006d9c0df0bde0eaec087982cd2a0827f1f43b9ec212a9e19",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -48375,7 +49207,23 @@
         "reviewer": ""
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6672e56090cb533cbcecbbd95e99ec22ff44cdf83dbdcaf08f302e284dab1653",
+          "title": "重做一遍项目，你会改什么",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     }
   ]
 }

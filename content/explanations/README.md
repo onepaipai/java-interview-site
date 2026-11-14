@@ -3,7 +3,7 @@
 面向资深 Java 开发和架构设计面试。复习提纲与深入题解分开维护：旧版短题解仍兼容，复杂工程题使用场景、口述结论、机制与取舍、故障推演及追问。题量、字数和格式检查都不代表内容达到资深水平。
 
 <!-- content-status:start -->
-当前解析包为 `explanations-v34`，共 1215 道：1087 道题目级正文、0 道固定样例、128 道主题正文。独立正文不等于事实核验完成；审核台账中 812 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](review-ledger.json)。
+当前解析包为 `explanations-v35`，共 1215 道：1140 道题目级正文、0 道固定样例、75 道主题正文。独立正文不等于事实核验完成；审核台账中 812 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](review-ledger.json)。
 <!-- content-status:end -->
 
 ## 写作规则
@@ -113,8 +113,8 @@ senior-v1 保留原来的 1,050 道题及稳定来源键；解析使用独立的
 
 ## 本轮逐题复查范围
 
-1. 当前为 1087 道题目级修订及 0 道独立样例。本次 46 道修改范围记录在 `review-fixes-20261020.json`，此前 21 道深度改写记录仍保留在 `senior-depth-review.json`；范围有重叠，不能直接相加。
-2. 剩余 128 道仍使用主题级分析与案例，尚未逐题完成事实与适配性核验。`review-status.json` 列出各模块进度，不能以格式检查通过代替该工作；其余已有独立正文的题目也不自动视为达到本轮深度标准。
+1. 当前为 1140 道题目级修订及 0 道独立样例。本次 46 道修改范围记录在 `review-fixes-20261020.json`，此前 21 道深度改写记录仍保留在 `senior-depth-review.json`；范围有重叠，不能直接相加。
+2. 剩余 75 道仍使用主题级分析与案例，尚未逐题完成事实与适配性核验。`review-status.json` 列出各模块进度，不能以格式检查通过代替该工作；其余已有独立正文的题目也不自动视为达到本轮深度标准。
 3. `node scripts/test-explanation-publication.mjs` 验证失败生成保留旧清单和不可变文件；`test-explanation-corrections.mjs` 等历史一次性验收脚本已退役(git 历史可恢复)。
 4. 正文中的 Java 示例由后端 `*ExamplesTest` 编译执行（舍入、二分、前缀和、背包和零钱案例等），另验证错误捕获片段编译失败。历史脚本 `verify-reviewed-examples.ps1` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/verify-reviewed-examples.ps1`)。
 5. 历史脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回(`git show bf8768a:scripts/prepare-review-examples.mjs`)后提取正文代码，再以 Java 17 执行 `backend/target/ReviewExamples20261020.java`；包含交接、丢更新、LRU、空值、顺序和可见性等 14 项验证。

@@ -3,46 +3,46 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/index.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/package-summary.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html)
 
 </details>
 
 ## 参考回答
 
-1. equals 定义业务相等；hashCode 用于哈希定位。
-2. 对象相等，哈希必须相同；哈希相同，对象未必相等。
-3. 重写 equals 时同步重写 hashCode，保持字段规则一致。
-4. 缓存键使用稳定身份；多租户场景同时包含租户 ID。
+<!-- explanation:deep -->
+
+> 场景与约束：网银账户沙盘:Account 重写 equals 不重写 hashCode——HashSet<Account> 里同一账户出现两次(哈希不同桶),HashMap 查不到已存对象。用 collections 8 题的判等分野实验说明契约的三条规则与领域建模的落点。
+
+1. 契约三规则:equals 相等则 hashCode 必相等(否则哈希容器丢元素);hashCode 相等不要求 equals 相等(允许碰撞);equals 的字段集⊆hashCode 的字段集(一致性,第 8 题collections compare 同源)。
+2. 实测锚点(collections C1):可变 key 修改后 get=null、containsKey=false——hashCode 随状态变化的键在容器中"消失";equals 与 hashCode 用不同字段集=TreeSet/HashMap 判等分野的隐患(collections 8 题)。
+3. 领域落点:值对象(账户 ID+类型)用 record(自动 equals/hashCode/toString,字段集天然一致);实体(有生命周期)按业务键 equals(ID)+hashCode(ID)——两类对象的判等策略显式分开。
 
 ## 参考分析
 
-1. 哈希容器先缩小查找范围，再判断键是否相等；碰撞不等于覆盖。
-2. 修改键的相等性字段后，Map 不再保证相关行为；容器可能找不到原条目。
-3. 手机号等可变属性适合作为值；tenantId、accountId 可组成不可变键。
-4. 实体入库前可能没有 ID；赋 ID 前后不能随意切换已入集合对象的相等规则。
-5. record 的引用字段仍可能指向可变对象；并发容器也不能修复不稳定的键。
+### 机制:哈希容器的判等链
+
+HashMap 定位:hash(键)→桶→equals 比对——hashCode 决定去哪个桶,equals 决定是不是同一个——两步任一不一致即"找不到"。契约违约的三种表现:重写 equals 不重写 hashCode(同对象两桶,Set 出现"重复");hashCode 用可变字段(键改状态后消失,C1 实验);equals 用可变字段(容器外的相等判断漂移)。record 的价值:编译器生成三件套且字段集一致——值对象的契约免维护。
+
+### 反例:契约违约的三种事故
+
+事故一,Set 重复:同账户两次 add 都成功(哈希不同)——去重失效(对账口径乱)。事故二,键消失:可变键改字段后 get=null(C1 实测:containsKey=false)——缓存丢失(第 47 题 banking 缓存归属同题)。事故三,跨容器不一致:HashMap 两份、TreeSet 一份(collections 8 题:compare/equals 分野)——同一数据不同容器结果不同。三条的正解:值对象 record 化+可变对象按业务键判等+键不可变化。
+
+### 取舍:实体与值对象的判等策略
+
+值对象(record):全字段 equals——内容相同即相等(金额+币种的 Money)。实体(ID 实体):按业务键 equals(ID 相等即同一账户——生命周期内状态可变,ID 不变)——实体的 hashCode 只用 ID(稳定)。JPA 实体的特殊面:ID 未生成时(新实体)equals 退化为引用相等——混合判等的边界要显式(状态机判等)。
 
 ## 案例
 
-1. 场景：账户缓存用手机号参与键计算，修改手机号后缓存无法命中。
-2. 修复：提取不可变身份，把手机号放进缓存值。
+### 验证:契约的断言组
 
-```java
-record AccountKey(long tenantId, long accountId) {}
+验证:三规则断言(equals→hashCode 相等;hashCode 字段集⊆equals;record 三件套一致——属性测试风格随机对象对);容器行为断言(可变键消失[C1 实测]、record 键稳定);实体/值对象双策略的对照用例——三组进领域模型的单测模板。
 
-var cache = new java.util.HashMap<AccountKey, String>();
-cache.put(new AccountKey(10, 1), "账户信息");
+### 追问链:契约三刀
 
-System.out.println(cache.get(new AccountKey(10, 1))); // 账户信息
-System.out.println(cache.get(new AccountKey(20, 1))); // null：租户不同
-```
-
-3. 验证：等价新键能命中；不同租户不串数据；修改手机号不改变缓存身份。
-4. 迁移：清理旧键，检查命中率和条目数量，防止遗留无效缓存。
+一刀:"hashCode 能缓存吗?"——String 缓存 hash(本机 J1:1ns,不可变前提)——可变对象缓存 hash=修改后哈希不更新(违约)——不可变才有缓存资格。二刀:"equals 的对称/传递违约?"——equals 与 compareTo/继承的对称问题(父类 equals 与子类——getClass vs instanceof 之争)——值对象用 record/getClass 终结。三刀:"第三方键类?"——用第三方类做键(不控 equals/hashCode)——包装(自己的键类包一层)或文档依赖(信任第三方契约)——键的契约责任要明确归属。
 
 ## 总结点
 
-1. 相等必同哈希，同哈希未必相等。
-2. 身份作键，可变属性作值。
-3. 身份含租户，缓存不串户。
+1. equals 相等则哈希必相等
+2. 可变键会消失,record 免维护
+3. 实体按 ID,值对象按内容

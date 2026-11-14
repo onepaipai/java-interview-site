@@ -32,6 +32,10 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 UseStringDeduplication 在 GC 期间自动把内容相同的 String 底层数组指向同一份（对象壳各自保留，业务无感知），适合"读多写少、重复内容多"的大堆服务；intern 适合"代码里显式复用少量键"。两者都不是免费的：去重要扫描与迁移，intern 要登记。
 
+### 展开：Compact Strings——String 底层存储的版本事实
+
+JDK 9(JEP 254)起 String 内部存储从 char[](每字符 2 字节)改为 byte[] 加 coder 标志：coder=LATIN1 表示纯 Latin-1 内容(每字符 1 字节,内存减半)，coder=UTF16 表示含非 Latin-1 字符(每字符 2 字节)。纯 ASCII 的业务串(URL、编码、JSON 键)普遍吃满减半红利——回答"String 内部用什么存"的版本事实。与 intern、UseStringDeduplication 合起来是字符串内存的三个优化维度：存储密度(JEP 254)、引用共享(intern)、数组去重(去重选项)；排查字符串内存按这三层分别看，不笼统说"字符串优化"。
+
 ## 案例
 
 ### 对照操作：intern 与去重的可观察证据

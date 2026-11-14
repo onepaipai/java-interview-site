@@ -11,7 +11,7 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 ## 参考回答
 
 1. @Autowired 按类型解析并支持 Primary、Qualifier 等候选选择，可用于构造器；单个构造器通常可省略该注解。
-2. Spring 6 的 jakarta.annotation.Resource 用于字段或属性方法，按名称查找，默认命名策略下可回退到类型匹配。
+2. Resource 用于字段或属性方法：指定 name 仅按名称查（找不到即失败，不回退）；未指定先按属性名，再回退类型（回退后仍适用 Qualifier）。
 
 ## 参考分析
 

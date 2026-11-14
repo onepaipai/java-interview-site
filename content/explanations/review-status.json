@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-24T13:01:20.432Z",
+  "generatedAt": "2026-11-08T14:22:18.878Z",
   "meaning": "结构覆盖不等于事实审查完成；sharedTopic 需要逐题核对分析、案例与问题是否对应。",
   "modules": [
     {
       "module": "java-language",
       "total": 61,
-      "questionSpecific": 13,
-      "sampleSpecific": 1,
-      "sharedTopic": 47
+      "questionSpecific": 50,
+      "sampleSpecific": 0,
+      "sharedTopic": 11
     },
     {
       "module": "collections",
@@ -54,9 +54,9 @@
     {
       "module": "ai-basics",
       "total": 54,
-      "questionSpecific": 5,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 49
+      "sharedTopic": 4
     },
     {
       "module": "concurrency-advanced",
@@ -68,16 +68,16 @@
     {
       "module": "jvm-advanced",
       "total": 60,
-      "questionSpecific": 14,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 46
+      "sharedTopic": 10
     },
     {
       "module": "spring-advanced",
       "total": 60,
-      "questionSpecific": 60,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 0
+      "sharedTopic": 10
     },
     {
       "module": "database-advanced",
@@ -117,23 +117,23 @@
     {
       "module": "distributed",
       "total": 60,
-      "questionSpecific": 17,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 43
+      "sharedTopic": 10
     },
     {
       "module": "reliability",
       "total": 55,
-      "questionSpecific": 11,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 44
+      "sharedTopic": 5
     },
     {
       "module": "architecture",
       "total": 55,
-      "questionSpecific": 14,
+      "questionSpecific": 51,
       "sampleSpecific": 0,
-      "sharedTopic": 41
+      "sharedTopic": 4
     },
     {
       "module": "ai-production",
@@ -145,9 +145,9 @@
     {
       "module": "system-design",
       "total": 57,
-      "questionSpecific": 4,
+      "questionSpecific": 50,
       "sampleSpecific": 0,
-      "sharedTopic": 53
+      "sharedTopic": 7
     }
   ]
 }

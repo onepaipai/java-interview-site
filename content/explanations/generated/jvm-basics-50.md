@@ -26,7 +26,7 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ### 故障推演：默认值差异的定位过程
 
-11 与 17 各跑一轮 PrintFlagsFinal，diff 发现 G1HeapRegionSize 自动选择不同（16M→4M）、ParallelGCThreads 不同。同一负载下 17 的 humongous 记录显著增多（region 变小，80MB 数组跨更多 region）——显式固定 G1HeapRegionSize 后 P99 回到基线。三层排查的每一层都可能单独命中，按成本从低到高走。
+11 与 17 各跑一轮 PrintFlagsFinal，diff 发现 G1HeapRegionSize 自动选择不同（堆大小从 32G 降到 8G 时 region 从 32M 降到 4M，同一负载下 humongous 记录显著增多——region 变小，80MB 数组跨更多 region）——显式固定 G1HeapRegionSize 后 P99 回到基线。注意：region 差异来自堆大小不同而非 JDK 版本，G1 的 region 公式 max(1MB, min(32MB, heap/2048)) 在各版本一致；此处作为 diff 方法的演示。三层排查的每一层都可能单独命中，按成本从低到高走。
 
 ### 取舍：升级的验证流程
 

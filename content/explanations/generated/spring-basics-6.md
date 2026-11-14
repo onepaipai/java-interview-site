@@ -3,9 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-nature.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-extension.html)
-- [Spring Framework 6.2 参考 · 3](https://docs.spring.io/spring-boot/3.5/reference/web/graceful-shutdown.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -13,39 +12,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Spring 6.2 / Boot 3.5 教学设计：报表组件需要校验配置、建立可关闭的客户端，并在应用可接流量前完成小范围预热。区分对象初始化、容器启动和业务就绪。
+> 场景与约束：网银连接池沙盘:连接池 bean 的初始化——构造器(依赖未注入)/@PostConstruct(依赖已注入)/afterPropertiesSet(同 @PostConstruct 时序)/ApplicationRunner(容器全就绪后)——四个阶段的依赖就绪度不同(第 6 题spring-advanced BeanPhases 的深化)。
 
-1. 构造器适合建立对象必需的不变式，注入完成后的 @PostConstruct 或 initMethod 适合依赖注入值的轻量初始化；不要在此假设自身 AOP 代理已经生效。
-2. 需要容器整体协作、启动停止顺序或后台任务时，考虑 SmartInitializingSingleton、SmartLifecycle 或 Boot 的启动回调，并为就绪状态、失败和超时建模。
-3. 初始化要有失败清理和对应关闭动作。不可把耗时远程调用塞进每个 Bean 的初始化回调，再把上下文刷新成功当成业务已经可用。
+1. 四阶段依赖就绪度不同:构造器(注入前,字段 null)/@PostConstruct(注入后,代理未生成[见 spring-advanced 28 题])/afterPropertiesSet(同 PostConstruct 时序,走接口)/ApplicationRunner(refresh 完成后,全部 bean 就绪)。
+2. 初始化资源的选择:依赖注入的协作者使用(如 DataSource 连接)→@PostConstruct(依赖已注入);需要全部 bean 就绪(如扫描其他 bean)→ApplicationRunner;代理相关(需要代理对象)→ BeanPostProcessor.after 或 @PostConstruct 后的独立阶段。
+3. 危险阶段:构造器(字段 null——禁用)、@PostConstruct 捕获 this(代理缺失,第 28 题)——每个阶段的能力边界要清楚。
 
 ## 参考分析
 
-### 初始化阶段：注入完成不等于所有代理已就绪
+### 机制:生命周期时序与依赖就绪度
 
-常规过程包括实例化、属性填充、相关 Aware 回调、初始化前后处理以及初始化方法；具体扩展点会参与不同阶段。@PostConstruct 发生在初始化期间，对本对象的直接方法调用不能指望触发最终代理上的事务或异步增强。校验本地配置与建立明确可关闭的轻量资源可以放在这里，跨 Bean 长业务应另设边界。类比新房交付：水电接通（注入完成）不等于智能家居联网（代理与就绪回调完成），入住动作要等全链路就绪。
+时序:实例化(构造器)→属性注入(字段赋值)→Aware 回调(BeanNameAware→BeanFactoryAware→ApplicationContextAware/EnvironmentAware 等,由 ApplicationContextAwareProcessor 这个 BPP 在 before 阶段统一驱动)→BeanPostProcessor.before→@PostConstruct→afterPropertiesSet→自定义 init-method→BeanPostProcessor.after(代理化:AbstractAutoProxyCreator 的 postProcessAfterInitialization)→就绪。依赖就绪度:构造器=无依赖;@PostConstruct=注入完成但代理未生成——这正是"@PostConstruct 里调本 bean 方法不会被增强"的原因(代理在 after 才包上);ApplicationRunner=全部就绪(含代理)。补充:循环引用场景代理可能提前发生(getEarlyBeanReference,见第 8 题)——同一坑有两个入口。
 
-### 整体协作：生命周期与就绪条件需要分开
+### 反例:阶段误用的三种事故
 
-SmartInitializingSingleton 在常规非懒加载单例创建完成后回调，不能据此推断所有懒加载组件也已初始化。SmartLifecycle 更适合需要阶段和停止协议的组件。Boot 的 ApplicationRunner 等可组织启动工作，但对外是否接流量仍应由 readiness 等可观测条件决定，避免端口已监听却尚未完成必要准备。
+事故一,构造器调依赖:构造器中 this.dependency.doSomething()——dependency 尚未注入(字段 null)——NPE。事故二,@PostConstruct 捕获 this:this 赋值给静态字段——捕获裸对象(代理缺失,第 28 题spring-advanced)。事故三,初始化做重活:@PostConstruct 查全表(启动慢,第 35 题)——重初始化移到 ApplicationRunner。三条的正解:@PostConstruct 只做"依赖就绪后的轻量初始化";重活走 ApplicationRunner;代理相关的延迟到 BeanPostProcessor.after。
 
-### 关闭与失败：成对释放也要覆盖半初始化
+### 取舍:初始化的分层策略
 
-完整初始化后的单例可通过 @PreDestroy、destroyMethod 或生命周期协议释放资源，prototype 的销毁责任另行安排。如果客户端创建成功而后续校验抛错，不能只假设普通销毁回调必然替这次失败收尾，应在失败路径主动关闭已经取得的资源。初始化和关闭都应有时间预算，避免部署无限等待。
+分层:构造器(赋值注入参数,不做业务)→@PostConstruct(依赖校验+轻量初始化)→ApplicationRunner(重初始化+预热——依赖全部就绪)。每一层的"能做什么"由依赖就绪度决定——分层纪律进评审清单(第 24 题)。
 
 ## 案例
 
-### 操作设计：配置错误应阻止就绪
+### 验证:生命周期时序的断言组
 
-为报表组件定义必填地址与连接超时，在类型化配置校验后建立客户端；预热任务单独记录开始、完成和失败状态。教学测试分别输入缺失地址、不可达地址和正常地址，观察启动错误与 readiness。预期错误能定位到配置或预热步骤，未满足必要条件时不接业务请求；不在每个 Bean 回调中互相调用做全量预热。
+验证:真值断言(BeanPhasesExample 的 definition:instance——后端真值测试);时序断言(生命周期回调的执行顺序日志:构造→注入→PostConstruct→afterPropertiesSet→after→就绪);代理缺失断言(@PostConstruct 捕获的 this 无 CGLIB 标记——第 28 题 spring-advanced 实测)——三组固化生命周期时序。
 
-### 失败推演：创建资源后预热失败
+### 追问链:生命周期三刀
 
-给客户端工厂和关闭动作加计数，在资源已建立后制造预热异常，检查失败分支只释放该资源一次；正常上下文关闭时同样验证释放。再给关闭过程加可控阻塞，核对停机超时与未完成工作的处理。这里是教学验收步骤，不声称已对真实远程客户端完成故障演练。
+一刀:"afterPropertiesSet vs @PostConstruct?"——同时序(InitializingBean 接口 vs JSR-250 注解)——接口=Spring 耦合(不推荐)+注解=标准(JSR-250)——优先注解。二刀:"init-method?"——XML 时代的自定义初始化方法(init-method 属性)——Java 配置用 @Bean(initMethod=...)——遗留兼容。三刀:"销毁的对称?"——@PreDestroy(销毁前)/DisposableBean.destroy/destroy-method——与初始化对称(销毁的顺序=创建的反向,第 38 题 spring-advanced)。
 
 ## 总结点
 
-1. 水电接通不等于智能联网
-2. 轻量初始化与业务就绪分开
-3. 初始化期间不假设自身代理有效
-4. 资源取得和释放都覆盖失败
+1. 构造器零依赖,PostConstruct 轻量,Runner 重活
+2. @PostConstruct 后代理化,捕获 this 有坑
+3. 分层策略:每阶段做什么有边界

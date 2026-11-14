@@ -3,29 +3,30 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-boot/3.5/reference/features/developing-auto-configuration.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
 
 </details>
 
 ## 参考回答
 
-1. Boot 启用自动配置后从约定元数据发现候选，按类路径、配置、Bean 和应用类型等条件注册默认能力。
-2. Boot 3 用 AutoConfiguration.imports 声明候选并按条件装配；历史 spring.factories 入口不能套到全部版本。
+1. EnableAutoConfiguration 导入候选自动配置，按类路径、属性和 Bean 条件生效。
+2. Boot 3 的自动配置候选使用 AutoConfiguration.imports，不照搬旧注册方式。
+3. 检查条件报告，业务 Bean 可按条件覆盖默认配置，避免扩大扫描污染边界。
 
 ## 参考分析
 
-1. starter 聚合依赖，自动配置负责条件化装配；缺失 Bean 条件允许用户覆盖默认实现。
-2. 自动配置不要被普通组件扫描重复发现，顺序主要影响定义应用而非直接规定实例创建顺序。
+1. 多实例同时启动会放大连接和 DDL 竞争。
+2. 宽泛扫描可能污染业务 Bean，配置半更新会形成不一致规则。
 
 ## 案例
 
-1. 教学场景：自制默认客户端只在本地源码工程被扫描，打包后不生效。
+1. 场景（教学示例）：二十个副本同时启动并执行数据库迁移。
+2. 处理：迁移放独立受控步骤，实例连接渐进建立；规则用带版本的不可变快照。
 
-2. 检查 imports 是否进入 JAR，核对类路径和条件报告，以独立宿主测试默认、禁用、缺库和用户覆盖。
-
-3. 验证每条分支可解释，宿主无需扫描依赖根包，也不会出现两个意外候选。
+3. 验证：只有预定迁移执行者生效；失败配置不覆盖旧版本，启动不会冲垮数据库。
 
 ## 总结点
 
-1. 元数据发现加条件装配。
-2. 版本入口和覆盖契约明确。
+1. 装配不污染业务。
+2. 迁移与扩容分开。

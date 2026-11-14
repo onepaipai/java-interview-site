@@ -3,7 +3,7 @@
 面向资深 Java 开发和架构设计面试。复习提纲与深入题解分开维护：旧版短题解仍兼容，复杂工程题使用场景、口述结论、机制与取舍、故障推演及追问。题量、字数和格式检查都不代表内容达到资深水平。
 
 <!-- content-status:start -->
-当前解析包为 `explanations-v18`，共 1215 道：731 道题目级正文、1 道固定样例、483 道主题正文。独立正文不等于事实核验完成；审核台账中 226 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](review-ledger.json)。
+当前解析包为 `explanations-v32`，共 1215 道：994 道题目级正文、0 道固定样例、221 道主题正文。独立正文不等于事实核验完成；审核台账中 712 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](review-ledger.json)。
 <!-- content-status:end -->
 
 ## 写作规则
@@ -69,9 +69,9 @@
 
 ## 验证
 
-1. 项目根目录执行 `node scripts/build-explanations.mjs`，再执行 `node scripts/validate-explanations.mjs`，检查 1,215 题的覆盖、摘要、段落顺序、编号、长度、总结点及图资源。
-   再执行 `node scripts/test-explanation-corrections.mjs`，验证题目级修订不会被模板覆盖、错误标题映射与缺失段落会被拒绝，并核对已修复内容的关键反例。
-2. 后端打包后执行 `powershell -ExecutionPolicy Bypass -File .\scripts\verify-explanation-samples.ps1`，运行 [完整案例](examples/ExplanationCases.java)。使用专用 H2 内存库。
+1. 项目根目录执行 `node scripts/validate-explanations.mjs`，检查 1,215 题的覆盖、摘要、段落顺序、编号、长度、总结点及图资源。
+   题目级修订的回归验证由 `validate-explanations.mjs` 与后端真值测试承担；历史修订脚本(`test-explanation-corrections.mjs`)及内容生成脚本(`build-explanations.mjs`)已随内容重整退役，需要时从 git 历史取回(`git show bf8768a:scripts/<脚本名>`)。
+2. 后端打包后执行 `mvn -B test`，其中 `*ExamplesTest` 编译运行正文中的 Java 源码并验证执行结果。使用专用 H2 内存库。
 3. 前端开发服务启动后，在 frontend 目录执行 `npm run test:explanations`，检查 1440、390、320 宽度的正文、图和代码排版。截图输出到 frontend/test-results/explanations。
 4. 库存的 H2 并发演示只验证条件更新思路；正式 SQL 与锁行为仍需 MySQL 8.4 验证。
 5. `TEST_BASE_URL` 指向独立测试环境，在 frontend 执行 `npm run test:explanation-pack`，核对所有答案与发布摘要，并检查 21 个模块和短题解在三种宽度的真实阅读页。
@@ -83,7 +83,7 @@
 2. 桌面和手机均按原文顺序显示步骤、流程图、代码与验证结果，不把图移到侧栏。图按自然比例自适应，代码允许横向滚动，正文不强制等高或截断。
 3. 代码独立高亮并可复制，流程图可点击放大；参考资料收进题目下方的展开项。
 4. 阅读、回答编辑预览、知识来源预览共用 `frontend/src/answer.ts` 及题解样式；支持三段或含独立分析的四段结构。知识来源允许受控本地流程图，其他图片保留提示和原文入口。
-5. `npm run test:explanation-reader` 使用浏览器响应替换验证正式阅读页，检查 1440、390、320 三种屏幕宽度及图文顺序，不向题库写入样例。本次代码检查与尚未执行的验证范围见 `docs/history/UI-REVIEW-20261015.md`。
+5. `npm run test:explanation-reader` 使用浏览器响应替换验证正式阅读页，检查 1440、390、320 三种屏幕宽度及图文顺序，不向题库写入样例。
 
 ## 现有题库升级
 
@@ -113,13 +113,13 @@ senior-v1 保留原来的 1,050 道题及稳定来源键；解析使用独立的
 
 ## 本轮逐题复查范围
 
-1. 当前为 731 道题目级修订及 1 道独立样例。本次 46 道修改范围记录在 `review-fixes-20261020.json`，此前 21 道深度改写记录仍保留在 `senior-depth-review.json`；范围有重叠，不能直接相加。
-2. 剩余 483 道仍使用主题级分析与案例，尚未逐题完成事实与适配性核验。`review-status.json` 列出各模块进度，不能以格式检查通过代替该工作；其余已有独立正文的题目也不自动视为达到本轮深度标准。
-3. `node scripts/test-explanation-corrections.mjs` 验证已知串题回归及题目映射；`node scripts/test-explanation-publication.mjs` 验证失败生成保留旧清单和不可变文件。
-4. `powershell -ExecutionPolicy Bypass -File scripts/verify-reviewed-examples.ps1` 从题目级正文取 Java 代码，实际编译执行舍入、二分、前缀和、背包和零钱案例；另验证错误捕获片段编译失败。
-5. `node scripts/prepare-review-examples.mjs` 提取本次正文代码，再以 Java 17 执行 `backend/target/ReviewExamples20261020.java`；包含交接、丢更新、LRU、空值、顺序和可见性等 14 项验证。
-6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；`node scripts/test-spring-core-answers.mjs` 核对执行证据与当前源码。完整范围及限制见 [整改记录](../../docs/reports/content/SPRING-CORE-CONTENT-20261023.md)。
-7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；`node scripts/test-spring-advanced-answers.mjs` 核对当前源文与证据。范围和未验证部分见 [进阶整改记录](../../docs/reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
+1. 当前为 994 道题目级修订及 0 道独立样例。本次 46 道修改范围记录在 `review-fixes-20261020.json`，此前 21 道深度改写记录仍保留在 `senior-depth-review.json`；范围有重叠，不能直接相加。
+2. 剩余 221 道仍使用主题级分析与案例，尚未逐题完成事实与适配性核验。`review-status.json` 列出各模块进度，不能以格式检查通过代替该工作；其余已有独立正文的题目也不自动视为达到本轮深度标准。
+3. `node scripts/test-explanation-publication.mjs` 验证失败生成保留旧清单和不可变文件；`test-explanation-corrections.mjs` 等历史一次性验收脚本已退役(git 历史可恢复)。
+4. 正文中的 Java 示例由后端 `*ExamplesTest` 编译执行（舍入、二分、前缀和、背包和零钱案例等），另验证错误捕获片段编译失败。历史脚本 `verify-reviewed-examples.ps1` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/verify-reviewed-examples.ps1`)。
+5. 历史脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回(`git show bf8768a:scripts/prepare-review-examples.mjs`)后提取正文代码，再以 Java 17 执行 `backend/target/ReviewExamples20261020.java`；包含交接、丢更新、LRU、空值、顺序和可见性等 14 项验证。
+6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；执行证据由 `SpringCoreExamplesTest` 与审核台账承接(历史核对脚本已退役)。完整范围及限制见 [整改记录](../../docs/reports/content/SPRING-CORE-CONTENT-20261023.md)。
+7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；执行证据由 `SpringAdvancedExamplesTest` 与审核台账承接(历史核对脚本已退役)。范围和未验证部分见 [进阶整改记录](../../docs/reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
 8. 数据库基础模块现有 59 题均有独立正文，新增 53 道修订及 12 道深入格式。`DatabaseBasicsExamplesTest` 执行正文中 3 组 SQL 并记录 H2 结果，`node scripts/test-database-basics-answers.mjs` 核对证据。相同 SQL 接入显式隔离 MySQL 8.4 门禁，本机未运行该门禁，不以 H2 结果代替索引或锁验证；范围见 [数据库整改记录](../../docs/reports/content/DATABASE-BASICS-CONTENT-20261023.md)。
 
 ## 版本核对依据

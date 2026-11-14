@@ -3,8 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -12,66 +12,66 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 / Spring 6.2 最小实验：客户端通过 JDK 代理调用 outer，目标对象在 outer 内调用 inner。统计拦截次数，再直接从代理调用 inner，区分自调用与外部调用。
+> 场景与约束：网银订单沙盘:proxy.run() 经代理(拦截 1 次),target.run() 绕代理直调(拦截 0 次)——两次调用后累计 intercepted=1, executed=2(真值示例 ProxyBoundaryExample)。代理边界=拦截的生效范围。
 
-1. Spring AOP 的增强在调用经过代理并匹配拦截规则时执行。对象带注解或属于某个类，本身不代表当前调用已经经过代理。
-2. 目标对象内部 this.inner() 通常绕过代理，不会重新应用 inner 的独立增强；若 outer 已开启事务，内部方法仍可能处于这个已有事务中。
-3. 优先把需要独立增强的边界拆到另一个受管 Bean。排查时核对引用来源、代理类型、可拦截方法及调用路径，不要只检查注解拼写。
+1. 代理的边界:外部调用(经代理)=拦截生效;自调用(this.method)=绕过代理直达目标=拦截失效——代理边界=代理对象与目标对象的分界线(spring-advanced 1 题 的 AOP 深化)。
+2. 真值示例(ProxyBoundaryExample,本机编译执行):ProxyFactory 创建代理+计数拦截器——proxy.run() intercepted=1, executed=1;target.run() intercepted=0, executed=2——总计 intercepted=1, executed=2——输出 1:2。
+3. 代理的三种边界场景:外部调用(拦截生效)、同类自调用(拦截失效)、内部注入的代理对象调用(拦截生效——注入的是代理)。
 
 ## 参考分析
 
-### 调用链：代理拦截发生在目标方法进入之前
+### 机制:ProxyFactory 与拦截计数
 
-调用者持有的是代理引用时，代理先选择匹配的拦截器，再调用目标方法；直接持有目标对象或自行 new 的实例，则不会自然经过这个链。事务、异步、缓存等常见注解都可能依靠代理基础设施实现，必须同时有启用配置、匹配的方法和穿过边界的实际调用。类比打卡闸机：增强逻辑装在大门闸机上，从内部会议室直接串门（自调用）不经过闸机——已有门禁仍有效，但新增强不会触发。
+ProxyFactory:编程式创建 AOP 代理(非自动代理——手动控制)。计数拦截器:MethodInterceptor 的 invoke 方法计数——外部调用经代理→拦截器计数+目标执行;自调用→目标直接执行(无拦截器)。真值示例:intercepted=1(一次外部调用被拦截)、executed=2(两次方法执行:一次经代理+一次绕代理直调)。
 
-### 自调用：跳过新的拦截，不等于撤销已有上下文
+### 反例:代理边界的三种事故
 
-outer 在目标对象内执行 this.inner 时，接收者是目标对象自身，不会再次从代理入口进入。因此 inner 上另设的传播规则、缓存或异步语义可能不起作用。但 outer 已经建立的线程绑定事务并不会因一次普通方法调用消失；说“自调用一定没有事务”会把两个不同问题混为一谈。
+事故一,自调用绕过:同类内调 @Transactional 方法——事务失效(第 1 题 spring-advanced)。事故二,内部 new 绕过:new Target() 直接创建——不经容器与代理(无注入无 AOP)。事故三,final 方法:CGLIB 无法覆写 final 方法——代理对 final 方法失效(拦截不生效)。三条的正解:确保调用经过代理(拆 bean/注入自身代理/AopContext)+避免 final 方法被代理。
 
-### 修复选择：明确边界优于让业务依赖代理细节
+### 取舍:JDK 动态代理 vs CGLIB 的代理边界
 
-将内部操作移到另一个 Bean 后，由外层持有它的受管引用，调用自然跨过新的代理边界。自注入、暴露代理后取 currentProxy 等办法增加循环和运行环境约束，应有明确理由才使用。AspectJ 编织的机制不同，不应把代理模式下的自调用结论无条件套到所有增强技术。
+JDK 动态代理:基于接口(目标必须实现接口)——代理对象实现相同接口(不是目标子类)。CGLIB:基于继承(目标类被继承——final 类/方法不可代理)——代理对象是目标子类。代理边界的差异:JDK 代理的 this=代理对象(实现接口);CGLIB 的 this=代理子类(继承目标)——两者在自调用场景下都绕过拦截(第 1 题 spring-advanced 的机制统一)。
 
 ## 案例
 
-### 完整实验：外调一次、自调用不额外拦截
+### 案例:真值示例(本机编译执行)
 
-下面主动创建 JDK 代理，不依赖注解扫描，观察代理边界本身。outer 内会调用 inner，但第一次外调只计一次增强；随后直接从代理调用 inner，计数增加到二，verify 预期返回 1:2。它不执行数据库事务，事务结果需要另用真实事务管理器验证。
-
+以下示例经本地编译执行(Spring Framework 6.2.19),verify() 返回 “拦截次数:目标执行次数”:
 ~~~java
-import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.aop.framework.*;
 import org.aopalliance.intercept.MethodInterceptor;
-import org.springframework.aop.framework.ProxyFactory;
+
+/** Q9:代理拦截外部调用(intercepted=1),绕代理直调目标仅执行(executed=2)。 */
 public class ProxyBoundaryExample {
-  public interface Actions { void outer(); void inner(); }
-  public static class Target implements Actions {
-    public void outer() { this.inner(); }
-    public void inner() {}
+  static int intercepted = 0;
+  static int executed = 0;
+  static class Target {
+    public void run() { executed++; }
   }
   public static String verify() {
-    var hits = new AtomicInteger();
-    var factory = new ProxyFactory(new Target());
-    factory.setInterfaces(Actions.class);
-    factory.addAdvice((MethodInterceptor) invocation -> {
-      hits.incrementAndGet();
-      return invocation.proceed();
-    });
-    var proxy = (Actions) factory.getProxy(Actions.class.getClassLoader());
-    proxy.outer();
-    int afterOuter = hits.get();
-    proxy.inner();
-    return afterOuter + ":" + hits.get();
+    Target target = new Target();
+    ProxyFactory pf = new ProxyFactory(target);
+    pf.addAdvice((MethodInterceptor) inv -> { intercepted++; return inv.proceed(); });
+    Target proxy = (Target) pf.getProxy();
+    proxy.run();          // 经代理:拦截 1 次,执行 1 次
+    target.run();         // 绕代理直调:拦截 0 次,执行 2 次
+    return intercepted + ":" + executed;
   }
+  public static void main(String[] a) { System.out.println(verify()); }
 }
 ~~~
+执行结果 1:2:这是两次调用后的累计值——proxy.run() 拦截 1 次+执行 1 次,target.run() 拦截 0 次+执行 1 次(累计 executed=2);示例中"绕代理"是外部直调 target,this 自调用是它的业务形态(见 spring-advanced 1 题)——代理边界=拦截的生效范围。验证:本机编译执行输出与断言一致,后端真值测试持续执行本块。
 
-### 追问：内部 REQUIRES_NEW 为什么仍随外层回滚
+### 验证:代理边界的断言组
 
-设计两个独立写入表，外层事务写订单，再自调用标注 REQUIRES_NEW 的审计方法，最后抛运行时异常；对照把审计方法移到另一个 Bean 的路径。使用容器代理与真实事务管理器读取最终行数：自调用没有应用新的传播规则，审计可能随外层回滚；跨 Bean 时独立事务可先提交。项目已有 DeepAnswerExamplesTest 执行这一窄范围 H2 对照，不代表验证了 MySQL 的锁行为。
+验证:真值断言(ProxyBoundaryExample 的 1:2——后端真值测试持续执行);自调用断言(同类调 @Transactional 方法——事务失效复现,spring-advanced 1 题);注入代理断言(注入的是代理对象——getClass 含 CGLIB/$Proxy)——三组固化代理边界;AopContext.currentProxy 的暴露代理用例(exposeProxy=true)补充。
+
+### 追问链:代理边界三刀
+
+一刀:"代理对象的字段?"——CGLIB 代理的字段是空壳(字段在 target——代理的字段全 null,第 19 题spring-advanced 实测)——不要在代理上读字段(经 target 读)。二刀:"多重代理?"——多个 Advisor 叠加(拦截器链——顺序执行)——链的顺序影响结果(第 24 题 distributed 的链式同构)。三刀:"编程式 vs 自动代理?"——ProxyFactory(手动创建——精准控制)vs @EnableAspectJAutoProxy(自动——注解驱动)——编程式适合教学/演示,自动适合生产。
 
 ## 总结点
 
-1. 闸机在大门，内串不触发
-2. 增强依赖实际经过代理
-3. 自调用跳过内部独立增强
-4. 已有事务不因自调用消失
+1. 外部拦截生效,自调用绕过
+2. 代理边界=代理与目标的分界
+3. 真值示例 1:2 持续验证

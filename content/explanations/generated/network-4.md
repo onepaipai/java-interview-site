@@ -3,58 +3,56 @@
 
 教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [RFC 9293 · TCP · 1](https://www.rfc-editor.org/rfc/rfc9293.html)
+- [HTTP 规范 · 1](https://www.rfc-editor.org/rfc/rfc9112.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/package-summary.html)
 
 </details>
 
 ## 参考回答
 
-1. TCP 提供有序字节流，不保留一次 write 对应一次 read 的边界；应用必须自行分帧。
-2. 协议可用定长、转义分隔符或长度前缀；接收端维护累积缓冲，半帧保留，多帧循环解析。
-3. 长度前缀先等完整头、校验长度上限，再等正文；长度单位应是编码后的字节数，不是字符数。
-4. 同时限制帧长、缓冲和半帧等待时间；负长度、溢出与超限必须在分配内存前拒绝。
-5. 调整 read 缓冲或关闭 Nagle 都不能解决协议边界；连接关闭时的截断帧也要明确处理。
+<!-- explanation:deep -->
+
+> 场景与约束：网银报文沙盘:客户端连发三条消息"MSG-A|""MSG-B|""MSG-C|",服务端一次 read 读到 18 字节三条粘连;发一条 8KB 大消息却被 2 次 read 分片——TCP 只保证字节流有序不丢,从不保证"一次写对应一次读"。
+
+1. 根因:TCP 的读写单位是字节不是消息——发送端 Nagle 合并小写、接收端缓冲区按到达顺序堆字节、MSS 分段、内核缓冲腾挪,都会让"写的边界"在读侧不可见;粘与半是同一件事的两个表象。
+2. 本机实证:8KB 消息被 2 次 read 读完(半包形态);客户端延迟读取时 3 次小写被 1 次 read 读走 18 字节(粘包形态)——两种形态都在 loopback 上稳定复现,与网络状况无关。
+3. 正解=应用层分帧:定长(浪费)、分隔符(如 | 或 \n,需转义)、长度前缀(推荐,变长高效)、HTTP 的 Content-Length/Transfer-Encoding 分块——边界由协议定,不由 TCP 定。
+
+## 参考分析
+
+### 机制:读写边界为什么错位
+
+发送侧:write 只是交给内核发送缓冲,实际分段由 MSS 决定;接收侧:read 从接收缓冲取字节,取多少取决于缓冲区现存量与应用缓冲大小——两侧的边界没有任何同步机制。流式语义是特性不是缺陷:它让吞吐优化(Nagle/合并)成为可能,代价是消息边界上移到应用层。
+
+### 反例:粘包的三种事故
+
+事故一:按 read 次数当消息个数解析——合并时把三条当一条,报文解析错乱。事故二:缓冲区小于消息——半包解析直接截断,余额字段缺尾。事故三:分隔符出现在业务数据里——用 | 分隔但金额文本含 |,分帧错位。三条的正解:长度前缀分帧+解析缓冲区累积(不足一帧先攒着)。
+
+### 取舍:三种分帧方式的选择
+
+定长:解析最简单但 padding 浪费,适合固定宽度协议;分隔符:可读性好但要转义与扫描,适合文本协议(日志/Redis 协议);长度前缀:解析 O(1) 支持二进制,是自定义协议的默认选择。HTTP 两者都用:Content-Length 定长、chunked 分块分隔。
 
 ## 案例
 
-1. 场景（教学示例）：4 字节大端正文长度；两帧 ABC、Z，被分为半个头、剩余头加部分正文、剩余全部三次送入。
+### 验证:粘与半的双向实证
 
-2. 处理：以下教学解码器限制正文最多 8 字节、缓冲 32 字节；完整帧才消费，不足时保留。
+本机实测(JDK 17.0.17,loopback):
+~~~
+java N1StreamFraming
+第一次 read 返回 6 字节,内容=MSG-A|
+8KB 消息被 2 次 read 分片读完(半包)
 
-```java
-class Decoder {
-    final java.nio.ByteBuffer in = java.nio.ByteBuffer.allocate(32);
-    java.util.List<String> feed(byte[] bytes) {
-        if (bytes.length > in.remaining())
-            throw new IllegalArgumentException("buffer limit");
-        in.put(bytes).flip();
-        var frames = new java.util.ArrayList<String>();
-        while (in.remaining() >= 4) {
-            in.mark();
-            int length = in.getInt();
-            if (length < 0 || length > 8)
-                throw new IllegalArgumentException("frame limit");
-            if (in.remaining() < length) { in.reset(); break; }
-            byte[] body = new byte[length];
-            in.get(body);
-            frames.add(new String(body, java.nio.charset.StandardCharsets.UTF_8));
-        }
-        in.compact();
-        return frames;
-    }
-}
-var decoder = new Decoder();
-System.out.println(decoder.feed(new byte[]{0, 0}));
-System.out.println(decoder.feed(new byte[]{0, 3, 65}));
-System.out.println(decoder.feed(new byte[]{66, 67, 0, 0, 0, 1, 90}));
-```
+java N1bMerge
+3 次写、延迟后 1 次 read 返回 18 字节,内容=MSG-A|MSG-B|MSG-C|(三条消息被一次读走=粘)
+~~~
+验证:8KB 被 2 次 read 分片(半)、3 次写被 1 次 read 读走(粘)——两种形态实测复现,读写边界错位成立,分帧必须上移到应用层。
 
-3. 结果：依次输出 []、[]、[ABC, Z]；半帧不输出，最后一次同时解析两帧，正文没有丢失或串帧。
+### 追问链:粘包三刀
 
-4. 验证：补测零长、负长、超过 8 字节、截断正文和半帧超时；协议错误应终止该连接，生产解码器另需处理受限扩容与大批输入。
+一刀:UDP 有粘包吗——没有,数据报天然有边界,代价是应用要自己处理丢包乱序(见 Q27 BIO/NIO 与 UDP 语义)。二刀:HTTP 为什么感觉不到粘包——Content-Length 或 chunked 就是它的分帧协议,解析器按帧边界读,粘半在框架里已被处理。三刀:长连接上分帧和短连接谁更难——短连接可以"关连接即一帧"偷懒,长连接必须显式分帧——连接复用让分帧从可省变成必需(见 Q9)。
 
 ## 总结点
 
-1. TCP 保字节顺序，不保帧。
-2. 半帧保留，多帧循环。
-3. 先验长度，再读正文。
+1. TCP 只保证字节流有序
+2. 粘半是边界的两个表象
+3. 长度前缀是最稳分帧

@@ -3,43 +3,47 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Google SRE · 2](https://sre.google/sre-book/addressing-cascading-failures/)
 
 </details>
 
 ## 参考回答
 
-1. 单例 Bean 由请求共享，Spring 不会自动串行化方法；成员字段里的身份可能被另一个请求覆盖。
-2. 租户、用户等请求状态放进方法参数和局部变量；身份必须来自认证结果，不能直接相信请求体。
-3. volatile 只解决可见性，不隔离请求；分别给 setter 和业务方法加锁也保护不了整个请求序列。
-4. 同步请求可用 request scope；异步显式传入不可变上下文，不假定请求结束后作用域仍有效。
-5. 共享缓存和统计另做并发与租户隔离；ThreadLocal 必须考虑线程池清理和跨线程传递。
+<!-- explanation:deep -->
+
+> 场景与约束：网银会话沙盘:单例 Service 的 userId 字段存"当前用户"——并发请求互相覆盖(线程 A 写用户甲,线程 B 写用户乙,A 读到乙)——单例是全局共享实例,请求级状态必须用请求级载体(ThreadLocal/方法参数/请求作用域 bean)。
+
+1. 竞态的本质:单例 bean 的字段被所有请求线程共享——字段写入无同步→后写覆盖前写;即使加锁→串行化吞吐(不是并发安全的方案,是吞吐杀手)。实测锚点(spring-advanced 3 题):单例 bean 保存请求状态=全局共享可变状态(第 47 题 banking 同构)。
+2. 正确载体:方法参数(显式传递——无隐藏状态)、ThreadLocal(请求线程绑定,框架管理[Spring MVC 的 request 绑定])、请求作用域 bean(@RequestScope——每请求一个实例)。
+3. 正确性判据:状态的生命周期=请求生命周期→请求级载体;状态的生命周期=应用生命周期→单例字段——生命周期的匹配是并发安全的前提。
+
+## 参考分析
+
+### 机制:单例共享与线程安全边界
+
+单例 bean:一个实例被所有线程共享——实例字段=全局共享可变状态(第 47 题distributed 全局可变的双罪:并发+泄漏)。无状态单例(只依赖注入的协作者,不保存可变状态)=线程安全(方法的局部变量=线程栈,天然隔离)。有状态单例的字段=并发事故源。请求级状态的三载体:方法参数(最显式)、RequestAttributes(ThreadLocal[Spring MVC 管理])、@RequestScope bean(每请求新实例)。
+
+### 反例:单例状态的两种事故
+
+事故一,竞态覆盖:userId 字段被并发请求覆盖——A 的操作记到 B 头上(资金安全事故)。事故二,ThreadLocal 泄漏:线程池复用线程,ThreadLocal 未清理——下一个请求读到上一个请求的状态(第 19 题distributed 会话污染同构)。两条的正解:请求状态用方法参数或 RequestAttributes(框架管理生命周期);单例 bean 保持无状态(只依赖注入的协作者)。
+
+### 取舍:无状态与有状态的边界
+
+无状态单例:Service/Repository(依赖注入的协作者+方法内局部变量)——线程安全天然。有状态的合法场景:配置缓存(只读,启动后不变)、计数器(AtomicLong——并发原语,第 19 题)——有状态但并发安全。禁止:请求级可变状态(userId/currentUser/临时数据)——必须请求级载体。
 
 ## 案例
 
-1. 场景（教学示例）：单例导出服务先 setTenant 再 export；A、B 请求交错，A 导出了 B 的数据。
+### 验证:单例无状态的断言组
 
-2. 处理：删除共享 tenant 字段，从认证层传入不可变上下文，并在 SQL 中保留租户条件。
+验证:竞态复现断言(并发请求写 userId 字段——覆盖复现);载体对照断言(方法参数传递——并发下各自独立);ThreadLocal 清理断言(线程池复用后的状态清理)——三组固化单例纪律;ArchUnit 规则(单例 bean 的可变实例字段扫描)进 CI。
 
-```java
-record Caller(String tenantId, String userId) {}
-class ExportService {
-    String tenantForExport(Caller caller) {
-        // caller 由认证层构造；查询仍需按 tenantId 过滤
-        return caller.tenantId();
-    }
-}
-var service = new ExportService();
-System.out.println(service.tenantForExport(new Caller("A", "u1")));
-System.out.println(service.tenantForExport(new Caller("B", "u2")));
-```
+### 追问链:单例三刀
 
-3. 结果：输出 A、B；同一服务实例不再保存上一次请求身份，异步导出也只传本次调用的上下文快照。
-
-4. 验证：让 A 在参数校验后暂停，完成 B 再恢复 A；检查 SQL 租户参数及导出文件归属均为 A，另测线程池复用。
+一刀:"单例与并发计数?"——AtomicLong(并发原语)替代 int 计数——有状态但线程安全(并发原语的正确使用);监控指标(第 48 题)用 LongAdder。二刀:"@RequestScope 的实现?"——每请求创建新实例(作用域代理——注入的是代理,访问时从请求上下文取)——代理的线程安全由作用域管理。三刀:"无状态的可测性?"——无状态 service 的测试=纯方法调用(无状态重置)——有状态需要重置(测试污染风险,第 37 题)——无状态的可测试性优于有状态。
 
 ## 总结点
 
-1. 单例共享，不会自动串行。
-2. 请求状态放入调用参数。
-3. 身份可信，查询仍需隔离。
+1. 单例字段=全局共享可变状态
+2. 请求状态用参数或请求作用域
+3. 无状态单例天然线程安全

@@ -3,7 +3,7 @@
     "key": "java-language/1",
     "title": "equals 与 hashCode 的契约为何会影响领域对象设计？",
     "topic": "value-key",
-    "contentSource": "sample"
+    "contentSource": "question"
   },
   {
     "key": "java-language/2",
@@ -33,31 +33,31 @@
     "key": "java-language/6",
     "title": "重载与重写在静态类型和动态分派上有何差异？",
     "topic": "dispatch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/7",
     "title": "接口默认方法与抽象类应该如何取舍？",
     "topic": "composition",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/8",
     "title": "如何设计真正不可变的 Java 值对象？",
     "topic": "immutable",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/9",
     "title": "record 是否自动保证深度不可变？",
     "topic": "immutable",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/10",
     "title": "为什么组合通常比继承更适合业务规则扩展？",
     "topic": "composition",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/11",
@@ -93,7 +93,7 @@
     "key": "java-language/16",
     "title": "parallelStream 为什么可能拖慢在线接口？",
     "topic": "parallel-stream",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/17",
@@ -111,37 +111,37 @@
     "key": "java-language/19",
     "title": "如何避免自动装箱导致的性能与正确性问题？",
     "topic": "boxing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/20",
     "title": "String.intern 在高基数业务数据中有什么风险？",
     "topic": "strings",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/21",
     "title": "StringBuilder 与字符串拼接应该如何选择？",
     "topic": "strings",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/22",
     "title": "Java 序列化为何不适合作为不可信输入协议？",
     "topic": "serialization",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/23",
     "title": "如何安全地实现枚举或静态持有者单例？",
     "topic": "singleton",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/24",
     "title": "深拷贝与浅拷贝在 DTO 隔离中如何选择？",
     "topic": "immutable",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/25",
@@ -153,19 +153,19 @@
     "key": "java-language/26",
     "title": "反射调用比直接调用慢的原因有哪些？",
     "topic": "reflection",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/27",
     "title": "MethodHandle 与反射应如何进行技术选型？",
     "topic": "reflection",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/28",
     "title": "注解保留策略如何影响框架运行？",
     "topic": "reflection",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/29",
@@ -177,127 +177,127 @@
     "key": "java-language/30",
     "title": "如何判断一个 API 改动是否保持二进制兼容？",
     "topic": "compatibility",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/31",
     "title": "为什么可变对象不适合直接作为缓存键？",
     "topic": "value-key",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/32",
     "title": "如何设计包含敏感字段的 toString 和日志输出？",
     "topic": "privacy-java",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/33",
     "title": "时间点、当地时间与时区应如何建模？",
     "topic": "time",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/34",
     "title": "夏令时会如何影响定时任务与账单周期？",
     "topic": "time",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/35",
     "title": "为什么格式化日期时不能混用 YYYY 和 yyyy？",
     "topic": "time",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/36",
     "title": "如何使用 Charset 避免跨平台乱码？",
     "topic": "io",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/37",
     "title": "Files.readAllBytes 为什么可能造成线上 OOM？",
     "topic": "io",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/38",
     "title": "如何设计可关闭的业务组件生命周期？",
     "topic": "io",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/39",
     "title": "如何让随机数满足不同的业务需求？",
     "topic": "random-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/40",
     "title": "UUID 能否同时满足索引效率与全局排序？",
     "topic": "random-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/41",
     "title": "如何避免正则表达式引起拒绝服务？",
     "topic": "text-edge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/42",
     "title": "字符串长度与用户可见字符数为何不同？",
     "topic": "text-edge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/43",
     "title": "Comparable 与 Comparator 如何保证有序集合正确性？",
     "topic": "ordering",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/44",
     "title": "如何在 Java 中避免整数溢出导致金额或容量错误？",
     "topic": "overflow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/45",
     "title": "如何实现支持版本演进的错误码体系？",
     "topic": "api-design",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/46",
     "title": "如何设计分页返回对象的泛型边界？",
     "topic": "generics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/47",
     "title": "如何给遗留静态工具类引入可测试性？",
     "topic": "api-design",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/48",
     "title": "接口幂等语义可以只靠方法名表达吗？",
     "topic": "api-design",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/49",
     "title": "如何评审一个看似简洁却难维护的链式表达式？",
     "topic": "functional",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "java-language/50",
     "title": "Java 版本升级前应验证哪些兼容性？",
     "topic": "compatibility",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "collections/1",
@@ -2103,25 +2103,25 @@
     "key": "ai-basics/1",
     "title": "大语言模型的生成过程为何不是事实数据库查询？",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/2",
     "title": "Token 与中文字符数为什么不能固定换算？",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/3",
     "title": "上下文窗口很大为什么仍可能答错？",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/4",
     "title": "temperature 降到零是否保证结果完全一致？",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/5",
@@ -2133,37 +2133,37 @@
     "key": "ai-basics/6",
     "title": "Prompt 应如何区分指令、资料与用户输入？",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/7",
     "title": "Few-shot 示例应该怎样选择？",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/8",
     "title": "为什么不应把所有业务规则都塞进一个超长提示？",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/9",
     "title": "RAG 与直接长上下文输入如何取舍？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/10",
     "title": "Embedding 相似度能直接表示事实是否正确吗？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/11",
     "title": "向量检索为什么可能漏掉精确编号和产品代码？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/12",
@@ -2181,7 +2181,7 @@
     "key": "ai-basics/14",
     "title": "为什么切分时应保留标题和来源元数据？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/15",
@@ -2193,169 +2193,169 @@
     "key": "ai-basics/16",
     "title": "Reranker 与向量检索各自承担什么任务？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/17",
     "title": "为什么模型回答带引用仍不能自动视为可靠？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/18",
     "title": "RAG 没找到证据时应该怎样回答？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/19",
     "title": "微调与 RAG 分别适合解决什么问题？",
     "topic": "training-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/20",
     "title": "LoRA 为什么能减少微调参数量？",
     "topic": "training-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/21",
     "title": "预训练、指令微调和偏好优化有何区别？",
     "topic": "training-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/22",
     "title": "如何判断一个任务更适合规则而非大模型？",
     "topic": "llm-output",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/23",
     "title": "结构化输出为什么仍要做后端校验？",
     "topic": "llm-output",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/24",
     "title": "Function Calling 是否意味着模型直接执行函数？",
     "topic": "tools-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/25",
     "title": "Agent 与普通问答链路的主要差别是什么？",
     "topic": "tools-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/26",
     "title": "为什么 Agent 需要限制最大步骤和总预算？",
     "topic": "tools-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/27",
     "title": "提示注入与普通用户指令冲突有什么不同？",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/28",
     "title": "工具返回内容为什么也必须视为不可信数据？",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/29",
     "title": "模型服务的 API Key 为什么不能放在浏览器代码里？",
     "topic": "ai-privacy-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/30",
     "title": "如何避免把用户敏感信息送到模型服务？",
     "topic": "ai-privacy-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/31",
     "title": "流式返回改善了哪些体验，没有解决什么？",
     "topic": "ai-runtime-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/32",
     "title": "首 token 时延与完整回答时延为何应分别监控？",
     "topic": "ai-runtime-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/33",
     "title": "模型请求超时后直接重试有什么风险？",
     "topic": "ai-runtime-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/34",
     "title": "如何为模型调用设计并发限制？",
     "topic": "ai-runtime-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/35",
     "title": "为什么只看平均准确率会掩盖模型风险？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/36",
     "title": "离线评测集应该怎样构建？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/37",
     "title": "人工评分与模型评分应该怎样配合？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/38",
     "title": "如何区分检索失败与生成失败？",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/39",
     "title": "为什么数据更新需要版本化的知识索引？",
     "topic": "ai-index-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/40",
     "title": "模型升级为何需要灰度而非直接替换？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/41",
     "title": "如何评估模型调用的总成本？",
     "topic": "ai-cost-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/42",
     "title": "缓存模型回答时应该包含哪些键维度？",
     "topic": "ai-cost-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/43",
     "title": "为什么语义缓存存在答非所问风险？",
     "topic": "ai-cost-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/44",
@@ -2367,37 +2367,37 @@
     "key": "ai-basics/45",
     "title": "如何安全地让模型生成 SQL？",
     "topic": "llm-output",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/46",
     "title": "多轮对话历史为什么需要裁剪与摘要？",
     "topic": "ai-cost-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/47",
     "title": "知识库权限过滤应该放在检索前还是生成后？",
     "topic": "ai-privacy-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/48",
     "title": "为什么应保存提示模板版本而不是只存最终回答？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/49",
     "title": "如何给 AI 功能设计人工接管入口？",
     "topic": "llm-output",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-basics/50",
     "title": "怎样向面试官展示一个 AI 项目不是简单套壳？",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "concurrency-advanced/1",
@@ -2739,19 +2739,19 @@
     "key": "jvm-advanced/7",
     "title": "ZGC 的低暂停特性有什么资源取舍？",
     "topic": "collector",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/8",
     "title": "如何比较 G1 与 ZGC 对同一服务的效果？",
     "topic": "collector",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/9",
     "title": "GC 时间占比不高，接口为何仍可能被 GC 影响？",
     "topic": "g1",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/10",
@@ -2799,199 +2799,199 @@
     "key": "jvm-advanced/17",
     "title": "直接内存增长但缓冲池指标稳定时还应看什么？",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/18",
     "title": "线程栈预算怎样影响高并发服务？",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/19",
     "title": "容器 OOMKilled 而没有 Java OOM 日志如何分析？",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/20",
     "title": "CPU throttling 为什么会让 GC 和请求同时变慢？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/21",
     "title": "安全点日志显示进入耗时长时如何排查？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/22",
     "title": "JFR 在性能排障中比单次线程栈多提供什么？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/23",
     "title": "如何用采样剖析区分 CPU 与等待瓶颈？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/24",
     "title": "为什么生产剖析要关注采样偏差？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/25",
     "title": "JIT 内联失败通常如何影响热点路径？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/26",
     "title": "多态调用何时可能影响 JIT 优化？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/27",
     "title": "去优化频繁应该检查哪些业务变化？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/28",
     "title": "字符串去重与业务级缓存分别节省什么？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/29",
     "title": "大 JSON 响应如何同时增加堆与尾延迟？",
     "topic": "payload",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/30",
     "title": "堆外内存池为什么也需要容量治理？",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/31",
     "title": "GC 参数过多为什么会增加升级风险？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/32",
     "title": "如何评估增大堆是否真的改善系统？",
     "topic": "collector",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/33",
     "title": "为什么限流有时比更换回收器更有效？",
     "topic": "g1",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/34",
     "title": "日志打印怎样导致显著分配压力？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/35",
     "title": "异常作为正常控制流为何可能影响性能？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/36",
     "title": "如何分析一次 Full GC 后内存仍接近上限？",
     "topic": "heap-leak",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/37",
     "title": "类直方图能否直接代替堆泄漏分析？",
     "topic": "heap-leak",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/38",
     "title": "动态代理数量增长怎样与类加载问题关联？",
     "topic": "heap-leak",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/39",
     "title": "如何避免诊断命令本身扩大事故？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/40",
     "title": "应用预热应该覆盖哪些路径？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/41",
     "title": "为什么扩容新实例后可能暂时拖慢整体？",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/42",
     "title": "如何在 Java 17 与更高 JDK 间设计性能对照？",
     "topic": "collector",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/43",
     "title": "虚拟线程相关固定问题为何必须按 JDK 版本讨论？",
     "topic": "virtual-jvm",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/44",
     "title": "NUMA 与内存局部性何时值得纳入 JVM 排障？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/45",
     "title": "透明大页可能怎样影响延迟？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/46",
     "title": "如何给 JVM 性能变更建立回滚条件？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/47",
     "title": "内存泄漏修复后为什么 RSS 不一定立刻下降？",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/48",
     "title": "服务卡顿但 GC 正常时如何继续排查？",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/49",
     "title": "如何为不同服务制定统一而不僵化的 JVM 基线？",
     "topic": "tuning-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "jvm-advanced/50",
@@ -4887,7 +4887,7 @@
     "key": "distributed/15",
     "title": "分布式锁与共识服务怎样按业务风险选择？",
     "topic": "dist-lock-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/16",
@@ -4899,13 +4899,13 @@
     "key": "distributed/17",
     "title": "全局 ID 方案应怎样处理时钟回拨？",
     "topic": "dist-lock-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/18",
     "title": "分布式限流为什么需要明确一致性与容错目标？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/19",
@@ -4917,67 +4917,67 @@
     "key": "distributed/20",
     "title": "多层限流怎样避免重复等待？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/21",
     "title": "熔断与限流为什么不能互相替代？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/22",
     "title": "服务降级怎样保持业务语义可解释？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/23",
     "title": "舱壁隔离应该围绕哪些资源划分？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/24",
     "title": "负载均衡为什么需要考虑请求成本差异？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/25",
     "title": "热点账户或商品为什么无法靠普通水平扩容解决？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/26",
     "title": "请求合并与异步化怎样改变用户看到的状态？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/27",
     "title": "高并发库存扣减如何分层保护？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/28",
     "title": "如何估算系统的在途请求容量？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/29",
     "title": "重试预算应该如何跨服务调用链分配？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/30",
     "title": "指数退避为什么不能代替并发上限？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/31",
@@ -4989,115 +4989,115 @@
     "key": "distributed/32",
     "title": "服务发现中的旧节点如何被安全清理？",
     "topic": "dist-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/33",
     "title": "分布式缓存的版本失效如何避免旧事件覆盖新值？",
     "topic": "dist-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/34",
     "title": "数据迁移中的双写为什么容易出现分叉？",
     "topic": "dist-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/35",
     "title": "灰度迁移怎样做到可回退？",
     "topic": "dist-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/36",
     "title": "如何设计跨机房读取的一致性策略？",
     "topic": "dist-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/37",
     "title": "多活系统最难的往往是什么？",
     "topic": "dist-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/38",
     "title": "单元化架构怎样控制跨单元访问？",
     "topic": "dist-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/39",
     "title": "时钟偏差为什么会破坏基于时间戳的冲突处理？",
     "topic": "dist-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/40",
     "title": "分布式链路追踪能否代替业务审计？",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/41",
     "title": "如何处理分布式任务的重复领取？",
     "topic": "dist-idempotency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/42",
     "title": "如何实现任务断点续跑而不重复外部副作用？",
     "topic": "dist-idempotency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/43",
     "title": "超大请求扇出为什么容易拉高尾延迟？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/44",
     "title": "对冲请求适合所有慢接口吗？",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/45",
     "title": "如何给分布式系统做故障注入？",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/46",
     "title": "为什么单节点基准不能直接推导集群容量？",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/47",
     "title": "如何区分扩容收益下降是热点还是协调成本？",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/48",
     "title": "如何设计端到端的超时取消协议？",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/49",
     "title": "资深开发怎样解释最终一致不是随便丢消息？",
     "topic": "dist-transactions",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "distributed/50",
     "title": "如何评审一个高并发方案是否过度设计？",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/1",
@@ -5115,7 +5115,7 @@
     "key": "reliability/3",
     "title": "为什么平均响应时间不能代表线上体验？",
     "topic": "slo",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/4",
@@ -5157,7 +5157,7 @@
     "key": "reliability/10",
     "title": "数据库连接池打满怎样止损？",
     "topic": "incident-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/11",
@@ -5175,133 +5175,133 @@
     "key": "reliability/13",
     "title": "如何设计可安全执行的一键降级？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/14",
     "title": "扩容为什么有时会加重数据库故障？",
     "topic": "incident-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/15",
     "title": "如何实施灰度发布的自动停止条件？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/16",
     "title": "蓝绿发布和滚动发布各有什么风险？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/17",
     "title": "配置变更为什么应被当成正式发布？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/18",
     "title": "如何避免特性开关长期积累成隐性复杂度？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/19",
     "title": "故障期间为什么要建立统一时间线？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/20",
     "title": "事故指挥与技术排障应怎样分工？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/21",
     "title": "为什么止损优先级不等于立刻重启？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/22",
     "title": "如何设计生产排障的最小证据集？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/23",
     "title": "日志、指标和追踪怎样互相补充？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/24",
     "title": "为什么高基数指标可能成为稳定性问题？",
     "topic": "telemetry-disk",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/25",
     "title": "如何判断日志洪峰是否在反过来拖垮服务？",
     "topic": "telemetry-disk",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/26",
     "title": "磁盘快满时如何安全处置？",
     "topic": "telemetry-disk",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/27",
     "title": "磁盘 I/O 高时如何区分业务与备份竞争？",
     "topic": "telemetry-disk",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/28",
     "title": "备份为什么必须包含图片和业务附件？",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/29",
     "title": "如何定义并验证 RTO 与 RPO？",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/30",
     "title": "灾备切换为什么要防止旧主继续写入？",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/31",
     "title": "如何开展不会失控的混沌实验？",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/32",
     "title": "压测流量为什么不能随便打到真实资金接口？",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/33",
     "title": "容量压测怎样避免只测出一个漂亮峰值？",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/34",
     "title": "如何计算扩容提前量？",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/35",
@@ -5313,91 +5313,91 @@
     "key": "reliability/36",
     "title": "如何识别服务中的单点与共同故障域？",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/37",
     "title": "证书过期为什么应该在业务故障前被发现？",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/38",
     "title": "怎样设计限流后的用户体验？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/39",
     "title": "一次回滚为什么可能无法恢复服务？",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/40",
     "title": "如何把事故复盘写成可执行的改进计划？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/41",
     "title": "如何验证修复措施真的防止同类事故？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/42",
     "title": "值班手册应该写到什么程度？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/43",
     "title": "如何治理反复需要人工执行的运维工作？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/44",
     "title": "稳定性治理怎样避免拖慢所有业务发布？",
     "topic": "slo",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/45",
     "title": "如何衡量依赖降级的真实覆盖率？",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/46",
     "title": "请求超时后如何避免后台工作继续堆积？",
     "topic": "incident-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/47",
     "title": "进程被强杀后系统应如何恢复未完成任务？",
     "topic": "crash-recovery",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/48",
     "title": "如何识别监控系统本身失效？",
     "topic": "telemetry-disk",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/49",
     "title": "如何向非技术人员解释服务稳定性取舍？",
     "topic": "slo",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "reliability/50",
     "title": "资深开发如何展示自己在稳定性中的责任？",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/1",
@@ -5409,7 +5409,7 @@
     "key": "architecture/2",
     "title": "领域边界应该按技术层还是业务能力划分？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/3",
@@ -5421,49 +5421,49 @@
     "key": "architecture/4",
     "title": "贫血模型与充血模型怎样避免教条争论？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/5",
     "title": "聚合边界为什么不能无限扩大？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/6",
     "title": "应用服务与领域服务分别应该承担什么？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/7",
     "title": "防腐层怎样降低外部系统模型的侵入？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/8",
     "title": "怎样识别并治理重复但不应合并的代码？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/9",
     "title": "策略模式与规则引擎应该怎样取舍？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/10",
     "title": "状态机怎样避免业务状态任意跳转？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/11",
     "title": "CQRS 适合哪些读写差异明显的场景？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/12",
@@ -5475,7 +5475,7 @@
     "key": "architecture/13",
     "title": "同步调用与事件驱动怎样选择边界？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/14",
@@ -5499,49 +5499,49 @@
     "key": "architecture/17",
     "title": "技术选型怎样避免只比较功能清单？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/18",
     "title": "架构决策记录应该包含哪些内容？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/19",
     "title": "如何识别真正需要重构的模块？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/20",
     "title": "绞杀者迁移怎样控制新旧系统并存风险？",
     "topic": "migration-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/21",
     "title": "模块拆分如何保持可测试性？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/22",
     "title": "测试金字塔为什么不是固定比例公式？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/23",
     "title": "回归测试为什么应从真实事故场景提炼？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/24",
     "title": "代码审查怎样聚焦正确性而非个人风格？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/25",
@@ -5583,25 +5583,25 @@
     "key": "architecture/31",
     "title": "如何设计可恢复的数据库升级？",
     "topic": "migration-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/32",
     "title": "构建通过为什么不等于可以上线？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/33",
     "title": "如何治理依赖版本与供应链风险？",
     "topic": "supply-chain",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/34",
     "title": "配置与密钥为什么应使用不同管理方式？",
     "topic": "supply-chain",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/35",
@@ -5613,91 +5613,91 @@
     "key": "architecture/36",
     "title": "灰度指标怎样防止被流量差异误导？",
     "topic": "migration-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/37",
     "title": "如何为技术债制定可兑现的治理计划？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/38",
     "title": "技术负责人怎样做方案评审而不垄断设计？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/39",
     "title": "如何处理产品期限与技术风险冲突？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/40",
     "title": "如何证明一次重构没有改变业务行为？",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/41",
     "title": "高内聚低耦合怎样用具体证据判断？",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/42",
     "title": "公共库与公共服务如何选择？",
     "topic": "supply-chain",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/43",
     "title": "如何防止公共组件成为无法升级的依赖中心？",
     "topic": "supply-chain",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/44",
     "title": "领域事件命名为何应表达事实而非命令？",
     "topic": "patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/45",
     "title": "如何为删除、归档与恢复定义统一语义？",
     "topic": "data-lifecycle-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/46",
     "title": "如何组织一个具备搜索与 AI 的知识系统？",
     "topic": "data-lifecycle-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/47",
     "title": "为什么缓存应服务于明确的数据所有权？",
     "topic": "data-lifecycle-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/48",
     "title": "如何定义工程改进的成功指标？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/49",
     "title": "怎样防止文档与当前实现长期背离？",
     "topic": "data-lifecycle-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "architecture/50",
     "title": "资深开发怎样展示架构判断力而非技术堆叠？",
     "topic": "decision-debt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/1",
@@ -6009,13 +6009,13 @@
     "key": "system-design/2",
     "title": "设计统一支付网关如何组织路由与状态？",
     "topic": "design-payment",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/3",
     "title": "设计千万用户余额查询服务怎样权衡一致性？",
     "topic": "design-payment",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/4",
@@ -6033,139 +6033,139 @@
     "key": "system-design/6",
     "title": "设计分布式 ID 服务需要哪些故障假设？",
     "topic": "design-stock-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/7",
     "title": "设计分布式限流平台如何支持多种配额？",
     "topic": "design-rate-task",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/8",
     "title": "设计延迟任务平台怎样保证可恢复执行？",
     "topic": "design-rate-task",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/9",
     "title": "设计通知中心如何处理多渠道与重复发送？",
     "topic": "design-notify-events",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/10",
     "title": "设计搜索服务如何处理内容修改与删除？",
     "topic": "design-knowledge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/11",
     "title": "设计企业知识库如何保证来源可追溯？",
     "topic": "design-knowledge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/12",
     "title": "设计 RAG 助手时如何拆分在线与离线链路？",
     "topic": "design-knowledge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/13",
     "title": "设计多租户 SaaS 数据模型如何防止越权？",
     "topic": "design-identity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/14",
     "title": "设计权限中心如何支持撤销及时生效？",
     "topic": "design-identity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/15",
     "title": "设计会话系统怎样支持多设备与改密退出？",
     "topic": "design-identity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/16",
     "title": "设计配置中心怎样防止一次错误全量扩散？",
     "topic": "design-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/17",
     "title": "设计特性开关平台如何避免组合爆炸？",
     "topic": "design-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/18",
     "title": "设计审计平台怎样兼顾可靠性与隐私？",
     "topic": "design-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/19",
     "title": "设计链路追踪平台如何控制采样与成本？",
     "topic": "design-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/20",
     "title": "设计海量日志平台怎样处理突发写入？",
     "topic": "design-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/21",
     "title": "设计监控告警平台如何避免报警风暴？",
     "topic": "design-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/22",
     "title": "设计全局缓存平台怎样隔离不同业务？",
     "topic": "design-cache",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/23",
     "title": "设计可靠事件总线怎样定义交付语义？",
     "topic": "design-notify-events",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/24",
     "title": "设计数据同步平台如何保证断点与幂等？",
     "topic": "design-notify-events",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/25",
     "title": "设计大表在线迁移怎样验证切换安全？",
     "topic": "design-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/26",
     "title": "设计对象存储上传服务怎样处理断点与安全？",
     "topic": "design-files",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/27",
     "title": "设计文件与数据库元信息一致的保存流程？",
     "topic": "design-files",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/28",
     "title": "设计秒级排行榜应怎样定义精度与公平性？",
     "topic": "design-rank-collab",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/29",
@@ -6177,127 +6177,127 @@
     "key": "system-design/30",
     "title": "设计短链接服务怎样防止碰撞与滥用？",
     "topic": "design-rank-collab",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/31",
     "title": "设计分布式定时调度怎样处理重复触发？",
     "topic": "design-rate-task",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/32",
     "title": "设计规则引擎怎样保证规则变更可回溯？",
     "topic": "design-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/33",
     "title": "设计统一风控服务如何处理慢依赖？",
     "topic": "design-risk-ledger",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/34",
     "title": "设计批量对账平台怎样管理多数据源口径？",
     "topic": "design-risk-ledger",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/35",
     "title": "设计资金补偿平台怎样避免重复更正？",
     "topic": "design-risk-ledger",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/36",
     "title": "设计异地容灾系统怎样说明一致性取舍？",
     "topic": "design-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/37",
     "title": "设计同城双活如何划分流量与数据归属？",
     "topic": "design-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/38",
     "title": "设计全链路压测平台怎样防止污染真实业务？",
     "topic": "design-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/39",
     "title": "设计灰度发布平台如何处理数据库变更？",
     "topic": "design-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/40",
     "title": "设计可观测平台如何关联一次失败请求？",
     "topic": "design-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/41",
     "title": "设计 Agent 执行平台如何限制真实副作用？",
     "topic": "design-ai-platform",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/42",
     "title": "设计企业 AI 网关如何管控成本与隐私？",
     "topic": "design-ai-platform",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/43",
     "title": "设计模型评测平台怎样让结果可重现？",
     "topic": "design-ai-platform",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/44",
     "title": "设计知识索引平台怎样支持零停机模型升级？",
     "topic": "design-knowledge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/45",
     "title": "设计面试题库如何兼顾编辑、导航和 AI？",
     "topic": "design-knowledge",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/46",
     "title": "设计百万级任务处理系统如何控制恢复洪峰？",
     "topic": "design-rate-task",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/47",
     "title": "设计多区域 API 服务如何控制超时与重试？",
     "topic": "design-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/48",
     "title": "设计系统时怎样给出可信容量估算？",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/49",
     "title": "系统数据量增长十倍时怎样判断先改哪里？",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "system-design/50",
     "title": "重做一个成熟系统时怎样提出可执行的演进路线？",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/1",
@@ -6795,61 +6795,61 @@
     "key": "legacy/83",
     "title": "Bean 完整生命周期？BeanPostProcessor 的作用",
     "topic": "bean-life",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/84",
     "title": "循环依赖如何解决？三级缓存分别存什么？为什么需要三级",
     "topic": "early-bean",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/85",
     "title": "事务传播行为",
     "topic": "propagation",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/86",
     "title": "事务失效的场景",
     "topic": "txn-proxy",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/87",
     "title": "JDK 动态代理与 CGLIB 区别？为什么自调用时 AOP 不生效",
     "topic": "txn-proxy",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/88",
     "title": "Spring Boot 自动装配原理",
     "topic": "auto-advanced",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/89",
     "title": "拦截器与过滤器的区别？执行顺序",
     "topic": "mvc",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/90",
     "title": "MyBatis 执行流程？一二级缓存？延迟加载",
     "topic": "legacy-mybatis",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/91",
     "title": "Spring 事件机制；@Async 原理与线程池配置",
     "topic": "async-event",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/92",
     "title": "如何自定义一个 starter",
     "topic": "auto-advanced",
-    "contentSource": "question"
+    "contentSource": "topic"
   },
   {
     "key": "legacy/93",

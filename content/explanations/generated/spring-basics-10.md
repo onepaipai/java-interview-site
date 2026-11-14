@@ -3,7 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -11,39 +12,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Spring 6.2 教学场景：BillingService 实现 Billing 接口，同时有一个未写入接口的辅助方法和一个 final 方法。比较注入接口与注入实现类的结果及增强边界。
+> 场景与约束：网银 SDK 沙盘:接口代理(JDK 动态代理——只代理接口方法)与类代理(CGLIB——代理非 final 非 private 方法)——两者的可代理方法集不同(接口方法 vs 非 final 公有方法)。影响:final 方法的 @Transactional 失效(CGLIB 无法覆写)。
 
-1. JDK 动态代理围绕接口建立代理对象，调用入口是代理暴露的接口方法；代理本身不是业务实现类的子类，不能假设能按实现类类型注入。
-2. 类代理通过生成目标类的子类增强可覆写方法。final 类不能被这种方式继承，final 或 private 方法不能被覆写增强，也要注意不可见方法与模块限制。
-3. 两种方式都不能解决目标对象自调用绕过代理的问题。应核对实际配置；Spring AOP 的基本选择规则与 Boot 默认偏好类代理不能混为一个固定结论。
+1. JDK 动态代理:实现目标接口(代理对象=接口的实现)——可代理方法=接口中声明的方法(类中非接口方法不可代理)——目标必须实现接口。CGLIB:继承目标类(代理对象=目标子类)——可代理方法=非 final 非 private 非 static 的方法(可被覆写)——无需接口。
+2. 可代理方法集:JDK=接口方法(窄);CGLIB=公有非 final 方法(宽)——final 方法的 @Transactional 在 CGLIB 下静默失效(不报错,只是不生效——第 28 题 distributed 静默失效)。
+3. Spring 的默认策略:目标有接口→JDK 代理(默认 proxyTargetClass=false);无接口→CGLIB;proxyTargetClass=true→强制 CGLIB——Boot 2.x 默认 CGLIB(spring.aop.proxy-target-class=true)——CGLIB 的宽代理面是默认选择。
 
 ## 参考分析
 
-### 接口代理：暴露的是契约，不是实现类身份
+### 机制:接口代理与类代理的方法集
 
-JDK 代理实现指定接口，接口调用可以进入拦截链；实现类独有的方法没有因此成为这个接口代理的调用入口。把注入点声明为具体实现类可能发生类型不匹配。代理仍委托给真实目标执行，所以目标实现方法是 final 并不妨碍已经通过接口代理发生的拦截，final 的覆写限制主要针对子类代理。类比持证导游与影子替身：JDK 代理只承诺接口合同（持证上岗），CGLIB 扮演本尊（继承外形）——final 方法连影子都学不了。
+JDK 代理:Proxy.newProxyInstance(类加载器, 接口列表, InvocationHandler)——代理实现接口(所有接口方法→InvocationHandler.invoke)。CGLIB:Enhancer.setSuperclass(目标类)——代理继承目标(覆写非 final 方法→MethodInterceptor)。方法集:JDK=接口交集;CGLIB=目标类公有非 final 方法(含继承的公有方法)。
 
-### 类代理：继承要求决定哪些方法可增强
+### 反例:代理方式的两种失效
 
-类代理需要能继承目标类并覆写相应方法，因此 final 类、final 方法、private 方法不符合这一机制。方法可见性、包和模块访问同样可能限制覆写；不能把所有非 public 方法一概当作必然可增强或必然不可增强。对事务等具体功能，还要结合该功能对方法可见性的规则。
+失效一,final 方法:CGLIB 覆写不了 final 方法——@Transactional 标在 final 方法上→事务失效(静默,第 28 题 distributed)。失效二,无接口的目标:JDK 代理要求接口——无接口时强制 proxyTargetClass=false 抛异常——需切 CGLIB 或加接口。两条的正解:final 方法不加事务注解(拆方法或去掉 final);无接口的类确认 proxyTargetClass=true(Boot 默认)。
 
-### 配置判断：框架能力与应用默认值分别确认
+### 取舍:CGLIB 的兼容代价
 
-没有业务接口时通常需要类代理，有接口也可显式强制类代理。Boot 3 的默认配置倾向类代理，但用户配置和具体基础设施会影响最终结果。排查时用 AopUtils 等检查实际对象，针对当前增强编写失败路径测试；看到类名包含某个字符串不等于该方法已经成功匹配。
+代价:代理对象的字段是空壳(字段在 target——代理的字段全 null,第 19 题 spring-advanced 实测)——不要在代理上读字段(经 target)。构造器调用:JDK 动态代理不涉及目标类构造器(基于接口创建新对象);CGLIB 默认通过 Objenesis 跳过父类构造器(若不用 Objenesis 则调无参构造)。依赖:cglib 库(spring 内嵌 repackaged)——版本与 JDK 兼容(第 49 题)。
 
 ## 案例
 
-### 对照步骤：接口方法与实现类独有方法
+### 验证:代理方式的断言组
 
-教学验证用同一 Billing 实现分别构建 JDK 代理和类代理，为普通可覆写方法记录拦截次数。JDK 路径按接口调用并检查它不是 BillingService 类型；类代理路径按实现类调用普通方法。预期两条合法路径都能触发增强，而不是认为只有类代理才能处理接口实现方法；实现类独有方法不能从仅暴露 Billing 的代理接口调用。
+验证:接口代理断言(JDK 代理的类实现目标接口——instanceof 接口 true);类代理断言(CGLIB 代理的类是目标子类——instanceof 目标类 true);final 失效断言(final 方法的 @Transactional 不生效——事务标志对比)——三组固化代理方式差异;代理类型判断(getClass 含 $Proxy 或 $$SpringCGLIB)进排查工具。
 
-### 边界追问：给 final 方法加注解为何没有效果
+### 追问链:代理方式三刀
 
-针对类代理单独测试 final 方法是否进入增强，同时比较 JDK 接口代理调用目标 final 实现的行为；不要直接依赖类代理 final 方法访问目标字段的结果。再让普通方法自调用，验证两类代理都不会因此多进入一次代理。验收证据应是拦截记录或实际事务结果，不是注解存在和启动无报错。
+一刀:"proxyTargetClass 的选择?"——true=强制 CGLIB(统一代理方式——但 final 方法失效);false=有接口用 JDK 无接口用 CGLIB(混合——行为不一致)——Boot 默认 true(统一)——统一与灵活的取舍。二刀:"接口的必要性?"——面向接口编程(为 JDK 代理铺路)vs 类直接(CGLIB)——接口的价值(DIP,第 1 题 spring-advanced)与 CGLIB 的便利的权衡。三刀:"代理与序列化?"——代理对象的序列化(CGLIB 代理不可序列化——含合成字段)——代理对象的序列化限制(返回 DTO 而非代理实体)。
 
 ## 总结点
 
-1. 持证上岗看接口，影子替身怕 final
-2. JDK 代理暴露接口契约
-3. 类代理依赖可继承和可覆写
-4. 两类代理都要检查调用路径
+1. JDK 代理限接口,CGLIB 限非 final
+2. final 方法的事务静默失效
+3. Boot 默认 CGLIB 统一代理

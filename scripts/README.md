@@ -7,9 +7,7 @@ Two kinds of files live here. When adding one, put it in the right group.
 - `verify.ps1` — 完整验证入口（格式、契约、内容、MySQL、浏览器 e2e）。
 - `verify.ps1:18` 清单内的校验脚本：`check-deployment-config.mjs`、`verify-contract.mjs`、
   `sync-content-status.mjs`、`validate-content.mjs`、`validate-explanations.mjs`、
-  `test-explanation-corrections.mjs`、`test-ui-content-fixes.mjs`、`test-spring-core-answers.mjs`、
-  `test-spring-advanced-answers.mjs`、`test-database-basics-answers.mjs`、
-  `test-explanation-publication.mjs`、`test-deep-answers.mjs`。
+  `test-database-basics-answers.mjs`、`test-explanation-publication.mjs`、`test-deep-answers.mjs`。历史批次的一次性验收脚本(如 `test-spring-core-answers`)已随内容重整退役,需要时从 git 历史恢复。
 - `api-contract.mjs` — 被 `verify-contract.mjs` 引用。
 - `build-manifest.mjs` — 发布哈希门禁记录（`verify.ps1:23`）。
 - `package-release.ps1` / `verify-staged-release.mjs` — 发布打包与 staged 目录哈希比对。

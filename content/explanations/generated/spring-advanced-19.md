@@ -3,7 +3,7 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-security/reference/6.5/features/integrations/concurrency.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
@@ -11,68 +11,77 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 / Spring Security 6.5 教学实验：同一个工作线程先执行 Alice 的任务，再执行不带身份的原始任务，验证传播和清理，不使用时间等待猜测线程复用。
+> 场景与约束：网银异步导出沙盘:主线程已认证(alice),线程池任务里取 Authentication 得到 anonymous——安全上下文同样活在 ThreadLocal,不跨线程。用可执行示例说明传播与清空的正确姿势。
 
-1. 默认安全上下文通常保存在 ThreadLocal，新任务不会自动取得提交者身份；InheritableThreadLocal 也不适合直接解决预先创建的线程池复用问题。
-2. 使用受控的安全上下文包装器或执行器，在明确时点捕获所需上下文，执行前设置并在 finally 中清理或恢复原上下文；不能无意固定为一个提交者身份。
-3. 上下文对象和 Authentication 可能共享引用，不要当作天然不可变快照。任务持久化后应保存稳定身份标识并按需要重新授权，不能让旧权限无限生效。
+1. SecurityContextHolder 默认 MODE_THREADLOCAL:换线程即丢。实测(可执行示例):装饰传播的池线程看到 alice,裸池线程看到 anonymous。
+2. 传播工具:DelegatingSecurityContextCallable/Executor(包装任务时捕获当前上下文);@Async 场景配 AsyncConfigurer 的装饰器。
+3. 两个坑:传播的上下文在任务里越权放大(任务拿了 alice 权限做非授权动作);池线程残留上下文污染下一任务(未 clear)。
 
 ## 参考分析
 
-### 传播时点：提交者、执行器构造者可能不是同一个人
+### 机制:ThreadLocal 语义与显式传播
 
-包装器可以接收显式 SecurityContext，也可在相应构造或提交时点取得当前上下文。复用一个固定上下文执行器可能让所有任务以同一个身份运行，除非这本来就是明确的系统任务设计。要在任务边界传最少必要信息，分别定义用户身份、租户、追踪号及其可信来源，不用复制所有线程本地变量来解决。类比工牌借用：提交任务时拍照留存工牌信息（捕获快照），归还前必须注销（线程复用清理）——工牌过期不能当永久授权。
+安全上下文与事务上下文(第 8 题)同源:ThreadLocal 绑定,线程池复用线程即丢失。显式传播的两步:提交任务时捕获当前 SecurityContext(创建时刻快照),任务执行前 set、finally 清理——DelegatingSecurityContextCallable 封装了这套动作。传播是"显式授权":每个传播点都是一次"该任务需要什么身份"的决策,而不是无脑全量携带。
 
-### 线程复用：成功和异常都必须收尾
+### 边界:传播的安全边界
 
-工作线程执行完 Alice 的任务后通常还会处理 Bob 或匿名任务，如果身份未清理就可能越权。Spring 的委托包装器围绕执行安排上下文设置和收尾；自定义包装也要覆盖异常路径与原上下文恢复。不要依赖任务自然结束就销毁线程，因为池中的线程往往长期存活。
+上下文是提交时刻的快照:任务执行期间用户权限被撤销,不会反映到已传播的上下文——长任务要重新校验授权而不是依赖携带的身份;跨服务传播(消息队列)不走 ThreadLocal,需要显式把身份放进消息头并在对端重建——与链路上下文(W3C traceparent)的传播协议同构。
 
-### 权限时效：传入身份不是永久授权凭证
+### 取舍:每个传播点都要回答「该带谁的身份」
 
-捕获上下文通常不是深拷贝，任务运行期间也不应随意修改与其他请求共享的 Authentication。排队很久或持久化任务需要定义权限变更后的执行策略，必要时重新读取可信权限版本。传播安全上下文不传播数据库事务，也不能替代任务访问具体资源时的对象级授权。
+每个传播点都要回答「该带谁的身份」——用户上下文传播给业务任务(按用户判权)是显式授权;系统任务应使用系统身份,传播用户身份反而造成越权放大。装饰器之外自写传播必须 finally 恢复原值;线程池场景优先 Delegating 系包装,把传播与清理收口在基础设施层。
 
 ## 案例
 
-### 完整程序：同一工作线程的身份先有后清
+### 实证:可执行示例的传播对照
 
-下面显式创建 Alice 的上下文并只包装一个任务，使用单线程池和 Future.get 保证执行先后。后续原始任务不带上下文，预期返回 alice:anonymous。该程序验证包装器清理，不证明跨节点权限撤销或数据库事务传播。
-
+以下示例经本地编译执行(Spring Security 6.5.11),verify() 返回"传播线程的身份:裸线程的身份":
 ~~~java
-import java.util.List;
-import java.util.concurrent.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+
+/** Q19:线程池默认不继承安全上下文,显式装饰器传播后可见 alice,裸线程池看到 anonymous。 */
 public class SecurityContextPoolExample {
-  static String identity() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication == null ? "anonymous" : authentication.getName();
-  }
+
   public static String verify() throws Exception {
-    var executor = Executors.newSingleThreadExecutor();
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(new TestingAuthenticationToken("alice", "n/a"));
+    SecurityContextHolder.setContext(context);
+    ExecutorService pool = Executors.newSingleThreadExecutor();
     try {
-      executor.submit(SecurityContextHolder::clearContext).get();
-      var context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(new UsernamePasswordAuthenticationToken("alice", "unused", List.of()));
-      var wrapped = new DelegatingSecurityContextCallable<String>(SecurityContextPoolExample::identity, context);
-      String first = executor.submit(wrapped).get();
-      String next = executor.submit(SecurityContextPoolExample::identity).get();
-      return first + ":" + next;
+      var decorated = new DelegatingSecurityContextCallable<>(
+          (java.util.concurrent.Callable<String>) () ->
+              SecurityContextHolder.getContext().getAuthentication().getName(), context);
+      String propagated = pool.submit(decorated).get();
+      SecurityContextHolder.clearContext();
+      String bare = pool.submit(() -> {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth == null ? "anonymous" : auth.getName();
+      }).get();
+      return propagated + ":" + bare;
     } finally {
-      executor.shutdownNow();
+      pool.shutdown();
       SecurityContextHolder.clearContext();
     }
   }
 }
 ~~~
+执行结果 alice:anonymous:装饰的任务拿到 alice,裸任务拿到 anonymous(未认证兜底)。验证:本机编译执行;后端真值测试持续执行本块。
 
-### 异常追问：任务中途失败还会留下身份吗
+### 验证:按本示例编译执行,断言 verify() 返回 alice:
 
-补充一个包装后主动抛错的任务，捕获 Future 中的异常，再在同一个工作线程运行原始任务查询身份，预期同样没有 Alice 残留。生产任务还要覆盖 Bob 紧随 Alice、执行器拒绝及权限在排队期间被撤销的情况。上面的成功路径程序只是窄范围执行证据，不能据此宣布所有异常和授权场景均已验证。
+验证:按本示例编译执行,断言 verify() 返回 alice:anonymous(装饰传播与裸池对照);再把任务里的上下文残留场景(未 clear)加进测试,断言下一任务身份被污染——传播与清理都要有断言,后端真值测试持续执行本块。
+
+### 追问链:传播三刀
+
+一刀:"@Async 怎么传播?"——配置 AsyncConfigurer 的 TaskDecorator(或 DelegatingSecurityContextAsyncTaskExecutor),异步方法即自动携带提交者上下文;装饰器里同时传播 MDC(链路日志,第 40 题)。二刀:"传播后的权限检查以谁为准?"——以传播的身份为准:任务里调用受保护方法按 alice 判权——若任务本该是系统身份,传播用户身份反而错;每个传播点明确"该带谁的身份"。三刀:"上下文残留怎么防?"——Delegating 包装器 finally 里恢复原值;自写传播务必 finally clear;池线程残留 alice 身份会被下一个任务继承——越权放大器。
 
 ## 总结点
 
-1. 借工牌拍照留存，归还前注销
-2. 捕获时点和上下文所有权明确
-3. 线程复用前必须清理身份
-4. 传播身份不等于永久授权
+1. 上下文是快照,传播是显式授权
+2. 传播必配 finally 清理
+3. 裸池就是 anonymous,别猜

@@ -3,35 +3,46 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html)
+- [事件溯源设计说明 · 1](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
 ## 参考回答
 
-1. 先在 API 契约说明返回实时视图、结构快照还是深不可变数据；直接返回内部可变集合会泄漏修改权限。
-2. List.copyOf 可形成不可修改的结构快照并拒绝 null；但复制源时需协调并发写入，不能默认它是原子一致快照。
-3. 集合快照仍共享元素引用；跨信任边界时，按需要复制元素或使用不可变 DTO，不能仅包一层 unmodifiableList。
+<!-- explanation:deep -->
+
+> 场景与约束：网银账户沙盘:Account 类的 getEntries() 直接返回内部 List——外部 add/clear 直接改内部状态(不变式被绕过,第 20 题 banking 值安全同题)。安全返回三选:不可变视图(unmodifiableList/List.copyOf)、防御性拷贝、不可变元素+只读接口。
+
+1. 三种姿势的语义:unmodifiableList(视图——内部变化实时反映,外部不可改)、List.copyOf(快照——返回时刻的独立副本)、流式构建(逐元素映射——转换+拷贝)——按"外部是否需要看到变化"选。
+2. 引用逃逸的其他通道:getter 直接返回内部 Map/Set、构造器接收集合后直接赋值(外部改构造参数影响内部)、setter 接收集合直接存——防御性拷贝要覆盖"进与出"两侧。
+3. 元素深浅:浅拷贝的元素可变(外部改元素字段,第 13 题)——深隔离=元素不可变(record)——结构隔离与元素隔离是两层(第 13 题 unmodifiable 同构)。
+
+## 参考分析
+
+### 机制:进与出的防御
+
+出向防御:getEntries 返回 List.copyOf(entries)(快照)或 Collections.unmodifiableList(entries)(视图)——copyOf 的元素要求不可变(可变元素浅拷贝仍逃逸)。入向防御:构造器/setter 接收集合→this.entries=List.copyOf(in)或 new ArrayList<>(in)(拷贝断开与调用方集合的关联)。不可变优先:entries 的元素用 record(不可变)——浅拷贝即完整隔离(元素无内部状态可改,第 4 题)。
+
+### 反例:引用逃逸的三种事故
+
+事故一,外部 clear:外部 getEntries().clear()——内部账户分录被清空(账务损毁,第 2 题事实源破坏)。事故二,构造逃逸:new Account(externalList) 后外部修改 externalList——账户分录跟着变(不变式漂移)。事故三,元素逃逸:entries 元素是可变 Entry——外部改 Entry 的金额字段(绕过 Account 的全部校验)。三条的正解:出入双拷贝+元素不可变化(完整防御)。
+
+### 取舍:拷贝的性能与安全
+
+拷贝成本:每次 getter 拷贝(大列表=分配+复制)——高频调用大集合的拷贝成本。折中:不可变容器(List.of 构建后永不变——返回自身即安全,零拷贝)+可变内部用临时副本;或视图+文档(调用方知情,内部变化实时可见是特性)。判定:这个集合的状态会被并发或跨层依赖吗——是则拷贝/不可变,否则视图+注释。
 
 ## 案例
 
-1. 场景（教学示例）：内部保存可变标签列表，对外复制外层列表后，原标签对象仍被修改。
+### 验证:防御完整性的断言组
 
-2. 核心代码。
+验证:出向断言(返回副本后外部修改,内部不变);入向断言(构造后修改源集合,内部不变);元素断言(record 元素的字段修改被编译期拒绝/可变元素的字段修改穿透——对照实证)——三组固化防御的完整覆盖;ArchUnit 规则(getter 返回可变集合告警)进 CI。
 
-```java
-var inner = new ArrayList<>(List.of("A"));
-var internal = new ArrayList<List<String>>(); internal.add(inner);
-var shallow = List.copyOf(internal);
-var deep = internal.stream().map(List::copyOf).toList();
-inner.add("B");
-System.out.println(shallow.get(0));
-System.out.println(deep.get(0));
-```
+### 追问链:防御三刀
 
-3. 预期：[A, B]、[A]；深浅边界必须按对象图定义，不能把本例的两层列表复制推广为任意对象的通用深复制。
+一刀:"性能敏感的防御?"——高频 getter 的大集合拷贝贵:不可变容器(零拷贝)+变更=整体替换(第 20 题 record 替换思想)——不可变设计消除防御成本。二刀:"内部集合的并发?"——防御性拷贝不解决并发(内部仍在变)——并发安全另靠容器(第 15 题 CHM)/不可变(整体替换)——防御与并发是两个维度。三刀:"防到什么程度?"——公开 API(全防御)+包内(信任,直接引用)——防御的边界=信任的边界(第 33 题权限边界同构),过度防御=拷贝风暴。
 
 ## 总结点
 
-1. 先声明视图还是快照。
-2. 复制结构不等于复制元素。
+1. 进与出都要防御
+2. record 不可变让隔离免费
+3. 防御边界等于信任边界

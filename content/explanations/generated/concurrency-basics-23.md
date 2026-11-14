@@ -16,13 +16,13 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 1. ReentrantLock 提供 tryLock 立即或限时获取（synchronized 会无限期阻塞）、可中断获取 lockInterruptibly、公平模式与多个 Condition 精准唤醒。
 2. 它还支持重入计数与 HoldCount 查询，配合显式 lock/unlock 把锁的边界写得更清楚，代价是必须 finally 解锁、代码更啰嗦。
-3. synchronized 在 Java 6 之后经偏向锁、轻量级锁等优化，多数场景性能相当；选择依据是"需要哪些控制能力"，不是"哪个更快"。
+3. synchronized 在 Java 6 之后经偏向锁、轻量级锁等优化（JDK 15 移除偏向锁后默认从无锁直接到轻量级），多数场景性能相当；选择依据是"需要哪些控制能力"，不是"哪个更快"。
 
 ## 参考分析
 
 ### 机制：同一互斥语义，不同的控制面板
 
-两者都是可重入互斥锁，底层都依赖 AQS 或监视器。ReentrantLock 像手动挡：tryLock 是"先看看能不能停进去"，lockInterruptibly 是"排队时可以接电话（响应中断）"，公平模式是"严格取号"，Condition 是"按业务分多条等待队列"。synchronized 是自动挡：简洁、不易漏解锁（作用域结束自动释放），但没有这些面板。
+两者都是可重入互斥锁，但底层实现不同：synchronized 走 JVM 内置 ObjectMonitor（C++ 实现，monitor enter/exit 字节码），ReentrantLock 基于 AQS（Java 层 CLH 变体队列）。锁升级方面，synchronized 经历偏向锁（JDK 15 移除）→轻量级锁（CAS 自旋+Lock Record）→重量级锁（ObjectMonitor，park/unpark），升级不可逆；ReentrantLock 无升级链，直接走 AQS 的 CAS+CLH 队列。ReentrantLock 像手动挡：tryLock 是"先看看能不能停进去"，lockInterruptibly 是"排队时可以接电话（响应中断）"，公平模式是"严格取号"，Condition 是"按业务分多条等待队列"。synchronized 是自动挡：简洁、不易漏解锁（作用域结束自动释放），但没有这些面板。
 
 ### 反例：把 tryLock 当万能优化
 

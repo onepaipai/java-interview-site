@@ -15,7 +15,7 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 > 场景与约束：MySQL 8.4 / InnoDB 教学场景：流水表按时间翻页，OFFSET 深页越来越慢，且同秒多条记录导致漏读。设计 (created_at, id) 复合游标：稳定性、唯一性与索引匹配三要素。
 
 1. 游标三元组：WHERE (created_at, id) < (:lastTime, :lastId) ORDER BY created_at DESC, id DESC LIMIT n——行定位由"时间 + 主键"唯一确定，同秒并列由 id 补齐，不漏不重。
-2. 索引前提：复合索引 (created_at, id) 与游标条件完全同构（DESC 8.0+ 可声明降序索引），扫描从游标位置起连续向后——每页成本恒定，与页深无关。
+2. 索引前提：复合索引 (created_at, id) 与游标条件完全同构（MySQL 8.0+ 支持真降序索引 INDEX(col DESC)，之前 DESC 语法被忽略、仍正向存储；无降序索引时 InnoDB 也能反向扫描满足 ORDER BY DESC，降序索引免去反向扫描开销），扫描从游标位置起连续向后——每页成本恒定，与页深无关。
 3. 边界协议：游标参数由服务端下发（客户端只透传），防止伪造跳页；过滤条件变更即游标作废（游标绑定查询，见 database-basics 相关题）；时间列用 UTC 存储、展示层转换，避免夏令时回拨造成游标倒退。
 
 ## 参考分析

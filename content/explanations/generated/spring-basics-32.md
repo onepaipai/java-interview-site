@@ -3,7 +3,7 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-boot/3.5/reference/features/developing-auto-configuration.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
@@ -11,39 +11,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Boot 3.5 / Java 17 教学场景：为公司内部通知客户端提供默认 Bean；只有依赖存在、功能启用且应用未自行定义实现时，才创建默认客户端，并要求测试能说明为何生效。
+> 场景与约束：网银 SDK 沙盘:引入 starter-web 自动配置 Tomcat/MVC/Jackson——自动配置等于条件化 bean 定义加 starter 聚合,约定优于配置的工程化。
 
-1. 自动配置把可复用默认配置按类路径、属性、Bean 等条件导入应用，让使用方通过依赖和少量配置获得合适的基础设施。默认值应允许用户明确覆盖。
-2. Boot 3 的自动配置候选通过 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports 声明，配合 @AutoConfiguration 和条件注解；不是任意扩大组件扫描。
-3. starter 主要聚合依赖，自动配置负责条件化装配。排查时查看条件评估报告，并测试缺依赖、禁用、自定义实现及合法默认配置等路径。
+1. 自动配置三步 starter 引依赖聚合 jar→AutoConfiguration.imports 声明配置类→条件评估决定是否生效——条件不满足配置跳过按需装配。
+2. 条件注解族 OnClass 类路径有某类,OnMissingBean 用户未自定义,OnProperty 属性条件——MissingBean 让用户覆盖默认宿主优先。
+3. 诊断 --debug 启动打印条件评估报告每个自动配置的匹配不匹配加原因——条件不生效的排查入口。
 
 ## 参考分析
 
-### 发现与条件：先是候选，再决定是否装配
+### 机制:条件评估与按需装配
 
-应用启用 Boot 自动配置后，候选类按约定元数据被发现，再根据类路径、配置值、已有 Bean 及应用类型等条件决定是否注册定义。@ConditionalOnClass 与 @ConditionalOnMissingBean 常用于“依赖存在且用户未提供实现”的默认能力。条件成立只证明装配决策，不证明远程通知服务可达或业务请求一定成功。类比自助餐厅备菜：先盘点可能有人吃的菜（候选），再按今天有没有人点、是否已被自带（条件）决定上不上——客人自带的不重复上。
+自动配置三步:starter 聚合依赖→imports 声明配置类→条件评估决定生效。条件注解族:OnClass(类路径)、OnMissingBean(宿主未自定义——让用户覆盖)、OnProperty(属性条件)。按需装配:条件不满足→配置跳过→bean 不创建。诊断:--debug 输出条件评估报告。
 
-### 覆盖契约：默认配置应主动退让
+### 反例:自动配置的两种事故
 
-当用户显式定义 NotificationClient 时，默认配置应通过缺失 Bean 条件退让，避免多实现歧义。自动配置类应置于独立包并通过 imports 文件导入，不应被普通组件扫描重复发现。条件所依赖的返回类型也应声明清楚，避免定义阶段无法推断类型，或者类路径缺失时在条件判断前就触发类加载错误。
+事故一,条件误判:OnClass 的类名拼错——条件永不匹配→自动配置静默失效。事故二,MissingBean 缺失:用户自定义了 bean 但 SDK 也注册了(缺 MissingBean)→bean 冲突。修复:条件评估报告(--debug)+MissingBean 纪律。
 
-### 测试证据：不要只跑一条成功启动路径
+### 取舍:starter 的设计
 
-使用 ApplicationContextRunner 等小范围工具可构造不同属性、用户 Bean 和过滤后的类路径，检查默认 Bean 是否出现以及用户定义是否保留。顺序注解主要影响定义应用次序，不直接等于实例创建先后。发布 starter 时还需核对依赖版本与 imports 文件实际进入 JAR，否则源代码正确也可能无法被使用方发现。
+starter=依赖聚合(pom)+自动配置(配置类)。自研 starter 的准入条件:能力被至少 3 个无关联项目需要加配置模式稳定加有条件化支持——三条件满足才值得做 starter。
 
 ## 案例
 
-### 四格矩阵：默认、禁用、用户覆盖、依赖缺失
+### 验证:自动配置的断言组
 
-为通知客户端设计四个最小上下文：依赖存在且启用时创建默认 Bean；属性关闭时不创建；用户提供实现时仅保留用户实现；客户端库缺失时不加载默认配置。逐项断言 Bean 数量与具体实现，并检查条件报告。预期配置能解释每个分支，不依赖恰好某台机器的完整类路径才能启动。
+验证:条件断言(类路径无 DataSource→跳过);覆盖断言(用户自定义→MissingBean 跳过默认);报告断言(--debug 输出)——三组固化自动配置的条件语义。验证结论:条件不生效在报告中有原因,排查入口。
 
-### 发布追问：本地源码可用而依赖 JAR 无效
+### 追问链:自动配置三刀
 
-检查打包产物内是否包含 AutoConfiguration.imports、类名是否准确、自动配置包是否被误扫描，再用独立小应用只引入已打包依赖启动。验证默认配置被发现且覆盖契约保持，不能在使用方加入大范围扫描作为掩盖。此教学案例说明可执行验收矩阵，没有声称已经发布真实公司 starter。
+一刀:starter 的设计 starter 依赖聚合 pom 加自动配置 jar。二刀:自动配置的顺序 AutoConfigureBefore After 配置类的执行顺序。三刀:排除自动配置 SpringBootApplication exclude 排除的合理场景记录进 ADR。
 
 ## 总结点
 
-1. 先盘点候选，再按条件上菜
-2. 候选发现与条件匹配分开
-3. starter 聚合依赖，配置负责装配
-4. 默认配置需允许用户覆盖
+1. 条件评估决定生效,MissingBean 宿主优先
+2. starter 打包开箱即用
+3. --debug 看条件评估报告

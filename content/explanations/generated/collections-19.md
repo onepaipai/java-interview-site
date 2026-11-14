@@ -9,35 +9,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考回答
 
-1. size 在并发更新下反映一个观察值；即使此刻数值准确，后续 put 也不与检查组成原子操作。
-2. “size 小于上限再写入”会让多个线程同时通过；限制全局在途量应先用信号量等机制原子申请许可。
-3. 许可与实际任务生命周期绑定，写入失败归还、完成后只归还一次；跨进程额度应由共享的原子存储或事务维护。
+<!-- explanation:deep -->
+
+> 场景与约束：网银限流沙盘:用 CHM.size() 做并发数限制(size>=N 拒绝)——size 是弱一致估计(CounterCell 分片计数),并发下不精确——精确业务控制用 Semaphore/AtomicLong(第 23 题分布式限额的原子累计同构)。
+
+1. size 的实现:baseCount+CounterCell[](分片计数,避免单点竞争)——求和时无全局锁:结果是"某一时刻的近似"(并发写进行中,某些 cell 未并入);isEmpty/size 同源弱一致。
+2. 业务控制的误用:if (map.size() >= max) reject——弱一致下并发放行超限(第 23 题 banking 限额穿透同构);精确控制用 Semaphore(tryAcquire 原子)或 AtomicLong 累计(条件 CAS)。
+3. size 的合法用途:监控/采样/近似判断(非精确业务门槛)——弱一致是设计选择(吞吐换精确),用对地方。
+
+## 参考分析
+
+### 机制:分片计数与弱一致
+
+CounterCell:计数分散到 baseCount+多个 cell(线程绑 cell,竞争分散)——size=遍历求和(sumCount)且求和本身无锁:遍历期间 cell 仍可能被改,这才是弱一致的根因;这套分片计数是 Striped64 框架,LongAdder 与 CHM 计数同源(同一设计两种封装)。写路径:casBaseCount 或 cell 累加——cell 未并入时求和偏小(弱一致)。AtomicLong 的对照:单值 CAS(精确但竞争集中)——精确与吞吐的取舍(第 23 题 banking:DB 累计 vs Redis 预扣同构)。
+
+### 反例:size 限流的穿透
+
+沙盘:并发数限制用 map.size()>=100 拒绝——弱一致下 105 个并发请求全部通过(size 读到 99)——限流穿透(第 23 题 banking 的穿透同构);资源(连接/线程)超限故障。修复:Semaphore(100, tryAcquire 原子)/AtomicLong.incrementAndGet<=100 的 CAS——精确控制的工具是同步原语,不是容器的统计。
+
+### 取舍:近似与精确的分界
+
+近似够用:监控面板(误差可接受)、缓存淘汰参考(近似 LRU)、采样判断。精确必须:限额(资金/资源)、去重计数(业务唯一性)、同步屏障——精确场景的原子原语(Semaphore/LongAdder 读多写少/AtomicLong)。LongAdder 的定位:CHM size 的计数机制独立成类(写分散读求和)——高并发计数器(监控指标,第 48 题)首选;精确控制仍用 AtomicLong/CAS。
 
 ## 案例
 
-1. 场景（教学示例）：上限为 1，屏障保证两个提交者都先检查空表，再执行写入。
+### 验证:弱一致的演示断言
 
-2. 核心代码。
+验证:并发断言(多线程高频写,size 求和采样与 AtomicLong 真值对照——偏差可见);精确控制断言(Semaphore 的限流零穿透;map.size() 限流的穿透复现)——对照组把"弱一致 vs 原子"的行为差异固化;本机 C2 的 size=0 形态(put/remove 后)为弱一致的旁证。
 
-```java
-var values = new java.util.concurrent.ConcurrentHashMap<String,Integer>();
-var gate = new java.util.concurrent.CyclicBarrier(2);
-java.util.concurrent.Callable<Void> submit = () -> {
-    boolean allowed = values.size() < 1;
-    gate.await();
-    if (allowed) values.put(Thread.currentThread().getName(), 1);
-    return null;
-};
-var a = new java.util.concurrent.FutureTask<Void>(submit);
-var b = new java.util.concurrent.FutureTask<Void>(submit);
-new Thread(a, "A").start(); new Thread(b, "B").start();
-a.get(); b.get();
-System.out.println(values.size());
-```
+### 追问链:size 三刀
 
-3. 预期：size 为 2，明确复现超额。修复后先 tryAcquire(1)，同一许可只允许一个任务进入，失败及完成路径分别核对归还。
+一刀:"mappingCount 与 size?"——mappingCount() long 版(size int 溢出风险,>21 亿)——大容量用 long 版;弱一致语义相同。二刀:"精确统计的方案?"——AtomicLong/LongAdder(计数)+CHM 存数据(数据与计数分离)——计数的精确与数据的弱一致分层(各取所需)。三刀:"keySet().size()?"——同弱一致(遍历求和)——换口径不换语义;精确等价物不存在于 CHM——接受或换工具。
 
 ## 总结点
 
-1. 先检查再写入仍有竞态。
-2. 额度先原子申请再执行。
+1. size 是估计,不是账本
+2. 精确控制用 Semaphore 或 CAS
+3. 弱一致有它的用武之地

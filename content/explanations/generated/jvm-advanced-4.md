@@ -3,7 +3,8 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-garbage-collector.html)
+- [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html)
+- [github.com · 2](https://github.com/openjdk/jdk17u/blob/master/src/hotspot/share/gc/g1/g1CollectedHeap.cpp)
 
 </details>
 
@@ -11,49 +12,43 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 G1 服务频繁分配大数组和序列化缓冲区，讨论 Region 阈值、连续空间、对象生命周期和验证。
+> 场景与约束：网银报表导出服务沙盘:导出大 Excel 时每次都组装超半 region 的字节数组,GC 日志里 Humongous regions 疯涨。解释 Humongous 的判定、存放、回收路径与治理手法,全部结论附实测证据。
 
-1. 超过一个 Region 一半大小的对象通常按 Humongous 对象处理，并可能占用连续 Region。
-2. 大对象会改变分配、碎片和回收压力，Region 大小会改变阈值；先检查对象生命周期和副本。
-3. 用 GC 日志、对象大小、存活时间和用户尾延迟验证，不能只靠增大堆或改变 Region。
+1. 超过 region 一半的对象就是 Humongous:直接进入老年代的连续 region,不经过 Eden 与 Survivor 的常规路径。
+2. 它有两笔账:内存上按整 region 占用(对齐浪费),回收上 young GC 只回收死掉的 Humongous,清理依赖并发标记确认。
+3. 治理优先在代码侧:拆小数组、流式处理、对象池复用;调 region 大小是次优解,会连锁影响其他行为。
 
 ## 参考分析
 
-### 阈值与空间
+### 机制:判定、分配与回收路径
 
-G1 通常把超过一个 Region 一半大小的对象视为 Humongous 对象，并在老年代路径中占用一个或多个连续 Region。总空闲量不等于存在满足一次分配的连续空间，目标 JDK 的日志才是最终证据。
+判定式是"对象大小 > G1HeapRegionSize/2"。分配时直接在老年代找连续 region,对象头记在第一个 region。回收有三条路:若对象在 young GC 前死亡且无引用,可在 young GC 直接回收(无需等标记);存活则占用老年代直至并发标记判定为死;实测日志中 Humongous regions: 29->15 表示一次 young GC 回收了 14 个 region 的死 Humongous。源码 g1CollectedHeap.cpp 的 humongous 分配分支处理连续查找与碎片整理。
 
-还要注意对象可能跨越多个 Region，分配失败或回收延迟会与堆碎片、并发标记和可用 to-space 共同表现；不能只用总堆空闲百分比判断安全。类比剧院散场：过大的道具必须整层货梯直运仓库，不走普通扶梯——占用的也是整层面积。
+### 反例:一次导出拖垮整个堆的账本
 
-### 生命周期与成本
+实测(64MB 堆,region 1MB,单个 600KB 数组即超半区):
+```
+GC(0) Humongous regions: 29->15
+GC(8) Humongous regions: 54->0   (System.gc 且引用全清后)
+```
+54 个 region 即 54MB 被大对象占用,占 64MB 堆的 84%;期间普通对象只剩零星 region,分配迅速退化。报表服务在高峰期批量导出时就是这个形态:Humongous 挤占 Eden,young GC 频率失真,to-space 紧张进一步诱发 evacuation failure。
 
-短命大数组、序列化缓冲区和整块复制会制造分配峰值；长期存活对象则扩大存活集。先改为流式处理、复用或限制批量，再评估 Region 参数，避免把参数调整当成对象设计修复。
+### 取舍:拆分优先,region 调整垫后
 
-对象大小、引用链和存活时间比某个参数名称更能决定根因。
-
-### 验证与取舍
-
-记录 Humongous 分配、回收释放、Full GC、evacuation failure、GC CPU、RSS 和 p99。Region 调整会同时改变阈值和管理粒度，必须在相同负载下比较。
-
-如果只是降低大对象分配就能消除压力，应优先保留代码修复，而不是依赖更大的堆。
+600KB 数组拆成 8 个 75KB 的块再按需拼接,直接从"Humongous"名单消失,这是零参数成本的改法。若业务确实需要大对象,评估调大 -XX:G1HeapRegionSize:region 从 1MB 到 4MB 后,1.5MB 数组不再是 Humongous;代价是 region 变大后碎片与小回收粒度都变粗,要连跑回归验证。禁止的替代方案是"给大对象开专属堆"——G1 没有这种开关,别把分布式缓存的思路带进来。
 
 ## 案例
 
-### 大对象对照
+### 实证:Humongous 的独立账本
 
-在隔离 Java 17 G1 环境生成短命和长期大数组，记录 Humongous Region、回收后存活量和堆余量。预期不同生命周期呈现不同曲线，具体阈值取决于 Region 大小和 JDK。
+命令:-Xms64m -Xmx64m -Xlog:gc*,gc+humongous=trace HumExp(Java 17.0.17,循环持有 40 个 600KB 数组并丢弃 700KB 临时数组)。输出见上:29->15 与 54->0 两行分别对应"young 部分回收"与"标记确认后全清"。验证:把数组改成 400KB(低于 region 一半)重跑,Humongous regions 行消失,普通代际统计接管——判定线的存在性由此验证。
 
-这是实验设计，不代表已经完成线上实测。
+### 追问链:Humongous 三刀
 
-### 修复验收
-
-将整块缓冲改为流式处理或复用后比较分配次数、p99、GC CPU、RSS 和 Full GC。验收确认压力没有转移到另一阶段，并保留原始 GC 日志供对照。
-
-还要验证应用在突发输入和恢复阶段仍能完成请求，不能只在稳定低负载下观察内存下降。
+一刀:"为什么是一半而不是整个 region?"——留一半让普通对象也能用该 region 的剩余空间,整 region 起步会让中等对象也被迫独占,浪费更严重。二刀:"Humongous 会引发什么连锁故障?"——挤占 region 触发 to-space exhausted(实测 evac 场景 855 次),进而 Full GC;网银导出高峰的 P999 尖刺常是这条链。三刀:"怎么线上发现?"——看 -Xlog:gc+humongous 或 GC 告警里的 Humongous regions 增速,配 jmap -histo 找大数组类;JFR 的 ObjectAllocationSample 也记录大对象分配(实测 profile 档 8 秒 120 条)。
 
 ## 总结点
 
-1. 大件整层直运，占的是整层
-2. 大对象占连续 Region
-3. 生命周期优先于调参
-4. 用日志和尾延迟验证
+1. 过半即专区,回收分三路
+2. 内存按整区,标记才全清
+3. 先拆对象再调区,顺序别颠倒

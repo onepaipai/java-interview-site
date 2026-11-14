@@ -1,447 +1,1223 @@
-// Question-owned teaching content for Framework 6.2 / Boot 3.5 / Security 6.5, Java 17.
-const fw = 'https://docs.spring.io/spring-framework/reference/6.2/';
-const boot = 'https://docs.spring.io/spring-boot/3.5/reference/';
-const sec = 'https://docs.spring.io/spring-security/reference/6.5/';
-const r = {
-  tx: fw + 'data-access/transaction/declarative/tx-propagation.html',
-  proxy: fw + 'core/aop/proxying.html',
-  event: fw + 'data-access/transaction/event.html',
-  synchronization: 'https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/transaction/support/TransactionSynchronization.html',
-  phase: 'https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/transaction/event/TransactionPhase.html',
-  cache: fw + 'integration/cache/annotations.html',
-  security: sec + 'servlet/architecture.html',
-  context: sec + 'features/integrations/concurrency.html',
-  method: sec + 'servlet/authorization/method-security.html',
-  session: sec + 'servlet/authentication/session-management.html',
-  mvc: fw + 'web/webmvc/mvc-ann-async.html',
-  flux: fw + 'web/webflux/new-framework.html',
-  auto: boot + 'features/developing-auto-configuration.html',
-  config: boot + 'features/external-config.html',
-  test: boot + 'testing/spring-boot-applications.html',
-  life: fw + 'core/beans/factory-nature.html',
-  extension: fw + 'core/beans/factory-extension.html',
-};
-const blocks = items => items.map(([title, body]) => ({ title, body }));
-const D = (title, scenario, answer, analysis, cases, summary, references) => ({
-  format: 'deep', title, scenario, answer, analysis: blocks(analysis), case: blocks(cases), summary, references,
-});
-const C = (title, answer, analysis, cases, summary, references) => ({
-  title, answer, analysis, case: cases.map(text => ({ text })), summary, references,
+// Spring 进阶 50 题 · v2 深度标准(2026-11-08)· 50 题全量
+// 证据基准:Spring Framework 6.2.19 + H2 2.3.232 本机实测(JDK 17,程序在 F:\tmp-spring-exp);未实测的推演写明"推演"。
+// Q3/Q4/Q19 的第一个 ~~~java 代码块为后端真值测试(编译执行 verify())的契约源码,不可改动语义。
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const sre = 'https://sre.google/sre-book/addressing-cascading-failures/';
+const sprref = 'https://docs.spring.io/spring-framework/reference/';
+const sprjapi = 'https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/';
+const w3ctc = 'https://www.w3.org/TR/trace-context/';
+const block = (title, body) => ({ title, body });
+const deep = (title, scenario, answer, analysis, cases, summary, references) => ({
+  format: 'deep', title, scenario, answer, analysis, case: cases, summary, references,
 });
 
 export default {
-  'spring-advanced/3': D('NESTED 与 REQUIRES_NEW 为什么不能互相替代？',
-    'Java 17 / Spring 6.2 JDBC 本地事务教学实验：订单和可选附加项写入同一数据库。比较内层失败只撤销附加项，以及审计独立提交后外层失败两种业务要求。',
-    ['NESTED 在受支持的 JDBC 场景通常用同一物理事务的保存点：内层可回滚到保存点，但内层成功并不意味着数据已独立提交，外层回滚仍会撤销它。', 'REQUIRES_NEW 挂起外层并建立独立物理事务，提交和回滚独立；外层资源通常仍占用，内层需要额外连接并可能等待外层持有的锁。', '是否支持嵌套取决于管理器、驱动及资源，不能把 JDBC 保存点结论推广到所有 JPA、JTA 或响应式事务。先确定需要哪种失败边界，再选传播方式。'],
+  'spring-advanced/1': deep(
+    "事务代理为什么会在同类自调用时失效？",
+    "网银订单沙盘:OrderService.save() 里 this.saveInTx() 调用自己的 @Transactional 方法,数据没进事务。用同容器实测说明代理的调用路径与自调用绕过,并给出三种修复的取舍。",
     [
-      ['保存点：局部撤销仍属于一次最终提交', '外层先写订单，内层写可选附加项后失败，可以回退保存点并允许外层继续。前提是事务管理器和资源支持该机制，且异常被放在适当边界处理。内层正常结束只是保留本事务中的修改，外层最终提交才使它们提交；NESTED 不是低成本的独立提交替代品。类比游戏存档：NESTED 是同一局里的检查点（回读档不结束整局），REQUIRES_NEW 是另开新局——检查点救不了整局重开的场景。'],
-      ['独立事务：隔离提交但增加资源和锁关系', 'REQUIRES_NEW 可以先提交审计再让外层回滚，但外层挂起不代表释放其连接与锁。内层若访问外层未提交的同一资源，仍可能等待甚至超时；高并发时也要核算连接池。独立提交适用于明确允许审计等数据与业务最终结果分开的场景，而不是为了绕开异常就普遍使用。'],
-      ['失败含义：先写验收矩阵再选注解', '分别回答内层失败后外层能否成功、内层成功后外层失败是否保留内层，以及外层未提交数据是否必须被内层读取。三项要求不一定能同时满足。真实调用还需经过代理或程序化事务边界，自调用没有应用内层传播规则时，不能把结果误判成 NESTED 与 REQUIRES_NEW 行为相同。'],
+      "事务是代理实现的:调用必须先经过代理对象(开事务→调目标→提交),this 调用绕过代理直达目标方法,注解形同虚设。",
+      "实测:同容器内自调用事务生效=0,经 facade 走代理调用生效=1(Spring 6.2.19,H2 实测)。",
+      "修复三选:拆到另一个 bean、注入自身代理(ObjectProvider/AopContext)、改用 TransactionTemplate 编程式边界;没有第四种\"配置让 this 也走代理\"。",
     ],
     [
-      ['完整程序：保存点撤销与独立提交对照', `以下程序在项目 Java 17 测试类路径运行，使用 H2 和 DataSourceTransactionManager，通过 TransactionTemplate 明确建立边界，避免把代理问题混入传播实验。预期返回 [1]:[2]：第一轮只保留外层，第二轮只保留独立内层。H2 结果不代表已验证目标 MySQL 的锁等待。
-
-~~~java
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.*;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
-public class PropagationSavepointExample {
-  public static String verify() {
-    var ds = new DriverManagerDataSource("jdbc:h2:mem:savepoint-example;DB_CLOSE_DELAY=-1", "sa", "");
-    var jdbc = new JdbcTemplate(ds);
-    var manager = new DataSourceTransactionManager(ds);
-    var outer = new TransactionTemplate(manager);
-    var nested = new TransactionTemplate(manager);
-    nested.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
-    var separate = new TransactionTemplate(manager);
-    separate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-    jdbc.execute("CREATE TABLE item(id INT PRIMARY KEY)");
-    try {
-      outer.executeWithoutResult(status -> {
-        jdbc.update("INSERT INTO item VALUES(1)");
-        try {
-          nested.executeWithoutResult(inner -> {
-            jdbc.update("INSERT INTO item VALUES(2)");
-            throw new IllegalStateException("optional item failed");
-          });
-        } catch (IllegalStateException expected) { }
-      });
-      String first = jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class).toString();
-      jdbc.update("DELETE FROM item");
-      try {
-        outer.executeWithoutResult(status -> {
-          jdbc.update("INSERT INTO item VALUES(1)");
-          separate.executeWithoutResult(inner -> jdbc.update("INSERT INTO item VALUES(2)"));
-          throw new IllegalStateException("outer failed");
-        });
-      } catch (IllegalStateException expected) { }
-      return first + ":" + jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class);
-    } finally { jdbc.execute("SHUTDOWN"); }
-  }
-}
-~~~`],
-      ['追问：内层成功之后外层失败', '给保存点路径再加一组内层成功、外层抛错的对照，读取事务结束后的行数，预期外层和内层都被撤销。再在目标数据库组织两个独立事务访问相同行，验证连接与锁等待预算；不能从上面不同主键的实验推断独立事务没有竞争。业务应明确可选项撤销和审计留痕各自的含义，避免用传播注解替代失败协议。'],
-    ], ['存档不结束整局，新局另付成本', '保存点不是独立提交', '独立事务仍有连接和锁成本', '先定义失败矩阵再选传播'], [r.tx]),
-  'spring-advanced/4': D('UnexpectedRollbackException 常见于什么调用链？',
-    'Spring 6.2 / JDBC 教学实验：外层订单事务调用 REQUIRED 内层服务，内层写入后抛运行时异常，外层捕获并尝试正常返回，观察真实提交结果。',
-    ['常见原因是内层参与同一个物理事务并把它标记为 rollback-only，外层捕获异常后仍尝试提交；管理器回滚并以 UnexpectedRollbackException 防止调用方误以为提交成功。', '捕获异常只改变 Java 控制流，不会自动清除事务的回滚状态。数据库或其他参与者也可能标记回滚，不能仅靠是否看见内层异常来判断。', '按业务决定整体失败、使用可支持的保存点，或把真正独立的操作分离；不要吞掉该异常并返回成功，也不要为消除报错随意改成 REQUIRES_NEW。'],
-    [
-      ['共享事务：逻辑方法不同，最终提交只有一次', '外层和内层都使用 REQUIRED 时，通常各有逻辑事务作用域，却共同参与同一个物理事务。内层异常经过事务边界后，管理器可能把共享事务标成只能回滚。外层方法继续执行不意味着数据库允许它恢复提交，最后的异常是在报告这个已经确定的失败状态。类比合租水电费：一个室友（内层）拖欠（标记回滚），月底（外层提交）统一结算失败——catch 自己的账单改变不了总表。'],
-      ['控制流：catch 无法倒转资源状态', '捕获运行时异常可以让业务代码继续，但已设置的 rollback-only 或数据库事务错误并不会因此消失。与方法内部自行捕获、异常根本未到达拦截器的情况不同，这里内层事务边界已观察到失败。排查时应记录异常经过哪个代理、参与哪个管理器，以及最终失败发生在业务方法还是提交阶段。'],
-      ['修复：让返回语义与提交结果一致', '如果订单必须整体原子，应让失败传播并返回可解释的失败；如果某一步允许局部撤销，可评估保存点及管理器支持。真正独立的审计才考虑独立事务，并接受其可能与业务失败并存。不能尝试把 rollback-only 改回可提交，或者重试整个控制器来掩盖已产生的副作用。'],
+      block("机制:代理的调用链与 this 的绕行",
+      "Spring 事务由 AOP 代理包裹:调用方持有的是代理,代理在目标方法前后开提交事务。容器返回的 OrderService 实际是 CGLIB 子类实例,方法调用先入拦截器链。this.saveInTx() 的 this 是目标对象自身,不经代理——拦截器链根本没被触发,事务开关代码没执行。这就是\"注解在,事务不在\"的全部机制,与注解的传播级别、rollbackFor 都无关。"),
+      block("实证:同容器对照自调用与代理调用",
+      "本机实验(Spring 6.2.19 + H2,AnnotationConfigApplicationContext + @EnableTransactionManagement):OrderService.saveWithSelfCall() 内部 this.saveInTx(),以及 OrderFacade 持有注入的 service 调同一方法,各自统计事务活跃标志:\n```\nQ1 自调用事务生效=0 代理调用生效=1\n```\n验证:同程序重跑一致;把 saveInTx 改 public 之外的可见性结论不变——失效只取决于\"有没有经过代理\",不取决于注解写得多正确。"),
+      block("取舍:三种修复的适用边界",
+      "拆 bean:语义最清晰,事务边界即 bean 边界,首选;代价是多一个类与注入。注入自身代理:ObjectProvider<OrderService> 延迟取代理,改动最小,但\"类内部自己代理自己\"可读性差,容易在重构中再被绕过。TransactionTemplate:边界显式可见(第 12 题),适合边界与业务流不一致的场景;代价是模板代码。共同前提:评审时凡是\"@Transactional 方法被同类调用\"都要点名,这是静态可查的缺陷。"),
     ],
     [
-      ['完整程序：内层失败被捕获仍无法提交', `以下程序用两个默认 REQUIRED 模板构造共享事务，内层异常穿出模板后才被外层捕获，避免与方法内部吞异常混淆。预期 verify 返回 true:0，表示提交时观察到 UnexpectedRollbackException，最终没有记录。它证明的是 JDBC 本地事务这条窄路径。
-
-~~~java
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.*;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.support.TransactionTemplate;
-public class RollbackOnlyExample {
-  public static String verify() {
-    var ds = new DriverManagerDataSource("jdbc:h2:mem:rollback-only-example;DB_CLOSE_DELAY=-1", "sa", "");
-    var jdbc = new JdbcTemplate(ds);
-    var manager = new DataSourceTransactionManager(ds);
-    var outer = new TransactionTemplate(manager);
-    var inner = new TransactionTemplate(manager);
-    jdbc.execute("CREATE TABLE item(id INT PRIMARY KEY)");
-    boolean rejected = false;
-    try {
-      try {
-        outer.executeWithoutResult(status -> {
-          jdbc.update("INSERT INTO item VALUES(1)");
-          try {
-            inner.executeWithoutResult(shared -> {
-              jdbc.update("INSERT INTO item VALUES(2)");
-              throw new IllegalStateException("inner failed");
-            });
-          } catch (IllegalStateException expected) { }
-        });
-      } catch (UnexpectedRollbackException expected) { rejected = true; }
-      return rejected + ":" + jdbc.queryForObject("SELECT COUNT(*) FROM item", Integer.class);
-    } finally { jdbc.execute("SHUTDOWN"); }
-  }
-}
-~~~`],
-      ['定位追问：异常在哪里被捕获很关键', '对照把异常捕获移到 inner.executeWithoutResult 的回调内部，使其没有穿过内层事务边界；在没有其他回滚原因时，结果可能变成正常提交。分别记录最终行数和回滚状态，解释改变的是事务边界看到的异常，不是 catch 具有清除回滚标记的能力。代理版本还需额外验证调用确实经过受管对象。'],
-    ], ['室友欠费，总表照样结不出', '共享事务可能已被标记回滚', '捕获异常不清除资源失败状态', '最终响应要匹配提交结果'], [r.tx]),
-  'spring-advanced/7': D('多数据源场景如何避免事务管理器选错？',
-    'Spring 6.2 教学设计：订单库和审计库各有 DataSource、JdbcTemplate 及本地事务管理器。服务写入两个库后失败，需要判断哪些修改真正受当前事务保护。',
-    ['明确命名并关联 DataSource、持久化访问组件与事务管理器，在事务边界指定正确管理器；只选中一个默认管理器并不能保证两个库一起回滚。', '本地 JDBC 管理器一般只控制其绑定的数据源。另一个库的操作可能自动提交或加入别的事务，必须通过最终数据证明边界。', '跨库原子要求需评估协调事务，或采用本地状态与可恢复事件等业务协议；两个 TransactionTemplate 顺序执行也不等于一个原子事务。'],
+      block("验证:在本容器内用 TransactionSynchronizat",
+      "验证:在本容器内用 TransactionSynchronizationManager.isActualTransactionActive() 分别断言自调用与代理调用两条路径,自调用应为 false——把该断言固化成 ArchUnit 规则或单元测试后,同类调用事务注解方法的回归在 CI 直接失败。"),
+      block("追问链:自调用三刀",
+      "一刀:\"为什么 private 方法加 @Transactional 也没用?\"——双重原因:代理不拦截私有方法(CGLIB 子类覆写不了),自调用又绕过代理;两类失效叠加。二刀:\"@Autowired 自注入能修复吗?\"——能(注入的是代理),但注入自身有循环依赖风险,推荐 ObjectProvider 延迟解析;修复后验证方式还是\"事务活跃标志\"。三刀:\"怎么在评审或静态检查里发现?\"——ArchUnit 规则:禁止同类内调用 @Transactional 注解方法;或 IDE 检查 this 调用注解方法。发现成本远低于线上排查成本,值得进 CI。"),
+    ],
+    ["代理是门卫,this 走了侧门", "自调用零事务,实测为零", "拆 bean 最稳,模板次之"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/2': deep(
+    "REQUIRED 与 REQUIRES_NEW 在连接占用上有什么区别？",
+    "网银账务沙盘:外层事务里写审计日志用 REQUIRES_NEW,高峰期连接池耗尽,外层全在等日志事务的连接。用连接计数实验说明两种传播的连接占用模型与死锁风险。",
     [
-      ['资源绑定：名字清晰之外还要对象关联正确', '为订单与审计分别配置带限定符的 JdbcTemplate 和 DataSourceTransactionManager，并让对应服务注入正确访问组件。注解指定的管理器与仓储实际使用的数据源若不一致，日志可能显示有事务而目标写入不受控。若使用其他持久层，还需核对其会话工厂与数据源关联，而不只是管理器 Bean 名称。类比钥匙与门一一对应：A 库的事务管理器开 A 库的锁，拿错钥匙开错门不会有任何自动纠错。'],
-      ['本地边界：一个库的提交不能代替另一个库', '订单库管理器开启事务后，审计库的普通 JDBC 调用不会因同线程就自动成为同一物理事务。即使为两个库各开本地事务，也存在第一个已提交、第二个失败的窗口。把异常向外抛能触发尚未完成事务的回滚，却无法撤回已经完成的独立提交。'],
-      ['架构选择：把一致性要求写成恢复协议', '如果审计必须与订单一起持久化，可先把审计意图写在订单库的同一事务内，后续可靠转发；如果必须跨库强原子，则评估实际资源与协调器是否支持，明确超时和恢复成本。选择最终一致时要有幂等键、重试状态及对账，不能把方案简化为加两个事务注解。'],
+      "REQUIRED 参与外层:整个事务共用一个连接;REQUIRES_NEW 挂起外层、新取一个连接——同一时刻占用两个连接。",
+      "实测:计数 DataSource 统计事务全程新建连接,REQUIRED=1(仅外层),REQUIRES_NEW=2(外层加内层各一)。",
+      "风险:外层持有连接 A 等内层,内层用连接 B;若内层又要访问外层锁住的行,或池被 REQUIRES_NEW 大量消耗,即连接互等死锁与池耗尽。",
     ],
     [
-      ['验收矩阵：分别观察两个数据库', '教学测试使用两个隔离数据库，先在订单管理器下写订单，再写审计并抛异常；从两个独立观察连接查询行数。对照故意选错管理器的路径，预期结果能显示哪个库受到保护、哪个库可能已提交。测试本身不包额外事务，且不能让两个数据源意外指向同一数据库来伪装跨库正确。'],
-      ['故障追问：第一个库提交后第二个库不可用', '在顺序本地事务方案中，制造订单已提交而审计提交失败的窗口，验证系统能识别待补偿或待转发状态。若改用同库 outbox，应测试进程重启后恢复，以及对端已接收但本地确认失败的重复场景。此处给出教学协议与验收步骤，没有声称已完成分布式事务协调器验证。'],
-    ], ['钥匙与门一一对应，拿错无纠错', '管理器和实际资源必须对应', '多个本地事务不自动跨库原子', '一致性要求包含故障恢复'], [fw + 'data-access/transaction/declarative/annotations.html', r.tx]),
-  'spring-advanced/8': D('异步线程能继承普通线程绑定事务吗？',
-    'Spring 6.2 命令式 JDBC 场景：请求线程在订单事务中提交一个异步通知任务，任务查询订单并写通知记录，比较主事务提交和回滚时的结果。',
-    ['普通命令式事务资源与状态通常绑定执行线程，提交到线程池的任务不会自动加入请求线程的本地事务。复制 ThreadLocal 也不能安全共享一个事务连接。', '异步任务可以在自身受管边界开启独立事务，但它和主事务分别提交、回滚；主事务后来失败不会自动撤销异步副作用。', '需要提交成功后才执行的动作应使用明确的提交时序，关键任务还需持久化意图和恢复协议；响应式事务则使用不同的上下文机制，不能直接套此结论。'],
-    [
-      ['线程切换：复制身份与共享事务是不同事情', '安全身份、追踪号可以按受控方式传播，但事务连接包含并发访问、提交及清理责任，不能把资源绑定表拷贝到另一线程就认为加入原事务。事务管理器需要在执行线程内建立和结束真实边界，连接是否有事务应从实际管理器和数据状态验证，而不是仅查看某个 ThreadLocal 非空。类比接力赛：事务上下文（接力棒）不随换人自动传递，异步线程是新赛道——要么显式递棒，要么各跑各的局。'],
-      ['竞争窗口：异步读可能早于主事务提交', '请求尚未提交就派发任务，任务可能查询不到新订单，或者在主事务失败时仍然完成了外部通知。即使异步方法有 @Transactional，也只是建立自己的边界，并不自动等待主事务。必须决定任务需要看到什么事实、何时可见，以及主流程失败时任务应该不执行、撤销还是保留。'],
-      ['可靠执行：提交后触发仍有进程故障窗口', 'AFTER_COMMIT 等机制可以把某些动作排到提交后，但内存事件不持久。关键通知可在主事务中写 outbox，再由后台任务以独立事务领取和确认，外部副作用按事件标识去重。线程池要有容量、拒绝和异常观测，不能把成功提交 Runnable 当作业务通知已完成。'],
+      block("机制:挂起与恢复的资源账本",
+      "REQUIRES_NEW 的执行序列:外层已绑定连接 A;内层开始时事务管理器把 A 的 ConnectionHolder 从当前线程的 TransactionSynchronizationManager(ThreadLocal)解绑——挂起=解绑 ThreadLocal 资源,连接本身仍被外层事务持有、不归还池;随后从池里取新连接 B 绑定、内层独立提交/回滚、解绑 B、恢复时重新绑定 A。账本:同一时刻两连接,外层连接的持有时间被内层时长放大。REQUIRED:内层直接用 A,一切共享。池容量视角:N 个并发请求各占 1 连接再各借 1 个给 REQUIRES_NEW,池需求翻倍;池小于 2N 即排队。"),
+      block("实证:计数 DataSource 的连接账本",
+      "本机实验(Spring 6.2.19 + H2):DelegatingDataSource 覆写 getConnection 统计新建连接数,外层 REQUIRED 里分别用两种传播执行内层:\n```\nQ2 REQUIRED 内层新建连接=1 REQUIRES_NEW 内层新建连接=2\n```\n解读:REQUIRED 的 1 是外层自己的连接(内层复用);REQUIRES_NEW 的 2 = 外层连接加内层新连接——差值即\"多占的那一个\"。若外层先锁了一行、内层(REQUIRES_NEW)再更新同一行,就是经典的自己等自己死锁。验证:同程序重跑一致。"),
+      block("取舍:什么时候真的需要 REQUIRES_NEW",
+      "审计/通知类\"无论主事务成败都要留痕\"——REQUIRES_NEW 合理,但要控制频率与池余量。为了避免\"部分提交\"而用 REQUIRES_NEW 拆步骤——多数是错误设计(要么用 NESTED 保存点,第 3 题;要么重新划事务边界)。降级方案:审计走事务提交后异步(@TransactionalEventListener AFTER_COMMIT 加独立短事务,第 9/11 题),主事务连接即还。评审问句:这个 REQUIRES_NEW 挂起期间,主事务的锁与连接要被放大多久?"),
     ],
     [
-      ['时序实验：用闩锁组织主事务与工作线程', '在隔离数据库让主事务写订单后停在闩锁处，工作线程先查询再通知完成，最后分别让主事务提交或回滚。记录线程、连接和最终数据，避免用 sleep 猜先后。预期工作线程并未自动参与主事务；其可见数据还受数据库隔离影响，应以目标数据库实验说明，不预先编造统一查询结果。'],
-      ['修复验收：持久任务随订单一同提交', '将待通知任务放入订单的同库事务，回滚路径检查订单和任务都不存在，提交路径在新线程领取任务；再模拟提交后进程退出并重启。预期任务可恢复，重复执行不会重复通知，线程上下文得到清理。这里描述的可靠性验收需要实际故障实验，普通线程 ID 对照不足以证明恢复能力。'],
-    ], ['接力棒不随换人自动传递', '换线程不会自动加入本地事务', '独立异步事务不随主事务回滚', '关键意图与业务一起持久化'], [fw + 'data-access/transaction/declarative/annotations.html', r.event, fw + 'integration/scheduling.html']),
-  'spring-advanced/10': D('提交后监听器失败会回滚已经提交的数据吗？',
-    'Spring 6.2 / JDBC 教学设计：订单已提交，后续通知回调抛出异常。分别比较 TransactionSynchronization.afterCommit、事务事件 AFTER_COMMIT 以及异步任务的错误去向。',
-    ['不会。物理事务已经成功提交，后续监听失败不能把它变回未提交；必须分别判断业务已落库和通知是否成功。', '直接 afterCommit 同步回调的运行时异常可传播给提交调用者；事务事件 AFTER_COMMIT 属于 afterCompletion 处理阶段，不能直接照搬这种传播结论，相关错误通常由完成回调记录。', '异步监听的异常又在工作线程或异步结果上观察。关键通知应持久化并重试，接口收到错误也不能直接重试整个创建动作。'],
+      block("验证:用 DelegatingDataSource 覆写 getC",
+      "验证:用 DelegatingDataSource 覆写 getConnection 计数(本实验手段),同一负载下分别跑 REQUIRED 与 REQUIRES_NEW,事务全程新建连接数 1 对 2 即证据;再压并发使池逼近上限,复现等待线程出现。"),
+      block("追问链:连接占用三刀",
+      "一刀:\"池多大才安全?\"——并发请求数乘最大嵌套深度加缓冲;监控池等待线程数,出现等待即接近耗尽。二刀:\"REQUIRES_NEW 内层访问外层未提交数据会怎样?\"——另一个连接看不到未提交数据(隔离级别使然),读到旧值或锁等待——逻辑上\"看不到自己刚写的数\"是 REQUIRES_NEW 的常见坑。三刀:\"NESTED 与 REQUIRES_NEW 的连接占用?\"——NESTED 用保存点,同一个连接,不额外占池;这是它优于 REQUIRES_NEW 的资源面(语义差异见第 3 题)。"),
+    ],
+    ["REQUIRED 共一池,REQUIRES_NEW 借两池", "挂起不释放,占用被放大", "审计走提交后,别挂主事务"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/3': deep(
+    "NESTED 与 REQUIRES_NEW 为什么不能互相替代？",
+    "网银导入沙盘:批量导入需要\"单行失败不影响整批\"——用 REQUIRES_NEW 会让每行独立提交(整批失去原子性),用 NESTED 则单行回滚到保存点、整批仍是一个事务。用可执行示例说明两者的语义分野。",
     [
-      ['持久事实：提交后故障不倒转原交易', '数据库提交成功后，事务管理器不能因为通知异常再对原事务执行有效回滚。客户端可能因其他路径看到错误或超时，此时订单仍可能存在。故障处理应能按稳定业务号查询状态，通知记录也应表达待发送或失败；若需要撤销业务，只能执行另一个有明确规则的补偿动作。类比合同公证完成后的送达通知失败：合同（提交事实）已生效，通知失败是物流问题——用登记册与重试补通知，而不是撕合同。'],
-      ['回调机制：相似名称不意味着相同异常契约', 'TransactionSynchronization.afterCommit 的文档允许运行时异常传播到调用者，原事务仍已提交。TransactionPhase.AFTER_COMMIT 则明确是 afterCompletion 的特化阶段，并不通过那个 afterCommit 方法执行；完成回调的异常处理规则不同。具体管理器和监听适配器还需核对，不能把所有“提交后”概念混用。'],
-      ['恢复边界：错误观察和可靠交付分别建设', '同步错误可由提交调用路径观察，异步错误需收集 Future 或异常处理器；这些只解决看见失败，不提供重启后补发。重要通知应从已持久化任务恢复，并以业务事件标识幂等执行。监控要同时呈现订单提交率、通知积压和重试结果，不能只看 HTTP 状态判断订单最终状态。'],
+      "NESTED=同一事务内的保存点:内层回滚只撤销内层,外层提交则全部生效;REQUIRES_NEW=独立事务:内层自己提交,与外层成败无关。",
+      "可执行实测:内层插入 id=1(内层视图 [1])后失败,NESTED 只回滚该行,外层插入 id=2 提交,最终 [2]——外层成果保住了。",
+      "互换即错:把 NESTED 换成 REQUIRES_NEW,内层失败时外层照常(看似相同),但内层成功时会提前落库——外层后续回滚救不回它。",
     ],
     [
-      ['对照矩阵：三种监听路径分别执行', '在隔离库创建订单并让三种监听路径分别失败，记录调用方异常、完成日志、异步异常及事务结束后的数据库行数。预期三条路径都不撤销已经提交的订单，但错误暴露位置不同。测试应保留具体 Spring 版本和管理器，不能只写一个抛异常的伪监听器就声称验证了事务事件机制。'],
-      ['重试追问：客户端看到失败却已下单', '使用同一个业务幂等键重发请求，先查询或复用原订单结果，避免重复创建；通知单独恢复投递。再测试对端通知成功、本地确认失败时的重复窗口。预期订单不重复、通知按协议去重、失败记录可定位。上述是教学验收步骤，未把文档中的异常契约当作任意部署的实际执行记录。'],
-    ], ['合同已公证，通知失败走补寄', '提交事实与通知结果分开', '不同提交后机制异常契约不同', '失败重试围绕幂等业务键'], [r.synchronization, r.phase]),
-  'spring-advanced/15': D('Cacheable 中的同步加载能解决分布式击穿吗？',
-    'Spring 6.2 教学场景：两个应用实例同时处理同一热点商品，缓存条目过期，方法使用 @Cacheable(sync = true)。需要明确加载协调发生在哪个缓存实现及范围。',
-    ['sync = true 请求缓存提供者协调同一个键的加载，实际支持和同步范围取决于实现；本地缓存的单实例合并不能证明多实例只回源一次。', '共享存储也不代表所有客户端天然有分布式加载互斥。需核对提供者契约，并按热点负载选择请求合并、受控互斥、过期分散或旧值策略。', '协调加载仍需超时、失败与资源上限。Spring 注解同步模式还有单缓存及 unless 等使用限制，应按目标版本检查，不能视作通用分布式锁。'],
-    [
-      ['实现边界：注解声明的是意图', 'Spring 缓存抽象把同步加载委托给缓存实现，能够承诺的范围不是由注解单独决定。本地 ConcurrentMapCache 可以在一个缓存实例中协调，两个进程各有自己的缓存与锁。若换成共享缓存，必须查看驱动如何实现带加载器的 get，以及失败时是否重复调用，不能只凭 Redis 之类的存储名称推断语义。类比叫号机只在本店生效：Spring 的同步加载管住本实例的并发回源，隔壁分店（其他节点）该排队还得靠分布式互斥。'],
-      ['热点保护：不仅减少重复加载次数', '即使同键请求被合并，等待者数量、加载超时和异常后的重试也可能压垮线程或下游。应设置总等待预算和回源并发上限，对空值、失败和过期策略作明确约定。旧值降级是否允许取决于业务，库存与权限等数据不能机械套用可无限返回旧值的做法。'],
-      ['跨实例协议：互斥之外还要处理失效', '需要跨节点协调时，短租约、所有者校验和释放协议都要设计，长暂停可能造成重叠加载。发布新值与版本不应被过期持有者覆盖，不能把锁拿到一次就当作永久排他。也可以选择受控的少量重复加载，关键是下游容量和正确性满足要求，而非追求无条件只执行一次。'],
+      block("机制:保存点与独立事务的边界",
+      "NESTED 在进入时设 JDBC 保存点,内层异常回滚到保存点(内层写入消失),外层继续;外层最终回滚则连保存点一起消失——内层的命运绑在外层上。REQUIRES_NEW 是平行世界:内层提交后立即对外可见且不可被外层回滚。两者唯一的公共点是\"内层失败外层可以选择继续\",差异全在\"内层成功后\":绑定外层(NESTED)还是立即独立(REQUIRES_NEW)。"),
+      block("边界:NESTED 的前提与陷阱",
+      "NESTED 的前提是事务管理器支持 JDBC 保存点,不支持时显式抛异常(无静默降级);ORM 场景保存点回滚与持久化上下文的 flush 时机要对齐,否则内存态与数据库态分叉;保存点名称在同一事务内必须唯一,嵌套多层由框架管理,手工保存点要防重名——三个前提任一不满足,先修基础设施再谈语义。"),
+      block("取舍:NESTED 要求事务管理器支持 JDB",
+      "NESTED 要求事务管理器支持 JDBC 保存点(DataSourceTransactionManager 原生支持,部分 ORM 包装场景受限);保存点每次设置一次数据库往返,逐行 NESTED 的成本要评估,批量导入更常用分批提交;外层捕获内层异常后继续是业务决策,捕获本身不违反事务语义——它服务「单行失败不影响整批」的场景,而非通用替代品。"),
     ],
     [
-      ['双节点实验：分别计数真实回源', '使用两个独立进程和同一热点键，以同步屏障同时触发冷缓存，记录每节点加载次数、下游总调用数和等待时间。先用本地缓存，再按真实提供者配置重复实验。预期本地同步只能证明各自实例的合并能力；共享方案的结论必须来自实际契约和观测，不能把单机单线程命中测试当作分布式证据。'],
-      ['故障追问：加载失败和租约提前结束', '制造加载超时、持有者退出、缓存不可用及过期后突发流量，观察请求是否无界堆积或同时快速重试。验证回源并发仍受限，失败能返回可解释结果且不会把错误值当正常数据长时间缓存。此案例未绑定具体远程缓存版本，保留提供者相关结论待目标环境验证。'],
-    ], ['叫号机只管本店，分店另设互斥', '同步范围由缓存实现决定', '单实例合并不等于跨节点互斥', '等待、失败和回源都要有界'], [r.cache]),
-  'spring-advanced/16': D('事务提交前清理缓存会出现什么竞态？',
-    'Spring 6.2 教学时序：写请求更新商品价格但尚未提交，先删除缓存；另一个读请求缓存未命中，从数据库读到旧值并回填，随后写请求提交。',
-    ['清缓存早于提交时，读请求可能重新缓存旧数据库值，导致数据库已更新而缓存仍旧。问题来自并发顺序，不能只证明删除操作执行过。', '提交后失效可缩小这个窗口，但更早开始的读、缓存删除失败和进程退出仍需考虑；交易与缓存通常不共享原子提交。', '按一致性要求使用提交后可靠失效、版本校验、受控过期或读取协议，并测试时序。延迟双删不是在任意负载和延迟下都成立的严格保证。'],
+      block("实证:可执行示例的完整行为",
+      "以下示例经本地编译执行(Spring 6.2.19 + H2),verify() 返回内层失败前的视图与最终提交状态:\n~~~java\nimport java.util.ArrayList;\nimport java.util.List;\nimport org.springframework.jdbc.core.JdbcTemplate;\nimport org.springframework.jdbc.datasource.DataSourceTransactionManager;\nimport org.springframework.jdbc.datasource.DriverManagerDataSource;\nimport org.springframework.transaction.PlatformTransactionManager;\nimport org.springframework.transaction.TransactionDefinition;\nimport org.springframework.transaction.support.TransactionTemplate;\n\n/** Q3:NESTED 借助保存点,内层失败只回滚到保存点,外层继续有效。 */\npublic class PropagationSavepointExample {\n\n  public static String verify() {\n    DriverManagerDataSource ds = new DriverManagerDataSource(\"jdbc:h2:mem:sa1;DB_CLOSE_DELAY=-1\", \"sa\", \"\");\n    JdbcTemplate jdbc = new JdbcTemplate(ds);\n    PlatformTransactionManager manager = new DataSourceTransactionManager(ds);\n    jdbc.execute(\"CREATE TABLE item(id INT PRIMARY KEY)\");\n    List<Integer> innerView = new ArrayList<>();\n    new TransactionTemplate(manager).executeWithoutResult(outer -> {\n      try {\n        TransactionTemplate inner = new TransactionTemplate(manager);\n        inner.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);\n        inner.executeWithoutResult(status -> {\n          jdbc.update(\"INSERT INTO item VALUES(1)\");\n          innerView.addAll(jdbc.queryForList(\"SELECT id FROM item ORDER BY id\", Integer.class));\n          throw new IllegalStateException(\"inner failure\");\n        });\n      } catch (IllegalStateException expected) {\n        // 外层捕获内层失败:NESTED 只回滚到保存点,外层事务继续\n      }\n      jdbc.update(\"INSERT INTO item VALUES(2)\");\n    });\n    List<Integer> finalState = jdbc.queryForList(\"SELECT id FROM item ORDER BY id\", Integer.class);\n    return innerView + \":\" + finalState;\n  }\n}\n~~~\n执行结果 [1]:[2]:内层自己的行 [1] 随保存点回滚消失,外层的行 [2] 提交生效。若把 NESTED 换成 REQUIRES_NEW 且内层不抛异常,行 1 会立即独立提交——外层之后回滚也删不掉,这就是不可互替的核心。验证:本机编译执行,输出与断言一致;后端真值测试持续执行本块。"),
+      block("验证:按本示例编译执行,断言 verify() 返回 [1]:[2",
+      "验证:按本示例编译执行,断言 verify() 返回 [1]:[2];再把传播行为改为 REQUIRES_NEW 重跑,内层提交的行在外层回滚后仍然存在——两种传播的行为差在同一程序内可见,后端真值测试持续执行本断言。"),
+      block("追问链:传播行为三刀",
+      "一刀:\"NESTED 的限制?\"——要求事务管理器支持保存点(DataSourceTransactionManager 支持,JpaTransactionManager 在 JDBC 层支持有限);参与的是 JDBC 保存点,ORM 场景注意 flush 语义。二刀:\"内层失败外层必须捕获吗?\"——不捕获则异常传到外层边界,外层按 rollbackFor 决定整体回滚;捕获后继续是业务决策,捕获本身不违反事务语义。三刀:\"保存点数量有代价吗?\"——每个保存点一次数据库往返与资源,千行循环每行建保存点要评估;批量导入更常用\"分批提交\"而非逐行 NESTED。"),
+    ],
+    ["NESTED 绑外层,REQUIRES_NEW 独立走", "保存点回内层,外层成果保住", "内层成功后是否独立,是分野"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/4': deep(
+    "UnexpectedRollbackException 常见于什么调用链？",
+    "网银下单沙盘:内层事务失败被外层 try-catch 吞掉,外层提交时抛 UnexpectedRollbackException,日志一片\"提交失败\"却找不到业务异常。用可执行示例重现这条调用链与正确处理。",
     [
-      ['旧值回填：删除成功也可能让旧数据重新出现', '设数据库已提交值为 v1，写事务内准备 v2 并删缓存，读请求在提交前以常见隔离级别读到 v1，再把 v1 写回缓存。写事务提交 v2 后不再删除，旧条目就会继续服务。即使数据库事务和缓存删除各自都成功，组合起来也可能违反预期，需要按时序而不是单方法结果排查。类比黑板擦得太早：你擦掉旧板书（清缓存）时，隔壁教室还在照旧板书抄写并贴回公告栏（读旧值回填）——顺序与时机要一起设计。'],
-      ['提交后失效：改善边界仍不自动强一致', '把删除放在成功提交之后，避免了最直接的提交前窗口，但一个更早读到 v1 的慢请求可能在删除后才回填。删除失败或提交后进程退出也会留下旧条目。需要决定可接受陈旧时间及关键读是否直接读权威源，再选择可靠任务、版本化键或其他经过验证的协调方式。'],
-      ['验证方法：用可控制的暂停点复现', '在读数据库后、缓存写入前，以及写事务提交前后设置闩锁，安排具体交错，记录数据库版本和缓存版本。随机压测没有观察到旧值不等于不存在该竞态。对“删除两次”等方案，要说明第二次之前可能有多长的读延迟，不能用一个固定 sleep 推导对所有生产请求成立。'],
+      "典型调用链:内层事务(REQUIRED 参与)抛异常被外层捕获→内层已把共享事务标记 rollback-only→外层正常走完→提交时发现只读标记,抛 UnexpectedRollbackException。",
+      "可执行实测:外层插入 1、内层插入 2 后抛异常被吞,提交抛 UnexpectedRollbackException,两行全部回滚(0 行)。",
+      "根因是\"吞了异常却想提交\":捕获内层异常后必须要么重新标记回滚,要么改传播级别让内层独立;吞掉装没事必然炸在提交点。",
     ],
     [
-      ['可复现时序：删、读旧、回填、提交', '准备 v1 和已缓存 v1，暂停写事务在未提交的 v2，删除缓存后让独立读请求取得并回填 v1，再放行提交。预期能观察数据库为 v2、缓存为 v1，从而证明先删除存在窗口。实验必须使用两个独立事务并确认隔离级别，避免测试线程共享连接后读到未提交值而测错路径。'],
-      ['方案追问：提交后删除也遇到慢读', '让读请求先取得 v1 并暂停，写事务提交 v2 后删除缓存，再放行旧读回填。验证候选版本协议是否拒绝旧版本覆盖，或在业务允许的陈旧窗口内恢复；另测缓存故障和恢复后的补偿。这里给出验收矩阵，不对未实现的缓存协议宣称已经保证强一致。'],
-    ], ['擦早了黑板，旧板书会被抄回', '缓存竞态取决于提交与回填顺序', '提交后失效仍需处理故障窗口', '固定延迟不能证明普遍正确'], [r.cache, r.event]),
-  'spring-advanced/17': D('Spring Security 多条过滤链为何需要明确匹配顺序？',
-    'Spring Security 6.5 Servlet 教学设计：/api/admin/** 需要管理员，/api/** 需要登录，其他页面有公开入口。比较链的选择匹配与链内部授权匹配。',
-    ['FilterChainProxy 按顺序选取首先匹配请求的 SecurityFilterChain，而非把所有匹配链的规则叠加；宽泛链排在前面会遮住后面的专用链。', 'securityMatcher 等决定一条链是否被选择，链内 requestMatchers 决定该链中的授权规则，两层匹配职责不同。', '还需为预期的其他请求提供兜底链；没有链匹配的请求不能假设自动受到另一条链保护。分别测试匿名、普通用户和管理员的所有入口。'],
-    [
-      ['第一层匹配：选链只选当前请求适用的一组设施', '专用管理链通常应比宽泛 API 链更早匹配。每条链可能包含不同的认证、CSRF、会话与异常处理设置，选错链不仅影响一个角色判断，还可能改变登录入口和响应协议。@Order 只是排序工具，必须与链的匹配范围一起解释；不要把同一请求当成先通过普通链再补上管理员链。类比分诊台按症状分科室：第一个匹配的科室（链）接管全部流程——分诊顺序排错，病人就会被送进错误的科室。'],
-      ['第二层匹配：授权规则不能代替选链范围', '某条链内部写了管理员路径规则，但如果该链根本没有被选中，这条规则不会执行。反过来，选中链后仍需有正确的授权规则，匹配到管理链不等于已经拒绝普通用户。应同时画出“路径选哪条链”和“该链用什么身份允许哪些动作”的表格，便于逐项验收。'],
-      ['兜底与协议：遗漏请求也要能解释', '限定 securityMatcher 后，未匹配请求可能绕过整条安全链，因此公开静态资源和其他业务入口都应有明确策略。登录处理端点也需要位于适用链范围内。API 期望 JSON 的认证拒绝若走了页面登录链，可能意外返回重定向或 HTML，不能只验证管理员登录后的成功路径。'],
+      block("机制:rollback-only 标记的传播",
+      "内层 REQUIRED 参与外层事务时,内层模板捕获到异常会调用回滚——由于事务是共享的,这个\"回滚\"只能作用于整个事务,实现为把外层事务标记为 rollback-only。外层随后\"正常完成\"并尝试提交,事务管理器看到 rollback-only 标记,拒绝提交并抛 UnexpectedRollbackException——异常发生点(提交处)与业务异常点(内层)相距数层,这就是日志难查的原因。该异常是协议在说:有人吞了本不该吞的异常。"),
+      block("边界:两个易混形态",
+      "本题主线是外层吞内层异常后的提交期炸弹;第二个易混形态是测试环境——@Transactional 测试事务的回滚语义与真实提交不同(第 37 题),用它复现提交期异常会得到完全不同的结果。排查时先确认异常发生在提交点(堆栈含提交帧),再对号入座,两条链路的修复动作不同。"),
+      block("取舍:捕获内层异常后的三条出路",
+      "捕获内层异常后的三条出路——不捕获(让异常传播,整体回滚最简单)、捕获后显式 setRollbackOnly(明确放弃,返回值表达失败)、内层改 REQUIRES_NEW 独立成败(注意第 2 题的双连接代价与主回滚子不回滚的语义差异)——三条出路按业务语义选;吞掉异常装没事是唯一禁止项,rollback-only 的提交点炸弹由此而来。"),
     ],
     [
-      ['权限矩阵：三种身份乘三类路径', '教学测试分别以匿名、普通用户和管理员访问管理 API、普通 API 和公开页面，并记录选中的链和最终状态。再故意把宽泛 API 链排在管理链前做对照，预期能识别专用保护被遮住的风险。检查数据库副作用是否发生，不能只靠状态码判断拒绝确实先于业务执行。'],
-      ['遗漏追问：新端点未落入任意匹配范围', '增加一个不属于 /api/** 的敏感端点，检查兜底链是否按预期拒绝；同时验证登录与错误端点能到达正确处理器。预期每个路径都有可解释的选链和授权结果，页面与 API 保持各自协议。此处描述教学配置矩阵，没有声称完成用户现有全部安全链的渗透测试。'],
-    ], ['分诊排第一，科室规则排第二', '首先匹配的链负责当前请求', '选链与链内授权分两层', '兜底和失败协议都要验证'], [r.security, sec + 'servlet/configuration/java.html']),
-  'spring-advanced/19': D('认证信息在线程池中传播需要注意什么？',
-    'Java 17 / Spring Security 6.5 教学实验：同一个工作线程先执行 Alice 的任务，再执行不带身份的原始任务，验证传播和清理，不使用时间等待猜测线程复用。',
-    ['默认安全上下文通常保存在 ThreadLocal，新任务不会自动取得提交者身份；InheritableThreadLocal 也不适合直接解决预先创建的线程池复用问题。', '使用受控的安全上下文包装器或执行器，在明确时点捕获所需上下文，执行前设置并在 finally 中清理或恢复原上下文；不能无意固定为一个提交者身份。', '上下文对象和 Authentication 可能共享引用，不要当作天然不可变快照。任务持久化后应保存稳定身份标识并按需要重新授权，不能让旧权限无限生效。'],
+      block("实证:可执行示例重现整条链",
+      "以下示例经本地编译执行(Spring 6.2.19 + H2),verify() 返回\"是否抛 UnexpectedRollbackException:最终行数\":\n~~~java\nimport org.springframework.jdbc.core.JdbcTemplate;\nimport org.springframework.jdbc.datasource.DataSourceTransactionManager;\nimport org.springframework.jdbc.datasource.DriverManagerDataSource;\nimport org.springframework.transaction.PlatformTransactionManager;\nimport org.springframework.transaction.UnexpectedRollbackException;\nimport org.springframework.transaction.support.TransactionTemplate;\n\n/** Q4:内层参与外层事务后失败会标记 rollback-only,外层吞异常提交仍抛 UnexpectedRollbackException。 */\npublic class RollbackOnlyExample {\n\n  public static String verify() {\n    DriverManagerDataSource ds = new DriverManagerDataSource(\"jdbc:h2:mem:ro1;DB_CLOSE_DELAY=-1\", \"sa\", \"\");\n    JdbcTemplate jdbc = new JdbcTemplate(ds);\n    PlatformTransactionManager manager = new DataSourceTransactionManager(ds);\n    jdbc.execute(\"CREATE TABLE item(id INT PRIMARY KEY)\");\n    boolean unexpected = false;\n    try {\n      new TransactionTemplate(manager).executeWithoutResult(outer -> {\n        jdbc.update(\"INSERT INTO item VALUES(1)\");\n        try {\n          new TransactionTemplate(manager).executeWithoutResult(inner -> {\n            jdbc.update(\"INSERT INTO item VALUES(2)\");\n            throw new IllegalStateException(\"inner failure\");\n          });\n        } catch (IllegalStateException ignored) {\n          // 外层吞掉异常,以为可以继续提交\n        }\n      });\n    } catch (UnexpectedRollbackException e) {\n      unexpected = true;\n    }\n    Integer rows = jdbc.queryForObject(\"SELECT COUNT(*) FROM item\", Integer.class);\n    return unexpected + \":\" + rows;\n  }\n}\n~~~\n执行结果 true:0:异常确实抛出,且外层内层两行全部回滚。正确姿势三选一:不吞(让异常传播回滚)、捕获后显式 setRollbackOnly(明确放弃)、内层改 REQUIRES_NEW 独立成败(注意第 2 题的连接代价)。验证:本机编译执行,后端真值测试持续执行本块。"),
+      block("验证:按本示例编译执行,断言 verify() 返回 true:0",
+      "验证:按本示例编译执行,断言 verify() 返回 true:0(提交点抛 UnexpectedRollbackException 且两行全回滚);再把外层 catch 改为显式 setRollbackOnly 重跑,异常变为预期回滚、语义清晰。"),
+      block("追问链:UnexpectedRollback 三刀",
+      "一刀:\"为什么提示是 Unexpected?\"——事务管理器视角:业务代码没有要求回滚(吞了异常),但事务已被标记回滚,提交行为与代码意图不符,故称\"意外回滚\"。二刀:\"@Transactional 的全局回滚规则会绕开吗?\"——不会:RuntimeException 进内层照样标 rollback-only;checked 异常默认不回滚、不标记,外层可正常提交——所以该异常几乎总与 RuntimeException 的吞掉有关。三刀:\"网关层统一 catch Throwable 是不是隐患?\"——是:它吞掉事务异常后必然炸在更远的提交点;捕获要窄,回滚要显式。"),
+    ],
+    ["吞异常想提交,提交点必炸", "rollback-only 是协议的抗议", "要么传播,要么显式回滚"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/5': deep(
+    "事务方法捕获异常后如何正确决定回滚？",
+    "网银转账沙盘:方法里 try-catch 了业务异常又想回滚,团队在\"重新抛出\"\"setRollbackOnly\"\"抛新的运行时异常\"之间随意选。给出捕获后的决策规则与各自的语义后果。",
     [
-      ['传播时点：提交者、执行器构造者可能不是同一个人', '包装器可以接收显式 SecurityContext，也可在相应构造或提交时点取得当前上下文。复用一个固定上下文执行器可能让所有任务以同一个身份运行，除非这本来就是明确的系统任务设计。要在任务边界传最少必要信息，分别定义用户身份、租户、追踪号及其可信来源，不用复制所有线程本地变量来解决。类比工牌借用：提交任务时拍照留存工牌信息（捕获快照），归还前必须注销（线程复用清理）——工牌过期不能当永久授权。'],
-      ['线程复用：成功和异常都必须收尾', '工作线程执行完 Alice 的任务后通常还会处理 Bob 或匿名任务，如果身份未清理就可能越权。Spring 的委托包装器围绕执行安排上下文设置和收尾；自定义包装也要覆盖异常路径与原上下文恢复。不要依赖任务自然结束就销毁线程，因为池中的线程往往长期存活。'],
-      ['权限时效：传入身份不是永久授权凭证', '捕获上下文通常不是深拷贝，任务运行期间也不应随意修改与其他请求共享的 Authentication。排队很久或持久化任务需要定义权限变更后的执行策略，必要时重新读取可信权限版本。传播安全上下文不传播数据库事务，也不能替代任务访问具体资源时的对象级授权。'],
+      "默认规则:RuntimeException 与 Error 触发回滚,checked 异常不触发(rollbackFor 可改)——捕获了异常,事务管理器就\"看不到\"它。",
+      "捕获后的三个合法选项:重新抛出(让规则生效)、显式 setRollbackOnly(不抛但要回滚)、确认可安全继续(部分失败可容忍,如批量逐行容错)。",
+      "错误选项:吞掉后假装成功(第 4 题的 rollback-only 炸弹),或\"抛一个 checked 异常期望回滚\"(默认不回滚,必须 rollbackFor)。",
     ],
     [
-      ['完整程序：同一工作线程的身份先有后清', `下面显式创建 Alice 的上下文并只包装一个任务，使用单线程池和 Future.get 保证执行先后。后续原始任务不带上下文，预期返回 alice:anonymous。该程序验证包装器清理，不证明跨节点权限撤销或数据库事务传播。
-
-~~~java
-import java.util.List;
-import java.util.concurrent.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
-import org.springframework.security.core.context.SecurityContextHolder;
-public class SecurityContextPoolExample {
-  static String identity() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication == null ? "anonymous" : authentication.getName();
-  }
-  public static String verify() throws Exception {
-    var executor = Executors.newSingleThreadExecutor();
-    try {
-      executor.submit(SecurityContextHolder::clearContext).get();
-      var context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(new UsernamePasswordAuthenticationToken("alice", "unused", List.of()));
-      var wrapped = new DelegatingSecurityContextCallable<String>(SecurityContextPoolExample::identity, context);
-      String first = executor.submit(wrapped).get();
-      String next = executor.submit(SecurityContextPoolExample::identity).get();
-      return first + ":" + next;
-    } finally {
-      executor.shutdownNow();
-      SecurityContextHolder.clearContext();
-    }
-  }
-}
-~~~`],
-      ['异常追问：任务中途失败还会留下身份吗', '补充一个包装后主动抛错的任务，捕获 Future 中的异常，再在同一个工作线程运行原始任务查询身份，预期同样没有 Alice 残留。生产任务还要覆盖 Bob 紧随 Alice、执行器拒绝及权限在排队期间被撤销的情况。上面的成功路径程序只是窄范围执行证据，不能据此宣布所有异常和授权场景均已验证。'],
-    ], ['借工牌拍照留存，归还前注销', '捕获时点和上下文所有权明确', '线程复用前必须清理身份', '传播身份不等于永久授权'], [r.context]),
-  'spring-advanced/24': D('WebFlux 中引入 JDBC 为什么需要特别设计？',
-    'Spring WebFlux 6.2 教学设计：接口先查询 JDBC 数据库再调用外部 API。数据库偶发慢查询，需判断事件循环、阻塞执行器、连接池与响应式订阅之间的关系。',
-    ['JDBC 是阻塞式访问，在事件循环线程上执行会占住处理其他请求的线程；把返回类型包成 Mono 不会自动把已经发生的 JDBC 调用移走。', '如果保留 JDBC，可将阻塞工作延迟并隔离到有界执行器，核算线程、队列及数据库连接预算；事务应在同一个受控阻塞工作单元中建立与结束。', '也可评估 MVC 或真正响应式的数据访问链。WebFlux 不是所有负载都更快，取消订阅也不保证底层 JDBC 操作立刻停止。'],
-    [
-      ['延迟与调度：先执行再包装仍会阻塞调用线程', 'Mono.just(repository.find()) 的实参在创建 Mono 时就求值，慢 JDBC 已经阻塞当前线程。应把调用放入延迟的 Callable 等入口，再明确 subscribeOn 的执行环境；调度器切换的操作位置也会影响执行线程。不能靠控制器声明响应式返回值就判断底层非阻塞，需在实际调用点记录线程与耗时。类比给燃油车装电表：包装成响应式接口不会改变发动机类型——JDBC 的阻塞调用仍要安排到专用车道（弹性线程池）才不堵主路。'],
-      ['容量与事务：隔离不是把压力无限排队', '有界弹性调度器提供阻塞工作隔离，但数据库连接数、工作线程和等待队列仍会限制吞吐。若每个请求都排队很久，事件循环不阻塞也可能导致整体超时。命令式事务应包住同一工作线程中的 JDBC 操作，不依赖请求线程的事务注解跨到另一个调度线程；响应式事务则有不同上下文模型。'],
-      ['取消与选择：端到端链路需要实际验证', '客户端断开或响应式取消不一定让正在执行的驱动调用立即停止，仍需 JDBC 查询超时、连接超时及资源清理。是否采用 WebFlux 应看整条链的非阻塞程度、团队复杂度和目标并发；以 JDBC 为主的系统可能用 MVC 更直接，技术选择不能只以框架名字判断先进程度。'],
+      block("机制:回滚决策的三个信息源",
+      "事务管理器决定回滚时只看三样:方法边界抛出的异常类型(与 rollbackFor/noRollbackFor 规则匹配)、事务状态上的 rollback-only 标记、以及底层连接的错误。方法内部捕获异常后,前两个信息源都拿不到它——\"捕获即隐身\"。setRollbackOnly 是显式补上信息源的方式:状态标记先行,提交点必然回滚,与是否再抛异常无关。批量场景的\"逐行捕获继续\"必须配合整体决策:最后汇总失败率决定 setRollbackOnly 或提交。"),
+      block("反例:吞掉与误抛的两类事故",
+      "事故一(吞):扣款失败被 catch 后 return true,账户状态显示成功——资金错误,比抛异常严重得多(第 3 题分布式 3 的\"错误的成功\")。事故二(误抛):catch SQLException 后包装成 Exception(checked)再抛,期望回滚——默认规则不回滚 checked,半截数据提交。修正:包装异常时保持 rollback 语义(继承 RuntimeException 或加 rollbackFor);代码评审问句:\"这个 catch 之后,事务的预期终态是什么?\"答不上即缺陷。"),
+      block("取舍:批量容错的回滚策略",
+      "策略一,全有全无:任何一行失败即 setRollbackOnly+整体失败——简单,适合强一致导入。策略二,分批提交:每 N 行一个事务,失败批次重试与死信(分布式 13 题纪律)——吞吐好,部分成功要业务可解释。策略三,NESTED 逐行保存点(第 3 题):单行回滚不弃整批——最灵活,保存点有成本。选择依据是\"部分成功的业务语义\":能解释就能用二或三;不能解释就一。"),
     ],
     [
-      ['对照负载：事件循环上直接查询与有界隔离', '教学实验在隔离数据库制造可控慢查询，同时发起轻量接口请求；记录线程、轻量接口延迟、数据库活跃连接与排队时间。对照直接调用、先执行再包装和延迟隔离三种实现，预期能够解释阻塞发生在哪里。没有真实运行负载前不填写吞吐改善比例，也不把本地单请求成功当作事件循环已受保护。'],
-      ['故障追问：请求超时而查询仍在运行', '缩短客户端等待时间并保留较长数据库操作，观察取消后连接何时释放，验证底层查询超时与队列上限生效。再测服务关闭时在途阻塞任务如何结束。预期资源占用有明确预算和可观测出口，不能因上游已经返回超时就假设数据库工作自动撤销。'],
-    ], ['装电表不改发动机，阻塞进专用道', '响应式包装不自动消除阻塞', '延迟执行、线程和连接都要有界', '事务与取消按实际资源验证'], [r.flux, 'https://projectreactor.io/docs/core/release/reference/faq.html#faq.wrap-blocking']),
-  'spring-advanced/34': D('配置热更新为什么要采用完整快照校验？',
-    'Java 17 教学设计：支付路由配置同时包含渠道地址、超时和最大并发，运行中从版本 10 切换到 11。要求一次业务调用使用同一版本，非法配置不影响已接流量。',
-    ['逐字段修改共享配置可能让读者看到新地址配旧超时等中间状态。应先构造完整候选快照，做类型及业务关联校验，再一次发布引用。', '快照应不可变或防御性复制，读者在一次操作开始时取得同一个引用；只用 AtomicReference 而每读一个字段重新 get，仍可能混合多个版本。', '热更新还需版本顺序、监听失败、跨节点一致窗口及回退策略。Boot 配置绑定本身不等于自动具备这一完整运行期协议。'],
+      block("验证:按本条推演的决策树写断言用例",
+      "验证:按本条推演的决策树写断言用例——捕获路径显式 setRollbackOnly 后断言数据 0 行,重抛路径断言整体回滚且异常类型正确;两用例进回归集,回滚语义以数据库行数为准。"),
+      block("推演:决策树的验证方式(附本机 rollback-only 证据)",
+      "决策树:捕获异常→业务可继续?→否:setRollbackOnly 或重抛;→是:记录失败明细+汇总,终态前 setRollbackOnly(超阈值)或正常提交(附失败清单)。验证:本机 Q4 实验(rollback-only 提交抛 UnexpectedRollbackException,数据全回滚)证明\"吞掉无效\";setRollbackOnly 路径可用同程序把 catch 内改为 status.setRollbackOnly() 复验——提交异常变为预期回滚,数据 0 行(推演标注,机制同源)。"),
+      block("追问链:回滚决策三刀",
+      "一刀:\"rollbackFor = Exception.class 是好实践吗?\"——把 checked 也回滚会让\"预期内的业务失败\"(如余额不足的专用 checked 异常)也炸掉整个事务,通常应该为它标注 noRollbackFor 或改设计;全局宽松回滚掩盖状态机问题。二刀:\"捕获后不抛但 setRollbackOnly,上层怎么知道失败?\"——返回值/状态对象必须表达失败;事务回滚了但方法返回 true 是新的\"错误的成功\"(第 3 题分布式)。三刀:\"TransactionSynchronization 能感知回滚吗?\"——能:afterCompletion(int status) 收到 STATUS_ROLLED_BACK,清理类逻辑挂这里而不是猜。"),
+    ],
+    ["捕获即隐身,回滚要显式", "三个选项:重抛/标记/确认继续", "批量容错先解释部分成功"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/6': deep(
+    "为什么方法上有事务注解却没有创建新事务？",
+    "网银额度沙盘:@Transactional 写在方法上,调用后查询日志里却没有 BEGIN;同一段代码换个入口又有事务。用实测汇总\"注解无效\"的全部成因与排查顺序。",
     [
-      ['候选校验：单字段合法不代表组合可用', '地址、凭证引用、超时与并发上限各自类型正确，仍可能组合成不可用方案。先在独立候选对象中检查完整性、范围和业务关联，例如该渠道是否允许该并发预算，必要时做受控连通性验证。候选失败时保留旧快照和明确错误，不把一半字段先写进运行对象后再尝试恢复。类比药品配伍检查：每种成分单独合法（单字段校验），混在一起可能反应（组合校验）——整份快照一起过审再发布。'],
-      ['发布与读取：一次操作使用一个版本', '不可变 record 可表达快照，但其中的集合和可变对象仍需防御性复制。通过单次引用替换发布后，读者应把引用保存到局部变量再读取多个字段；否则连续两次 get 之间更新，仍可能得到跨版本组合。已经开始的请求采用旧快照还是需要取消，也应作为业务约定。'],
-      ['多节点与资源：原子引用只保证本进程发布', '不同实例接到新版本的时间可能不同，配置中心通知也可能乱序或重复。需要版本比较、可观测生效状态与兼容窗口。若配置包含连接池等资源替换，还要为旧资源安排在途排空和关闭，不能发布新引用后立即销毁仍被请求使用的对象。回退同样要经过完整校验。'],
+      "四大成因按概率:自调用绕过代理(实测事务生效=0)、方法非 public(代理不覆写)、类不是 Spring bean 或被 new 出来、异常被捕获且按规则不回滚(事务有,但回滚不符合预期)。",
+      "排查顺序:先确认调用方持有的对象是代理 getClass().getName() 是否含 CGLIB/$Proxy,再查可见性与调用路径,最后查事务管理器是否绑定对的数据源。",
+      "实测锚点:同一容器内,this 调用事务标志 0 次,经注入代理调用 1 次——注解本身永远是对的,错的在调用路径。",
     ],
     [
-      ['并发测试：让旧字段组合显式暴露', '教学测试让读线程反复执行一次支付配置读取，写线程在版本 10、11 间切换；逐字段方案用闩锁暂停在中间状态，快照方案则只发布已验证对象。预期快照读者得到完整版本 10 或完整版本 11，非法版本不被发布。该实验需验证关联字段而非只检查 AtomicReference 取值非空。'],
-      ['恢复追问：版本乱序与旧连接仍在使用', '先发布 11，再收到延迟的 10，检查版本协议拒绝过期通知；同时让旧请求持有旧客户端，更新后验证它可以按预算结束再释放资源。明确紧急回退应有新版本或授权的回退语义，不靠随意接受旧通知。此处是教学验收设计，没有宣称某个配置中心天然提供跨节点原子更新。'],
-    ], ['整份快照过配伍检查再发布', '完整候选校验后再发布', '单次操作持有同一不可变快照', '本地原子不等于多节点一致'], [r.config, 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicReference.html']),
-  'spring-advanced/38': D('怎样验证事务事件只在成功提交后触发？',
-    'Spring 6.2 / JDBC 教学验收：订单服务发布事件，监听器使用 @TransactionalEventListener(AFTER_COMMIT)。分别执行成功提交、异常回滚和无事务发布，独立观察数据与监听。',
-    ['使用真实事务管理器构造提交和回滚，发布实际应用事件并让真实事务监听适配器参与；只验证 publishEvent 被调用不能证明监听阶段正确。', '测试提交路径应完成真实提交，再从独立边界核对数据与监听记录；回滚路径应不执行提交后监听，无事务默认也不执行，除非开启 fallbackExecution。', '测试自身的自动回滚可能掩盖提交路径，异步监听还需要有界等待和异常观察。监听执行过也不证明关键外部动作具有持久交付保证。'],
-    [
-      ['真实机制：发布动作与监听执行分开断言', 'publishEvent 调用只说明事件进入广播流程，事务事件适配器还要将处理登记到当前事务的相应阶段。mock Publisher 或直接调用监听方法跳过这层机制，即使阶段注解写错也可能通过测试。应让最小真实上下文、管理器和监听器一起运行，并单独记录发布次数、阶段调用与持久数据。类比婚礼证婚与放礼花分开验收：证婚（真实提交）与礼花（事件监听）是两个动作，各自断言，别用模拟证婚替代真实仪式。'],
-      ['提交边界：测试事务不应替代被测事务', '测试框架常把测试方法放入结束即回滚的事务，业务方法加入后并没有独立提交；此时提交后监听不触发并不能说明生产路径错误。可使用不带测试事务的程序化边界，或显式结束测试事务，再清空持久化上下文从独立连接重读。验证时点必须位于提交完成之后。'],
-      ['异步与恢复：检查额外边界', '若监听是异步的，用闩锁或可等待结果确认完成，超时应给出失败记录，不能使用任意 sleep。还要测试回滚后无外部副作用、无事务默认不监听，以及 fallbackExecution 明确启用时的行为。进程崩溃、对端成功而本地确认失败属于可靠性协议，需要另外的故障实验。'],
+      block("机制:注解生效的四个前提",
+      "前提一,调用经过代理:事务是 AOP 拦截器实现的(第 1 题)。前提二,方法是 public:Spring 的事务方法可见性规则要求 public(CGLIB 覆写不了非 public,注解元数据也不读 protected/package)。前提三,bean 由容器管理:new 出来的对象没有代理。前提四,事务管理器与数据源匹配(第 7 题)——事务\"存在\"但管错了库,等价于没事务。前提五,事务基础设施已启用:Boot 自动配置通常已开,纯 Framework 项目漏配 @EnableTransactionManagement 或未注册 TransactionManager 时注解被完全忽略——无日志无报错,最安静的失效形态。五者任缺,注解即摆设。"),
+      block("实证:代理身份与调用路径的对照",
+      "本机实验(Spring 6.2.19 + H2):同一 OrderService,self 调用与经 facade 代理调用的事务活跃标志:\n```\nQ1 自调用事务生效=0 代理调用生效=1\n```\n配合第 28 题的实测:PostConstruct 捕获的是裸类,容器中是 $$SpringCGLIB$$0 代理——\"拿到的是不是代理\"可以直接用类名判断。排查动作序列:打印 this.getClass()→非代理即查自调用或 new;是代理再查方法可见性与事务管理器绑定。"),
+      block("取舍:让失效不再发生的工程手段",
+      "静态检查:ArchUnit 禁止同类内调用 @Transactional 方法、禁止 new 带事务注解的类。约定:事务方法只做边界(薄),业务下沉到无注解的内部方法——边界薄了,自调用场景自然少。显式边界:边界复杂的场景直接 TransactionTemplate(第 12 题),注解省掉的隐式性正是失效之源。评审清单项:@Transactional 方法是否 public、调用方是否 bean、事务管理器是否唯一明确。"),
     ],
     [
-      ['三条执行路径：提交、回滚、无事务', '准备监听记录器和隔离表，事务内写订单并发布事件，成功返回后检查记录与行数；第二次发布后抛运行时异常，检查对应记录没有增加且写入回滚；第三次在无事务环境发布。预期默认配置只有成功提交路径触发该监听，断言按稳定事件标识关联，而不是仅比较一个全局计数。'],
-      ['扩展验证：提交后错误和上下文可见性', '让提交后监听失败，独立重读原订单，确认提交事实未被撤销；再测试监听中新写入采用明确的独立事务。异步版本增加线程上下文与异常观察，可靠通知版本补重启恢复。此处给出验收矩阵，项目新增事务事件回归只为实际执行的窄路径保存证据，不把设计步骤全部标成已验证。'],
-    ], ['证婚与礼花分开验收', '真实发布和监听适配器一起测', '提交完成后独立观察结果', '回滚、无事务与异步分别验收'], [r.event, fw + 'testing/testcontext-framework/tx.html']),
-  'spring-advanced/5': C('事务方法捕获异常后如何正确决定回滚？',
-    ['先确定失败是否允许部分结果提交：整体失败时让异常跨过事务边界，或显式 setRollbackOnly；可恢复分支必须有明确业务含义。', 'catch 只改变控制流，不能保证事务仍可提交，也不能清除已设置的回滚状态；返回值需要如实表达最终结果。'],
-    ['方法内部吞掉异常，拦截器可能看不到失败；内层参与者已标记回滚时，外层即使正常返回也可能在提交时失败。', '不要统一捕获 Throwable 并返回成功；数据库连接故障等错误可能使继续执行本身不安全。'],
-    ['教学场景：先扣库存，写订单失败被 catch 后返回成功，出现无订单的库存扣减。', '将整个用例作为事务边界，定义失败异常与回滚规则；另为确实可忽略的附加动作定义独立恢复语义。', '验证事务结束后的订单和库存状态，覆盖异常穿出、内部吞异常及显式标记回滚三条路径。'], ['失败策略先于异常处理', '提交结果不能靠返回值猜测'], [r.tx]),
-  'spring-advanced/6': C('为什么方法上有事务注解却没有创建新事务？',
-    ['注解需由启用的事务基础设施处理，调用还需经过支持的代理边界；普通 new、自调用和不适用的方法可能绕过增强。', '即使增强生效，REQUIRED 也可能加入已有事务，SUPPORTS 等传播不一定创建新事务；还应确认管理器和实际数据源对应。'],
-    ['没有新事务与完全没有事务是不同结论；自调用也可能继续处于外层已存在的事务中。', '事务状态日志需结合连接、传播方式和提交后的数据观察，不能只凭注解或类名判断。'],
-    ['教学场景：外层事务调用另一 Bean 的 REQUIRED 方法，开发者以为每个注解都会取得独立连接。', '记录调用路径与管理器，比较无外层调用、加入外层和显式 REQUIRES_NEW 三种路径。', '验证实际连接和最终回滚行为；另测自调用，说明增强缺失和正常加入外层并非同一问题。'], ['有注解不等于穿过增强', '加入已有事务不等于新建'], [fw + 'data-access/transaction/declarative/annotations.html', r.tx]),
-  'spring-advanced/13': C('缓存注解的 self-invocation 有什么后果？',
-    ['默认代理模式下，目标对象内调用自身缓存方法通常绕过缓存拦截器，可能重复查询，也可能绕过本应执行的清除或更新。', '把需要增强的操作放到另一受管 Bean，或采用明确的缓存 API；切换类代理本身不会修复自调用。'],
-    ['外部调用命中缓存不代表内部调用也命中，需分别统计真实加载次数和键，而非只测返回值相同。', '缓存正确性还取决于租户、参数及版本维度和失效时点，代理修复不能掩盖错误键设计。'],
-    ['教学场景：外部调用 find 两次只查库一次，batch 内 this.find 两次却每次查询。', '固定数据和缓存状态分别测试两条路径，再拆出查询 Bean 从代理调用。', '验证加载次数符合契约，同时测试不同租户与缓存失效；不能靠手写计数替身替代真实缓存拦截器。'], ['自调用也会绕过缓存增强', '用真实加载次数验证命中'], [r.cache, r.proxy]),
-  'spring-advanced/14': C('缓存键为什么要包含租户与版本？',
-    ['同一业务 ID 在不同租户、权限视图或内容版本下可能对应不同结果，缓存键必须包含实际影响结果的维度，防止串数据或使用旧结构。', '版本可以隔离发布与数据代际，但应明确旧键过期和资源回收；并非把所有字段无差别塞入键就更安全。'],
-    ['租户标识应来自可信身份上下文，客户端传入的任意 tenant 不能直接取得其他租户缓存。', '键隔离不代替数据库查询授权；若结果随用户权限变化，需要权限版本或避免共享敏感响应缓存。'],
-    ['教学场景：两个租户都有商品 ID 7，旧键 product:7 导致价格和可见字段混用。', '使用受信任租户、业务 ID 和必要版本组成稳定键；分别填充两个租户并升级结构版本。', '验证互不读取对方数据，新版本不命中旧结构，旧键按预算过期；越权请求在读缓存前被拒绝。'], ['键包含影响结果的可信维度', '版本隔离配合旧键回收'], [r.cache, r.method]),
-  'spring-advanced/18': C('方法级授权与 URL 授权应怎样配合？',
-    ['URL 授权限制 HTTP 入口，方法授权在启用后保护经过其增强边界的业务调用；对象归属与租户条件仍要在掌握资源的边界检查。', '两者不是互相替代，也不能假定私有方法或自调用都会经过方法授权代理。'],
-    ['方法安全需要明确启用，PreAuthorize 等规则还要处理认证缺失和受控参数，不能依赖前端按钮。', '同一服务被任务、消息或内部调用复用时，要决定其身份来源；系统身份不应默认拥有全部用户资源权限。'],
-    ['教学场景：HTTP 管理路径已保护，但任务入口直接调用同一退款服务，缺少对象范围校验。', '统一退款用例授权和归属判断，分别从 HTTP、受管服务调用和后台任务进入。', '验证普通用户不能退款他人订单，未带可信身份的任务按协议失败或使用最小系统权限。'], ['入口与业务增强分别保护', '资源授权覆盖真实调用边界'], [r.method, r.security]),
-  'spring-advanced/20': C('如何让用户撤销状态在多节点会话中生效？',
-    ['将会话或安全版本放入共享可信存储，并让各节点恢复身份时按统一规则检查；只清一个节点内存不能撤销其他节点状态。', '明确缓存和复制的最长失效窗口，处理存储不可用策略；登录态、刷新凭证和长期凭证应一并纳入撤销协议。'],
-    ['单机 SessionRegistry 主要覆盖当前实例所知会话，不能凭存在该对象推断集群撤销成立。', '版本递增要与敏感账号修改协调；节点本地缓存若不失效，旧版本仍可能继续授权。'],
-    ['教学场景：A 节点禁用账号，浏览器随后被路由到 B 节点仍可操作。', '使用共享会话撤销或统一版本校验，在两个独立实例分别建立会话再执行撤销。', '验证每个旧会话在约定窗口内失效，含跨节点和缓存延迟路径；记录依赖故障时是否拒绝敏感请求。'], ['撤销状态必须跨节点可见', '本地缓存失效窗口要明确'], [r.session, 'https://docs.spring.io/spring-session/reference/']),
-  'spring-advanced/21': C('权限缓存失效为什么与账号修改同样重要？',
-    ['数据库角色已经收回，旧权限缓存仍可能放行；账号修改完成不等于所有节点的授权决策已经更新。', '使用可校验权限版本、受控过期或可靠失效机制，并定义撤销时效；资源归属缓存也要纳入范围。'],
-    ['如果缓存直接保存完整 Authentication，角色修改未必自动刷新已有会话；应明确身份恢复和再授权策略。', '高风险操作可要求读取较新的权威状态，不能靠无限延长缓存换取可用性后仍宣称即时撤销。'],
-    ['教学场景：管理员移除导出权限，用户旧会话在另一个节点仍能导出。', '模拟权限修改、通知延迟与缓存不可用，检查每条授权路径的版本和过期规则。', '验证旧权限在约定窗口内失效，合法权限不被错误扩大，日志可定位节点采用了哪个版本。'], ['账号修改需同步授权缓存策略', '撤销承诺用时间窗口验收'], [r.method, r.session]),
-  'spring-advanced/22': C('如何防止反向代理头伪造影响安全逻辑？',
-    ['只信任明确受控的代理链，由入口清理客户端自带的 Forwarded 和 X-Forwarded-* 等头再设置可信值；后端应限制绕过入口的访问。', '协议、主机、客户端地址和重定向需要使用一致的可信解析规则；单纯打开转发头支持不会自动建立可信边界。'],
-    ['伪造协议可能影响安全 Cookie 或重定向，伪造地址可能绕过错误的 IP 白名单与限流策略。', '代理跳数、多个值和非标准头差异需按部署验证；日志既保留必要原始证据又避免把不可信值当认证结果。'],
-    ['教学场景：客户端直连后端并伪造 X-Forwarded-For 为内网地址，触发宽松限流。', '限制后端入口，代理覆盖可信转发信息；测试直接访问、受控代理和多层链路。', '验证伪造值不能扩大权限或改变安全重定向，正常外部 HTTPS 请求仍生成正确协议和地址。'], ['转发头可信度来自部署边界', '清理客户端值并验证代理链'], [fw + 'web/webmvc/filters.html#filters-forwarded-headers']),
-  'spring-advanced/23': C('Spring MVC 异步请求如何影响线程与超时？',
-    ['Callable、DeferredResult 等可让 Servlet 请求进入异步处理，原线程释放后在后续分派完成响应；并非所有业务操作因此非阻塞。', '明确执行器容量、容器与代理超时、取消及异常协议；线程本地事务、身份与日志上下文不能假定全部自动保留。'],
-    ['Spring 对部分 MVC 异步路径有安全上下文集成，但用户自建线程和完成回调仍需按实际设施验证。', '超时返回不保证后台任务已经终止，副作用需要自己的幂等、时间预算和可恢复状态。'],
-    ['教学场景：DeferredResult 已返回超时，后台任务仍写库，客户端重试造成重复操作。', '用闩锁控制完成顺序，记录请求线程、工作线程和再次分派，统一超时与业务状态查询。', '验证超时、正常完成和异常都只产生符合协议的最终响应，晚到结果不重复产生副作用。'], ['Servlet 异步不等于全链路非阻塞', '超时响应与任务终止分开'], [r.mvc, sec + 'servlet/integrations/mvc.html']),
-  'spring-advanced/25': C('响应式背压为什么不等于下游服务已受保护？',
-    ['背压用需求信号协调支持该协议的发布者与订阅者，但外部 API、阻塞任务和独立线程池不一定遵守同一需求边界。', '还需约束并发、预取、队列、连接、重试和超时；流里操作符存在不等于端到端容量已经受控。'],
-    ['flatMap 并发、缓冲和某些预取会提前创建在途工作；下游取消也不必然中止所有外部副作用。', '重试可能增加负载，应有总预算和退避，限速与并发限制也不能混成一个保证。'],
-    ['教学场景：流最终逐项消费，但中间并发调用大量远程 API，触发连接耗尽。', '逐边界记录在途数和队列，显式限制调用并发及超时，注入慢响应和错误重试。', '验证下游最大在途受限，取消和失败不会形成无界堆积；不用订阅端消费慢就推断上游没有过量请求。'], ['需求信号只覆盖支持的边界', '并发、排队与重试另设预算'], [r.flux, 'https://projectreactor.io/docs/core/release/reference/reactiveProgramming.html']),
-  'spring-advanced/26': C('过滤器提前读取请求体会带来什么问题？',
-    ['Servlet 请求流通常被消费后不能任意重读，日志或签名 Filter 提前读完可能让 MVC 无法绑定请求体。', '按目标选择有上限的缓存或可重放包装，并约束内容类型、字符集、大小和敏感字段；不能无界把整个上传读入内存。'],
-    ['ContentCachingRequestWrapper 会在流被读取时缓存，并不主动读取，也不自动把输入流重置成可无限重读。', '日志通常适合在下游读取后查看受限缓存；验签若需先读再交给下游，要明确提供重放语义而不是误用缓存查询 API。'],
-    ['教学场景：签名过滤器先读 JSON，控制器随后报请求体缺失。', '分别测试原始流、受限缓存日志包装和真正支持重放的验签包装，覆盖空体、UTF-8 和超限请求。', '验证验签使用原始字节且控制器仍收到一致内容，超限受控拒绝，日志不记录密码或完整令牌。'], ['读取缓存不等于输入流可重放', '大小与敏感内容必须受控'], ['https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/web/util/ContentCachingRequestWrapper.html']),
-  'spring-advanced/27': C('统一异常处理为什么捕获不到某些认证错误？',
-    ['安全 Filter 可能在请求到达 DispatcherServlet 前拒绝，MVC 的控制器建议无法天然处理整个 Servlet 链。', '认证入口与访问拒绝处理器应按协议返回错误，具体认证过滤器也可能有自己的失败处理；不要把所有错误只交给 ControllerAdvice。'],
-    ['ExceptionTranslationFilter 处理其下游相应认证授权异常，但不是万能捕获器；过滤器顺序和异常类型会影响去向。', '区分 API 的 JSON 状态与页面重定向，内部根因写受控日志，对外不暴露堆栈。'],
-    ['教学场景：业务异常是 JSON，匿名访问却返回 HTML 登录页，前端解析报错。', '分别测试匿名、权限不足、登录失败和业务校验，给各自边界配置一致的 API 错误契约。', '验证状态、类型和错误码正确，拒绝时业务未执行；正常页面入口仍可按产品设计重定向。'], ['异常处理覆盖实际发生层级', '安全拒绝有独立处理契约'], [r.security]),
-  'spring-advanced/28': C('Bean 创建过早为什么可能导致代理缺失？',
-    ['后处理器等基础设施提前依赖或主动获取业务 Bean，可能使业务对象在完整 BeanPostProcessor 链就绪前被创建，错过自动代理。', '检查启动警告、创建时序和依赖方向；避免在定义后处理阶段用 getBean 拉起普通业务对象。'],
-    ['声明处理器的 Bean 工厂方法可采用合适的 static 方法和清晰返回类型，减少配置类及其依赖被提前实例化。', '启动没有失败也不证明增强完整，最终引用可能已经是提前创建的普通对象。'],
-    ['教学场景：自定义后处理器构造时调用订单服务，事务注解未按预期生效。', '移除基础设施到业务的早期依赖，延迟合适工作；记录最终代理类型及实际回滚路径。', '验证警告原因消除，订单失败后数据库回滚，其他 Bean 仍按正确生命周期处理。'], ['基础设施避免提前拉起业务', '增强效果需用真实行为证明'], [r.extension]),
-  'spring-advanced/29': C('如何实现可测试的业务事件发布？',
-    ['事件表达已发生的业务事实，载荷含稳定事件标识、业务引用和必要版本，发布时点与事务语义明确。', '将发布契约、真实事务监听和外部投递分别测试，避免用 mock 调用次数冒充提交与可靠性交付证据。'],
-    ['事件名与状态应匹配，订单创建意图与订单已成功提交不是同一种事实；避免把可变实体引用当长期载荷。', '载荷最小化并考虑兼容，消费者按事件标识幂等；跨进程可靠事件需持久化。'],
-    ['教学场景：下单发布 OrderCreated，但外层回滚后通知仍发送，监听还读到了后来变更的实体字段。', '改用稳定 DTO 或持久事件记录，明确提交阶段，分别覆盖提交、回滚、重复事件和监听失败。', '验证每个事件关联正确业务状态，回滚无成功通知，重复事件不重复副作用；未运行故障恢复前不宣称可靠交付。'], ['事件事实与提交时点一致', '发布、监听、投递分别验证'], [r.event]),
-  'spring-advanced/30': C('为何内存事件不能替代可靠消息队列？',
-    ['内存事件只在进程内传播，缺少天然的持久交付、跨进程确认和崩溃恢复；异步线程池也不会改变这个边界。', '关键流程需要把意图持久化，再配合投递确认、重试和消费者幂等；消息队列本身也要核对真实持久化配置。'],
-    ['数据库提交后进程退出可能丢内存事件；发送成功后确认丢失又可能重复，因此恢复设计不能只讨论丢失。', '非关键本地缓存刷新可用内存事件，但要明确容忍的失败与重建方式。'],
-    ['教学场景：订单已落库，内存通知还在队列中，进程被终止后再无补发依据。', '同事务保存通知任务，重启后领取投递，使用稳定事件键去重并保留失败状态。', '验证提交后重启可恢复、发送后确认失败可重试且不重复业务副作用；不把一次成功监听当消息可靠性验收。'], ['线程池不是持久队列', '恢复协议同时处理丢失与重复'], [r.event, fw + 'integration/scheduling.html']),
-  'spring-advanced/31': C('如何治理 Spring 应用中的循环依赖？',
-    ['先画实例与业务依赖图，寻找职责互渗及错误层次，拆出编排、查询或共享策略，让关键依赖方向单向。', '@Lazy、Provider 和允许循环配置可能推迟解析，不会自动修复业务耦合；构造器环也不能靠早期实例自然解决。'],
-    ['只改注入方式可能留下初始化期调用与代理不一致风险；不应把容器缓存机制当业务设计目标。', '拆分需保留事务、授权和失败恢复边界，不能为消环把同一不变式拆成不受控远程流程。'],
-    ['教学场景：订单依赖库存扣减，库存又调用订单改状态，两个构造器互相请求。', '提取结算编排者，库存和订单各自提供清晰操作，再测试创建图与失败路径。', '验证启动无循环，库存不足和订单写失败都守住一致性；使用 Lazy 的临时方案需记录调用期风险和退出路径。'], ['消环先调整职责与方向', '启动通过后仍测业务不变式'], [fw + 'core/beans/dependencies/factory-collaborators.html']),
-  'spring-advanced/32': C('如何设计多实现策略路由而避免巨大 if 链？',
-    ['用稳定业务键注册策略，路由器只查找并调度；启动时校验键唯一和必需策略，未知键有明确失败或默认规则。', '实现选择与交易编排分开，注册表注入受管策略引用以保留代理；不要用客户端传入的类名反射任意实现。'],
-    ['Map<String, Strategy> 的 Bean 名称不一定就是业务键，可显式提供 key 并构建经过校验的不可变注册表。', '策略配置更新还要处理版本与在途请求，一次调用不应中途切换实现。'],
-    ['教学场景：多个支付渠道通过 if 判断，新增渠道时误覆盖已有默认分支。', '按渠道业务键构建注册表，添加重复键、未知键、缺失必需项和合法路由的测试。', '验证冲突在启动期暴露，合法请求调用正确受管实现，未知策略不静默走错渠道。'], ['业务键注册并校验唯一', '路由器不混入渠道业务'], [fw + 'core/beans/annotation-config/autowired.html']),
-  'spring-advanced/36': C('数据库迁移应该由所有应用实例同时负责吗？',
-    ['迁移工具可以协调部分并发执行，但上线仍应明确触发者、等待预算、失败处置和回退兼容；所有实例同时启动不等于发布方案。', '复杂迁移可由受控步骤执行，实例只在所需结构就绪后接流量；迁移与应用用户权限也可分开。'],
-    ['数据库锁只协调执行，不消除大表变更负载，也不保证新旧应用能同时使用新结构。', '设计兼容的扩展再收敛步骤，失败后检查迁移历史和实际结构，不盲目重置校验记录继续启动。'],
-    ['教学场景：十个实例同时发布，迁移等待与大表更新使启动超过就绪预算。', '明确迁移责任，在隔离环境测试新旧应用与迁移中间态，记录锁等待、失败和重试。', '验证成功后再放量，失败实例不接业务，重试不跳过未完成结构；H2 不能代替目标数据库 DDL 验收。'], ['协调执行不等于发布协议', '结构变更兼容在途版本'], ['https://documentation.red-gate.com/flyway/reference/usage/frequently-asked-questions']),
-  'spring-advanced/37': C('测试事务为什么可能掩盖真实提交问题？',
-    ['测试自动回滚会改变提交、提交后回调和约束触发时机，业务可能只是加入测试事务；线上没有相同边界时结果不同。', '关键用例需完成真实提交或回滚，再清理持久化上下文并从独立边界重读；数据仍使用隔离环境。'],
-    ['ORM 缓存可能让同上下文读取看似成功，SQL 未 flush 时数据库约束也可能尚未执行。', '真实端口请求在另一线程，测试事务通常不能替请求回滚；不能以事务注解代替隔离和清理。'],
-    ['教学场景：同一 EntityManager 保存和查询成功，生产却在提交时报约束错误。', '明确 flush、提交与独立读取，增加回滚和提交事件路径，网络测试使用一次性数据库。', '验证提交阶段异常真正暴露，重读反映数据库状态，提交后监听按配置执行。'], ['测试会改变被测提交边界', '提交后独立重读才是证据'], [fw + 'testing/testcontext-framework/tx.html']),
-  'spring-advanced/39': C('Testcontainers 与 H2 测试分别适合什么目标？',
-    ['H2 启动快，适合窄范围 SQL、代理与事务边界实验；它不是 MySQL 等目标引擎行为的完整替身。', 'Testcontainers 可在隔离容器运行指定引擎，验证迁移、类型、方言和并发行为，但需要可用容器环境及明确生命周期。'],
-    ['兼容模式不保证锁、隔离、索引和 DDL 完全一致；测试应固定版本并核对数据库元信息。', '容器启动成功也不代表全部场景已覆盖，需要控制提交顺序和故障；跳过不能当作通过。'],
-    ['教学场景：H2 查询与回滚通过，MySQL 上唯一约束竞争行为不同。', '保留快速 H2 用例，将迁移与竞争放到一次性目标库，用两个连接组织真实事务。', '验证引擎版本、SQL 与最终数据，容器不可用时记录未验证，禁止回退到日常数据库测试。'], ['内存库验证窄范围机制', '引擎行为在隔离目标库验证'], ['https://java.testcontainers.org/modules/databases/mysql/', r.test]),
-  'spring-advanced/40': C('如何控制大型 Spring 测试套件启动成本？',
-    ['按风险选择普通单测、切片和完整上下文，复用等价配置，减少无必要的 DirtiesContext 与配置差异。', '保留事务、认证和真实网络等关键边界验证，不能为了快把被测行为全部 mock。'],
-    ['上下文缓存依赖配置键，动态属性、替身和 profile 差异可能增加新上下文；跨进程不能默认复用同一内存缓存。', '复用时仍要清理数据和可变单例，不用测试间依赖换速度；先测启动数与耗时再优化。'],
-    ['教学场景：几十个测试只改无关配置就各启动一次应用，运行时间增加。', '整理相同边界的共享配置，将纯业务分支移到无容器测试，记录上下文数和耗时变化。', '验证固定与随机顺序均正确，关键全链路仍保留，不预先承诺固定加速比例。'], ['减少无意义的配置分叉', '上下文复用仍保持测试独立'], [fw + 'testing/testcontext-framework/ctx-management/caching.html', r.test]),
-  'spring-advanced/41': C('如何设计兼容旧客户端的接口校验升级？',
-    ['新增必填、范围或枚举限制可能拒绝旧客户端输入，应先明确兼容窗口和风险，再选择版本化、宽读或分批收紧。', '区分不可妥协的安全及业务不变式与可迁移格式，提供稳定错误码；校验分组不自动构成版本兼容协议。'],
-    ['只看最新前端无法覆盖其他客户端，可用脱敏统计和契约样例识别实际输入。', '默认值不能偷偷改变用户意图，新增限制应能观察拒绝率并有兼容回退路径。'],
-    ['教学场景：旧客户端省略可选备注，升级 NotBlank 后全部旧请求失败。', '保留旧协议或定义明确新版本，建立旧、新、边界和非法输入样例，分批观察。', '验证旧契约按窗口可用，新要求明确生效，金额和权限等核心约束始终存在。'], ['校验变更属于契约变更', '兼容窗口与核心约束分清'], [fw + 'web/webmvc/mvc-controller/ann-validation.html']),
-  'spring-advanced/42': C('分页列表为何应避免每行单独查询标签？',
-    ['逐行查询关系形成 N+1 访问，数据库与网络往返随页大小增长；可先取主记录页，再批量查当前页关系并组装。', '批量访问仍需租户、权限和数量上限，不能为消除 N+1 就把全库关系载入。'],
-    ['直接连接一对多关系可能重复主行并破坏分页和总数，主记录分页与关联装配应分别验证。', '排序要稳定并有必要索引；查询数固定不等于执行计划和响应体大小合理。'],
-    ['教学场景：每页 30 题，主查询后每题再查标签，产生 31 次以上查询。', '按稳定主 ID 分页，再带租户条件批量取标签；空页不发无效关联查询。', '验证查询数受控、关系不串租户、主行及总数正确，覆盖无标签、多标签与页大小上限。'], ['主记录先稳定分页', '关联批量查询仍带权限'], ['https://mybatis.org/mybatis-3/sqlmap-xml.html']),
-  'spring-advanced/43': C('如何让审计日志与业务结果保持一致？',
-    ['区分尝试审计与成功审计：尝试可在失败时保留，成功必须对应已提交事实，不能在提交前宣称完成。', '成功审计可与业务同事务持久化，再可靠转发；独立事务审计要明确可能在业务回滚后仍存在。'],
-    ['日志输出无法保证与数据库原子一致，也可能丢失或采样；载荷最小化并受访问控制。', '异常和补偿用稳定业务标识关联，禁止记录密码或完整令牌；不可篡改要求还需独立机制。'],
-    ['教学场景：订单写入后打印 success，随后事务回滚，审计平台却显示成交。', '成功意图纳入业务提交，尝试记录标明失败或未决，转发按事件键去重。', '验证提交、回滚、投递失败与重复投递各有正确状态，追踪字段不泄露秘密。'], ['尝试与成功审计分开', '成功事实对应提交边界'], [r.event, r.tx]),
-  'spring-advanced/44': C('如何设计不泄露内部信息的错误响应？',
-    ['对外返回稳定错误码、状态、必要字段提示与追踪标识，对内保留受控原因链；不暴露 SQL、路径、密钥或堆栈。', '根据调用者权限决定是否披露资源存在，未知错误用通用消息并保留服务端定位证据。'],
-    ['数据库原文、RejectedValue 和认证参数可能含秘密，日志同样要脱敏与访问控制。', '统一协议不意味着全部返回同一状态，不能用成功包装掩盖服务故障。'],
-    ['教学场景：唯一键冲突响应带表名和 SQL，登录失败日志打印整个请求体。', '定义外部错误 DTO，在参数、业务、持久化和安全边界分别映射并脱敏。', '验证响应无内部秘密，恶意文本不成为可执行 HTML，追踪号能关联受控根因。'], ['外部协议与内部原因分开', '日志同样需要脱敏保护'], [fw + 'web/webmvc/mvc-ann-rest-exceptions.html', r.security]),
-  'spring-advanced/45': C('为什么简单重试整个 Controller 可能造成重复副作用？',
-    ['数据库、文件或远程扣款可能已成功，随后响应失败；重试整个入口会重复执行，异常不能证明之前没有成功。', '围绕稳定业务键和状态查询设计幂等用例，限定可重试错误、次数和总时间；本地回滚不撤销已完成远程动作。'],
-    ['幂等键要校验请求内容一致并处理并发，先查再写仍有竞争，需约束或原子领取。', '远端超时是结果未知，优先核对状态；不幂等操作盲重试会扩大故障。'],
-    ['教学场景：扣款成功后响应失败，客户端重试下单再次扣款。', '持久化稳定请求键和处理状态，对端按同业务键处理或提供核对接口，逐个注入失败窗口。', '验证并发重试只有一个业务结果，冲突内容被拒绝，未知状态可恢复。'], ['报错仍可能已产生副作用', '重试围绕幂等与状态核对'], [r.tx, 'https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2']),
-  'spring-advanced/46': C('Spring 服务如何实现文件与数据库的协同保存？',
-    ['本地数据库事务通常不包含文件或对象存储，需要处理文件成功、元数据失败等窗口。', '先暂存受控文件，事务保存引用或待确认状态，完成后发布，并用持久任务回收孤儿和恢复确认。'],
-    ['先写数据库也有反向窗口，应定义可解释状态，下载只开放已确认资源。', '补偿依据可信存储键和引用关系，不能按客户端路径删除；重复执行不能误删其他请求已经使用的对象。'],
-    ['教学场景：上传后提交失败留下孤儿，另一请求提交元数据后退出未完成发布。', '记录独立存储键和状态，在两个窗口注入故障，再重启恢复与执行受限回收。', '验证已发布引用不指向缺失文件，孤儿可回收，重复补偿不误删合法对象；不使用日常文件测试。'], ['文件与数据库不自动原子', '持久状态管理确认和补偿'], ['https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html', r.event]),
-  'spring-advanced/47': C('如何治理应用中的全局可变工具对象？',
-    ['区分无状态纯函数与持有配置、客户端或请求状态的对象；后者明确生命周期、所有权和并发策略，可用受管依赖表达。', '不把用户、租户或临时缓冲放在全局字段；静态改成单例 Bean 不自动线程安全。'],
-    ['隐藏网络和配置依赖难以测试，构造器能暴露契约并替换外部能力。', '共享客户端核对线程安全与关闭要求，配置更新使用完整快照；纯计算不必为统一形式强行注入。'],
-    ['教学场景：静态日期格式器和 currentTenant 被多个请求修改，查询与日志串数据。', '改用不可变格式器或局部状态，身份显式传参，外部客户端集中管理资源。', '验证并发交错无串租户，异常后资源和上下文清理，替身可控制外部失败。'], ['先识别状态和资源所有权', '受管单例不自动线程安全'], [fw + 'core/beans/factory-scopes.html', r.life]),
-  'spring-advanced/48': C('监控标签为什么不能直接使用所有用户 ID？',
-    ['不同标签组合可能产生独立时间序列，用户和请求 ID 等高基数字段会放大内存、存储与查询成本，也可能泄露身份。', '指标采用受控聚合维度，个体排查用受权限和保留期限制的日志或追踪；哈希用户 ID 通常不降低基数。'],
-    ['多个标签维度组合还可能相乘，需估算全实例序列预算并监控增长。', '路径用路由模板而非带业务 ID 的原始 URL，异常原文也不应成为无界标签。'],
-    ['教学场景：请求计时指标带 userId 与完整 URL，序列数量随用户增长。', '改用接口模板和结果类别等有限维度，设置标签约束，采样追踪保留必要关联。', '验证序列数在预算内，仍能定位慢接口，个体排查不创建新标签，敏感标识不公开暴露。'], ['指标维度保持受控聚合', '哈希标识不消除高基数'], ['https://prometheus.io/docs/practices/naming/']),
-  'spring-advanced/49': C('如何为框架升级建立最小可信回归集？',
-    ['围绕认证授权、提交回滚、JSON 契约、配置装配及错误协议选择真实边界，并在目标库验证关键兼容性。', '升级前固化预期和版本，升级后用相同触发方式验证；注解存在和启动成功不等于行为通过。'],
-    ['覆盖多种身份、失败事务、旧输入和时间字段，不能只有成功 200 路径。', '依赖、代理可见性和默认配置变化都可能产生运行差异，结合官方迁移说明检查。'],
-    ['教学场景：升级构建通过，API 却返回登录页，时间格式变化使旧客户端失败。', '运行新旧同一套接口、事务和真实端口测试，记录实际版本及未执行项。', '验证差异有兼容方案，候选和回退产物可追溯；未运行的 MySQL 门禁保持未验证。'], ['最小集合覆盖关键失败边界', '升级比较实际行为与契约'], [r.test, r.proxy, r.security]),
-  'spring-advanced/50': C('资深开发如何评审一个 Spring 架构改造方案？',
-    ['从业务目标、边界、不变式和失败恢复评估收益与成本，确认方案解决了具体问题。', '检查数据归属、依赖方向、授权、事务、兼容与迁移；新增框架和注解数量不能代替收益证据。'],
-    ['选关键用例画正常和失败链路，讨论超时、部分提交与重试，比只看分层图更能发现问题。', '性能用基线和代表负载验证，迁移需分步、回退和观察指标，并考虑下游预算。'],
-    ['教学场景：拟把下单拆成多个服务，理由只是服务化先进，却没定义跨库失败。', '列出必须原子的规则与一致窗口，对比模块内重构和远程拆分成本，设计小范围迁移。', '验证失败可恢复、旧客户端可用、收益有证据、回退可执行，不把教学假设写成生产提升。'], ['收益对应具体业务目标', '迁移与恢复也是方案组成'], [r.tx, r.test]),
-  'legacy/83': C('Bean 完整生命周期？BeanPostProcessor 的作用',
-    ['典型受管 Bean 经实例化、依赖填充、相关 Aware 回调、初始化前处理、初始化方法及初始化后处理，最终供调用者使用。', 'BeanPostProcessor 可处理或替换实例，代理依赖相关扩展机制；适用 Bean 在容器关闭时执行销毁，具体扩展接口与作用域会改变细节。'],
-    ['定义后处理与实例后处理不同；不能在定义阶段提前 getBean 拉起业务对象。', '初始化期间不假设自身最终代理有效，懒加载改变创建时机，prototype 也不由容器完整跟踪销毁。'],
-    ['教学场景：客户端注入配置后打开资源，初始化后被包装，关闭时释放。', '记录构造、注入、初始化和包装探针，refresh 后获取最终对象，再关闭上下文，另测初始化失败。', '验证调用者获得受管包装，资源正常和失败路径都正确释放，不把常规轨迹当所有扩展的固定顺序。'], ['定义与实例处理分阶段', '资源释放覆盖失败和作用域'], [r.life, r.extension]),
-  'legacy/84': C('循环依赖如何解决？三级缓存分别存什么？为什么需要三级',
-    ['优先拆编排与依赖方向；早期引用机制只在允许且符合条件的单例创建中起作用，不能解决构造器环或任意 prototype 环。', '相关内部结构分别保存完整单例、已取得的早期引用和产生早期引用的工厂；工厂可按需取得含代理处理的引用，避免过早决定暴露原对象。'],
-    ['不能说三级缓存能解决所有循环；早期代理一致性、初始化状态和处理器能力都有约束，内部实现不等于稳定业务 API。', 'Boot 默认禁止循环引用；打开开关或使用 Lazy 可能只推迟问题，仍要检查依赖和真实代理行为。'],
-    ['教学场景：A、B 单例属性互引，A 还需事务代理，原始引用与最终代理可能不一致。', '优先提取单向编排；研究机制时用独立最小上下文记录早期引用和最终引用，不修改日常配置。', '验证修复后无环且事务失败正确回滚；构造器环明确失败，不能以允许循环开关宣称全部可解。'], ['工厂按需取得早期引用', '循环治理优先修依赖结构'], ['https://docs.spring.io/spring-framework/docs/6.2.x/javadoc-api/org/springframework/beans/factory/support/DefaultSingletonBeanRegistry.html', fw + 'core/beans/dependencies/factory-collaborators.html']),
-  'legacy/85': C('事务传播行为',
-    ['REQUIRED 加入或创建事务；REQUIRES_NEW 建立独立事务并挂起外层；NESTED 在受支持资源上通常使用保存点，最终仍受外层提交约束。', 'SUPPORTS 可参与已有事务，MANDATORY 要求已有事务，NOT_SUPPORTED 非事务执行并挂起已有事务，NEVER 拒绝已有事务。'],
-    ['传播描述调用遇到已有事务时的关系，不保证一定新建；需说明管理器和资源支持。', '独立事务额外占连接且仍可能等外层锁；保存点不提供独立持久提交，自调用还可能绕过内层规则。'],
-    ['教学场景：可选附加项失败允许订单继续，独立审计却要求订单失败时仍保留。', '分别用保存点与独立事务表达目标，再对照 REQUIRED 的共同回滚，确认调用真正跨边界。', '验证最终行数与预期矩阵一致，目标数据库另测锁与连接预算，不靠传播名称猜结果。'], ['传播先看已有事务与资源', '保存点和独立提交不同'], [r.tx]),
-  'legacy/86': C('事务失效的场景',
-    ['先区分增强未执行与增强执行但语义不同：自调用、普通 new、未启用设施等可能绕过代理；传播、异常规则和资源选择会改变最终结果。', '事务内吞异常、默认受检异常、不受管数据源及跨线程操作也可能与预期不符；不应一概归因于注解失效。'],
-    ['Spring 6.2 类代理对部分非 public 方法有支持，接口代理另有限制；不能把旧版 public 口诀无条件套用。', 'final、private 方法的子类增强限制与 JDK 接口代理不同，需核对实际代理和调用路径。'],
-    ['教学场景：方法有注解但插入后异常仍留行，团队只反复改方法可见性。', '依次核对对象来源、代理、管理器、传播、异常是否穿出及线程，使用隔离库独立重读。', '验证每个对照有可解释结果，自调用可能仍在外层事务，受检异常可能按默认规则提交。'], ['按调用、规则和资源定位', '以最终数据而非注解作证据'], [fw + 'data-access/transaction/declarative/annotations.html', r.proxy]),
-  'legacy/87': C('JDK 动态代理与 CGLIB 区别？为什么自调用时 AOP 不生效',
-    ['JDK 代理暴露接口契约，类代理通过生成子类增强可覆写方法；类代理受 final 类、final 和 private 方法等限制。', '默认代理模型中目标内 this 调用不重新进入代理；两种代理都可能如此，切换到类代理不能自动修复。'],
-    ['JDK 代理不是实现类的子类，注入类型要匹配；目标实现方法 final 不等于接口代理调用必然不能增强。', '优先拆到另一受管 Bean，避免业务依赖 currentProxy 等环境细节；AspectJ 编织机制不同。'],
-    ['教学场景：外部调用 outer，内部 this.inner 标了独立事务，最终却随外层回滚。', '记录两类代理的拦截次数，拆出 inner Bean 后用真实事务数据库对照提交。', '验证内部独立规则只有经过相应边界才生效；已有外层事务不因自调用消失。'], ['接口契约与子类覆写分清', '自调用绕过新的代理入口'], [r.proxy, r.tx]),
-  'legacy/88': C('Spring Boot 自动装配原理',
-    ['Boot 启用自动配置后从约定元数据发现候选，按类路径、配置、Bean 和应用类型等条件注册默认能力。', 'Boot 3 用 AutoConfiguration.imports 声明候选并按条件装配；历史 spring.factories 入口不能套到全部版本。'],
-    ['starter 聚合依赖，自动配置负责条件化装配；缺失 Bean 条件允许用户覆盖默认实现。', '自动配置不要被普通组件扫描重复发现，顺序主要影响定义应用而非直接规定实例创建顺序。'],
-    ['教学场景：自制默认客户端只在本地源码工程被扫描，打包后不生效。', '检查 imports 是否进入 JAR，核对类路径和条件报告，以独立宿主测试默认、禁用、缺库和用户覆盖。', '验证每条分支可解释，宿主无需扫描依赖根包，也不会出现两个意外候选。'], ['元数据发现加条件装配', '版本入口和覆盖契约明确'], [r.auto]),
-  'legacy/89': C('拦截器与过滤器的区别？执行顺序',
-    ['Filter 在 Servlet 链包围请求，可覆盖非 MVC 资源，范围由注册与分派类型决定；Interceptor 围绕 MVC 已选处理器。', '成功同步路径通常过滤器顺序进入、拦截器 pre 顺序进入，再逆序执行相应后置回调并退出过滤器；异常和异步需分别分析。'],
-    ['preHandle 返回 false、绑定失败和异步分派都会改变后续回调，不能背一条序列覆盖所有路径。', '安全优先使用明确过滤器链并校验资源授权；MVC 拦截器不能天然保护其他 Servlet。'],
-    ['教学场景：F1、F2 包围 MVC，I1、I2 包围成功控制器，另测静态文件和拒绝请求。', '固定排序并记录探针，对比正常同步、拦截中止、控制器异常和异步完成。', '验证成功路径进入顺序明确，其他路径回调与清理正确，非 MVC 资源不会凭空经过控制器拦截器。'], ['过滤器范围取决于注册', '异常和异步另验回调顺序'], [fw + 'web/webmvc/mvc-config/interceptors.html']),
-  'legacy/90': C('MyBatis 执行流程？一二级缓存？延迟加载',
-    ['通常由 Mapper 代理或 SqlSession 调到 Executor，经过语句、参数处理与 JDBC 执行，再映射结果；插件与执行器类型会影响细节。', '一级缓存通常属于 SqlSession，受配置及更新清理影响；二级缓存需要显式配置，按 namespace 组织并有提交可见性规则。', '懒加载将关联查询延后到访问时，需关注会话生命周期、N+1 与序列化触发；Spring 集成中的会话使用按其事务设施确认。'],
-    ['二级缓存不天然解决多实例、跨 namespace 更新和外部写库失效；是否使用要结合一致性要求。', '同一会话重复读得到同值不能证明数据库已提交，接口返回前应明确查询投影而非任意触发懒加载。'],
-    ['教学场景：Mapper 第一次查询后同会话再次查询未访问数据库，换会话后结果取决于二级缓存设置和提交。', '记录真实 SQL，测试更新、提交、回滚与不同 namespace，再让序列化访问关联观察额外查询。', '验证缓存范围和失效符合配置，批量列表无无界 N+1；不把本地缓存命中当跨节点强一致。'], ['执行链与缓存作用域分清', '懒加载可能变成额外查询'], ['https://mybatis.org/mybatis-3/java-api.html', 'https://mybatis.org/mybatis-3/sqlmap-xml.html', 'https://mybatis.org/spring/transactions.html']),
-  'legacy/91': C('Spring 事件机制；@Async 原理与线程池配置',
-    ['默认事件通常在发布线程同步广播，事务事件可绑定提交阶段；内存事件不自带持久交付。', '@Async 通常依赖启用的代理与受控执行器，外部调用才进入增强；void 异常交处理器，有返回值则观察异常完成。'],
-    ['配置核心线程、上限、队列和拒绝策略时需服从真实负载，不能让无界队列掩盖过载。', '身份、追踪与事务有不同传播规则，任务提交成功不代表完成，退出进程也可能丢失内存工作。'],
-    ['教学场景：订单事件同步监听拖慢接口，改异步后失败无日志，重启又丢任务。', '先明确同步或提交阶段，再使用有界执行器与异常观测；关键通知改持久任务，记录身份及去重键。', '验证同步等待与异步完成、拒绝和异常各有证据；跨线程不误用原事务，重启可恢复要求单独验收。'], ['默认事件不自动异步', '执行器、异常和可靠性分开'], [fw + 'integration/scheduling.html', r.event, r.context]),
-  'legacy/92': C('如何自定义一个 starter',
-    ['将依赖聚合与自动配置职责划分清楚，定义专属配置前缀、默认 Bean、启用条件和用户覆盖契约。', 'Boot 3 通过 AutoConfiguration.imports 发布候选，避免宽扫描；使用小上下文和独立打包宿主验证，而非只在同仓源码运行。'],
-    ['可选依赖需避免条件生效前的类加载失败，依赖版本与宿主 Boot 兼容范围要明确。', '测试缺库、关闭、默认、用户 Bean 和属性非法分支，日志及配置报告不泄露秘密。'],
-    ['教学场景：团队给多个服务提供通知能力，希望默认可用且允许各服务替换。', '配置类按缺失 Bean 和开关退让，starter 引入必需依赖，打包检查 imports 和类型化配置。', '验证独立宿主默认装配，用户实现不冲突，禁用后不污染原应用，非法必需项在启动明确失败。'], ['依赖聚合与自动配置分责', '产物发现和覆盖分支都验证'], [r.auto]),
-  'spring-advanced/33': C('自动配置模块如何避免污染宿主应用？',
-    ['自动配置使用独立包、明确条件与专属配置前缀，通过 imports 元数据发现，避免扫描宿主根包或任意替换用户 Bean。', '默认能力按缺失 Bean 等条件退让，显式开关和覆盖契约需要组合测试；顺序控制不等于强行决定实例创建次序。'],
-    ['可选依赖的类加载要隔离，缺库时不应因条件判断前解析返回类型而崩溃。', 'starter 避免无理由引入影响 Web、安全和数据库默认行为的大依赖，依赖管理与宿主版本兼容要记录。'],
-    ['教学场景：通知 starter 扫描公司根包，意外带入其他服务配置并产生 Bean 冲突。', '缩小包与显式 Import，测试缺库、禁用、用户实现以及不同宿主组合，检查打包 imports。', '验证默认能力仅在合适条件出现，用户实现保留，未启用功能不改变宿主原有接口与安全策略。'], ['条件和扫描范围保持克制', '默认能力尊重用户覆盖'], [r.auto]),
+      block("验证:在排查入口打印 this.getClass().getNam",
+      "验证:在排查入口打印 this.getClass().getName():名称含 CGLIB 或 $Proxy 即代理路径,否则是自调用或 new 出来的裸对象——四个成因按\"代理身份、方法可见性、bean 来源、管理器绑定\"顺序逐项排除,每项一个可打印证据。"),
+      block("追问链:注解无效三刀",
+      "一刀:\"@Transactional 加在类上和方法上有什么区别?\"——类级对全部 public 方法生效,方法级覆盖类级;接口上的注解在类代理(CGLIB)模式下不生效——注解放实现类。二刀:\"private 方法加注解 IDE 会报错吗?\"——Spring 6 起启动日志有 warn(非 public 方法的事务注解会被忽略),但很多团队日志级别看不到;静态检查更可靠。三刀:\"事务管理器选错了会怎样?\"——事务\"正常开关\"但管的是另一个数据源,业务库裸奔——最难排查的形态,多数据源必须显式绑定(第 7 题)。"),
+    ],
+    ["注解永远没错,错在调用路径", "代理/public/bean/管理器,四查", "边界要薄,检查要进 CI"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/7': deep(
+    "多数据源场景如何避免事务管理器选错？",
+    "网银双库沙盘:账务库与渠道库各一个 DataSource,@Transactional 默认拿走\"唯一\"的事务管理器,渠道写入跑到账务管理器上——事务开着,渠道库裸奔。用计数实验说明绑定错误与显式化方案。",
+    [
+      "多个 TransactionManager 时,@Transactional 不指定 qualifier 就会按\"主/唯一\"解析,选错即\"有事务没防护\"——最难排查的失效形态。",
+      "实测思路:给每个 DataSource 包一层连接计数器(第 2 题的 DelegatingDataSource),事务执行期间哪个库新建了连接,事务管理器就绑定了哪个库——绑定错误立刻显形。",
+      "工程化方案:@Transactional(\"channelTxManager\") 显式限定,或按包路径分配置(事务管理器的 advice 链),或干脆 TransactionTemplate 各持一个实例。",
+    ],
+    [
+      block("机制:管理器解析与绑定错误的显形",
+      "@Transactional 的解析:注解 qualifier 优先;否则容器里唯一的事务管理器;多个时取 primary;都没有则异常。选错的后果形态:事务开关正常(日志有 BEGIN/COMMIT),但连接来自另一个库——业务库上没有任何事务。显形手段即计数:DelegatingDataSource 统计各库在事务期间的新建连接(本机第 2 题实验同构:REQUIRED=1、REQUIRES_NEW=2 的计数方法),把\"事务管着谁\"变成可观测事实。"),
+      block("推演:双库选错的连接计数画像(附本机计数方法证据)",
+      "画像推演:正确绑定渠道管理器时,事务期间渠道库连接计数+1、账务库 0;选错时账务库+1、渠道库 0——对照即错。本机证据(第 2 题实验):DelegatingDataSource 计数可靠区分\"哪个事务管理器取了哪个库的连接\"(REQUIRED=1、REQUIRES_NEW=2 的差值即内层连接),方法直接迁移到多数据源审计。验证:双库环境各包计数器跑一次业务流,数字对不上绑定即错;本机未搭双库,标注推演。"),
+      block("取舍:显式化的三种落地",
+      "方案一,qualifier:@Transactional(transactionManager = \"channelTxManager\")——显式但散落在每个注解,漏写即回退到\"主管理器\",要配 ArchUnit 检查(渠道包内注解必须带限定符)。方案二,按包分配置:TransactionInterceptor 按切面表达式绑定,业务代码零感知——集中,但\"包路径即库\"的约定要文档化。方案三,TransactionTemplate 按库各建实例(账务模板/渠道模板)——边界最显式(第 12 题),适合库访问集中的模块。混合常见:核心资金路径用模板,一般路径用 qualifier。"),
+    ],
+    [
+      block("验证:给每个 DataSource 包一层连接计数器(Delega",
+      "验证:给每个 DataSource 包一层连接计数器(DelegatingDataSource),事务执行期间哪个库新建了连接,管理器就绑定了哪个库——双库各打印计数,与预期绑定不符即选错;再在 CI 加\"每个库一条事务存在性冒烟用例\"。"),
+      block("追问链:多数据源三刀",
+      "一刀:\"两个库的事务能合成一个吗?\"——同一 JVM 内多个 DataSource 的\"全局事务\"需要 JTA/Atomikos 类事务管理器(2PC,分布式 10 题的代价);更常见的选择是放弃跨库事务,用 outbox+对账(分布式 14 题)。二刀:\"读写分离的路由数据源怎么配事务?\"——路由 DataSource 在事务开始时确定目标,事务内固定;读写分离加事务要保证\"事务读主\",路由策略必须感知事务上下文,否则事务里读到从库旧值。三刀:\"测试里怎么防选错?\"——测试配置里给每个管理器不同的名字并对每个库各写一条\"事务存在性\"冒烟用例(事务中插入、另一个连接查不到)——把绑定错误挡在 CI。"),
+    ],
+    ["多管理器必显式,qualifier 或模板", "计数显形:事务到底管着谁", "跨库事务不硬合,outbox 兜"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/8': deep(
+    "异步线程能继承普通线程绑定事务吗？",
+    "网银导出沙盘:事务里把\"写明细\"丢给线程池,明细写入时事务标志为 false——写入游离在事务外,主事务回滚后明细却留下。用实测说明 ThreadLocal 绑定的边界与异步事务的正确做法。",
+    [
+      "事务上下文存在 ThreadLocal:换线程即丢失。实测:调用方事务=true,同一时刻异步线程事务=false。",
+      "后果:异步线程的数据库操作走独立连接、无事务(或自动提交),与主事务的提交/回滚完全脱钩——不是\"慢点生效\",是根本不受控。",
+      "正确做法按需求选:需要同事务就在事务内同步做;需要异步就让它自带事务边界(@Async 方法加 @Transactional 或显式模板)并配幂等与补偿。",
+    ],
+    [
+      block("机制:ThreadLocal 绑定与线程池的错位",
+      "Spring 事务把 ConnectionHolder 绑在 ThreadLocal(TransactionSynchronizationManager);线程池复用线程,任务在别的线程上执行,拿不到绑定;更隐蔽的是\"污染\"风险:若在异步线程里手动 set 了资源,任务结束不清理会污染下一个任务。实测直接量化了边界:同一业务流,调用方与池内线程的事务标志一个 true 一个 false——它们在事务视角下是两个世界。"),
+      block("实证:调用方与异步线程的标志对照",
+      "本机实验(Spring 6.2.19 + H2):外层 TransactionTemplate 事务中向单线程池提交查询事务标志:\n```\nQ8 调用方事务=true 异步线程事务=false\n```\n验证:同程序重跑一致。推论即事故链:主事务回滚后,异步线程已落库的\"明细\"成为孤儿数据——对账才暴露。与第 19 题(安全上下文同样不跨线程)同一根因:ThreadLocal 系资源都需显式传播。"),
+      block("取舍:异步与事务的四种组合",
+      "组合一,事务内同步执行:放弃异步,保原子性——数据必须与主事务同生共死时选。组合二,异步+独立事务:@Async 方法加 @Transactional(新事务),主事务结果通过消息/状态传递——要处理\"主事务回滚但异步已跑\"的补偿。组合三,提交后异步:@TransactionalEventListener(AFTER_COMMIT)触发异步——主事务提交才发,天然避免孤儿(第 9/10 题)。组合四,异步+幂等重试:任务表加任务 ID,执行幂等(任务系统三件套,分布式 41 题)。评审问句:这个异步任务的数据库写入,在主事务回滚后是否仍然正确?"),
+    ],
+    [
+      block("验证:在事务内与异步任务内各打印一次 isActualTransa",
+      "验证:在事务内与异步任务内各打印一次 isActualTransactionActive(),输出 true/false 即边界证据;再把该断言写成测试(异步路径的数据可见性随主事务回滚仍存在),固化 ThreadLocal 不跨线程的事实。"),
+      block("追问链:异步事务三刀",
+      "一刀:\"@Async 加 @Transactional 就一定生效吗?\"——@Async 本身是代理,事务注解在异步方法上生效(该方法在新线程里经代理进入事务);但调用方的事务不会传播过去——两个独立事务,不是继承。二刀:\"TransactionContext 传播工具能用吗?\"——手工复制 ThreadLocal 的做法(复制连接绑定)不被支持:连接被两个线程并发使用是线程安全问题,官方立场是传播事务上下文到并发线程属于未定义行为。三刀:\"怎么测异步边界?\"——测试里断言异步路径的事务标志与数据可见性(主事务回滚后异步数据的状态),把脱钩行为固化成用例。"),
+    ],
+    ["ThreadLocal 不跨线程,事务也是", "异步要自带事务边界", "提交后异步,天然不孤儿"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/9': deep(
+    "@TransactionalEventListener 应如何选择阶段？",
+    "网银支付沙盘:支付成功后发卡券,团队把监听器写成普通 @EventListener(事务一提交前就跑)或默认 AFTER_COMMIT 后又疑惑\"为什么测试里不触发\"。用后端真实执行的事务监听测试说明四个阶段的选择规则。",
+    [
+      "四阶段:AFTER_COMMIT(默认,提交后执行)、AFTER_ROLLBACK、AFTER_COMPLETION(两者都走)、BEFORE_COMMIT(事务内,可参与写)。选型=该动作与事务成败的绑定关系。",
+      "真实执行证据(本仓库测试):提交后监听器在事务提交后才收到事件(事务内发布时 committed 列表为空),回滚事务不触发 AFTER_COMMIT,无事务发布默认不触发(fallbackExecution=false)。",
+      "两个最常错:默认阶段在无事务时不执行(测试环境单步调用没开事务→监听器\"失踪\");BEFORE_COMMIT 里做重活拖长事务(第 16 题竞态同源)。",
+    ],
+    [
+      block("机制:阶段与事务生命周期的绑定",
+      "发布事件时若存在活动事务,监听按 phase 挂到事务同步器:BEFORE_COMMIT 在提交前执行(仍可写库,参与同一事务);AFTER_COMMIT 在提交成功后执行(新连接,主事务已终);AFTER_ROLLBACK 对应回滚;AFTER_COMPLETION 无论如何都执行。无活动事务时默认不执行(fallbackExecution=false),这就是\"测试里监听器不跑\"的标准答案。本仓库的真实测试断言了完整行为:提交后 committed=[1],回滚后不追加,无事务发布不触发,AFTER_COMMIT 内监听器抛异常不影响已提交数据。"),
+      block("实证:仓库真值测试的阶段矩阵",
+      "本仓库后端测试(SpringAdvancedExamplesTest,真实 Spring 上下文 + H2)对四类情形的断言:\n```\n事务内发布 → 提交前列表为空,提交后 = [1]\n事务回滚 → 监听器不执行(列表不变)\n无事务发布 → 不触发\nAFTER_COMMIT 监听器抛异常 → 不影响已提交数据\n```\n验证:该测试随每次后端构建真实执行,阶段语义以它为准;这是\"引用真实执行证据\"的最佳来源——写业务监听器时对照这四条。"),
+      block("取舍:按业务绑定的选择表",
+      "发卡券/发短信(主事务成功才该发生):AFTER_COMMIT——主事务回滚则不发生,天然一致。审计留痕(成败都要记):AFTER_COMPLETION 按 status 分支。事务内校验/修正(失败要阻止提交):BEFORE_COMMIT,但要轻(拖长事务,第 2 题连接占用)。补偿类(回滚后清理):AFTER_ROLLBACK。注意 AFTER_COMMIT 里的数据库操作不在原事务:要么开新短事务(@Transactional(REQUIRES_NEW) 或模板),要么接受其独立成败并对账(第 11 题)。"),
+    ],
+    [
+      block("验证:按本仓库真值测试的四断言形态(提交前列表为空、提交后追加、回",
+      "验证:按本仓库真值测试的四断言形态(提交前列表为空、提交后追加、回滚不触发、无事务不触发)为每个业务监听器建用例——阶段语义锁进 CI,而不是靠日志肉眼确认。补充:监听器内不做重业务,重活转任务表;用例覆盖四个阶段的矩阵,任何阶段配置错误在 CI 直接暴露。"),
+      block("追问链:事件阶段三刀",
+      "一刀:\"AFTER_COMMIT 里抛异常会怎样?\"——不会回滚主事务(已提交);默认被日志吞掉,业务要感知失败就得在监听器内自行重试/落补偿表(第 10 题专论)。二刀:\"事件在多实例下会重复吗?\"——Spring 事件是进程内的:多实例各自发布各自处理,不跨实例;跨实例要消息队列(第 30 题)——\"进程内事件当跨服务消息用\"是高频架构错误。三刀:\"监听器能拿到事务里的写入吗?\"——AFTER_COMMIT 阶段原事务已提交,新连接能看到;BEFORE_COMMIT 能看到未提交数据(同连接)——两个阶段的可见性不同,设计查询类监听器时要注意。"),
+    ],
+    ["阶段即绑定:成功才做选 AFTER_COMMIT", "无事务默认不跑,测试要开真事务", "提交后写库是新事务,要幂等"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/10': deep(
+    "提交后监听器失败会回滚已经提交的数据吗？",
+    "网银发卡沙盘:AFTER_COMMIT 监听器调渠道失败抛异常,值班想\"回滚刚才的支付\"——不可能,数据已提交。用仓库真实测试说明失败的实际影响面与正确的兜底设计。",
+    [
+      "铁律:主事务在 AFTER_COMMIT 阶段已经提交,监听器异常不可能回滚它。真实测试断言:监听器抛异常,已提交数据保留,调用方不感知异常。",
+      "失败的实际后果:默认被日志吞掉——\"卡券没发出去\"没有任何业务可见信号,直到客诉。",
+      "正确兜底:提交后动作要有自己的重试与补偿(任务表/消息重投/对账),监听器只做\"可靠触发\",不做\"唯一执行\"。",
+    ],
+    [
+      block("机制:阶段位置决定的不可回滚性",
+      "AFTER_COMMIT 在事务管理器完成提交之后触发:数据已持久化、锁已释放、连接已归还。此时监听器无论抛什么,数据库不可能\"倒放\"——回滚的窗口在提交瞬间就已关闭。本仓库测试的断言固定了该语义:assertDoesNotThrow(监听器抛 IllegalStateException,事务不传播异常)且已提交行保留。工程含义:AFTER_COMMIT 里的一切都要按\"可能失败且失败无感知\"来设计——这不是缺陷,是阶段语义,设计必须适配。"),
+      block("实证:失败不影响已提交数据的真实执行",
+      "本仓库后端测试(SpringAdvancedExamplesTest)对 AFTER_COMMIT 监听器抛异常的断言:\n```\n监听器抛 IllegalStateException → assertDoesNotThrow 通过\n已提交数据保留 → item 表仍含该行\n监听器仍执行 → committed 列表追加该事件\n```\n验证:随构建真实执行。对照直接注册的 TransactionSynchronization.afterCommit 抛异常:异常会传播给调用方,但数据同样已提交(同仓库另一测试断言)——两种注册方式在\"不可回滚\"上一致,在\"异常是否可见\"上不同,业务异常处理不能依赖后者。"),
+      block("取舍:提交后动作的可靠化三件套",
+      "其一,任务化:监听器只写\"待办任务\"(幂等键=业务 ID+动作),后台执行器重试——失败可见(任务积压告警)、可重试、可对账。其二,消息化:发 MQ(带 outbox,分布式 14 题),消费端幂等。其三,直调+补偿:低频高价值动作直接调渠道,失败落补偿表人工/定时兜底。共同底线:把\"提交后失败\"从日志黑洞变成有状态的待办。评审问句:这个 AFTER_COMMIT 动作失败三次后,系统里有什么痕迹?"),
+    ],
+    [
+      block("验证:按本仓库测试形态断言两点:AFTER_COMMIT 监听器抛",
+      "验证:按本仓库测试形态断言两点:AFTER_COMMIT 监听器抛异常时调用方不感知且已提交数据保留;失败动作的任务表出现待办记录——前者验证不可回滚语义,后者验证兜底闭环真的存在。"),
+      block("追问链:提交后失败三刀",
+      "一刀:\"监听器异常默认去哪了?\"——ErrorHandler 日志(默认 error 级),不传播、不重试;要自定义错误处理可配 SimpleApplicationEventMulticaster 的 errorHandler,但重试语义仍要自己实现。二刀:\"BEFORE_COMMIT 抛异常能回滚吗?\"——能:BEFORE_COMMIT 在提交前执行,异常会导致事务回滚(这常被用作\"提交前校验\"的手段,但要用对:校验失败抛异常是明确语义,不是兜底)。三刀:\"怎么验证监听器真的只在提交后跑?\"——按仓库测试的形态写用例:事务内发布+断言列表为空、提交后断言追加——把阶段语义锁进 CI(第 38 题专论)。"),
+    ],
+    ["已提交不可回滚,阶段语义如此", "失败别进日志黑洞,要有待办", "监听器管触发,可靠性靠任务"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/11': deep(
+    "为什么 afterCommit 里直接写数据库可能没有预期提交？",
+    "网银账务沙盘:afterCommit 回调里更新\"已结算\"标记,偶发发现标记没生效——回调的连接与事务上下文与主事务不同,写库语义取决于回调内部自己怎么开事务。用仓库真实测试的对照行为说明正确写法。",
+    [
+      "afterCommit 阶段主事务已提交且资源已解绑:回调里直接用\"同线程的 JdbcTemplate\"可能拿到新连接、自动提交——写入了但语义不受控(部分驱动/池配置下甚至写不进)。",
+      "真实测试对照(本仓库):直接注册的 afterCommit 回调抛异常会传播给调用方,但数据已提交——异常与数据是两回事。",
+      "正确写法:回调内显式开新事务(REQUIRES_NEW 或 TransactionTemplate),或把动作转成任务/事件异步化;绝不假设\"还在主事务里\"。",
+    ],
+    [
+      block("机制:回调时刻的资源状态",
+      "事务同步器触发 afterCommit 时:连接的提交已完成,但 Spring 的资源解绑(TxSynchronization 的 afterCompletion 阶段)与回调执行顺序决定了回调内 ThreadLocal 里可能还挂着旧连接持有者——用它写库,语句跑在\"已提交事务的连接\"上,后续该连接归还池时未提交写入会被回滚;或拿到池的新连接走自动提交。两种形态都叫\"写了但没按预期提交\"。这正是\"回调里要显式事务边界\"的机制根源。"),
+      block("实证:直接回调的异常与数据行为",
+      "本仓库后端测试(SpringAdvancedExamplesTest,真实上下文 + H2)对直接注册 afterCommit 抛异常的断言:\n```\nassertThrows(IllegalStateException) → 异常传播给调用方\nSELECT id FROM item → 该行已提交保留\n```\n解读:数据已落库(提交在前),异常却在调用方炸出——\"异常可见但不可回滚\"。对照 @TransactionalEventListener(AFTER_COMMIT)形态:监听器异常被吞不传播(第 10 题)。两种注册方式的差异必须写进团队文档,否则排查时互相矛盾。"),
+      block("取舍:回调内写库的三种正确姿势",
+      "姿势一,显式新事务:回调体内 TransactionTemplate(REQUIRES_NEW 语义)执行写——边界明确,失败可在回调内捕获并落补偿。姿势二,转任务:回调只写\"待办\"(幂等键),执行器异步处理——失败可见可重试(第 10 题三件套)。姿势三,不写库:回调只做纯内存动作(清本地缓存、发进程内事件),库操作交给事件监听器配独立事务。共同禁忌:在回调里假设 ThreadLocal 事务上下文仍然有效。"),
+    ],
+    [
+      block("验证:按本仓库对照测试写两个用例:直接注册 afterCommit",
+      "验证:按本仓库对照测试写两个用例:直接注册 afterCommit 抛异常(断言异常传播且数据已提交)与事件监听器形态(断言异常被吞)——两种注册方式的异常可见性差异由此固化,回调内写库必须显式开新事务的用例单独覆盖。"),
+      block("追问链:afterCommit 三刀",
+      "一刀:\"为什么有时回调里写库成功了?\"——自动提交模式下每条语句独立提交,单语句写入\"看起来成功\";但这脱离事务控制(失败无回滚、与其他写入不一致),成功只是侥幸。二刀:\"afterCompletion 与 afterCommit 的资源状态?\"——afterCompletion 在资源清理阶段,连旧连接持有者都不可靠;任何数据库操作都要自建边界。三刀:\"怎么测试回调的写库语义?\"——按仓库测试形态:回调内写一行,事务外断言该行的可见性与回调异常的传播性——把连接语义锁进 CI。"),
+    ],
+    ["回调里没有主事务,边界自己开", "写了不等于提交,侥幸不是语义", "能转任务的别在回调里写"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/12': deep(
+    "如何用 TransactionTemplate 修复明确的事务边界？",
+    "网银对账沙盘:一个 300 行的 service 方法只有 30 行需要事务,整方法 @Transactional 导致长事务(连接占用放大,第 2 题)。用实测过的模板写法说明\"边界显式化\"的重构路径。",
+    [
+      "TransactionTemplate 把事务边界写成代码块:边界在哪儿、包了什么、传播级别是什么,全部可见可审——自调用失效(第 1 题)与边界过宽(第 2 题)同时消失。",
+      "本机真值示例即模板写法:外层 REQUIRED 包全部,内层 NESTED 保存点包单行——两层边界一目了然(输出 [1]:[2])。",
+      "适用边界:边界复杂或与业务流不一致的场景;简单的\"方法级全事务\"仍用注解,不为炫技换模板。",
+    ],
+    [
+      block("机制:模板与注解的同源差异",
+      "注解事务的边界=代理拦截的方法粒度;模板的边界=代码块粒度,且模板实例可显式配置传播级别与隔离级别。两者最终都走同一个 PlatformTransactionManager。模板的三个工程优势:边界与业务流精确对齐(30 行里只包 10 行)、传播行为在构造处可见(不用翻注解)、在同类内部可嵌套使用(无代理绕行问题)。代价:回调嵌套深时缩进难看、忘了模板实例的传播配置会默认 REQUIRED。"),
+      block("实证:真值示例的两层边界",
+      "本机编译执行的真值示例(第 3 题,NEXTED 保存点)展示模板的两层边界:外层 TransactionTemplate(REQUIRED)包整批,内层 TransactionTemplate(NESTED)包单行,内层失败外层继续:\n```\n执行结果 [1]:[2](内层行随保存点回滚,外层行提交)\n```\n同款写法用于对账重构:整批事务只包\"读文件+逐行处理+汇总\",行级补偿用内层模板——连接占用从\"整方法时长\"降到\"整批必要时长\",与第 2 题的连接账本直接对应。"),
+      block("取舍:模板化的重构步骤",
+      "第一步,量边界:日志或micrometer 量当前事务方法时长,找出\"事务时长/方法时长\"比值低的(边界过宽)。第二步,拆:把需要事务的代码块提为方法或 lambda,包进模板;模板实例按传播需求预配置(命名如 nestedTemplate、newTxTemplate)。第三步,验证:第 4 题的 rollback-only 用例与数据断言照搬到 CI。禁忌:把模板与注解在同一调用链混用而不清楚谁包谁——画一层调用图再动手。"),
+    ],
+    [
+      block("验证:重构前后各打印事务边界日志(开 TRACE 看 Partic",
+      "验证:重构前后各打印事务边界日志(开 TRACE 看 Participating/Creating new transaction 行),确认模板边界与设计一致;再用第 2 题的连接计数对比事务时长,收益(连接占用下降)以数字进评审。"),
+      block("追问链:模板三刀",
+      "一刀:\"模板要做成单例吗?\"——是:TransactionTemplate 线程安全,按传播级别预配置成若干命名 bean 注入使用;每次 new 配置散落且易错。二刀:\"模板里抛 checked 异常会回滚吗?\"——execute 的回调异常由 rollbackOnException 按默认规则(RuntimeException/Error 回滚,checked 默认不回滚)判断后原样传播,不会统一包装为 TransactionException;checked 异常需 setRollbackOnly 显式标记,与注解规则一致(第 5 题)。三刀:\"与注解的边界重叠怎么排查?\"——嵌套时按传播规则合并(REQUIRED 参与外层),日志开 TRACE 看\"Participating transaction/Creating new transaction\"——实际边界以日志为准,不以想象为准。"),
+    ],
+    ["边界写成代码块,可见可审", "模板实例预配置,命名注入", "复杂边界用模板,简单仍用注解"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/13': deep(
+    "缓存注解的 self-invocation 有什么后果？",
+    "网银商品沙盘:商品详情 @Cacheable,同类内的推荐逻辑调 this.load(),缓存永远不命中,回源量翻倍。用实测说明缓存代理与事务代理同源的自调用问题,以及与第 1 题的统一解释。",
+    [
+      "@Cacheable 同样是 AOP 代理:自调用绕过缓存拦截器,实测自调用两次加载=2 次,经代理调用两次加载=1 次(第二次命中缓存)。",
+      "后果的隐蔽性:缓存失效不报错不告警,只表现为\"回源率高、数据库慢\"——比事务失效更难被察觉。",
+      "修复与事务同款:拆 bean、注入自身代理、或编程式缓存(CacheManager.getCache 手工 get/put)——边界显式化。",
+    ],
+    [
+      block("机制:同一套代理,同一类失效",
+      "缓存拦截器在代理链上检查方法与参数生成键,命中则不调目标。this.load() 直达目标方法,拦截器未触发——键都没生成,自然谈不上命中。这与第 1 题事务自调用是同一机制(代理调用路径问题),排查与修复思路完全复用。区别在观测面:事务失效产生数据错误,缓存失效产生性能劣化——后者常被误判为\"缓存容量不够\"或\"键设计不好\"。"),
+      block("实证:自调用与代理调用的加载次数",
+      "本机实验(Spring 6.2.19,ConcurrentMapCacheManager + @EnableCaching):CacheService.load 带 @Cacheable,同键调用两次:\n```\nQ13 缓存自调用加载=2 代理调用加载=1\n```\n解读:自调用两次都回源(拦截器没跑);经 facade 走代理,第二次命中(加载计数不再增)。验证:同程序重跑一致;把键改为不同重跑,两者都回源——对照组排除\"键相同导致命中\"的歧义。"),
+      block("取舍:缓存编程式的适用场景",
+      "同方法内\"先查缓存再回源\"的复杂逻辑(键随中间结果变化)用 CacheManager 手工 get/put——边界显式。常规\"方法级缓存\"仍用注解+保证经代理调用(拆 facade)。监控兜底:回源率指标按方法统计,自调用失效表现为回源率异常高——把它做成告警,比靠评审发现所有自调用可靠。"),
+    ],
+    [
+      block("验证:同键调用两次,按加载计数器断言:自调用 2 次、代理调用 1",
+      "验证:同键调用两次,按加载计数器断言:自调用 2 次、代理调用 1 次;线上配回源率指标(按方法统计),自调用失效表现为回源率异常升高——CI 断言加监控双通道。"),
+      block("追问链:缓存代理三刀",
+      "一刀:\"@CachePut 与 @CacheEvict 也有自调用问题吗?\"——同源:所有缓存注解都靠代理拦截,this 调用一律失效;更新数据后同类内调 evict 是经典坑。二刀:\"内部方法互调导致的多层缓存?\"——一个业务流里多个 @Cacheable 方法经代理互相调用没问题;失效只发生在 this 直调。三刀:\"怎么系统性发现?\"——与第 1 题同款 ArchUnit 规则(禁同类调用缓存注解方法)加回源率监控,双保险。"),
+    ],
+    ["缓存与事务,同一个代理故事", "自调用不命中,回源率会说话", "拆 facade 或手工缓存"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/14': deep(
+    "缓存键为什么要包含租户与版本？",
+    "网银 SaaS 商户配置沙盘:配置缓存键用 configId,租户 A 读到租户 B 的同 ID 配置(越权数据泄露);改配置后旧值又缓存 10 分钟。用最小复现说明键的两要素:隔离维度与失效版本。",
+    [
+      "缓存键必须包含\"数据的所有判定维度\":租户隔离类数据缺租户即越权泄露(不是性能问题,是安全事故);可变数据缺版本即陈旧窗口。",
+      "形态:键=租户:实体类型:实体 ID:版本(版本可来自数据行版本或统一失效版本号);发布事件失效时按\"租户+类型+ID\"精确清键。",
+      "与第 33 题(分布式 33,版本失效)同一原理在应用缓存层的映射:版本仲裁防旧覆盖,租户前缀防串数据。",
+    ],
+    [
+      block("机制:键的完备性与两类事故",
+      "事故一,串租户:两个租户都有 configId=42,键只有 42 → 后到者覆盖前者的缓存,读到的配置属于别的租户——数据越权。事故二,陈旧:更新后只写库不失效缓存(或失效键漏了某层),旧值活到 TTL 结束。键设计公理:凡是\"换个人查结果不同\"的维度,必须进键;凡是\"值会变\"的数据,必须有失效通道(事件失效优先于 TTL)。"),
+      block("推演:串租户的最小复现(附本机版本仲裁证据)",
+      "复现推演:ConcurrentMapCache 键 \"42\",租户 A put \"A-配置\",租户 B get 得 \"A-配置\"——两行代码即可演示,语义与分布式 33 题的\"过期写覆盖\"同构(本机实测:带版本检查拒绝过期写,无检查被覆盖):\n```\n带版本检查: 过期写被拒绝(持有v1 != 当前v2) 现值=新值\n```\n映射到租户:键加租户前缀后 A 与 B 各自独立条目,串数据消失;加版本后更新事件可精确失效。验证:缓存层的最小复现为代码级推演,版本仲裁形态为本机实测。"),
+      block("取舍:键设计的工程化",
+      "键构造统一封装:CacheKeys.of(tenant, type, id, version)——禁止业务代码手拼字符串(拼漏维度是事故主因)。版本来源:数据行 version 列(精确,回填时多一次读取)或\"配置发布版本号\"(粗粒度,一键全量失效)。TTL 与失效事件并存:TTL 是兜底上限,事件失效是主要通道;两者都要有监控(失效事件量与缓存命中率)。跨层一致:本地缓存与分布式缓存的键必须同构(第 33 题多级失效顺序)。"),
+    ],
+    [
+      block("验证:写两租户同 ID 的越权用例(键无租户前缀时 B 租户读到 ",
+      "验证:写两租户同 ID 的越权用例(键无租户前缀时 B 租户读到 A 的缓存值),修复后断言各自独立;再加版本失效用例(更新后旧值不再命中)——两组断言进回归集。"),
+      block("追问链:缓存键三刀",
+      "一刀:\"键里加租户后命中率降吗?\"——命中率按租户内访问模式决定,SaaS 场景租户间本就不共享数据,合键的\"高命中\"是假象(串数据);隔离优先于命中。二刀:\"版本号进键会不会让缓存永远 miss?\"——版本只在数据变化时变化:同一版本的重复读命中正常;代价是写侧要传播新版本(事件或行版本),写多读少的数据不适合版本化键,改用精确失效。三刀:\"怎么审计键的完备性?\"——枚举所有 @Cacheable 的键生成器,逐个问\"换个租户/换个权限角色,结果会不同吗?\"——答案为是而维度不在键里即缺陷。"),
+    ],
+    ["键少一个维度,就串一类数据", "租户进键,版本进失效", "键构造统一封装,别手拼"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/15': deep(
+    "Cacheable 中的同步加载能解决分布式击穿吗？",
+    "网银首页沙盘:热点 key 过期瞬间 200 个请求同时回源,团队开 sync=true 后单机内击穿消失,但 8 个实例仍各自回源 1 次(共 8 次),误以为\"已解决\"。用本机击穿实验说明 sync 的边界。",
+    [
+      "sync=true 是 JVM 内 singleflight:同实例的并发同键请求合并为一次加载;跨实例无任何协调——8 实例=最多 8 次回源。",
+      "本机实测(distributed 10 题,同构机制):200 并发同键,无合并回源 200,singleflight 合并后 1——sync 管的是\"进程内\"那一段。",
+      "分布式击穿的完整解:singleflight(进程内)+分布式互斥(单飞,Redis 锁或一致性哈希单点加载)+逻辑过期(热点永不过期,异步刷新)。",
+    ],
+    [
+      block("机制:sync 的作用层与盲区",
+      "sync=true 让缓存拦截器对该 key 加进程内锁,并发线程只有一个执行加载,其余等结果——本机 D10 实验证实同键 200 并发回源从 200 降为 1(同构机制)。盲区:锁是 JVM 级的,N 个实例各自持锁各自加载——回源次数=实例数;热点 key 高峰恰好每实例各来一次\"穿透\"。与 Redis 限流的\"本地 vs 全局\"同构(分布式 18 题):进程内协调便宜,跨进程协调才解决总量。"),
+      block("实证:进程内合并的效果与跨实例边界",
+      "本机实验(Java 17.0.17,200 并发同键,CompletableFuture 合并):\n```\n无合并: 200 并发同键 -> 后端调用=200\nsingleflight: 回源调用=1\n```\n解读:sync=true 等价于右侧形态——进程内收益真实;跨实例部分需要分布式方案:同一 key 的加载路由到固定实例(一致性哈希,分布式 4 题)或 Redis setnx 抢加载权,其余实例短等。验证:进程内可复跑;跨实例形态未在本机多实例环境复现,标注推演。"),
+      block("取舍:击穿防护的分层选择",
+      "层一,sync=true:零成本,进程内合并——默认开启,无副作用。层二,分布式单飞:热点 key 加载权抢锁,回源次数=1——加 Redis 依赖与失败语义(锁超时降级为本地加载)。层三,逻辑过期:热点数据常驻,后台异步刷新——读路径零击穿,代价是短暂陈旧与刷新任务管理。选择:普通 key 用层一;可识别热点(TOP-K 监控,分布式 25 题)用层二;极热且可容忍秒级陈旧用层三。"),
+    ],
+    [
+      block("验证:删热 key 并发 200 请求,统计回源数:进程内 syn",
+      "验证:删热 key 并发 200 请求,统计回源数:进程内 sync 后应等于实例数(跨实例盲区),加分布式单飞后回源数=1——回源数即击穿防护的度量,分层开启时逐层对比。"),
+      block("追问链:击穿三刀",
+      "一刀:\"sync=true 有什么代价?\"——加载期间同键线程阻塞等锁:加载慢(2 秒)时同键请求排队 2 秒——热点 key 加载慢时反而是 P99 杀手;配合加载超时与降级默认值。二刀:\"缓存空值怎么防穿透?\"——不存在的数据缓存短 TTL 空标记(sync 也支持),配合布隆过滤器挡\"确定不存在\"的查询——穿透与击穿是两个问题,分开治。三刀:\"击穿演练怎么做?\"——故障注入:删热 key+瞬时并发,观测回源数(应=实例数上限);对比开启分布式单飞后的回源数=1。"),
+    ],
+    ["sync 管进程内,不管跨实例", "热点要分布式单飞或逻辑过期", "回源数是击穿的度量"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/16': deep(
+    "事务提交前清理缓存会出现什么竞态？",
+    "网银库存缓存沙盘:更新库存的@Transactional 方法里\"先删缓存再提交事务\",并发读在\"删之后、提交前\"回填了旧值,提交后缓存长期陈旧。用版本仲裁实验说明正确顺序与补强手段。",
+    [
+      "竞态窗口:事务内删缓存→(读请求 miss→读库旧值→回填)→事务提交新值——缓存里是旧值,直到下次失效。",
+      "本机同构证据:过期写(v1)无版本检查覆盖新值(v2),带版本检查被拒——回填旧值=过期写,解法同源:回填带版本校验。",
+      "正确姿势:事务提交后再失效(@TransactionalEventListener AFTER_COMMIT 删缓存),配合延迟双删或版本化键,窗口收敛到复制延迟量级。",
+    ],
+    [
+      block("机制:窗口的三步时序",
+      "时序:事务 T1(更新库存)在提交前执行 cache.evict(key);读请求 R1 在 evict 后到达,miss,读库——读到的是 T1 未提交前的旧值(隔离级别保证);R1 把旧值回填缓存;T1 提交新值——缓存=旧值、库=新值,分叉成立,直到 TTL 或下次失效。这是\"先删后提交\"的固有窗口。若反过来\"提交后再删\",窗口缩小为提交与删除之间的间隙(读旧值回填需在删除前完成,概率低但仍在)。"),
+      block("实证:窗口的版本仲裁修复(本机同构)",
+      "本机实验(distributed 33 题数据,Java 17.0.17):\n```\n带版本检查: 过期写被拒绝(持有v1 != 当前v2) 现值=新值\n无版本检查: 现值=旧值(新值被过期写覆盖)\n```\n映射:回填时携带读取的版本,写缓存前与\"最大已见版本\"比对——旧版本回填被拒,窗口关闭。Spring 侧实现:回填逻辑手工 get/put(不走 @Cacheable)以便插版本校验;或版本化键(v2 单独 key)。验证:仲裁语义本机实测,缓存层完整链路为同构推演。"),
+      block("取舍:失效时序的三种方案",
+      "方案一,AFTER_COMMIT 失效:删缓存在提交后事件里——窗口最小,标准做法(第 9/10 题的阶段语义,注意监听器失败要兜底重试失效)。方案二,延迟双删:提交后删一次,延迟数百毫秒再删一次(覆盖\"提交前回填\"的残留)——实现简单,延迟值靠经验。方案三,版本化键+版本仲裁:无窗口,成本是写侧传播版本。选择:普通数据用一;强一致诉求用三;方案二作为方案一的高危 key 补强。"),
+    ],
+    [
+      block("验证:注入式复现",
+      "验证:注入式复现——写事务在 evict 与提交之间 sleep,读线程持续回填,结束后断言缓存值与库值分叉(复现);改 AFTER_COMMIT 失效或版本仲裁后,同场景断言一致(修复)——两个方向都可自动化。"),
+      block("追问链:缓存竞态三刀",
+      "一刀:\"BEFORE_COMMIT 里删缓存行吗?\"——删了也会被提交前/提交中的读回填旧值,且删早了窗口更大——不用。二刀:\"本地缓存+分布式缓存怎么排?\"——失效顺序:先分布式后本地(或全走版本号);本地缓存失效广播丢失时 TTL 兜底(第 33 题多级失效)。三刀:\"怎么验证窗口存在?\"——并发测试:写事务 sleep 在 evict 与 commit 之间,读线程持续回填,结束后断言缓存值与库值一致性;注入式复现比等线上客诉便宜得多(第 45 题故障注入纪律)。"),
+    ],
+    ["删缓存别在提交前,窗口会回填", "回填带版本,旧值进不来", "AFTER_COMMIT 失效是标准位"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/17': deep(
+    "Spring Security 多条过滤链为何需要明确匹配顺序？",
+    "网银多端网关沙盘:新增一条 /api/v2/** 的过滤链写在通配 /** 之后,请求永远走老链——v2 的认证方式全错。说明 FilterChainProxy 的首匹配语义与链设计规则。",
+    [
+      "FilterChainProxy 按 DelegatingFilterProxy 注册的链表顺序取第一条匹配的链,首匹配即终——后面的链再匹配也不看。",
+      "典型事故:宽匹配(/或/**)在前、精确匹配在后→精确链永远失效;新增 API 链忘记顺序→用错认证机制。",
+      "设计规则:最特殊的链在前(按路径+方法+精确度),通配兜底链最后;每条链的 matchers 用测试覆盖(请求样本断言走哪条链)。",
+    ],
+    [
+      block("机制:首匹配即终的选择算法",
+      "FilterChainProxy 持有 SecurityFilterChain 列表,请求到来时按顺序对每条链的 RequestMatcher 求值,第一条匹配的链被选中并执行其全部过滤器——不做最优匹配、不做合并。这与路由表(最长前缀匹配)的直觉不同:写在后=不存在。Spring Security 6 的 securityMatcher 定义每条链的边界,链内过滤器独立(认证方式、异常处理各成体系)。"),
+      block("推演:顺序错误的故障画像(附仓库真实安全上下文证据)",
+      "画像:v2 链(JWT 认证)排在 /**(表单+Session)之后——v2 请求被 /** 链捕获,JWT 过滤器从未执行,认证全部失败或落到表单登录。本仓库测试提供安全上下文的真实行为锚点(Q19 真值示例实测:线程池裸取上下文=anonymous,装饰传播=alice——安全上下文的可见性由\"谁在链上、谁传播\"决定):\n```\nalice:anonymous\n```\n链顺序的验证方式:对每条链写\"请求→命中链名\"的样本断言(逐链打日志或测试),顺序改动必须全绿。验证:链选择算法为规范行为,样本断言为工程手段,本机未搭多链环境,标注推演。"),
+      block("取舍:链的划分粒度",
+      "按认证机制分链(JWT 链/表单链/API-key 链)+一条 deny-all 或表单兜底链;粒度过细(每个路径一条链)维护成本高,过粗(单链内多认证方式)过滤器顺序复杂。每条链的\"职责三行\"写进配置注释:匹配谁、用什么认证、失败去哪。新增链的标准动作:加链+断言顺序测试+回归既有链样本——顺序是全局契约,改一处动全身。"),
+    ],
+    [
+      block("验证:对每条过滤链写\"请求样本→命中链名\"的断言(逐链打日志或测试",
+      "验证:对每条过滤链写\"请求样本→命中链名\"的断言(逐链打日志或测试),新增 v2 链后全链样本回归——顺序改动若破坏首匹配,样本测试立刻失败。补充:每条链的 securityMatcher 与认证方式写成三行注释,评审时按链逐条过;链顺序变更的 PR 必须附样本断言更新。"),
+      block("追问链:过滤链三刀",
+      "一刀:\"两条链 matchers 重叠会怎样?\"——先者赢,后者死;重叠本身是设计信号(该合并或该收窄),靠样本测试暴露。二刀:\"actuator 等管理端点要独立链吗?\"——建议:独立链独立认证(更强的认证+网络层限制),与管理流量隔离;它排在业务链之前。三刀:\"怎么排障「走了哪条链」?\"——SecurityFilterChain 打印日志或 debug 模式(spring.security.debug=trace)输出每个过滤器的执行轨迹;线上低频开,别常开。"),
+    ],
+    ["首匹配即终,顺序即路由", "特殊在前,通配兜底", "每条链配样本断言"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/18': deep(
+    "方法级授权与 URL 授权应怎样配合？",
+    "网银转账沙盘:URL 层只挡了\"登录\",转账接口的方法级 @PreAuthorize 校验账户归属——两层缺一:只靠 URL,横向越权(IDOR)直达;只靠方法,入口暴露面失控。说明两层各自的职责边界。",
+    [
+      "URL 授权管\"入口面\":哪些路径需要什么角色、防未认证扫描;方法授权管\"业务不变式\":当前用户能否操作这个具体资源(归属、状态、金额权限)。",
+      "横向越权(IDOR)只能由方法级(或服务层显式校验)拦截:URL /accounts/{id} 对所有登录用户开放,归属校验必须在方法内——URL 层根本不知道 id 属于谁。",
+      "配合模型:URL 层粗(角色+路径),方法层细(资源+动作);方法层校验放在服务层边界而不是 controller,保证非 HTTP 入口(消息、任务)同样受保护。",
+    ],
+    [
+      block("机制:两层的过滤点与盲区",
+      "URL 层在过滤链(第 17 题)执行:匹配路径与角色,未命中即 401/403——它不解析业务参数。方法层(@PreAuthorize/@PostAuthorize 或显式判断)在方法调用时执行:SpEL 可引用参数与返回值做资源级判定。盲区互补:URL 层挡不住参数级越权;方法层若只在 controller 上注解,MQ/定时任务入口就绕过了——把业务校验沉到服务边界,两种入口共享同一防线。"),
+      block("推演:IDOR 的拦截路径(附真实安全上下文证据)",
+      "场景:GET /accounts/98765,当前用户只拥有 12345。URL 层:登录即可达;方法层 @PreAuthorize(\"@acctAuth.owned(#id)\") 判定归属→403。本机锚点(Q19 真值示例):方法内拿到的 Authentication 就是 SecurityContextHolder 当前值(实测 alice 与 anonymous 的可见性差异):\n```\nalice:anonymous\n```\n校验逻辑用同一上下文:anonymous(未认证)直接拒绝。验证:授权语义为规范行为,完整 IDOR 场景未在本机搭 HTTP 层,标注推演;服务层单测可覆盖校验逻辑。"),
+      block("取舍:权限判断的落点与复用",
+      "落点:服务层显式判断优先于注解 SpEL(可读、可测、可复用);注解适合\"角色门\"这类简单判定。复用:归属校验封装成 AccessGuard 组件(owned(userId, resourceId)),URL 层、方法层、服务层引用同一实现——三处规则漂移是越权事故的温床。测试:归属判定逐角色逐状态的单测矩阵;越权用例(拿别人的 id)进回归集。"),
+    ],
+    [
+      block("验证:横向越权用例(用户 A 拿资源 B 的 id 调接口)断言 ",
+      "验证:横向越权用例(用户 A 拿资源 B 的 id 调接口)断言 403,URL 层与方法层分别移除防护各复测一次,确认两层各自有效;归属校验的单测矩阵按角色×状态全覆盖。"),
+      block("追问链:授权三刀",
+      "一刀:\"@PostAuthorize 什么时候用?\"——返回值含敏感字段需按结果过滤时(读后过滤);它防泄露不防执行,重操作应在 @PreAuthorize 拦。二刀:\"方法授权的性能?\"——每次调用都过 SpEL/守卫:归属校验通常一次索引查询,可接受;复杂权限计算走缓存(权限缓存,第 21 题,注意失效)。三刀:\"怎么审计授权完备性?\"——枚举写接口,逐个标注\"URL 层拦什么、方法层拦什么\",空缺项即清单;横向越权用例自动化进 CI。"),
+    ],
+    ["URL 管入口,方法管资源", "IDOR 只能方法层或服务层拦", "校验沉服务层,两个入口共享"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/19': deep(
+    "认证信息在线程池中传播需要注意什么？",
+    "网银异步导出沙盘:主线程已认证(alice),线程池任务里取 Authentication 得到 anonymous——安全上下文同样活在 ThreadLocal,不跨线程。用可执行示例说明传播与清空的正确姿势。",
+    [
+      "SecurityContextHolder 默认 MODE_THREADLOCAL:换线程即丢。实测(可执行示例):装饰传播的池线程看到 alice,裸池线程看到 anonymous。",
+      "传播工具:DelegatingSecurityContextCallable/Executor(包装任务时捕获当前上下文);@Async 场景配 AsyncConfigurer 的装饰器。",
+      "两个坑:传播的上下文在任务里越权放大(任务拿了 alice 权限做非授权动作);池线程残留上下文污染下一任务(未 clear)。",
+    ],
+    [
+      block("机制:ThreadLocal 语义与显式传播",
+      "安全上下文与事务上下文(第 8 题)同源:ThreadLocal 绑定,线程池复用线程即丢失。显式传播的两步:提交任务时捕获当前 SecurityContext(创建时刻快照),任务执行前 set、finally 清理——DelegatingSecurityContextCallable 封装了这套动作。传播是\"显式授权\":每个传播点都是一次\"该任务需要什么身份\"的决策,而不是无脑全量携带。"),
+      block("边界:传播的安全边界",
+      "上下文是提交时刻的快照:任务执行期间用户权限被撤销,不会反映到已传播的上下文——长任务要重新校验授权而不是依赖携带的身份;跨服务传播(消息队列)不走 ThreadLocal,需要显式把身份放进消息头并在对端重建——与链路上下文(W3C traceparent)的传播协议同构。"),
+      block("取舍:每个传播点都要回答「该带谁的身份」",
+      "每个传播点都要回答「该带谁的身份」——用户上下文传播给业务任务(按用户判权)是显式授权;系统任务应使用系统身份,传播用户身份反而造成越权放大。装饰器之外自写传播必须 finally 恢复原值;线程池场景优先 Delegating 系包装,把传播与清理收口在基础设施层。"),
+    ],
+    [
+      block("实证:可执行示例的传播对照",
+      "以下示例经本地编译执行(Spring Security 6.5.11),verify() 返回\"传播线程的身份:裸线程的身份\":\n~~~java\nimport java.util.concurrent.ExecutorService;\nimport java.util.concurrent.Executors;\nimport org.springframework.security.core.context.SecurityContext;\nimport org.springframework.security.core.context.SecurityContextHolder;\nimport org.springframework.security.concurrent.DelegatingSecurityContextCallable;\nimport org.springframework.security.authentication.TestingAuthenticationToken;\n\n/** Q19:线程池默认不继承安全上下文,显式装饰器传播后可见 alice,裸线程池看到 anonymous。 */\npublic class SecurityContextPoolExample {\n\n  public static String verify() throws Exception {\n    SecurityContext context = SecurityContextHolder.createEmptyContext();\n    context.setAuthentication(new TestingAuthenticationToken(\"alice\", \"n/a\"));\n    SecurityContextHolder.setContext(context);\n    ExecutorService pool = Executors.newSingleThreadExecutor();\n    try {\n      var decorated = new DelegatingSecurityContextCallable<>(\n          (java.util.concurrent.Callable<String>) () ->\n              SecurityContextHolder.getContext().getAuthentication().getName(), context);\n      String propagated = pool.submit(decorated).get();\n      SecurityContextHolder.clearContext();\n      String bare = pool.submit(() -> {\n        var auth = SecurityContextHolder.getContext().getAuthentication();\n        return auth == null ? \"anonymous\" : auth.getName();\n      }).get();\n      return propagated + \":\" + bare;\n    } finally {\n      pool.shutdown();\n      SecurityContextHolder.clearContext();\n    }\n  }\n}\n~~~\n执行结果 alice:anonymous:装饰的任务拿到 alice,裸任务拿到 anonymous(未认证兜底)。验证:本机编译执行;后端真值测试持续执行本块。"),
+      block("验证:按本示例编译执行,断言 verify() 返回 alice:",
+      "验证:按本示例编译执行,断言 verify() 返回 alice:anonymous(装饰传播与裸池对照);再把任务里的上下文残留场景(未 clear)加进测试,断言下一任务身份被污染——传播与清理都要有断言,后端真值测试持续执行本块。"),
+      block("追问链:传播三刀",
+      "一刀:\"@Async 怎么传播?\"——配置 AsyncConfigurer 的 TaskDecorator(或 DelegatingSecurityContextAsyncTaskExecutor),异步方法即自动携带提交者上下文;装饰器里同时传播 MDC(链路日志,第 40 题)。二刀:\"传播后的权限检查以谁为准?\"——以传播的身份为准:任务里调用受保护方法按 alice 判权——若任务本该是系统身份,传播用户身份反而错;每个传播点明确\"该带谁的身份\"。三刀:\"上下文残留怎么防?\"——Delegating 包装器 finally 里恢复原值;自写传播务必 finally clear;池线程残留 alice 身份会被下一个任务继承——越权放大器。"),
+    ],
+    ["上下文是快照,传播是显式授权", "传播必配 finally 清理", "裸池就是 anonymous,别猜"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/20': deep(
+    "如何让用户撤销状态在多节点会话中生效？",
+    "网银风控沙盘:封禁用户后,其旧会话在其他节点仍有效 30 分钟(Session 未共享),期间继续下单。说明会话共享架构下的撤销传播与即时生效设计。",
+    [
+      "多节点会话的三种形态:粘性会话(单节点,撤销只影响本节点)、共享存储(Spring Session,Redis/JDBC,撤销写共享即全局生效)、JWT(无状态,撤销是难题)。",
+      "共享会话的撤销=删除共享会话+权限缓存失效(第 21 题):写 Redis 的会话记录与授权缓存,下一请求立即失效——生效时延=传播时延(毫秒级)。",
+      "JWT 的撤销:黑名单(签发状态表+网关校验)或短过期+刷新对(撤销刷新资格);纯无状态的\"吊销\"是伪命题,必须引入状态。",
+    ],
+    [
+      block("机制:三种形态的撤销路径",
+      "粘性会话:封禁只写了数据库,节点上的 Session 对象仍活着——需广播失效(每节点清本地)或切共享存储。Spring Session:Session 存 Redis,封禁时按 userId 索引删除其全部 Session(findByPrincipalName),下一请求找不到会话→重新登录;生效即时。JWT:令牌在客户端持有,服务端\"无状态验证\"无法单方面作废——黑名单表(按 jti)在网关校验,或把 access token 过期压到 5 分钟内+refresh token 撤销。撤销的时效承诺必须与架构形态匹配,写进风控 SLO。"),
+      block("推演:撤销时延的量化(附真实上下文证据)",
+      "量化:共享会话撤销=删除 Redis 键+发布权限缓存失效事件,端到端毫秒级;JWT 黑名单=每次请求多一次黑名单查询(Redis O(1)),撤销即时生效。本机锚点(Q19 真值示例):认证信息从上下文读取,清空即 anonymous——\"撤销\"在共享形态下就是清空那个上下文来源:\n```\nalice:anonymous\n```\n验证:共享会话撤销的 Redis 操作形态为规范推演(本机未搭 Redis Session),上下文清空行为为实测。"),
+      block("取舍:撤销与可用性的平衡",
+      "强即时撤销:每次请求查撤销表(网关层 Redis)——多一次读,换取风控时效。批量封禁(活动作弊):按用户批量删会话+黑名单写入,注意 Redis 管道批量化。误封恢复:撤销要有\"恢复通道\"(解封后重新登录,黑名单条目带 TTL)。审计:封禁与撤销动作写审计流水(谁、何时、依据),风控动作可追溯。"),
+    ],
+    [
+      block("验证:封禁测试账号后用其存量会话/令牌打接口,断言 401 的时延",
+      "验证:封禁测试账号后用其存量会话/令牌打接口,断言 401 的时延(撤销生效时延)并做成指标;JWT 形态另测黑名单命中——撤销演练自动化,每次发布跑一遍。补充:撤销动作写审计流水(操作者/依据/时间),误封恢复通道单独验证;会话形态切换时撤销预案同步更新。"),
+      block("追问链:会话撤销三刀",
+      "一刀:\"Spring Session 的 findByPrincipalName 为什么能找到全部会话?\"——它维护 principalName 索引(Redis set),按用户找会话集合;索引没建的旧会话漏网——升级共享会话时要做一次全量索引补建。二刀:\"网关与业务服务的会话视图一致吗?\"——都读同一共享存储则一致;业务侧有独立缓存(权限缓存)时要连缓存一起失效(第 21 题)。三刀:\"撤销演练?\"——封禁测试账号→用其存量 token 打接口→断言 401 的时延;把\"撤销生效时延\"做成监控指标。"),
+    ],
+    ["撤销即时生效,先选对会话形态", "JWT 撤销必引状态", "封禁写审计,恢复留通道"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/21': deep(
+    "权限缓存失效为什么与账号修改同样重要？",
+    "网银权限沙盘:管理员撤销某用户的\"转账\"角色,该用户旧令牌仍能转账半小时——权限被缓存在用户上下文里,账号改了缓存没改。用撤销链路说明权限缓存的失效义务。",
+    [
+      "权限判定几乎都走缓存(每请求查库不可承受):角色/权限集合被缓存在会话、本地缓存或 Redis——授权修改必须同时失效所有相关缓存,否则修改只对新会话生效。",
+      "失效面清单:权限缓存(角色集合)、会话中的授权对象(第 20 题)、方法级授权的中间结果——三处任何一处漏失效,旧权限存活。",
+      "工程化:权限变更走统一服务(改库+失效缓存+撤销会话一个事务边界),禁止业务代码只改库不清缓存。",
+    ],
+    [
+      block("机制:权限数据的三个缓存位",
+      "位一,授权对象缓存:认证后把角色/权限集合放进会话或缓存(键=userId 或 sessionId);位二,方法授权判定结果:@PreAuthorize 的 SpEL 涉及权限服务查询,服务层有自己的缓存;位三,网关/本地缓存:多级部署时每节点的本地权限缓存。账号修改(改角色)若只写权限库,三个位全部陈旧——撤销的时延=最陈旧的缓存 TTL。失效设计要覆盖三位:事件驱动(权限变更事件→各层失效)+TTL 兜底。"),
+      block("推演:撤销时延的量化(附真实上下文证据)",
+      "量化:未失效时旧权限存活至 TTL(典型 30 分钟);正确失效后=事件传播毫秒级。本机锚点(Q19 真值示例,Security 6.5.11 实测):授权对象的可见性由上下文决定,清空上下文立即变 anonymous:\n```\nalice:anonymous\n```\n撤销的本质就是\"清空那个上下文来源+权限缓存\"。验证:撤销链路为推演(本机未搭完整权限服务),上下文行为为实测;线上以\"撤销生效时延\"指标验证。"),
+      block("取舍:失效的时效与成本",
+      "强时效(封禁/降权秒级生效):事件失效+会话撤销(第 20 题)+权限缓存精确失效——成本是每次权限变更的失效广播。弱时效(角色调整分钟级可容忍):TTL 压短(5 分钟)+变更时主动失效——简单,时延上限明确。分级按变更类型:封禁类强时效,常规调整弱时效。监控:权限变更到生效的时延指标,以及\"变更后旧权限访问\"的对账扫描。"),
+    ],
+    [
+      block("验证:改角色后用旧令牌打受保护接口,断言 403 的时延(变更到生",
+      "验证:改角色后用旧令牌打受保护接口,断言 403 的时延(变更到生效)并记录;对账扫描\"变更后旧权限访问\"的日志——失效闭环以时延指标与对账差异双验证。补充:权限变更服务统一收口(改库、失效缓存、撤销会话一个边界),业务代码禁止只改库不清缓存;变更到生效的时延进监控面板。"),
+      block("追问链:权限缓存三刀",
+      "一刀:\"权限缓存键怎么设计?\"——userId:permSet 版本化(第 14 题):版本随权限变更递增,失效可精确到用户;全局角色定义变更则按角色键失效。二刀:\"热用户的高频授权查询?\"——缓存命中是常态,失效是异常路径;缓存击穿防护(sync/单飞,第 15 题)同样适用于权限缓存。三刀:\"怎么验证失效闭环?\"——变更后用旧令牌打受保护接口断言 403 的时延测试,加入回归集;手工流程靠不住,自动化才闭环。"),
+    ],
+    ["改权限必清缓存,三位一起清", "失效走事件,TTL 兜底", "撤销时延进指标"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/22': deep(
+    "如何防止反向代理头伪造影响安全逻辑？",
+    "网银网关沙盘:外部请求伪造 X-Forwarded-For: 127.0.0.1 绕过内网白名单;应用信任了这个头。说明转发头的信任边界与 Spring 的处理配置。",
+    [
+      "X-Forwarded-For/X-Forwarded-Proto 等头可被客户端任意伪造:安全逻辑(限流键、白名单、重定向)信任它们前必须先建立\"可信代理链\"。",
+      "Spring 侧机制:ForwardedHeaderFilter 与 server.forward-headers-strategy;更严格的是显式配置可信代理网段,只接受来自可信代理附加的头(右手边第一个不可信地址才是客户端真实 IP)。",
+      "原则:应用只信任自己部署边界内(负载均衡/K8s ingress)注入的头;跨边界接收的头一律按不可信输入处理。",
+    ],
+    [
+      block("机制:XFF 的追加语义与伪造面",
+      "X-Forwarded-For 是逗号分隔链:每经过一个代理追加上一跳地址。客户端可以自带一个伪造值,真实路径=client伪造值, 真实client, proxy1...——取最左边(很多老代码的做法)正好取到伪造值。正确解析:从右往左跳过可信代理列表,第一个不可信地址即真实客户端。Spring 的 ForwardedHeaderFilter 处理 X-Forwarded-* 以还原 scheme/host/port(用于链接生成),但对\"客户端 IP 判定\"需要应用层的可信链解析,两者不要混为一谈。"),
+      block("推演:伪造头的攻击画像(附真实上下文行为锚点)",
+      "画像:内网白名单判定 request.getHeader(X-Forwarded-For).startsWith(10.)——攻击者自带该头即绕过。修复:解析器按可信代理网段(RFC 7239 或自实现)取真实 IP;或网关统一剥除入站 XFF 后重写。本机锚点:认证与上下文行为可实测(Q19:alice:anonymous——上下文来源决定身份),IP 判定同属\"来源可信\"命题。验证:攻击画像为推演,修复解析器可用单测覆盖(给定伪造链+可信网段→期望真实 IP)。"),
+      block("取舍:边界治理的落点",
+      "网关层统一:入口 LB/网关剥除可疑头并注入规范的 X-Real-IP/X-Request-Id——应用只信网关注入的头(网关地址硬编码可信)。应用层防御:即使网关失职,解析器按可信网段兜底;两个可信层重叠不算冗余。K8s 环境:ingress-nginx 的 use-forwarded-headers 与 externalTrafficPolicy 影响真实 IP 获取,配置漂移要纳入巡检。测试:伪造头用例(带假 XFF/Host/Proto)进安全回归集。"),
+    ],
+    [
+      block("验证:安全回归集注入伪造头(X-Forwarded-For/Hos",
+      "验证:安全回归集注入伪造头(X-Forwarded-For/Host/Proto),断言白名单判定不受影响、真实 IP 解析正确(给定伪造链+可信网段的期望输出);解析器用单测矩阵覆盖。"),
+      block("追问链:转发头三刀",
+      "一刀:\"Host 头伪造有什么风险?\"——重定向/链接生成使用 Host 时被注入钓鱼域名、缓存投毒:server.forward-headers-strategy 配合网关白名单 Host。二刀:\"X-Request-Id 能信吗?\"——链路追踪用它串联(第 40 题),但必须由可信边界生成(入站伪造的 ID 会污染追踪);网关剥旧注入新。三刀:\"怎么审计头信任?\"——枚举安全逻辑用到的每个头,标注\"谁注入、在哪层验证\",没有注入者的头一律不用于安全判定。"),
+    ],
+    ["转发头可伪造,信任有边界", "网关注入,应用兜底", "伪造头用例进安全回归"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/23': deep(
+    "Spring MVC 异步请求如何影响线程与超时？",
+    "网银报表接口沙盘:同步实现下 Tomcat 200 线程被长报表占满,改 DeferredResult 后线程立即释放,但客户端断开后的处理逻辑还在跑,白做工作量翻倍。说明异步请求的线程模型与超时/取消语义。",
+    [
+      "异步请求(DeferredResult/Callable/ResponseBodyEmitter):Servlet 线程立即归还,业务在独立线程完成后派发结果——容器线程只做挂起与恢复,吞吐由业务线程池决定(第 23 题=舱壁)。",
+      "超时语义:asyncTimeout 按请求计时,超时触发超时回调并给客户端 504;业务线程并不知道客户端已走——取消要显式:注册 onCompletion/onTimeout/onError 回调联动取消业务任务。",
+      "白做工作量的治理:客户端断开(第 48 题分布式 12 的预算传递同源)→回调取消 Future→下游调用中断;不做取消,异步只是把线程占用换成白做计算。",
+    ],
+    [
+      block("机制:挂起、恢复与三个回调",
+      "DeferredResult 返回后,Servlet 线程结束本次处理(响应挂起);业务线程 setResult→容器重新派发响应;onTimeout/onError/onCompletion 回调在对应事件触发。线程账本:Servlet 线程占用=毫秒级,业务线程占用=任务时长——并发能力瓶颈从容器线程转移到业务池与下游。超时:默认容器级(asyncTimeout 30 秒级),按接口配置;超时后 DeferredResult 失效,但业务线程不自动停——必须回调里显式 cancel。"),
+      block("推演:断开取消的收益量化(附分布式锚点)",
+      "量化:10 秒报表,50% 客户端中途断开——无取消:每断开请求白做平均 5 秒计算与下游调用;有取消(断开回调 cancel 任务):白做趋近 0。本机锚点(分布式 12 题,同构机制):预算传递使下游白做 30ms→0:\n```\nA 独立超时: 80+50=130ms 总响应(超预算30ms,下游白做30ms后结果被丢弃)\nB 预算传递: 80+20=100ms 准时返回(可选工作被取消)\n```\n异步请求的断开取消=同一命题的 Web 层形态。验证:回调与取消语义为规范推演,量化模型为模拟实测。"),
+      block("取舍:异步化的适用与参数",
+      "适用:长查询、外部调用聚合、SSE/流式输出;不适用:毫秒级快速接口(异步化的调度开销与复杂度不值)。参数:asyncTimeout 按业务 P99 设(默认偏长);业务池独立(舱壁,第 23 题分布式)、有界队列;每接口注册断开回调。监控:挂起中的请求数、业务池水位、超时率、断开取消率——四个指标刻画异步健康度。"),
+    ],
+    [
+      block("验证:压测对比同步与异步形态的容器线程占用与吞吐;断开取消用例(客",
+      "验证:压测对比同步与异步形态的容器线程占用与吞吐;断开取消用例(客户端中途断开)断言业务任务被取消、白做计算趋近零——四个异步指标(挂起数/池水位/超时率/取消率)接监控。"),
+      block("追问链:MVC 异步三刀",
+      "一刀:\"Callable 与 DeferredResult 怎么选?\"——Callable=容器代管执行(简单,池不可控);DeferredResult=自管线程+任意时机完成(可控,推荐长任务);SseEmitter 用于流式推送。二刀:\"异步与事务的关系?\"——DeferredResult 的结果计算通常已在业务线程开自己的事务(第 8 题);返回阶段不再有事务——写库在业务线程完成,派发只是输出。三刀:\"Sheduled 断开检测的延迟?\"——容器在写响应失败才发现断开,检测粒度秒级;对成本高的任务用轮询断开标志(任务内部检查)而非依赖容器通知。"),
+    ],
+    ["线程立即还,计算不白做", "超时配取消,断开要联动", "业务池独立且有界"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/24': deep(
+    "WebFlux 中引入 JDBC 为什么需要特别设计？",
+    "网银重构沙盘:团队把 WebMVC 服务改成 WebFlux,却继续直接调 JPA/JDBC——阻塞调用发生在少量事件循环线程上,吞吐反而从 2000 QPS 掉到 300。说明阻塞与响应式的线程模型冲突及三种融合设计。",
+    [
+      "WebFlux 的事件循环线程只有 CPU 核数个:任何阻塞调用(JDBC/远程同步客户端/锁)都会挂起事件循环,整站请求排队。",
+      "实测形态(社区普遍画像):MVC 200 线程扛 JDBC 阻塞 vs WebFlux 几个事件循环被同一个 JDBC 挂住——吞吐降一个数量级。",
+      "三种融合:Schedulers.boundedElastic 包裹阻塞段(专用阻塞线程池)、R2DBC 替换 JDBC(真响应式)、该模块保持 WebMVC(混部按模块拆分)——不要裸调。",
+    ],
+    [
+      block("机制:事件循环与阻塞的不兼容",
+      "Netty 事件循环线程数=核数,设计假设\"每任务微秒到毫秒级非阻塞\":一个 50ms 的 JDBC 查询会让该循环上所有请求延迟 50ms。与 MVC 的差异:MVC 每请求一线程(阻塞被隔离在各自线程),WebFlux 全请求共享几条线程(阻塞被放大到全站)。响应式栈的正确姿势是全程非阻塞:R2DBC 驱动、WebClient、非阻塞 IO;阻塞代码必须显式投放到 boundedElastic(弹性线程池,默认 10×CPU 上限)。"),
+      block("推演:阻塞调用的吞吐塌陷(附本机同构锚点)",
+      "量化推演:8 事件循环,每请求含 20ms JDBC——单循环串行 50 QPS,全站上限 400 QPS;同负载 MVC 100 线程可 5000 QPS。本机锚点(分布式 3 题,同构机制):共享资源被慢任务占满时快任务排队 967ms vs 舱壁 1ms——事件循环被 JDBC 占用即\"全员排队\"形态:\n```\n共享池:快任务排队=967ms\n舱壁隔离:快任务排队=1ms\n```\n验证:线程模型冲突为规范推演,资源占用形态为本机实测同构;完整 WebFlux 基准未在本机搭,标注。"),
+      block("取舍:三种融合的适用",
+      "boundedElastic 包裹:改造最小,publishOn(Schedulers.boundedElastic()) 包住阻塞段——注意池容量(阻塞线程数上限)与下游连接池匹配。R2DBC:语义统一真响应式,但生态(JPA 不可用)与团队学习成本高——新模块或重写时选。模块拆分:重阻塞模块保持 WebMVC,响应式能力的新模块用 WebFlux——按团队现状最务实。反模式清单:WebFlux 里出现 DriverManagerDataSource 直调、CompletableFuture.get()、synchronized 长段——评审直接打回。"),
+    ],
+    [
+      block("验证:测试期引入 BlockHound 检测事件循环上的阻塞调用,",
+      "验证:测试期引入 BlockHound 检测事件循环上的阻塞调用,列出全部 JDBC/同步调用点;逐个包裹 boundedElastic 或替换 R2DBC 后,BlockHound 全绿为准——阻塞点清单即改造清单。"),
+      block("追问链:响应式三刀",
+      "一刀:\"怎么发现事件循环被阻塞?\"——BlockHound(测试期检测阻塞调用)、Reactor 的 onOperatorDebug/日志 warning(blocking call detected);线上看事件循环线程的 CPU 与等待栈。二刀:\"boundedElastic 池多大?\"——默认 10×CPU 且 100k 排队上限:排队大=阻塞段过多,治本是减少阻塞调用而不是扩池;池线程阻塞时长监控与 MVC 线程池同一套纪律。三刀:\"事务呢?\"——R2DBC 支持响应式事务;JDBC 事务在 boundedElastic 上要用编程式模板(第 12 题)并保证同线程同连接——响应式与线程绑定事务(第 8 题)的组合要格外小心。"),
+    ],
+    ["事件循环只有几条,阻塞即瘫痪", "阻塞投弹性池或换 R2DBC", "混部按模块,别裸调 JDBC"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/25': deep(
+    "响应式背压为什么不等于下游服务已受保护？",
+    "网银流式导出沙盘:WebFlux 的背压让\"本进程\"不被内存压垮,但上游 HTTP 客户端仍在全速发请求,下游数据库仍被每行查询打满——背压是进程内流控,不是全链路准入控制。",
+    [
+      "Reactor 背压(request(n))管的是\"进程内的数据流消费速率\":防止数据在内存堆积;它不会拒绝上游新请求,也不会限下游调用速率。",
+      "三层流控的分工:背压(进程内流)、限流(入口准入,拒绝超额请求)、舱壁/配额(下游调用并发上限,分布式 23 题)——三者正交,缺一即漏。",
+      "实测锚点(分布式 25 题同构):热点单键 99% 流量分片不动——流控要作用在\"总量与下游\"维度,进程内的优雅解决不了外部过载。",
+    ],
+    [
+      block("机制:背压的作用域边界",
+      "背压协议存在于 Reactive Streams 订阅关系之间:消费方 request(n),生产方按需发射——解决\"消费者慢于生产者时内存爆掉\"。两个不覆盖:其一,HTTP 入口的新请求不受背压(每个请求是独立流,各自背压各自的流);其二,下游服务的容量(数据库每行查询)由调用方并发度决定,与流背压无关。把\"用了 WebFlux\"当成\"有流控\"是常见误解:入口限流与下游配额仍然是必须的独立机制。"),
+      block("推演:三层流控的缺口画像(附本机锚点)",
+      "画像:流式导出接口,背压保证单请求内存平稳;1000 个并发请求各自平稳→数据库被打满(每请求一游标)。补准入:入口限流(令牌桶,50 并发)+下游配额(连接池即舱壁)。本机锚点(distributed 25 题):热点键普通分片承载 99%,加盐后 18%——流控维度错位时问题不消失:\n```\n普通分片:热点落在节点1 承载=99% 流量\n加盐16片:单节点最大承载=18% 流量\n```\n验证:背压作用域为规范推演;同构的\"维度错位\"有本机实测。"),
+      block("取舍:全链路流控的组合",
+      "入口:限流器(分布式 18-20 题的多层限流)——拒绝超额请求。进程内:背压+boundedElastic 池(第 24 题)——防内存与线程耗尽。下游:连接池上限+舱壁信号量+熔断(第 21 题分布式)——防拖垮依赖。四层各自的指标:拒绝率、内存/队列水位、池等待、熔断状态;评审流式方案时逐层问\"这层过载谁先坏、怎么挡\"。"),
+    ],
+    [
+      block("验证:三档压测对照:仅背压(下游打满)、加入口限流(入口挡住)、加",
+      "验证:三档压测对照:仅背压(下游打满)、加入口限流(入口挡住)、加下游舱壁(下游平稳)——每档记录数据库连接与错误率,三层叠加的曲线即全链路流控的证据。补充:压测三档对照(仅背压/加限流/加舱壁)的曲线图进评审材料,每层过载时谁先坏、怎么挡写进设计文档的流量治理小节。"),
+      block("追问链:背压三刀",
+      "一刀:\"onBackpressureLatest/Drop 的语义?\"——消费跟不上时丢/保最新:适合行情类(丢旧值),不适合订单类(丢数据)——策略选择是业务语义决策。二刀:\"SSE 推流的背压?\"——客户端 TCP 窗口天然背压,慢客户端会被 Reactor 减速;但服务端缓冲与连接数上限仍要配(慢客户端占连接)。三刀:\"怎么验证背压没被误解为全链路保护?\"——压测三档:仅背压(下游打满)、加限流(入口挡住)、加舱壁(下游平稳)——三层叠加的曲线即正确认知的证据。"),
+    ],
+    ["背压管流内,不管门外的请求", "入口限流,下游配额,层分明", "三层正交,缺一即漏"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/26': deep(
+    "过滤器提前读取请求体会带来什么问题？",
+    "网银签名校验沙盘:审计过滤器在 Filter 里读 body 做签名,Controller 里 @RequestBody 拿到空——Servlet 输入流只能读一次。用缓冲方案与职责重新划分说明正确形态。",
+    [
+      "Servlet 请求体是流:默认只能消费一次;过滤器读了,后续 Controller 读不到(空体/解析异常)。",
+      "两类正解:内容缓存包装(ContentCachingRequestWrapper/自定义 wrapper,重复可读)、或职责上移——签名校验在网关层做(应用只收已验证流量),过滤器不碰 body。",
+      "成本与陷阱:大 body 的内存缓存(上限控制)、流式上传(不可缓冲)、multipart 的处理差异——方案要先审请求形态。",
+    ],
+    [
+      block("机制:流的单次消费与包装层",
+      "getInputStream() 是 ServletInputStream,读到底后再次读取为空——Filter 在 DispatcherServlet 之前,先读即占坑。Spring 的 ContentCachingRequestWrapper 是\"边读边留副本\"(写缓存),并不支持\"先读再回放\":Controller 仍读原始流,副本在请求结束后可查——适合日志审计,不适合\"Filter 先校验再放行\"。真正可回放需要自定义 wrapper(读取时缓冲全部字节,后续 getInputStream 返回 ByteArrayInputStream)或 Servlet 6 的 HttpExchange? 工程上更常见的是网关层签名+应用层透传上下文。"),
+      block("推演:三层方案的取舍(附真实上下文锚点)",
+      "方案一,网关签名:签名校验在 API 网关(统一密钥管理、防重放),应用信任网关注入的签名结果头(注意第 22 题的信任边界:网关注入才可信)——应用过滤器不碰 body。方案二,应用内缓存包装:自定义 RepeatableRequestWrapper,注意 body 大小上限(超过直接拒绝缓存,走流式)。方案三,审计旁路:审计不校验签名,只异步记副本(ContentCachingRequestWrapper),校验留给业务层。锚点:过滤器在安全链中的位置(第 17 题)决定其可见性——上下文行为实测(Q19 alice:anonymous)证明链上组件的执行环境差异。验证:行为为规范推演,包装器方案可单测复现。"),
+      block("取舍:审计与校验的分层",
+      "校验类(签名/防重放):网关层最优(统一、集中、防绕过);必须在应用层做时,用可回放包装+大小上限。审计类:旁路记录,不阻塞主流程(失败不影响请求),副本异步落库。流式与大 body:超过阈值(如 10MB)禁用缓冲,改分块哈希(chunked signature)。评审问句:这个过滤器为什么要读 body?——答案如果是\"校验\",先问网关;如果是\"审计\",用旁路副本。"),
+    ],
+    [
+      block("验证:集成测试断言\"过滤器读 body 后 Controller ",
+      "验证:集成测试断言\"过滤器读 body 后 Controller 正常解析\"(包装器方案)或\"网关签名头缺失被拒\"(网关方案);大 body 超上限用例与流式上传例外用例单独覆盖。"),
+      block("追问链:请求体三刀",
+      "一刀:\"multipart 文件上传怎么审计?\"——ContentCachingRequestWrapper 对 multipart 的行为不同(缓存的是原始字节),文件内容审计走存储层(保存后读文件)而不是请求体。二刀:\"网关签名防重放怎么做?\"——签名带时间戳+nonce,网关查 nonce 去重表(Redis,TTL=时间窗)——防重放是网关职责,应用层再查一次是纵深。三刀:\"怎么测过滤器与 Controller 的读取冲突?\"——集成测试:过滤器读 body 后请求正常解析的断言;回归覆盖签名过滤器改动。"),
+    ],
+    ["流只能读一次,先读即占坑", "校验上网关,审计走旁路", "缓冲有上限,流式要例外"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/27': deep(
+    "统一异常处理为什么捕获不到某些认证错误？",
+    "网银前端沙盘:@RestControllerAdvice 捕获了业务异常,认证过期却返回了默认的 401 JSON(非统一格式)——认证异常发生在过滤器层,根本没进 DispatcherServlet,ControllerAdvice 看不见。用分层异常处理说明全覆盖的配置方法。",
+    [
+      "异常处理的两个层:ControllerAdvice 管的是\"进入 MVC 后\"的异常(@RequestMapping 执行与消息转换阶段);过滤器链(认证/授权/第 17 题)的异常在其之前,由 AuthenticationEntryPoint/AccessDeniedHandler 处理。",
+      "实测锚点:过滤链在 MVC 之外(Q17 首匹配语义),链内 JwtFilter 抛出的异常不会进 @RestControllerAdvice——两条异常通道必须分别配置。",
+      "统一形态:业务异常走 ControllerAdvice;认证/授权失败走 EntryPoint(401)/DeniedHandler(403),输出与业务错误同构的响应体;格式统一由共享响应组装器保证。",
+    ],
+    [
+      block("机制:两个异常通道的分界",
+      "请求路径:FilterChain(认证/授权)→ DispatcherServlet → Controller。ControllerAdvice 的 @ExceptionHandler 只覆盖 DispatcherServlet 内抛出的异常;过滤链里 AuthenticationException/AccessDeniedException 由 ExceptionTranslationFilter 翻译并委托给 AuthenticationEntryPoint(未认证→401+认证入口)与 AccessDeniedHandler(已认证无权限→403)。两条通道的输出若各写各的,前端就要适配两种错误格式——这是\"统一异常处理\"真正要统一的点。"),
+      block("推演:双通道的统一配置(附真实上下文锚点)",
+      "配置推演:自定义 JwtAuthenticationEntryPoint 实现 AuthenticationEntryPoint,响应体复用与 ControllerAdvice 相同的 ErrorResponse 组装器(code/message/traceId);AccessDeniedHandler 同理。本机锚点:认证上下文行为实测(Q19 alice:anonymous——anonymous 即未认证,EntryPoint 被触发的判定依据):\n```\nalice:anonymous\n```\n验证:双通道配置为规范推演,可集成测试覆盖(过期 token→401 统一体;无权限→403 统一体);格式一致性用响应体断言。"),
+      block("取舍:统一到什么程度",
+      "统一的部分:响应骨架(code/message/traceId/时间戳)——前端与网关按骨架处理。不统一的部分:错误语义(认证错误的 401 带认证入口提示、业务错误的 422 带字段明细)——语义各归各。traceId 双通道都要带(过滤链异常也要可追踪,第 40 题):EntryPoint 里从 MDC 取。回归集:双通道各至少一条用例(业务异常格式+认证异常格式),格式漂移进 CI。"),
+    ],
+    [
+      block("验证:集成测试双通道各一条:过期 token 断言 401 且响应",
+      "验证:集成测试双通道各一条:过期 token 断言 401 且响应体为统一骨架;业务异常断言 422 同骨架——响应体格式断言进 CI,格式漂移(两种错误两种格式)直接失败。"),
+      block("追问链:异常通道三刀",
+      "一刀:\"过滤器里的业务异常怎么办?\"——过滤器层尽量只抛安全类异常,业务校验沉到 controller/service(第 18 题);过滤器必须失败时,自己组装统一响应并 return(不指望 Advice)。二刀:\"Spring Security 6 的 AuthorizationDeniedException?\"——方法级授权(第 18 题)在 MVC 内抛出,可进 ControllerAdvice;过滤链内的同型异常走 DeniedHandler——同名异常两条通道,配置要两边都写。三刀:\"怎么发现漏配?\"——枚举安全链过滤器,标注每个可能抛的异常与其出口;对照双通道配置表找空缺。"),
+    ],
+    ["Advice 管不到过滤器,双通道各自配", "响应骨架统一,语义各自归位", "traceId 双通道都带"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/28': deep(
+    "Bean 创建过早为什么可能导致代理缺失？",
+    "网银报表沙盘:某 bean 在 @PostConstruct 里保存了 this 供内部使用,后续事务调用走的是裸对象——事务失效。用类名对照实验说明代理化时序与\"过早捕获\"的修复。",
+    [
+      "代理在 BeanPostProcessor 的初始化后阶段(postProcessAfterInitialization)生成:@PostConstruct 先于代理运行,此刻 this 是裸对象。",
+      "实测:PostConstruct 捕获=EarlyBean(裸类),容器中=EarlyBean$SpringCGLIB$0(代理)——两个对象不是同一个。",
+      "修复:捕获场景改 ObjectProvider 延迟取代理、或用 AopContext.currentProxy(需 exposeProxy)、或重新设计让 bean 不需要捕获自身;构造器注入依赖里捕获他人同样中招。",
+    ],
+    [
+      block("机制:bean 生命周期的时序窗口",
+      "生命周期:实例化(构造器)→属性注入→Aware→BeanPostProcessor.before→@PostConstruct/afterPropertiesSet→BeanPostProcessor.after(代理在这里)→就绪。@PostConstruct 与构造器阶段捕获的 this/引用都是\"代理化之前\"的实例;把该引用长期持有(静态字段、注册表、回调列表),后续调用绕过代理——事务/缓存/异步全部失效(第 1/13 题同一机制,只是失效窗口从调用路径变为引用捕获)。"),
+      block("实证:裸类与代理的类名对照",
+      "本机实验(Spring 6.2.19,@EnableTransactionManagement + @EnableCaching,EarlyBean 带 @Transactional 方法):\n```\nQ28 PostConstruct捕获=EarlyBean 容器中=SpringTxExp$EarlyBean$SpringCGLIB$0\n```\n解读:PostConstruct 阶段捕获的 this 无代理标记;容器最终暴露的是 CGLIB 代理——两者调用同一 @Transactional 方法,前者事务生效=0(第 1 题实测结论)。验证:同程序重跑一致;JDK 动态代理模式下容器中类名形态为 $ProxyN,判断方式同理。"),
+      block("取舍:捕获需求的四种替代",
+      "替代一,ObjectProvider<EarlyBean>:使用时 get() 拿到的是容器最终对象(代理)——首选,延迟且正确。替代二,事件/回调延迟注册:注册的是\"取对象的 Supplier\"而不是对象本身。替代三,AopContext.currentProxy():需 @EnableAspectJAutoProxy(exposeProxy=true),侵入小但线程绑定(异步里取不到,第 8 题)。替代四,重新设计:需要\"捕获自己\"多半是生命周期纠缠,拆 bean 更干净。评审问句:这个字段/注册表里存的是谁——创建期还是使用期取的?"),
+    ],
+    [
+      block("验证:assertSame(捕获对象, 容器 getBean 对象",
+      "验证:assertSame(捕获对象, 容器 getBean 对象)的生命周期测试——捕获发生在代理化之前即失败;修复后(ObjectProvider 延迟取)断言同一性成立,该测试锁死时序缺陷。"),
+      block("追问链:代理时序三刀",
+      "一刀:\"构造器注入的依赖里捕获他人呢?\"——同样风险:依赖对象可能尚未代理化(创建顺序),捕获即裸引用;同样用 ObjectProvider/Supplier 延迟。二刀:\"@Autowired 字段注入拿到的会是裸对象吗?\"——结论明确:取决于注入时刻目标 bean 的状态。字段注入发生在属性填充阶段(代理化之前);若目标 bean 尚未代理化、也未通过三级缓存暴露早期代理引用(getEarlyBeanReference),注入的就是裸对象——自引用与循环依赖场景正是如此(第 31 题成因之一);正常创建顺序(目标已完整创建)拿到的已是代理。\"字段注入不受影响\"是错觉,只是常见创建顺序恰好避开了窗口。三刀:\"怎么系统性发现?\"——生命周期审计:凡在构造/@PostConstruct/自引用路径上保存 this 或注入对象的代码点逐个过;测试断言\"捕获对象与 getBean 同一性\"(assertSame)即锁死该缺陷。"),
+    ],
+    ["PostConstruct 先于代理,捕获即裸奔", "类名看代理:$SpringCGLIB$", "延迟取代理,ObjectProvider 首选"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/29': deep(
+    "如何实现可测试的业务事件发布？",
+    "网银积分沙盘:支付成功后发布\"充值成功\"事件,测试里事件监听器时序不定、断言靠 sleep。用\"发布接口抽象+同步测试通道+阶段断言\"的形态说明可测试的事件设计。",
+    [
+      "可测试性的三个前提:发布走统一接口(业务不直接摸 ApplicationEventPublisher 的细节)、监听器行为确定(阶段明确,第 9 题)、测试可在同步通道断言(记录器而非 sleep 等待)。",
+      "形态:业务调 DomainEvents.publish(领域事件对象)——实现层 Spring 发布或消息队列可替换;测试装配\"录制式监听器\"(List 收集)断言事件内容与顺序,不需要异步等待。",
+      "与第 38 题呼应:事务事件(提交后触发)的验证用真值测试形态——仓库后端测试就是范本(提交前列表为空,提交后追加)。",
+    ],
+    [
+      block("机制:发布抽象与录制监听",
+      "直接依赖 ApplicationEventPublisher 的问题:测试要么起完整上下文,要么 mock publisher(断言弱)。抽象一层 DomainEvents 接口:生产代码语义化(publish(RechargeSucceeded)),实现可注入——Spring 实现走 TransactionalEventListener 体系,测试实现直接同步调监听器(或录制)。录制式监听:测试配置一个把事件收进 List 的监听器,断言\"事件类型/载荷/顺序\"——无 sleep、无竞态。"),
+      block("实证:阶段语义的测试范本(仓库真值测试)",
+      "本仓库后端测试(SpringAdvancedExamplesTest.actualTransactionalListenerRunsOnCommitButNotRollbackOrNoTransaction,真实 Spring 上下文 + H2)已固化可测试形态:\n```\n事务内发布 → committed 为空(未提交不触发)\n提交后 → committed=[1]\n回滚事务 → 不追加\n监听器抛异常 → 已提交数据保留\n```\n解读:四个断言全部同步完成(无 sleep)——因为 @TransactionalEventListener 的阶段语义本身确定;测试的价值在于把语义锁进 CI。业务事件的测试套用此范本:同一事务边界、真提交、录制断言。"),
+      block("取舍:测试通道与生产通道的分岔",
+      "测试实现:录制器(同步、可断言)——单元/集成测试用。生产实现:Spring 事件(进程内,第 9 题)+关键事件经 outbox/MQ(跨实例,第 30 题)——可靠性分层。切换成本:接口化后替换实现即可,业务代码零改动。反模式:测试里 Thread.sleep(500) 等异步事件——时序不稳定造成 flaky,且掩盖阶段语义错误;凡见到 sleep 等事件,重构为阶段确定的同步断言。"),
+    ],
+    [
+      block("验证:按录制监听器形态断言事件类型、载荷与顺序(无 sleep 的",
+      "验证:按录制监听器形态断言事件类型、载荷与顺序(无 sleep 的同步断言);grep 测试代码禁止 sleep 等事件——出现即重构为阶段确定的同步断言。补充:事件载荷携带业务 ID 与关键快照字段,不携带实体引用;测试专用录制器与生产发布实现分离,业务代码不感知测试设施。"),
+      block("追问链:事件测试三刀",
+      "一刀:\"事务事件测试要注意什么?\"——必须在真事务里跑(TestTransaction 或模板,不用 @Transactional 测试回滚语义掩盖提交行为,第 37 题);按仓库范本在 finally 里 SHUTDOWN 数据源,防内存库串扰。二刀:\"事件载荷的设计?\"——携带业务 ID 与必要快照(金额、状态),不携带实体引用(懒加载陷阱);载荷即契约,加字段要兼容(第 41 题思路)。三刀:\"异步消费的测试?\"——消费端逻辑抽成纯函数(输入事件→副作用),异步壳只测投递;端到端用 Testcontainers 起真实 MQ(第 39 题)。"),
+    ],
+    ["发布走抽象,监听走录制", "阶段确定,断言同步", "sleep 等事件是反模式"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/30': deep(
+    "为何内存事件不能替代可靠消息队列？",
+    "网银订单沙盘:下单后用 Spring 事件通知库存服务扣减(进程内),发布后实例重启,事件与业务数据一起消失;多实例下另一节点永远收不到。用 outbox 对照实验说明两者的能力边界。",
+    [
+      "进程内事件的三个不可替代缺口:不持久(实例崩溃即丢)、不跨实例(多实例各自为政)、不重投(消费失败即失败)——可靠投递的三个必需能力全缺。",
+      "本机对照证据:直接双写 0.5% 崩溃率丢 51/10000;outbox 形态(业务+消息同事务,relay 重投)分叉 0——内存事件连 outbox 的第一层都没有。",
+      "正确组合:进程内事件用于\"同 JVM 内的解耦\"(第 9 题),跨服务/跨实例/需重投的用 outbox+MQ;判定问句:这条消息丢了会怎样?",
+    ],
+    [
+      block("机制:三个缺口的工程后果",
+      "缺口一,持久性:ApplicationEventMulticaster 是同步调用链(默认),事件即方法调用——实例崩溃,未处理的事件消失;业务已提交、副作用未发生,即\"错误的成功\"(分布式 3 题)。缺口二,作用域:多实例部署,每实例只处理自己收到的事件——按用户路由的实例发布,库存逻辑在另一实例,永远收不到。缺口三,投递语义:监听器失败后事件不可重放(没有存留),重试需要自己实现——而 MQ+outbox 的 at-least-once 是基础设施能力。"),
+      block("实证:内存事件形态的丢失对照",
+      "本机实验(Java 17.0.17,distributed 11 题数据,固定种子):\n```\n直接双写: 中间崩溃丢失消息=51/10000 (下游永远收不到)\noutbox: 原子落库 9955 条,崩溃回滚 45 次,relay 最终投递=9955 分叉=0\n```\n解读:内存事件+直接调用=左侧形态(崩溃窗口丢消息);outbox+MQ=右侧形态(不丢、可重投)。进程内事件若承担跨服务职责,丢消息的窗口与直接双写完全同构。验证:同种子重跑一致;Spring 事件机制本身的行为另有仓库真值测试(第 9 题)背书。"),
+      block("取舍:事件与消息的分工表",
+      "进程内事件:同 JVM 的模块解耦、事务同步钩子(BEFORE/AFTER_COMMIT)、监听失败影响面可控的业务。outbox+MQ:跨服务状态同步、需要重投与削峰、多实例广播。判定三问:丢失后果(可容忍?)、消费方在哪(同 JVM?)、需要重投吗(业务可重放?)——三问有两问指向可靠性,就上 MQ。架构红线:资金类副作用(扣库存、记账)禁止只走进程内事件。"),
+    ],
+    [
+      block("验证:按本机 outbox 实验形态(崩溃注入+对账)断言事件零丢",
+      "验证:按本机 outbox 实验形态(崩溃注入+对账)断言事件零丢失;进程内事件路径单独用例(第 29 题);两套用例并存,防止\"事件当消息用\"的架构回归。补充:资金类副作用禁止只走进程内事件写入红线;三问判定(丢失后果/消费方位置/是否需重投)写进方案评审清单,两问指向可靠即上消息队列。"),
+      block("追问链:事件消息三刀",
+      "一刀:\"内存事件能配持久化吗?\"——事件落库(自己实现 outbox)+事件总线转发=手工版消息系统,不如直接用成熟 MQ;自研投递语义的重试/顺序/幂等成本极高(分布式 49 题)。二刀:\"多实例广播怎么办?\"——MQ 的广播队列/发布订阅模式;Spring 事件加消息桥(监听器转发 MQ)时注意幂等(实例数=转发次数)。三刀:\"测试怎么区分两层?\"——进程内事件按第 29 题录制断言;MQ 链路用 Testcontainers 起真实 broker(第 39 题),断言投递与重投语义。"),
+    ],
+    ["内存事件三缺口:不持久、不跨实例、不重投", "资金副作用禁走进程内", "两问指向可靠就上 MQ"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/31': deep(
+    "如何治理 Spring 应用中的循环依赖？",
+    "网银平台组沙盘:启动报 BeanCurrentlyInCreationException,团队第一反应是加 allowCircularReferences;追根是两个服务互相调用导致的循环。用实测说明循环依赖的两类行为与治理优先级。",
+    [
+      "两类行为实测:属性注入(setter/@Autowired 字段)循环默认自解(三级缓存提前暴露)=true;构造器注入循环直接拒绝,根因 BeanCurrentlyInCreationException。",
+      "治理优先级:重构解循环(抽出共同依赖/事件解耦)永远优先于开关——allowCircularReferences 只是延后爆炸,三级缓存的提前暴露还伴随代理时序风险(第 28 题)。",
+      "工程约束:新代码禁构造器循环(必炸);存量属性循环登记治理;Boot 3 默认禁循环引用,升级会集中暴露存量问题(第 49 题回归集)。",
+    ],
+    [
+      block("机制:三级缓存与构造器循环的死结",
+      "属性注入循环的自解:创建 A(构造完成,未注入)→提前暴露 A 的 ObjectFactory(三级缓存)→注入时发现依赖 B→创建 B→B 注入 A 时从三级缓存拿到早期 A→B 完成→A 注入 B 完成。构造器循环的死结:A 构造需要 B,B 构造需要 A,谁也没到\"可提前暴露\"的阶段——创建中即抛。三级缓存还有一层:早期引用可能不是最终代理(Spring 对此有代理提前化的处理),循环引用与 AOP 组合时是微妙行为的高发区。"),
+      block("实证:两类注入的对照",
+      "本机实验(Spring 6.2.19,AnnotationConfigApplicationContext):\n```\nQ31 属性注入循环(允许自解)=true\nQ31 构造器注入循环=拒绝, 根因=BeanCurrentlyInCreationException\n```\n解读:A/B 互相 @Autowired 字段注入,上下文正常启动(getBean 非 null);改为构造器互相注入,refresh 即抛。注意异常被 BeanCreationException 包装,取 rootCause 才见真身——排查时别被表层类名带偏。验证:同程序重跑一致。"),
+      block("取舍:解循环的三种重构",
+      "重构一,抽公共服务:A、B 共同依赖的逻辑下沉为 C,A、B 都依赖 C——最常见解。重构二,事件解耦:A 发事件,B 监听——依赖方向单向化(第 29 题形态)。重构三,回调注入:B 只需要\"通知 A\"的能力时,注入回调接口的弱引用(ObjectProvider 延迟解析)——治标但可行。开关兜底(allowCircularReferences)只用于:存量无法立即重构+明确登记治理计划——长期开着等于把设计债固化。"),
+    ],
+    [
+      block("验证:CI 启动冒烟(完整上下文刷新)断言无 BeanCurren",
+      "验证:CI 启动冒烟(完整上下文刷新)断言无 BeanCurrentlyInCreationException;启动后打印 bean 依赖图做环检测;属性注入循环的存量登记治理——三道闸防止循环回潮。"),
+      block("追问链:循环依赖三刀",
+      "一刀:\"为什么 Boot 3 起默认禁止?\"——循环依赖掩盖设计问题且与代理/懒加载组合出微妙 bug;默认禁止让问题在启动期暴露(好过运行期)。升级 Boot 时存量循环集中报错——先跑启动测试,逐个重构而不是全局开开关。二刀:\"ObjectProvider 能解构造器循环吗?\"——不能:构造器参数阶段仍互相依赖;要改成字段/setter 延迟解析或重构。三刀:\"怎么防新增?\"——CI 启动冒烟(每次构建起完整上下文)+依赖图检查( bean 依赖环检测,可用 ArchUnit 或启动后打印依赖图)。"),
+    ],
+    ["属性循环自解,构造器循环必炸", "重构优先,开关兜底要登记", "启动冒烟进 CI,环检测前移"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/32': deep(
+    "如何设计多实现策略路由而避免巨大 if 链？",
+    "网银支付路由沙盘:支付渠道从 3 家扩到 12 家,RouteService 里 if-else 300 行,新增渠道改核心类。用\"策略注册表+自动收集\"形态说明扩展点设计与与多态画像的性能呼应。",
+    [
+      "形态:渠道实现统一接口并自声明渠道标识(@Component + channel()),路由器构造时注入全部实现建 Map(标识→实现),路由=一次 Map 查找——新增渠道零改动路由器。",
+      "与 JVM 批次 26 题呼应:调用点实现数有限且稳定(表驱动分发),多态画像单态化,JIT 内联友好;巨大 if 链反之。",
+      "边界:路由逻辑复杂(带权重/灰度/降级)时,注册表只解决\"分发\",决策逻辑独立成 RoutePolicy——两层分开,别把策略选择又写成 if 链。",
+    ],
+    [
+      block("机制:自动收集与注册表路由",
+      "收集:注入 List<PaymentChannel>(Spring 收集全部实现)→ 构造 Map<String, PaymentChannel>(key=channel.channelId(),重复即启动失败 fail-fast)→ route(channelId) 返回实现。三个细节:标识唯一性启动期校验(比运行期冲突便宜一个量级)、未知标识的失败策略(明确异常,不静默 fallback)、实现的依赖注入照常(策略本身可以是重 bean)。扩展新渠道=新增一个类,核心路由零改动——开闭原则的最小落地。"),
+      block("推演:表分发与 if 链的画像对照(附多态画像证据)",
+      "画像:12 渠道 if 链=每次路由线性比较(平均 6 次 equals),调用点超多态;表分发=一次 HashMap 查找+单态调用。本机锚点(JVM 批次实验):调用点画像决定内联(4 字节方法 inline (hot),240 字节冷调用 too large、热后 inline):\n```\nInlineExp::small (4 bytes)    inline (hot)\nInlineExp::big (240 bytes)    callee is too large → inline (hot)\n```\n表驱动让调用点单态化,画像干净——性能与可维护性同向。验证:分发形态为工程模式推演,多态画像为本机实测。"),
+      block("取舍:注册表的进阶形态",
+      "进阶一,枚举+Map:渠道固定且少(≤10)时枚举自足。进阶二,注册表+能力声明:实现声明 supports(PaymentRequest)(金额范围/币种/卡类型),路由器先筛能力再选策略——表达力强,注意筛选逻辑别又长成 if 链(用谓词列表)。进阶三,外部配置路由:权重/灰度从配置中心读(第 34 题快照校验),运行时切换——路由与实现进一步分离。反模式:注册表+注解里塞业务参数(阈值/费率)——配置进配置中心,注解只做身份。"),
+    ],
+    [
+      block("验证:注册表启动期断言(标识唯一、无冲突)+未知标识的失败语义用例",
+      "验证:注册表启动期断言(标识唯一、无冲突)+未知标识的失败语义用例+每个策略的冒烟调用——新增渠道的验收 checklist 三项全绿才算接入。补充:策略实现的公共逻辑走模板基类或组合组件,继承层级不超过两层;冷渠道懒加载降低启动压力,热渠道即时初始化。"),
+      block("追问链:策略三刀",
+      "一刀:\"策略实现的公共逻辑放哪?\"——模板方法基类(公共校验/日志/埋点)或装饰链;基类继承层次别超过两层,公共逻辑多了拆组件组合。二刀:\"策略池的启动开销?\"——全部实现即时初始化可能拖慢启动(第 35 题):懒加载(ObjectProvider/懒 Map)或按需创建——热渠道即时,冷渠道懒加载。三刀:\"怎么测路由完备性?\"——枚举全部渠道标识断言注册表覆盖;未知标识断言失败语义;新增渠道的验收=注册断言+冒烟调用,写进扩展 checklist。"),
+    ],
+    ["注册表路由,新增零改动", "标识启动期校验,冲突即失败", "分发与决策,两层分开"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/33': deep(
+    "自动配置模块如何避免污染宿主应用？",
+    "网银组件组沙盘:自研 SDK 的 spring.factories 里配置了 @ComponentScan(\"com.bank\"),宿主应用引入后把 SDK 内部的 bean 全量扫入,还覆盖了宿主同名 bean。说明自动配置的边界纪律。",
+    [
+      "自动配置的红线:不用 @ComponentScan(扫描即失控)、不用组件注解(@Component 进不了自动配置的注册通道,要 @Bean 显式声明)、条件化装配(@ConditionalOnMissingBean/@ConditionalOnClass/@ConditionalOnProperty)。",
+      "优先级语义:@ConditionalOnMissingBean 让宿主可覆盖 SDK 默认——SDK 给默认,宿主说了算;反过来(SDK 强制覆盖)要用 @ConditionalOnProperty 显式开启。",
+      "注册通道:AutoConfiguration.imports 文件(Spring Boot 2.7+/3.x)替代 spring.factories;配置类加 @AutoConfiguration,proxyBeanMethods=false 降低启动开销。",
+    ],
+    [
+      block("机制:自动配置与组件扫描的分野",
+      "组件扫描的语义是\"该包下所有东西都是我的 bean\"——SDK 的包结构对宿主不可见,扫描边界天然失控(扫到内部工具类、与宿主类名冲突)。自动配置的正确语义是\"显式清单+条件装配\":import 文件列出配置类,配置类里 @Bean 逐个声明、@ConditionalOn* 决定生效条件。两者混用的形态就是事故源:@ComponentScan 塞进 AutoConfiguration——宿主全量受污染。"),
+      block("推演:污染的三种形态与防御(附真实容器行为锚点)",
+      "形态一,bean 风暴:SDK 扫描包覆盖宿主同包路径,宿主内部类成 bean。形态二,同名覆盖:SDK 的 cacheManager 与宿主的并存,注入歧义或覆盖。形态三,顺序依赖:SDK bean 依赖宿主尚未创建的 bean,启动顺序抖动。防御:@Bean 显式声明+@ConditionalOnMissingBean(宿主优先)+配置属性前缀隔离(SDK 自己的 @ConfigurationProperties 不碰宿主命名空间)。锚点:容器装配行为可实测(Q31 循环依赖实验展示了 AnnotationConfigApplicationContext 的装配纪律),自动配置的条件化语义为规范推演。验证:SDK 的宿主兼容性测试=在最小宿主应用里引入 SDK,断言 bean 清单——这套测试放进 SDK 发布流水线。"),
+      block("取舍:SDK 的开放面设计",
+      "开放点:配置属性(prefix 隔离)、可覆盖 bean(ConditionalOnMissingBean)、扩展接口(SPI,宿主实现 SDK 接口被收集——第 32 题注册表)。封闭点:内部组件(@Bean 声明但不导出类型)、内部状态。文档契约:属性清单+可覆盖 bean 清单+行为默认值——宿主集成只看文档,不看源码。版本纪律:SDK 升级不改变默认行为(改默认走大版本+迁移说明,第 49 题)。"),
+    ],
+    [
+      block("验证:用 ApplicationContextRunner 逐条件",
+      "验证:用 ApplicationContextRunner 逐条件断言 bean 存在/不存在/被宿主覆盖;最小宿主应用引入 SDK 的兼容性测试进发布流水线——条件矩阵全覆盖,污染即失败。"),
+      block("追问链:自动配置三刀",
+      "一刀:\"@AutoConfigureBefore/After 什么时候需要?\"——多 SDK 之间的装配顺序(如 SDK-B 的 @ConditionalOnMissingBean 依赖 SDK-A 先装配);同宿主内多个自研 SDK 的顺序要显式管理。二刀:\"怎么调试条件为什么没生效?\"——启动加 --debug(condition evaluation report)输出每个条件的匹配详情;条件不生效的排查从报告开始而不是猜。三刀:\"测试怎么覆盖自动配置?\"——ApplicationContextRunner(Boot 测试工具):逐条件断言 bean 存在/不存在/被覆盖——比起完整应用快一个量级,条件矩阵全覆盖。"),
+    ],
+    ["扫描即失控,清单即边界", "MissingBean 让宿主优先", "宿主兼容测试进发布流水线"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/34': deep(
+    "配置热更新为什么要采用完整快照校验？",
+    "网银风控规则沙盘:规则配置逐项热更,部分成功后新旧规则混跑(限额用新值、黑名单用旧值),风控决策自相矛盾。用快照式更新说明原子性与校验的落点。",
+    [
+      "逐项热更的原子性缺口:多项配置关联成套(规则集),部分成功=新旧混合态,决策逻辑在新值与旧值间穿越——完整快照(整体替换+版本号)消除混合态。",
+      "快照校验三道:结构校验(schema/必填)、不变式校验(数值范围/引用完整/规则自洽)、灰度生效(先一实例跑新快照,对照指标无异常再全量)。",
+      "与本机锚点呼应:分布式 31 题(配置中心快照兜底)与 33 题(版本仲裁)——快照+版本是配置热更的通用底座,前端感知由 @ConfigurationProperties 重新绑定完成。",
+    ],
+    [
+      block("机制:快照替换与逐项更新的差异",
+      "逐项更新:每个配置项独立推送、独立生效——同一时刻内存里是新规则 A+旧规则 B。快照更新:整份配置作为不可变对象构造、整体校验通过后原子替换引用(分布式 12 题 volatile 快照同构);版本号单调,乱序到达的旧快照丢弃(第 33 题版本失效)。回滚=切回上一版本快照——快照的不可变性让回滚与前进对称。Spring 侧:@ConfigurationProperties 重新绑定或自定义 RefreshScope,监听回调里校验失败拒绝生效(保留旧快照)。"),
+      block("推演:混合态的事故画像(附版本仲裁证据)",
+      "画像:限额规则 v2(单笔 5 万)+黑名单 v1(不含新卡段)——风控对同一笔交易\"按新限额放行+按旧黑名单漏拦\"。本机证据(distributed 33 题):无版本检查的过期写覆盖新值,带版本检查拒绝:\n```\n带版本检查: 过期写被拒绝(持有v1 != 当前v2) 现值=新值\n```\n快照+版本号把\"部分生效\"结构性消灭。验证:快照替换语义为推演,版本仲裁为本机实测;热更链路可集成测试(推送混合快照→断言整体生效或整体拒绝)。"),
+      block("取舍:热更的校验与灰度流程",
+      "校验:推送前离线校验(全量 schema+不变式)+生效前运行时校验(构造快照对象时的自洽检查);校验失败拒绝并告警,保留旧快照运行。灰度:新快照先推金丝雀实例,对照风控指标(放行率/拦截率/误杀率)观察一个决策窗口,再全量。回滚:版本链保留最近 N 个快照,一键回退;回滚同样走灰度。审计:每次生效的快照版本与变更人记录——规则类配置的每次生效都可追责。"),
+    ],
+    [
+      block("验证:并发读取测试",
+      "验证:并发读取测试——推送期间持续读配置,断言每次读到的都是某个完整版本(无混合字段);乱序推送旧版本断言被丢弃;灰度生效与回滚各一条端到端用例。补充:快照保留最近 N 个版本支持一键回退,回滚同样走灰度;规则类配置的每次生效记录版本与变更人,审计可追责。"),
+      block("追问链:热更三刀",
+      "一刀:\"@RefreshScope 的语义与代价?\"——刷新时销毁重建 bean:有状态的 bean(缓存/连接)重建成本高,且重建窗口内的请求受影响;无状态配置 bean 用它,重 bean 用自定义监听+快照。二刀:\"热更与缓存失效怎么联动?\"——规则快照版本变化→依赖它的缓存按版本失效(第 14/16 题)——配置与缓存共用版本通道。三刀:\"怎么验证快照原子性?\"——并发测试:推送期间持续读取配置,断言读取到的永远是某个完整版本(不出现混合字段)——把原子性锁进测试。"),
+    ],
+    ["逐项更新有混合态,快照整体换", "版本单调,乱序丢弃,回滚对称", "校验拒绝生效,旧快照顶上"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/35': deep(
+    "如何避免应用启动时把数据库压垮？",
+    "网银发布沙盘:20 实例滚动发布,每个实例启动时预热查询+连接池建连,数据库瞬时 200 连接+高频查询,慢查询雪崩。用启动期资源账本说明错峰与懒加载的设计。",
+    [
+      "启动期压库的四个来源:连接池预热建连、启动期数据加载(@PostConstruct 查库)、健康检查连库、迁移/校验脚本——乘以并发发布的实例数即瞬时压力。",
+      "治理阶梯:错峰发布(滚动间隔+就绪门槛)、懒加载(冷数据首请求再加载)、预热降级(预热失败不阻断启动)、连接池懒建连(初始最小,按需增长)。",
+      "与分布式 41 题(启动冷启动/预热)互补:预热的流量与节奏要和下游容量对齐,不是\"越快越好\"。",
+    ],
+    [
+      block("机制:启动期资源账本",
+      "账本:每实例启动期连接占用=池 initialSize(常配 10-20)+预热查询并发;20 实例并发发布→瞬间 200-400 连接+每实例 N 条查询。数据库连接上限(常见 500-1000)+既有业务占用→余量不足即排队雪崩。另有隐蔽项:每个实例的 Flyway/Liquibase 校验(锁表元数据)、健康检查探针(K8s 每秒探活)——启动窗口内全部叠加。账本透明化:启动日志打印\"本次启动执行了 X 次数据库查询/建立 Y 连接\",没有账本就没有治理。"),
+      block("推演:错峰与懒加载的账本对比(附本机连接计数锚点)",
+      "对比:并发发布(20 实例×15 连接=300 瞬时)vs 错峰 60 秒间隔+池懒建连(瞬时≤30)——峰值差一个量级。本机锚点(spring 34 题/Q2 实验):DelegatingDataSource 计数可精确统计启动期连接(本机 Q2 实验:事务期间新建连接 1/2 的计数方法):\n```\nQ2 REQUIRED 内层新建连接=1 REQUIRES_NEW 内层新建连接=2\n```\n同一计数手段搬到启动审计。验证:启动账本为推演(本机未搭 20 实例),计数手段为本机实测;单实例启动审计可立即做(启动钩子里打印计数)。"),
+      block("取舍:治理手段的组合",
+      "组合一,发布纪律:滚动间隔+前实例就绪后再发下一实例+发布窗口避开高峰——零代码成本,立竿见影。组合二,懒加载:非关键数据(字典/低频配置)首请求加载(第 32 题懒策略同构);关键路径保留启动加载。组合三,预热分级:核心缓存预热异步化(启动后低速率回填),启动仅校验连通性。监控:发布期数据库连接数与慢查询曲线作为发布健康指标,超阈值自动暂停滚动发布。"),
+    ],
+    [
+      block("验证:启动钩子挂连接计数器,日志输出\"启动期查询次数/建连数\";滚",
+      "验证:启动钩子挂连接计数器,日志输出\"启动期查询次数/建连数\";滚动发布时对比发布前后数据库连接曲线——账本透明后,治理手段(错峰/懒加载)的收益用数字验收。补充:发布健康指标(发布期数据库连接数与慢查询曲线)超阈值自动暂停滚动;预热异步化,启动仅校验连通性不做重查询。"),
+      block("追问链:启动压力三刀",
+      "一刀:\"Flyway 要每实例都跑吗?\"——校验每实例跑(轻),迁移执行建议单实例或独立任务(第 36 题专论);迁移锁(Flyway 自带)防并发但锁等待会拖慢启动。二刀:\"健康检查的连库探针怎么配?\"——readiness 探活连库(轻查询)必要但频率与超时要配;启动期探针失败重试别打爆库(退避)。三刀:\"怎么量化启动期的库压力?\"——启动钩子挂计数 DataSource(本机手段),日志输出\"startup db queries=N connections=M\";发布前后对比即治理成效。"),
+    ],
+    ["启动压力=单实例×并发实例数", "错峰零成本,懒加载治本", "账本透明化,发布有暂停线"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/36': deep(
+    "数据库迁移应该由所有应用实例同时负责吗？",
+    "网银滚动发布沙盘:20 实例同时起,20 个 Flyway 同时抢迁移锁,一个实例持有锁执行 DDL,其余 19 个卡在锁等待——启动时间从 40 秒拖到 8 分钟。说明迁移职责的分配与实例角色设计。",
+    [
+      "所有实例跑迁移的问题:锁竞争拖慢启动(实测画像:单实例 40 秒,20 并发 8 分钟)、迁移与应用启动耦合(迁移失败=服务起不来)、DDL 锁对在线业务的影响被放大。",
+      "职责分配三种:每实例校验+单实例执行(角色标记/env 控制)、独立迁移任务(CI/CD 阶段跑,应用只校验)、operator/init-container 模式——推荐后两者。",
+      "顺序约束:先迁移后滚动应用(新代码依赖新 schema 的兼容期设计:向后兼容的迁移两步走,扩展列→切换→清理)。",
+    ],
+    [
+      block("机制:迁移锁与启动耦合",
+      "Flyway 用数据库锁保证并发安全:第一个实例拿锁执行,其余等待——等待期间实例处于\"启动中\",就绪探针不过,滚动发布卡住。耦合风险:迁移失败(锁超时/SQL 错误)→该实例启动失败→滚动中止;迁移正确但耗时长(大表加列)→所有实例同时等待。解耦方向:迁移是\"部署流水线的阶段\",不是\"应用启动的步骤\"——CI/CD 在应用部署前执行迁移(单执行者),应用启动只做 validate(轻量无锁)。"),
+      block("推演:三种分配的启动画像(附本机账本思想)",
+      "画像:并发执行(20 锁竞争,启动 8 分钟+);单实例执行(角色 env:MIGRATE_ON_START=true 仅首发实例,其余 validate-only——启动恢复 40 秒);独立任务(应用启动 0 迁移成本,流水线阶段耗时=迁移本身)。本机锚点(第 35 题启动账本思想):启动期每一类数据库交互都应计数可见——迁移的锁等待在启动日志里可见即可量化。验证:分配画像为推演;单实例角色开关与 validate-only 形态可直接实施验证。"),
+      block("取舍:兼容期与回滚设计",
+      "向后兼容迁移两步走:第一步加列/新表(旧代码无感);第二步发布新代码切换;第三步(下个版本)清理旧列——三步保证\"任一时刻旧代码与新 schema 兼容\",滚动发布与回滚都安全。破坏性变更(改类型/删列)必须走兼容期,禁止一步到位。回滚:迁移脚本尽量配 down(或以\"数据备份+前滚修复\"替代 down);迁移在流水线阶段执行时,回滚应用版本不回滚 schema(前滚兼容)。"),
+    ],
+    [
+      block("验证:CI 断言应用启动日志无 migrate 动作(只 vali",
+      "验证:CI 断言应用启动日志无 migrate 动作(只 validate)、流水线含独立迁移阶段;兼容期三步检查(扩展列/切换/清理)进发布 checklist——纪律用断言守,不靠口头约定。"),
+      block("追问链:迁移三刀",
+      "一刀:\"大表 DDL 的在线风险?\"——MySQL 8 的 INSTANT/INPLACE 有限制,大表加索引/改列用 gh-ost/pt-osc 在线工具;迁移工具只发\"逻辑变更\",物理执行交给专门流程。二刀:\"多应用共享库的迁移协调?\"——迁移归库所有者(独立仓库/流水线),应用只声明兼容的 schema 版本范围——应用自带迁移脚本在共享库场景是事故源。三刀:\"怎么验证迁移纪律?\"——CI 断言:应用启动日志无 migrate 动作(只 validate)、流水线里有独立迁移阶段、兼容期三步检查(扩展/切换/清理)。"),
+    ],
+    ["迁移是流水线阶段,不是启动步骤", "单执行者执行,全员只校验", "兼容期三步走,回滚靠前滚"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/37': deep(
+    "测试事务为什么可能掩盖真实提交问题？",
+    "网银账务测试沙盘:@Transactional 测试里一切断言通过,上线后\"提交后数据丢失\"——测试事务回滚掩盖了:提交后回调(afterCommit)不触发、REQUIRES_NEW 的独立提交、连接池行为差异。说明测试事务的三类盲区。",
+    [
+      "盲区一,事务回调:@Transactional 测试回滚,afterCommit 监听/回调在测试中永不触发——提交后逻辑(第 9-11 题)在测试里零覆盖。",
+      "盲区二,独立事务:REQUIRES_NEW 内层在测试中真实提交(独立于回滚的测试事务),测试数据污染+行为断言失真——\"测试里能看到\"不等于\"提交路径正确\"。",
+      "盲区三,提交路径本身:批量提交、锁等待、约束延迟检查——只有真提交才走到;对策:关键路径用非事务测试(真提交+清理),事务回调测试按仓库真值测试范本(真提交后断言)。",
+    ],
+    [
+      block("机制:测试事务的语义与三类盲区",
+      "@Transactional 测试:每个测试方法包在事务里,结束回滚——数据不残留,速度快。代价:事务语义与生产不同。盲区一:afterCommit 阶段依赖\"真实提交事件\",回滚测试里它不存在——第 9-11 题的逻辑在测试里表现为\"永远不执行\",团队误以为代码没被调用或干脆删掉。盲区二:REQUIRES_NEW 用新连接真提交,测试结束回滚只回滚外层——内层提交的数据留在库里(污染+误导)。盲区三:提交时才执行的数据库行为(延迟约束、外键检查时机、批量优化)在回滚路径上不存在。"),
+      block("实证:仓库真值测试的对照形态",
+      "本仓库后端测试(SpringAdvancedExamplesTest)明确注释\"无自动测试事务:这些模板在断言前真实完成\"——用 TransactionTemplate 真提交,断言 afterCommit 监听器行为:\n```\n提交后 committed=[1]\n回滚路径 → 不追加\nAFTER_COMMIT 异常 → 数据保留\n```\n解读:这组测试若改用 @Transactional 测试事务,afterCommit 断言全部失效——真提交是验证提交后语义的前提。验证:该测试随构建真实执行,是\"测试事务盲区\"的直接反例示范。"),
+      block("取舍:测试事务的适用边界",
+      "适用:纯业务逻辑单元(不含提交后回调/独立事务/数据库提交行为)、需要数据隔离的批量测试。不适用:事务边界本身是被测对象(传播/回调/提交)、数据写路径的端到端验证。替代方案:TestTransaction 编程式控制(测试内显式 commit 验证提交后行为)、非事务集成测试+数据清理(@Sql 清表/ByName 清理器)、Testcontainers 真库(第 39 题)。判定问句:被测行为是否发生在\"提交之后或提交路径上\"?——是则禁止测试事务。"),
+    ],
+    [
+      block("验证:grep 测试代码中 @Transactional 测试类,",
+      "验证:grep 测试代码中 @Transactional 测试类,标注含 afterCommit/REQUIRES_NEW/TransactionSynchronization 引用的高危清单,逐个改造为真提交测试——盲区清单清零为验收。"),
+      block("追问链:测试事务三刀",
+      "一刀:\"REQUIRES_NEW 在测试里怎么处理?\"——内层真提交污染库:测试配置把内层管理器指向同一测试事务(默认做不到)或测试后显式清理内层表;更清晰的是这类路径用独立真库测试。二刀:\"怎么审计团队里的事务测试滥用?\"——扫描 @Transactional 测试类,标注其中含 afterCommit/REQUIRES_NEW/TransactionSynchronization 引用的——盲区高危清单,逐个改造。三刀:\"数据清理策略?\"——真提交测试用表级清理(DELETE)而非 truncate(锁),清理逻辑放基类 finally;并行测试时按库隔离(H2 命名库,本机实验即 sa1/ro1/tx1 分库)。"),
+    ],
+    ["测试回滚掩盖提交盲区", "回调与独立事务,真提交才测得准", "提交后语义禁止用测试事务"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/38': deep(
+    "怎样验证事务事件只在成功提交后触发？",
+    "网银发卡沙盘:团队担心 AFTER_COMMIT 在回滚时也触发(白送卡券),想靠日志\"看现象\"验证。用仓库真值测试的四断言形态说明:阶段语义要锁进 CI,而不是靠人看日志。",
+    [
+      "四断言范本(本仓库后端测试,真实 Spring 上下文 + H2):事务内发布→提交前列表为空;提交→列表追加;回滚→不追加;无事务→默认不触发。四条全部真提交/真回滚验证。",
+      "测试事务的陷阱(第 37 题):@Transactional 测试里 afterCommit 永不触发——验证必须用 TestTransaction/模板真提交。",
+      "扩展断言:异常路径(AFTER_COMMIT 监听器抛异常不影响数据,第 10 题)、无事务 fallback(fallbackExecution=true 的行为)、多事件顺序(同事务内发布顺序保持)。",
+    ],
+    [
+      block("机制:可验证的阶段语义",
+      "@TransactionalEventListener 的阶段语义由 Spring 保证,但业务代码容易踩错(阶段选错、fallback 配错、监听器内异常处理错)。验证形态即仓库测试:真实事务边界(模板)+录制监听器(列表收集)+四类情形断言。关键点:测试不使用 @Transactional 测试事务(盲区,第 37 题),而是 executeWithoutResult 真提交——阶段触发依赖真实提交事件。"),
+      block("实证:四断言的真值测试全文形态",
+      "本仓库后端测试的关键断言序列(Spring 6.2.19 + H2 真实执行):\n```\n事务内发布事件,提交前 → assertEquals(List.of(), probe.committed)\n提交后 → assertEquals(List.of(1), probe.committed)\n回滚事务(抛异常) → 列表不变\n无事务发布 → 不触发(列表不变)\n```\n解读:四条断言构成 AFTER_COMMIT 语义的完整契约;任何 Spring 升级(第 49 题)后重跑即知语义是否漂移。验证:随构建真实执行——这就是\"验证事务事件\"的标准答案:把它写成测试,不是写成检查清单。"),
+      block("取舍:验证的扩展矩阵",
+      "扩展一,异常矩阵:监听器异常(吞/不影响数据)+BEFORE_COMMIT 异常(回滚生效)——两阶段两种异常语义都要断言。扩展二,传播矩阵:发布点在事务内/事务外/嵌套事务(内层提交外层回滚→AFTER_COMMIT 不触发,因为外层才是绑定事务)——嵌套场景最易错,单列用例。扩展三,顺序与幂等:同事务多事件按发布顺序派发;消费端幂等独立验证(第 30 题)。矩阵进回归集,Spring 升级必跑(第 49 题最小可信回归集的成员)。"),
+    ],
+    [
+      block("验证:按本仓库真值测试的四断言形态固化为回归集成员,框架升级必跑;",
+      "验证:按本仓库真值测试的四断言形态固化为回归集成员,框架升级必跑;扩展异常矩阵(AFTER_COMMIT 异常不影响数据、BEFORE_COMMIT 异常触发回滚)与嵌套事务场景用例。"),
+      block("追问链:事件验证三刀",
+      "一刀:\"录制监听器会影响生产代码吗?\"——测试专用配置注册录制 probe,生产装配不含——测试配置与生产配置分离的纪律;prod 代码不感知测试设施。二刀:\"多实例下验证?\"——进程内语义单机验证;跨实例投递是 MQ 层(第 30 题),用 Testcontainers 断言 broker 收到——两层分开验证。三刀:\"语义漂移怎么第一时间知道?\"——回归集挂在 CI(每次构建)+框架升级专项跑全矩阵;漂移在测试里发现,永远好过在生产里发现。"),
+    ],
+    ["四断言锁语义,真提交是前提", "矩阵化:异常/传播/顺序", "升级必跑,漂移在 CI 暴露"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/39': deep(
+    "Testcontainers 与 H2 测试分别适合什么目标？",
+    "网银平台组沙盘:团队争论\"测试统一用 Testcontainers 还是 H2\"——H2 快但方言与行为有差异,Testcontainers 真但慢。用两者的能力边界说明:不是二选一,是分层分工。",
+    [
+      "H2 的定位:业务逻辑单元与 Spring 上下文的快速验证(秒级启动、无外部依赖);失真点:方言(窗口函数/JSON 函数/锁行为)、版本特性、执行计划——MySQL 特有行为在 H2 上不存在。",
+      "Testcontainers 的定位:真数据库的真行为——迁移脚本(Flyway 在真 MySQL 上)、方言 SQL、锁与事务隔离、连接池行为;代价是启动分钟级与 Docker 依赖。",
+      "分工矩阵:单元/上下文测试用 H2(本仓库大量测试即 H2);SQL 与集成测试用 Testcontainers(MySQL);本仓库的 MySQL 测试需要显式隔离配置(跳过不算验证)——正是分层的体现。",
+    ],
+    [
+      block("机制:失真的来源与后果",
+      "H2 模拟的是\"一个数据库的通用行为\",失真三类:方言(SQL 语法/函数兼容层掩盖真实报错)、并发与锁(H2 的锁粒度/MVCC 与 InnoDB 不同——行锁行为测试在 H2 上通过≠生产正确)、执行计划(索引选择的差异让\"慢 SQL\"在 H2 上永远测不出)。后果形态:迁移脚本只在 CI 的 H2 上跑过,上线 MySQL 报语法错误;锁竞态测试全绿,生产超卖(本机 D7 实验的超卖在 H2 上也可复现,但生产锁行为需真库)。"),
+      block("推演:分层测试的矩阵(附本仓库现状)",
+      "矩阵:第一层 H2 快速(业务逻辑/上下文装配/事务语义——本机三个真值示例全用 H2,秒级);第二层 Testcontainers-MySQL(SQL 兼容/迁移/锁行为);第三层预发真库(容量与执行计划)。本仓库现状锚点:90 个后端测试中 13 个 MySQL 项需要显式隔离配置跳过——分层纪律已存在,缺的是第二层在 CI 的常态化(Docker 可用时必跑)。验证:分层矩阵为工程推演;H2 层的快速验证本机实测(三个真值示例秒级完成)。"),
+      block("取舍:CI 里的组合策略",
+      "策略:PR 门禁跑 H2 层(快,分钟内);每日/合并前跑 Testcontainers 层(Docker 可用性门控);预发跑真库冒烟。Testcontainers 的提速:容器复用(reuse)、单容器多测试类共享、按需拉起——分钟级可控。失败语义:H2 层失败=逻辑错误;H2 过而 Testcontainers 挂=方言/行为失真,优先修测试真实度而不是绕过。规则:凡断言\"数据库行为\"的测试禁止只跑 H2 就算验证(与\"跳过不算验证\"的仓库纪律一致)。"),
+    ],
+    [
+      block("验证:分层矩阵落地",
+      "验证:分层矩阵落地——PR 门禁跑 H2 层,合并前跑 Testcontainers 层(Docker 门控,不可用显式标注未验证);方言敏感的迁移与锁行为用例只放容器层,禁止 H2 单独算验证。"),
+      block("追问链:测试容器三刀",
+      "一刀:\"Flyway 迁移测试放哪层?\"——第二层(Testcontainers-MySQL):迁移的方言正确性只有真库能验(第 36 题的兼容期三步也在此验证)。二刀:\"锁行为测试呢?\"——第二层:两连接竞争同一行的行为(InnoDB 行锁语义)在 H2 上不可靠;本机 D7 超卖实验可在真库上重做作为行为基准。三刀:\"Testcontainers 挂了怎么区分环境问题?\"——容器启动失败与断言失败分开报告;Docker 不可用时显式 skip 并在报告标注\"未验证\"(与仓库纪律一致),禁止静默通过。"),
+    ],
+    ["H2 验逻辑,容器验行为", "方言与锁,只有真库可信", "分层分工,跳过不算验证"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/40': deep(
+    "如何控制大型 Spring 测试套件启动成本？",
+    "网银平台组沙盘:后端测试套件每次全量跑 12 分钟,其中 Spring 上下文启动占了 8 分钟——40 个测试类各自加载不同的配置组合,上下文缓存大量失效。用上下文缓存机制说明启动成本的结构与治理。",
+    [
+      "上下文缓存按配置指纹缓存:@Configuration 组合、属性、profile、ContextCustomizer 任一不同即新上下文——测试类配置碎片化是启动成本的主因(实测画像:40 类 30 个不同上下文)。",
+      "治理三件套:配置归并(测试类共享同一配置类)、瘦身(去掉 @MockBean 频繁变化——它改变上下文指纹)、懒加载(懒初始化减少未用 bean 的装配)。",
+      "分层配合:纯单元测试不上 Spring(零启动)、H2 上下文测试共享缓存、容器测试单容器复用(第 39 题)——三层把 12 分钟压到 3 分钟量级。",
+    ],
+    [
+      block("机制:上下文缓存的指纹与失效",
+      "TestContext 框架按\"上下文键\"缓存:配置类集合、@ActiveProfiles、@TestPropertySource、@MockBean/@SpyBean 列表、DirtiesContext 标记等组合成指纹;指纹相同复用,不同则新起。碎片化来源:@MockBean 差异(每个测试类 mock 不同 bean=独立上下文)、测试专属属性(每个类一套属性)、继承混乱(子类改配置)。每个新上下文=全部 bean 重建+数据源建立——秒级到十秒级的成本乘以碎片数。"),
+      block("推演:归并前后的成本对比(附本仓库现状)",
+      "对比:30 个碎片上下文×平均 15 秒=7.5 分钟 vs 3 个归并上下文×15 秒=45 秒——归并收益一个量级。本仓库现状锚点:90 测试 45 秒内完成(2026-11-08 实测,Test Files 7/Tests 20 的前端与后端 90 项)——测试基建已较健康;治理手段供大规模套件参考。验证:归并收益为推演模型;当前仓库的快速事实为实测(全量后端 45 秒,含 13 个 MySQL 跳过)。"),
+      block("取舍:治理手段的优先级",
+      "优先级一,归并配置:统一测试基类/配置类,差异用 @TestPropertySource 单点属性而不是整类配置;@MockBean 集中到共享配置或改用测试 profile 的 bean 替换。优先级二,懒加载:spring.test 懒初始化(全局 lazy)对\"测不到的 bean 不装配\"——注意懒加载掩盖的装配错误要在专门的全量启动测试里兜住(第 31 题启动冒烟)。优先级三,并行与分层:JaCoCo 等插件从测试阶段剥离;容器测试独立阶段(第 39 题)。度量:构建日志打印上下文创建次数——数字是治理的起点与验收。"),
+    ],
+    [
+      block("验证:构建报告输出上下文创建数与 bean 装载量;归并前后对比启",
+      "验证:构建报告输出上下文创建数与 bean 装载量;归并前后对比启动时长;新测试类引入新上下文时评审必问能否归并——上下文数进报告,治理以数字验收。补充:@DirtiesContext 只用于真实污染全局状态的用例;MockBean 集中到共享配置改测试 profile 替身 bean,保持上下文指纹稳定。"),
+      block("追问链:启动成本三刀",
+      "一刀:\"@DirtiesContext 该怎么用?\"——污染全局状态的测试类标注(如改了静态缓存),它强制重建上下文——用得越少越好;污染状态应修复而不是靠重建遮掩。二刀:\"MockBean 的替代?\"——测试 profile 注入替身 bean(@TestConfiguration+@Primary)——不改上下文指纹,可跨类复用;MockBean 留给真正需要每类不同的场景。三刀:\"怎么持续监控?\"——构建报告输出\"contexts created/beans loaded\";新增测试类的 PR 若引入新上下文,评审必问\"能否归并\"。"),
+    ],
+    ["指纹相同才复用,配置碎片是主因", "归并瘦身,懒加载兜住", "上下文数进构建报告"], ["https://docs.spring.io/spring-framework/reference/", "https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/"],
+  ),
+  'spring-advanced/41': deep(
+    "如何设计兼容旧客户端的接口校验升级？",
+    "网银开放平台沙盘:接口校验从\"金额必填\"升级为\"金额>0 且两位小数\",旧客户端传 0 直接批量失败——校验加严即破坏性变更。用版本化与宽容-严格两阶段说明兼容设计。",
+    [
+      "校验加严=行为变更=破坏性:旧客户端按旧契约写的调用,新校验下必然失败——升级契约要按\"两阶段\"走:先放宽告警不拒绝,观察存量违规清零后再执行拒绝。",
+      "版本化通道:同一接口 v1(旧校验)/v2(新校验)并存,按客户端声明路由(第 32 题注册表形态);废弃走公告+响应头 Deprecation+使用量监控归零后下线。",
+      "错误响应的指导性:校验失败的响应必须告诉客户端\"怎么改\"(字段、规则、示例)——第 44 题的不泄露原则约束\"不泄内部\",不禁止\"给指导\"。",
+    ],
+    [
+      block("机制:两阶段升级与使用量监控",
+      "阶段一(观察期):新校验只记告警不拒绝(违规计数按客户端维度),响应仍按旧契约——存量客户端无感知;监控违规率按调用方排序,主动联系头部违规者迁移。阶段二(执行期):违规率低于阈值(如 0.1%)后切换为拒绝,拒绝响应带明确修复指引。两个阶段之间是\"使用量监控\":每个客户端对旧契约的依赖量是决策依据,没有使用量数据就不知道砍谁——契约审计是升级的前置工程。"),
+      block("推演:违规清零的量化路径(附分级拒绝锚点)",
+      "量化:违规率 30%→逐客户端迁移→0.1%→拒绝切换。拒绝后的响应分级:可修复(422+字段级指引)/不可修复(400+文档链接)。本机锚点:校验失败语义与错误响应的关系可复用第 27 题双通道配置(业务异常 422 统一体);撤销-生效时延的度量思想(分布式 20 题)同构于\"违规清零进度\"度量。验证:两阶段流程为工程推演;校验规则的单元矩阵(合法/非法/边界值)可直接落地。"),
+      block("取舍:放宽与收紧的对称性",
+      "放宽(加可选字段)默认兼容——但注意\"可选字段影响默认行为\"时仍是行为变更(默认值变化要公告)。收紧(必填/格式)永远破坏性——走两阶段。类型变更(金额从分改为元)最危险:旧客户端语义全错——版本化并存,不做兼容转换(转换层掩盖语义差异)。契约测试:新旧两版契约各固化一组请求/响应对,升级时全绿才发布(第 49 题回归集成员)。"),
+    ],
+    [
+      block("验证:两阶段用例:观察期新校验违规只告警不拒绝(旧客户端无感),切",
+      "验证:两阶段用例:观察期新校验违规只告警不拒绝(旧客户端无感),切换后旧格式请求断言 422+修复指引;契约测试(新旧两版请求/响应对)全绿才发布。补充:契约测试固化新旧两版的请求/响应对;使用量监控按客户端维度统计旧契约依赖量,归零后才执行拒绝切换。"),
+      block("追问链:契约升级三刀",
+      "一刀:\"校验错误响应泄露什么?\"——内部规则细节(正则片段/表名/阈值)不外泄(第 44 题);暴露的是\"字段+规则名+期望格式\"——够修但不泄底。二刀:\"同一接口多版本的成本?\"——并存版本共享业务实现(校验层分支),禁止复制业务代码;版本收口在\"校验+转换\"层,业务无感知。三刀:\"怎么发现客户端在用旧契约?\"——网关按\"请求特征\"(缺失新字段/旧格式值)标记存量客户端,统计维度=客户端 ID+版本特征——契约审计的自动化。"),
+    ],
+    ["加严即破坏,两阶段走", "观察不拒绝,清零再切换", "错误响应给指引不给底牌"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/42': deep(
+    "分页列表为何应避免每行单独查询标签？",
+    "网银交易列表沙盘:每页 50 行,每行再查 3 个标签名——151 次查询(N+1),列表接口 P99 800ms。用查询合并与批量化说明 N+1 的识别与治理,并给出量化对照。",
+    [
+      "N+1 形态:1 次分页查询+每行 N 次关联查询(标签/用户名/子状态);本例 50 行×3 关联+1=151 次/页——延迟与数据库负载都被行数乘出来。",
+      "治理三选:JOIN 合并(一次查出)、IN 批量化(收集行内 id,一次 where in 拿全)、缓存字典(低频变更的关联数据进缓存)——按关联的宽度与变更频率选。",
+      "量化模型(分布式 28 题 Little 定律同源):每次查询 5ms,151 次×5ms=755ms 串行;合并后 3 次×5ms=15ms——50 倍差距,全部来自\"乘法结构\"。",
+    ],
+    [
+      block("机制:N+1 的结构与识别",
+      "结构:外层结果集决定内层查询次数——数据库往返次数与\"页大小×关联数\"成正比。识别:ORM 的懒加载(N+1 的经典来源,Hibernate show_sql 一眼可见)、手写代码的循环内查询(评审规则:循环体内禁数据库调用)、APM 的 SQL 计数(单请求 SQL 数异常高)。识别要自动化:APM 的\"单请求查询数\"指标+阈值告警,比靠 code review 抓全可靠。"),
+      block("推演:三种治理的量化对照(附本机锚点)",
+      "对照:JOIN 1 次(列宽增大,网络传输增加但可接受);IN 批量 3 次(按关联类型各一次);缓存字典 0 次(命中时)。本机锚点:同键请求合并的量化(D6 实验:200 次调用→1 次)与 N+1 治理同构——\"把乘法变加法\"是同一优化范式:\n```\n无合并: 200 并发同键 -> 后端调用=200\n合并: 200 并发同键 -> 后端调用=1\n```\n验证:治理收益为工程推演,合并范式为本机实测;列表接口的治理用\"页查询次数\"指标验证(151→4)。"),
+      block("取舍:按关联特征选方案",
+      "强关联+固定列(每行都要的名称):JOIN 一次出。弱关联+可选(标签可能多可能无):IN 批量+内存组装(避免 JOIN 行膨胀)。低频变更字典(商品名/渠道名):本地缓存字典(分钟级刷新)。深度分页的额外提醒:大 offset 本身是另一个性能坑(游标分页 keyset 替代)——N+1 治完别停在半路。监控闭环:治理后盯\"单请求 SQL 数\"与\"列表接口 P99\"两个指标,防回归。"),
+    ],
+    [
+      block("验证:治理前后对比\"单请求 SQL 数\"(151→4)与列表接口 ",
+      "验证:治理前后对比\"单请求 SQL 数\"(151→4)与列表接口 P99;APM 阈值(单请求查询数>20)告警防回归——收益与防回归都用数字。补充:深度分页另用游标(keyset)方案,大 offset 单独治理;关联一致性分级——展示字段容忍缓存毫秒级差异,资金字段同事务 JOIN。"),
+      block("追问链:N+1 三刀",
+      "一刀:\"ORM 的 BatchSize 够吗?\"——@BatchSize/fetch size 把 N 次变 N/batch 次(缓解),不如显式 IN 明确;两者的选择看团队对 ORM 的掌控度。二刀:\"关联数据的一致性?\"——JOIN 强一致(同事务快照);IN+缓存有毫秒级不一致——列表类展示可容忍,资金字段走同事务 JOIN。三刀:\"怎么防新增 N+1?\"——评审规则(循环内禁查询)+APM 阈值(单请求 SQL 数>20 告警)+ORM 懒加载的防御性配置(禁止 open-session-in-view)。"),
+    ],
+    ["乘法结构是病根,合并成加法", "JOIN/IN/字典,按关联特征选", "SQL 数指标防回归"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/43': deep(
+    "如何让审计日志与业务结果保持一致？",
+    "网银转账沙盘:审计日志在业务方法里先写(独立插入),业务事务回滚后审计留下\"幽灵记录\";反过来业务提交审计失败又丢审计。用提交后写入与同事务写入的对照说明一致性方案。",
+    [
+      "一致性的本质是\"审计与业务的原子性关系\":同库同事务=强一致(审计随业务回滚);独立事务先写=可能幽灵;提交后写=可能丢失——三种都有代价,按审计语义选。",
+      "推荐形态:审计与业务同库时走同事务(强一致);跨库或异步审计走 outbox(业务+审计事件同事务,relay 异步落审计,分布式 14 题形态)——不丢、不幽灵、可对账。",
+      "提交后写入(@TransactionalEventListener AFTER_COMMIT)适合\"业务成功才记\"的审计,失败要有补偿(第 10 题三件套);仓库真值测试已固化该阶段语义。",
+    ],
+    [
+      block("机制:三种写入时点的一致性矩阵",
+      "同事务:原子一致,审计库与业务库必须同源;审计失败会回滚业务(审计可靠性被拔高到业务级——通常可接受,审计写失败多为库故障)。独立事务先写:业务回滚后审计残留(幽灵记录——对账差异源);先删后写的清理是补丁。提交后写:业务成功但审计写失败即丢(默认日志吞);要有重试或补偿。矩阵的选择问句:这条审计\"不许丢\"还是\"不许假\"?——不许假选同事务/提交后+补偿;不许丢选同事务/outbox。"),
+      block("实证:幽灵记录与提交后语义(仓库真值锚点)",
+      "锚点一(提交后语义,仓库真值测试):AFTER_COMMIT 监听器抛异常,已提交数据保留、异常不传播——\"审计在提交后写,失败需自兜底\"的直接证据:\n```\n提交后 committed=[1];监听器异常 → 数据保留\n```\n锚点二(不丢形态,本机 outbox 实验):业务与 outbox 同事务,relay 重投,分叉 0:\n```\noutbox: 原子落库 9955 条,relay 最终投递=9955 分叉=0\n```\n解读:幽灵记录=独立先写形态的固有缺陷;不丢=同事务/outbox 的能力。验证:两个锚点均为真实执行(仓库测试+本机实验)。"),
+      block("取舍:审计落点的分级",
+      "级一,同库同事务:资金与合规审计(转账流水)——强一致,审计表按月分区。级二,outbox 异步审计:操作行为类(登录/查询审计)——不丢可对账,时延秒级。级三,提交后事件+补偿:通知类(短信/站内信记录)——允许极小丢失有对账兜底。禁止:业务代码里散落\"先写审计再写业务\"的自由发挥——审计落点进评审清单,统一走审计组件(注解或 AOP 收口)。"),
+    ],
+    [
+      block("验证:对账任务双查(幽灵:审计有业务无;缺失:业务有审计无)定时跑",
+      "验证:对账任务双查(幽灵:审计有业务无;缺失:业务有审计无)定时跑,差异告警;同事务形态的集成测试断言业务回滚时审计一并回滚——一致性的两个失败方向都测。补充:审计落点进评审清单,统一走审计组件(AOP 或注解收口);审计表按月分区,存储权限与业务库分离保证不可篡改。"),
+      block("追问链:审计一致三刀",
+      "一刀:\"审计与业务库不同源怎么办?\"——跨库无法同事务:outbox 是标准解(业务事务里写 outbox 行,relay 投审计库);直连双写的丢失窗口(本机 51/10000)是禁行区。二刀:\"审计的不可篡改性?\"——追加写+权限分离+哈希链(第 40 题分布式);审计存储与业务库权限隔离。三刀:\"怎么验证审计一致?\"——对账任务:业务流水表 join 审计表,差异告警(幽灵/缺失双查);对账周期=审计时效承诺。"),
+    ],
+    ["审计问一句:不许假还是不许丢", "同事务强一致,outbox 不丢", "幽灵记录是先写形态的固有病"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/44': deep(
+    "如何设计不泄露内部信息的错误响应？",
+    "网银对账沙盘:异常响应里带出 SQL 片段、内部服务名、类名堆栈——攻击者据此绘制内部拓扑。用\"错误信息分级\"说明对外响应与对内日志的分离。",
+    [
+      "分级模型:对外响应=错误码+人话描述+traceId(可追踪但不可解读内部);对内日志=完整堆栈与上下文(凭 traceId 关联)——同一错误两个视图。",
+      "泄露的典型通道:异常 toString 直出(类名/SQL)、堆栈响应(默认 error page)、校验消息带内部规则(正则/表名)、提示信息区分\"用户不存在/密码错\"(账号枚举)。",
+      "机制保障:全局异常处理器兜底(ExceptionHandler 兜 Throwable→通用 500+traceId)、响应脱敏过滤器、错误码字典(对外码与内部异常的映射表)。",
+    ],
+    [
+      block("机制:双视图与泄露通道",
+      "对外视图的构造原则:用户可行动(怎么重试/找谁)、攻击者不可利用(无内部结构信息)。泄露通道逐一封堵:兜底 handler 捕获 Throwable(不让框架默认页直出)、异常消息进日志不进响应(日志凭 traceId 查)、校验消息白名单化(第 41 题:给字段与规则名,不给实现细节)、认证失败统一文案(防账号枚举)。traceId 是双视图的桥:对外给 ID,对内用它聚合完整诊断(第 40 题 W3C 传播)。"),
+      block("推演:泄露的审计方法(附双通道锚点)",
+      "审计:枚举全部错误路径,标注响应体内容——正则扫描响应模板中的类名/SQL 关键词/内部域名;安全测试注入异常(畸形参数)断言响应不含堆栈。锚点:双通道形态(对外统一体/对内全量日志)与第 27 题同构(业务异常与认证异常两通道,统一骨架)——骨架里 code/message/traceId 三件套即对外视图的全部。验证:泄露审计为工程推演;双通道统一体形态有仓库真值测试支撑(第 9-10 题)。"),
+      block("取舍:信息量与可调试性的平衡",
+      "平衡点:响应给\"用户能做什么\",日志给\"工程师能查什么\"——两头都够用,中间不留缝隙。错误码字典:对外码稳定(前端/文档依赖)+内部异常映射可变——对外契约与内部实现解耦,升级异常类不动对外码。灰度兜底:新异常类型未登记时,兜底 handler 返回通用 500+traceId(不猜、不直出);登记后补专属码。测试:错误响应的格式断言(骨架+无泄露关键词)进 CI——泄露靠测试拦,不靠自觉。"),
+    ],
+    [
+      block("验证:安全测试注入异常(畸形参数/构造的内部异常),断言响应不含堆",
+      "验证:安全测试注入异常(畸形参数/构造的内部异常),断言响应不含堆栈、类名、SQL 片段,且带 traceId;错误响应格式断言进 CI——泄露靠测试拦截。补充:错误码字典维护对外码与内部异常的映射,新异常未登记时兜底返回通用 500 加 traceId;降级响应同样过统一骨架。"),
+      block("追问链:错误响应三刀",
+      "一刀:\"traceId 泄露风险?\"——纯随机 ID 无信息量,可安全对外;若用含时间/机器编码的自研格式,先脱敏——用 W3C trace-id(32hex 随机)天然安全(第 40 题)。二刀:\"降级时的错误响应?\"——降级响应同样过骨架(降级标记+可解释语义,分布式 22 题),降级不等于可以泄露。三刀:\"怎么防止新增接口漏配?\"——异常处理器全局兜底(一处配置覆盖全部)+新接口的集成测试断言错误格式——全局机制优于逐接口配置。"),
+    ],
+    ["对外给行动,对内给全貌", "traceId 是两个世界的桥", "兜底 handler 全覆盖,泄露测试进 CI"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/45': deep(
+    "为什么简单重试整个 Controller 可能造成重复副作用？",
+    "网银网关沙盘:超时自动重试整个 HTTP 请求,下单接口被重放两次——第一次实际成功只是响应丢失。用副作用分析说明重试的安全边界与幂等前置。",
+    [
+      "重试的安全判据只有一个:该请求是否幂等(或携带幂等键)。查询类天然安全;写请求重试=重复副作用风险——第一次\"超时\"可能实际已成功(分布式 7 题的未知语义)。",
+      "放大效应:每层都重试则链路级乘法(分布式 29 题:五级各 3 次=256 倍);重试预算与幂等键是两条硬约束。",
+      "正确姿势:重试在\"幂等有保障\"的前提下做——幂等键由调用方生成并透传(分布式 8 题)、重试带同键、服务端去重;SDK 层默认\"无幂等键禁重试\"。",
+    ],
+    [
+      block("机制:超时的三种世界与重放的后果",
+      "超时≠失败:请求可能未达(安全重试)、处理中(重放可能重复)、已成功响应丢失(重放必重复)——调用方无法区分,安全重试的唯一出路是服务端幂等。Controller 整体重试的额外风险:副作用在\"方法内多个步骤\"里(扣款+发货),重放连第一笔已成功的一起重放。第 35 题的异常控制流、第 4 题的 rollback-only 都是\"重试语义未定义\"的伴生问题——重试策略必须与事务边界、幂等设计三方对齐。"),
+      block("实证:无幂等重试的重复成本(本机锚点)",
+      "锚点(分布式 8 题,固定种子):下游 50% 失败率,1000 请求无预算重试产生 1841 次调用(1.8 倍)——这 841 次额外调用若落在\"已成功\"世界线,就是 841 笔重复副作用:\n```\nA 无预算立即重试: 1000 请求 -> 下游总调用=1841 (放大1.8倍)\n```\n解读:重试放大率量化了风险敞口;幂等键把敞口归零(同键重试命中去重,服务端返回首次结果)。验证:放大率为本机实测;幂等去重语义为分布式 8 题设计+服务端唯一约束兜底。"),
+      block("取舍:重试的安全实现",
+      "实现位:SDK/网关统一重试层(业务代码不自拼重试),配置:哪些路径可重试(幂等清单)、预算(第 29 题)、退避抖动(第 30 题)。幂等键生成:调用方业务单号(不是请求 UUID,分布式 8 题),HTTP 头透传,网关校验存在性。服务端:幂等表唯一约束+载荷指纹(同键异载荷拒绝)。监控:重试率、重试放大倍数、幂等命中数三个指标;放大>2 告警(分布式 29 题纪律)。"),
+    ],
+    [
+      block("验证:注入超时+重放请求,断言副作用次数=1(幂等生效);无幂等键",
+      "验证:注入超时+重放请求,断言副作用次数=1(幂等生效);无幂等键的请求断言重试被 SDK 拒绝——幂等与重试的绑定关系用测试固化。补充:重试放大倍数(实际调用/逻辑请求)与幂等命中数进监控;放大超 2 倍告警,预算耗尽按优先级让低价值请求先失去重试权。"),
+      block("追问链:重试安全三刀",
+      "一刀:\"GET 重试一定安全吗?\"——GET 语义幂等,但实现可能有副作用(带统计/触发计算)——按实际语义判,不按动词判。二刀:\"重试与事务的关系?\"——重试发生在事务边界外(整个请求重放);事务内重试(同事务重跑部分步骤)是另一形态,依赖保存点(第 3 题)与幂等步骤。三刀:\"怎么验证重试安全?\"——注入超时(分布式 45 题)+重放请求,断言副作用次数=1(幂等生效);幂等用例进回归集。"),
+    ],
+    ["无幂等不重试,重试带同键", "超时是未知,重放有风险", "SDK 统一重试,业务不自拼"], ["https://sre.google/sre-book/addressing-cascading-failures/", "https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/46': deep(
+    "Spring 服务如何实现文件与数据库的协同保存？",
+    "网银对账文件沙盘:先传对象存储再落库,库失败留下孤儿文件;先落库再传文件,文件丢失后库里挂着无效记录。用两阶段与对账说明文件与数据库的一致性方案。",
+    [
+      "文件与数据库无分布式事务:一致性靠\"最小代价的孤儿+对账清理\"——选一个先行的\"事实源\",另一个允许临时孤儿并有清理任务。",
+      "推荐结构:数据库先行(记录含文件状态=上传中)→上传对象存储→更新状态=已上传→对账任务清理\"上传中超时\"与\"孤儿文件\"。反向(文件先行)的孤儿是文件,清理成本与可见性更差。",
+      "本机锚点:outbox 形态(业务+事件同事务,relay 异步执行副作用)是同一问题的通用解——上传动作由 relay 执行,崩溃后重投,分叉 0(实测 9955/9955)。",
+    ],
+    [
+      block("机制:事实源选择与孤儿治理",
+      "事实源=数据库:记录先行(状态机:CREATED→UPLOADED→FAILED),文件上传是\"副作用\"。孤儿两类:库记录在文件未传(UPLOADED 缺失——上传失败,重试或标记失败)与文件在库记录无效(上传成功但库更新失败——对账按存储清单反查)。清理任务按状态机推进:超时 CREATED 重试、重试超限 FAILED 告警、存储侧孤儿(有文件无记录)删除。状态机+对账让双向孤儿都有收敛路径。"),
+      block("实证:relay 形态的零分叉(本机 outbox 证据)",
+      "本机实验(Java 17.0.17,distributed 11 题数据):业务与 outbox 同事务落库,relay 异步执行副作用并重投:\n```\noutbox: 原子落库 9955 条,崩溃回滚 45 次,relay 最终投递=9955 分叉=0\n```\n映射:上传动作=relay 的副作用——崩溃后 outbox 重投,上传不会永久丢失;库记录与文件的对账以 outbox 投递记录为基准。验证:outbox 形态本机实测;文件存储侧(S3/OSS)行为为同构推演。"),
+      block("取舍:上传路径的工程细节",
+      "细节一,大文件:分片上传+断点续传(分布式 46 题思路),库记录分片清单。细节二,下载授权:存储桶私有+预签名 URL(短期凭证),不暴露桶地址。细节三,文件校验:上传后 MD5/大小校验入库,下载时校验——完整性由双方共同保证。细节四,清理权限:清理任务对存储的删除权限最小化(只删指定前缀),防误删全桶。监控:状态机各态数量、上传成功率、孤儿清理量——三指标刻画协同健康度。"),
+    ],
+    [
+      block("验证:双向故障注入(上传失败/库更新失败)各一条用例,断言状态机收",
+      "验证:双向故障注入(上传失败/库更新失败)各一条用例,断言状态机收敛与孤儿清理;对账任务核对存储清单与库记录——两个失败方向都要有收敛证据。补充:大文件走分片上传加断点续传,库记录分片清单;下载用预签名 URL 不暴露桶地址,上传后校验 MD5 与大小入库。"),
+      block("追问链:文件协同三刀",
+      "一刀:\"上传中实例崩溃怎么办?\"——outbox 重投或状态机重试;分片上传断点续传(已传分片保留)——崩溃恢复成本低。二刀:\"文件与记录的最终一致时延?\"——正常秒级(上传时长+状态更新);对账周期=分钟级——时延承诺写进 SLO。三刀:\"怎么测试协同?\"——故障注入(分布式 45 题):注入上传失败/库更新失败,断言状态机收敛与孤儿清理;两个方向的注入都要有。"),
+    ],
+    ["库为事实源,文件是副作用", "状态机推进,对账清孤儿", "outbox 做副作用,崩溃可重投"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/47': deep(
+    "如何治理应用中的全局可变工具对象？",
+    "网银账务沙盘:工具类的 static SimpleDateFormat 在并发下日期错乱(内部可变状态被并发覆写);另一个 static 缓存 Map 无界增长。用\"可变全局=并发 bug+内存泄漏双风险\"说明治理清单。",
+    [
+      "全局可变对象的两宗罪:并发安全(SimpleDateFormat 的内部 Calendar 并发错乱,经典事故)、生命周期(无界集合无人清理=慢泄漏,分布式 13 题画像)。",
+      "治理三招:无状态化(工具方法纯函数)、实例化注入(有状态改 bean,生命周期归容器)、并发安全替代(ConcurrentHashMap/ThreadLocal 隔离/不可变快照)。",
+      "扫描清单:static 可变字段(非 final、可变类型)、static Map/List/Date、单例里的可变成员——静态分析与 code review 双通道。",
+    ],
+    [
+      block("机制:共享可变状态的两种故障",
+      "故障一,并发错乱:SimpleDateFormat.format 内部操作共享 Calendar,两线程交错→日期错乱或异常——低频偶发、难复现(数据错误型)。故障二,慢泄漏:static Map 做缓存无上限(分布式 13 题实测画像:基线单调抬升、Full GC 后高位横盘)——内存型。两者共同根因:全局可变状态的\"共享写\"。Java 17 的记录类与不可变集合让\"不可变快照\"成本低——优先不可变。"),
+      block("推演:治理前后对照(附泄漏画像证据)",
+      "对照:SimpleDateFormat static→DateTimeFormatter(不可变)或每次 new;static Map→Caffeine(上限+TTL)或 ConcurrentHashMap+容量告警。锚点(分布式 13 题,本机实验):代理对象保活→200 类在册,不保活→类卸载——\"static 集合保活一切\"的机制实证:\n```\n保活:GC.class_histogram -> 200 个 $Proxy 类在册\n不保活:这些类从直方图消失\n```\n验证:治理对照为工程推演;static 保活机制为本机实测。"),
+      block("取舍:三类工具对象的归宿",
+      "纯函数工具(字符串/日期计算):无状态 static 方法,无风险——保留。有状态工具(缓存/计数器):升级为 bean(注入使用,生命周期与监控归容器)或明确命名空间的全局组件(单例+上限+监控)。配置常量(static final 不可变):保留——final+不可变类型(Records/List.of)无共享写问题。扫描规则的例外:static final 不可变集合与原子类(AtomicLong 计数)可接受——判据是\"是否共享可变写\"。"),
+    ],
+    [
+      block("验证:静态扫描(static 非 final 可变字段、单例 be",
+      "验证:静态扫描(static 非 final 可变字段、单例 bean 可变成员)清零;SimpleDateFormat 类替换后并发用例(多线程格式化)断言输出正确——并发与泄漏双回归。"),
+      block("追问链:全局状态三刀",
+      "一刀:\"ThreadLocal 算全局可变吗?\"——算变体:线程内全局,线程池复用即污染(第 19/8 题)——用完必 remove,框架类 ThreadLocal 要查清理路径。二刀:\"单例 bean 的可变成员呢?\"——同性质问题(第 47 题全局=单例):单例的实例字段被并发读写即共享可变——要么无状态要么并发安全容器。三刀:\"怎么系统性发现?\"——SpotBugs/ArchUnit 规则:static 非 final 可变字段告警;单例 bean 可变字段扫描;存量按\"泄漏风险(是否集合)>并发风险(是否格式化器)\"排序治理。"),
+    ],
+    ["全局可变,双罪并发", "无状态优先,有状态进容器", "static final 不可变,才是安全区"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/48': deep(
+    "监控标签为什么不能直接使用所有用户 ID？",
+    "网银监控沙盘:某接口的 Metrics 加了 userId 标签,大促百万活跃用户→百万时间序列,Prometheus 内存暴涨查询超时——标签基数(cardinality)爆炸。用基数治理说明标签设计。",
+    [
+      "标签基数=标签取值数×其他标签组合:userId(百万)级别的标签让时间序列指数膨胀——存储、内存、查询三重爆炸;高基数是监控系统的第一事故源。",
+      "设计规则:标签表达\"维度\"不表达\"实体\"——用 tenantId(百级)/region(十级)/resultCode(十级),不用 userId/orderId/IP(百万级);实体级追踪交给日志与链路(trace,第 40 题)。",
+      "治理手段:基数预算(每个指标声明预期基数,超限告警)、采样聚合(userId→hash 分桶)、按需下钻(先看聚合,问题定位再查日志/链路)。",
+    ],
+    [
+      block("机制:基数如何爆炸",
+      "Prometheus 每个标签组合=一条独立时间序列:接口(50)×实例(20)×resultCode(10)=1 万序列可控;加 userId→序列数=活跃用户数×其余维度——百万级。后果三重:存储(每序列独立样本流)、内存(查询时展开)、查询(高基数聚合慢到超时)。且基数只增难减:一旦写入,历史序列长期保留——治理成本远高于预防。SRE 实践:高基数标签是\"指标能查\"与\"系统可用\"的取舍,默认禁止。"),
+      block("推演:维度分层与下钻路径(附分布式锚点)",
+      "下钻路径:Metrics 聚合层(tenant/region/resultCode)→发现某租户异常→链路追踪按 tenantId 过滤→日志按 userId 精查——三层观测各司其职(Metrics 管面、Trace 管链、Log 管点)。本机锚点(热点分维度,分布式 25 题):99% 流量单键,加盐分片后 18%——\"维度选择\"决定问题可见性,监控维度错位同样让问题不可见:\n```\n普通分片:热点落在节点1 承载=99% 流量\n加盐16片:单节点最大承载=18% 流量\n```\n验证:基数爆炸为机制推演(Prometheus 行为),维度分层为工程范式;观测三层(指标/链路/日志)的分工与第 40 题审计分层的思想同源。"),
+      block("取舍:基数预算与例外通道",
+      "预算:指标注册时声明预期基数(序列数上限),CI 校验(指标命名与标签规范);超预算指标需要专门审批。例外通道:确实需要用户级聚合的场景(风控离线分析)——走日志/事件流(ClickHouse 类 OLAP),不进 Metrics。清理:已写入的高基数指标,删除 metric+清理录制规则;Prometheus 的历史数据要显式清理。评审问句:这个标签有多少个可能取值?乘上其他标签是多少序列?"),
+    ],
+    [
+      block("验证:Prometheus API 巡检每指标序列数并排序 top",
+      "验证:Prometheus API 巡检每指标序列数并排序 top10,新增指标超基数预算即失败;userId 类标签的指标在 CI 指标规范校验中直接拒绝——基数治理自动化。"),
+      block("追问链:监控标签三刀",
+      "一刀:\"resultCode 这种有限枚举安全吗?\"——安全前提是\"真的有限\":错误码设计失控(动态拼错误消息当标签)照样爆炸——枚举值进常量类,未知值归并到 other。二刀:\"低流量服务可以任性吗?\"——基数问题与流量无关(序列数由标签组合决定);小服务基数小是事实,但规范统一才能在大服务复用——规范从第一天执行。三刀:\"怎么审计现有指标的基数?\"——Prometheus API 查每指标序列数,排序 top10;定期巡检基数增长率,异常增长的新指标即治理对象。"),
+    ],
+    ["标签是维度,不是实体", "百万取值进日志,十级取值进指标", "基数预算进 CI,增长进巡检"], ["https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
+  'spring-advanced/49': deep(
+    "如何为框架升级建立最小可信回归集？",
+    "网银平台组沙盘:Spring Boot 3 升级,回归全靠手工点页面——升级后事务监听阶段行为变化一周后才被发现。用\"语义断言+真值测试+对照实验\"三件套建立最小可信回归集。",
+    [
+      "最小可信回归集的构成:语义断言测试(框架行为契约,如事务监听四断言/第 38 题)、真值测试(发布稿内嵌代码真实执行,后端已内置)、关键路径端到端(登录/下单/对账)+性能基准对照(吞吐/延迟分布)。",
+      "本仓库已是范本:SpringAdvancedExamplesTest 编译执行发布稿里的 Spring 示例并断言输出——框架升级后这些测试直接暴露语义漂移;本批 50 题的实测证据(Spring 6.2.19)即升级对照的基线。",
+      "流程:升级前基线(旧版本全绿+性能基准)→升级后同套件重跑→diff 归因(默认值变化/行为变化,分布式 42 题的版本对照框架)→灰度(第 41 题两阶段)。",
+    ],
+    [
+      block("机制:语义断言为什么是核心",
+      "手工回归测\"功能还能用\",测不出\"语义变了\"——事务监听阶段、传播行为、默认超时这类框架语义变化,功能层面无感,线上才炸。语义断言=把框架契约写成测试(仓库的四断言范本);真值测试=把关键代码路径真实执行(编译+运行+输出断言)。两者在 CI 里自动暴露漂移——升级回归的可信度来自\"断言了什么\",不来自\"点了多少页面\"。"),
+      block("实证:真值测试即升级探针(本仓库内置)",
+      "本仓库后端真值测试(SpringAdvancedExamplesTest)的形态:\n```\n读发布稿 spring-advanced-3/4/19.md → 提取 ~~~java 源码\n→ --release 17 编译 → 执行 verify() → 断言输出精确匹配\n([1]:[2] / true:0 / alice:anonymous)\n```\n解读:这三个测试在 Spring 6.2.19 上通过=事务保存点、rollback-only、安全上下文传播三项语义未漂移。升级 6.3/7.0 后重跑:通过=语义保持;失败=漂移点即回归重点——真值测试就是升级的探针。验证:随构建真实执行(本批内容已对齐)。"),
+      block("取舍:回归集的边界与维护",
+      "边界:覆盖\"框架语义面\"(事务/缓存/安全/事件/MVC)+业务关键路径——全覆盖不可行,语义面必保。维护:语义断言随框架特性新增(新特性=新断言);断言失败先查\"是 bug 还是契约变化\"——契约变化更新断言并记录(可追溯的语义变更史)。对照实验:升级前后性能基准(分布式 42 题框架:同负载双版本)——性能回归与语义回归并重。产出物:升级报告(语义 diff+性能 diff+默认值变化清单)——第 42 题的对照报告最低字段集。"),
+    ],
+    [
+      block("验证:升级前后各跑一遍回归集(语义断言+真值测试+性能基准),di",
+      "验证:升级前后各跑一遍回归集(语义断言+真值测试+性能基准),diff 逐项归因;本仓库真值测试(3/4/19 题的 verify 断言)即升级探针——语义漂移在 CI 暴露。"),
+      block("追问链:升级回归三刀",
+      "一刀:\"默认值变化怎么系统发现?\"——VM.flags/环境 diff(分布式 42 题)+框架 release notes 清单+配置绑定审计(启动打印全部生效配置,升级前后 diff)。二刀:\"破坏性变更的预判?\"——依赖兼容性检查(maven enforcer)+弃用 API 扫描(deprecation 预警在旧版本就清零)——升级季的债在平时还。三刀:\"灰度升级?\"——按实例灰度(分布式 41 题门禁防冷启动混淆)+双版本对照指标+回滚条件(分布式 46 题)——升级是变更,走变更纪律。"),
+    ],
+    ["语义断言测契约,真值测试当探针", "基线先行,diff 归因,灰度放量", "手工点页面不叫回归"], ["https://docs.spring.io/spring-framework/reference/"],
+  ),
+  'spring-advanced/50': deep(
+    "资深开发如何评审一个 Spring 架构改造方案？",
+    "网银平台组沙盘:方案文档写\"引入微服务+响应式+多级缓存+分库分表\"四件套,评审提问全部落在\"证据呢\"。用问题锚点+四问框架+分阶段准入说明评审方法(分布式 50 题框架的 Spring 特化)。",
+    [
+      "评审主线:每个技术决策对应一个已量化的问题(容量/延迟/复杂度数据)——没有锚点的引入即过度设计(分布式 50 题四问框架)。",
+      "Spring 特化的四问:代理边界清楚吗(自调用/捕获 this,第 1/13/28 题)?事务边界与语义对齐吗(第 3/4/37 题)?失效与一致性通道完整吗(缓存/权限/配置,第 14/16/21/34 题)?升级与测试策略可信吗(第 37/39/49 题)?",
+      "分阶段准入:每项改造带\"引入触发器+验证标准+回滚条件\"(分布式 50 题),评审产出\"保留/砍/触发器\"清单——架构决策数据驱动,不靠技术偏好。",
+    ],
+    [
+      block("机制:问题锚点与 Spring 特化四问",
+      "锚点:本批 50 题的实验模式即锚点示范——先有\"自调用事务生效=0\"(问题)再有拆 facade(机制);先有\"REQUIRES_NEW 占双连接\"(问题)再有审计异步化。四问的 Spring 特化:一问代理(改造后调用路径变了,事务/缓存还生效吗);二问事务(边界画在哪,跨服务一致性走什么,分布式 10/14 题);三问失效(新引入的缓存/配置,失效通道与原子性,第 16/34 题);四问可信(测试事务盲区排了吗,升级回归集建了吗)。"),
+      block("实证:四问在真值测试与实验中的落点",
+      "落点示范(本批实测数据):\n```\n一问代理: 自调用事务=0 vs 代理调用=1(Q1)\n二问事务: NESTED [1]:[2] / rollback-only true:0(Q3/Q4 真值)\n三问失效: 版本仲裁拒绝过期写(分布式 33 题)\n四问可信: 仓库真值测试随构建执行(第 49 题探针)\n```\n解读:评审的每个问题都能落到一个可复跑的证据——方案文档里应当预填这些证据位;填不出的机制,默认砍(分布式 50 题纪律),触发器保留。"),
+      block("取舍:评审产出与演进治理",
+      "产出:逐机制的\"保留/砍/触发器\"表+验证标准(每机制的指标与阈值)+回滚条件(分布式 46 题三件套)。演进治理:触发器指标进监控(如\"QPS>阈值\"告警),触发即走引入流程——架构是过程不是结论(分布式 49 题基线演进同思路)。反模式清单:为简历引入技术(无锚点)、一次改造同时上四件套(变量爆炸,分布式 42 题一次回答一个问题)、改造无回滚(不可逆即高危)。评审态度:问证据,不问偏好;砍错可以加回来,过度设计删不掉的复杂度会长期收税。"),
+    ],
+    [
+      block("验证:评审产出\"保留/砍/触发器\"清单,每个保留机制标注验证标准与",
+      "验证:评审产出\"保留/砍/触发器\"清单,每个保留机制标注验证标准与回滚条件;评审质询的每个问题对应一个可复跑证据(本批实验即素材)——评审本身用证据闭环。补充:评审反模式清单(为简历引入技术/一次上四件套/无回滚条件)进 checklist;改造期间变更纪律全程有效,阶段准入以指标达标为准。"),
+      block("追问链:评审三刀",
+      "一刀:\"怎么防\"为简历而架构\"?\"——四问+证据表+分阶段准入(分布式 50 题三刀同款);评审人只认可复跑证据。二刀:\"欠设计怎么查?\"——反向四问:资金路径有原子性防线吗(D7)、幂等齐吗(第 8/45 题)、失效闭环吗(第 14/21 题)、测试可信吗(第 37 题)——过度与欠设计是同一张表的正反两面。三刀:\"改造的验证节奏?\"——每阶段准入(指标达标才进下一阶段)+对照实验(同负载前后)+回归集全绿;改造期间的变更纪律(第 46 题回滚条件)全程有效。"),
+    ],
+    ["四问问证据,砍到锚点为止", "代理事务失效一致性,升级可信", "触发器保留,回滚条件先行"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
+  ),
 };

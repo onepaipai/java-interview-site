@@ -3,30 +3,30 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/tx-propagation.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
 
 </details>
 
 ## 参考回答
 
-1. JDK 代理暴露接口契约，类代理通过生成子类增强可覆写方法；类代理受 final 类、final 和 private 方法等限制。
-2. 默认代理模型中目标内 this 调用不重新进入代理；两种代理都可能如此，切换到类代理不能自动修复。
+1. JDK 代理围绕接口，CGLIB 类代理不能覆盖 final 等受限方法。
+2. 同类直接调用 this 绕过代理，注解拦截不会自动再次发生。
+3. 优先拆到独立职责服务并经注入代理调用，用真实提交断言验证。
 
 ## 参考分析
 
-1. JDK 代理不是实现类的子类，注入类型要匹配；目标实现方法 final 不等于接口代理调用必然不能增强。
-2. 优先拆到另一受管 Bean，避免业务依赖 currentProxy 等环境细节；AspectJ 编织机制不同。
+1. 外层已有事务时，内层可能参与外层而掩盖自调用问题。
+2. 测试须明确外层无事务和异常条件。
 
 ## 案例
 
-1. 教学场景：外部调用 outer，内部 this.inner 标了独立事务，最终却随外层回滚。
+1. 场景（教学示例）：非事务方法直接调用同类事务方法，第二次插入失败。
+2. 处理：拆分到独立写服务，通过注入的代理调用；保留数据库回滚断言。
 
-2. 记录两类代理的拦截次数，拆出 inner Bean 后用真实事务数据库对照提交。
-
-3. 验证内部独立规则只有经过相应边界才生效；已有外层事务不因自调用消失。
+3. 验证：两次写入都回滚；同样检查缓存与异步注解是否真正经过代理。
 
 ## 总结点
 
-1. 接口契约与子类覆写分清。
-2. 自调用绕过新的代理入口。
+1. 同类调用绕代理。
+2. 验证要看真实提交。

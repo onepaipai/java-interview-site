@@ -15,7 +15,7 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 > 场景与约束：Java 17 教学场景：监控模块有 5 个周期任务，其中之一可能抛运行时异常且个别任务耗时长。对照 Timer 单线程串行与 ScheduledExecutorService 多线程隔离在异常传播、相互阻塞与时间漂移上的表现。
 
 1. Timer 单线程串行执行全部任务：一个任务耗时或异常都会拖垮其他任务；任务抛出未捕获异常时 Timer 线程终止，后续所有任务静默停摆。
-2. ScheduledExecutorService 每个任务独立捕获异常（未提交后续则该任务停止，但其他任务不受影响），可配多线程池、可控的重排策略与相对时间基准。
+2. ScheduledExecutorService 每个任务独立捕获异常（未提交后续则该任务停止，其他任务不受影响），可配多线程池；时间基准用 nanoTime 单调时钟，不受 NTP 校时与跳变影响——Timer 依赖 System.currentTimeMillis 墙钟，回拨会让任务提前或延后触发，这是 Timer 被淘汰的第三个理由。
 3. 新代码一律选 ScheduledExecutorService（或框架级调度器如 Spring 的 TaskScheduler）；Timer 只在维护历史代码时认识它。
 
 ## 参考分析

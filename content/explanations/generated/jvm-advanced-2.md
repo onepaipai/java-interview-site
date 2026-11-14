@@ -3,8 +3,9 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-garbage-collector.html)
-- [OpenJDK 设计说明 · 2](https://openjdk.org/jeps/248)
+- [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html)
+- [github.com · 2](https://github.com/openjdk/jdk17u/blob/master/src/hotspot/share/gc/g1/g1CollectedHeap.cpp)
+- [OpenJDK 设计说明 · 3](https://openjdk.org/jeps/248)
 
 </details>
 
@@ -12,42 +13,48 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 G1 管理包含短命对象、长寿命对象和大数组的堆。讨论 Region、回收集合和对象生命周期之间的关系，不把 Region 当成固定的 Eden/Old 分区或性能保证。
+> 场景与约束：网银账务服务沙盘:老服务用 CMS 时代思路理解 G1,把堆当成"新生代加老年代两块连续空间"来排查问题,解释 region 化后堆的形态、回收单位与可预测性来源。数据来自本机 64MB 小堆实测。
 
-1. G1 把堆划成等大小 Region，逻辑上按需要充当 Eden、Survivor、Old 或 Humongous 区域，使回收可以选择一组收益较高的区域。
-2. Region 化减少了必须对整个连续老年代做处理的约束，但回收仍需扫描、复制存活对象并受可用目标空间限制。
-3. Region 并不消除暂停、碎片或大对象成本；应结合 Region 大小、存活率、分配速率和 GC 日志判断是否真正改善。
+1. Region 把堆切成 1 至 32MB 的等大分区,按角色(Eden/Survivor/Old/Humongous)动态分配,角色随 GC 切换——分代仍在,但物理边界消失了。
+2. 回收单位从"整代"变成"分区集合":每次 GC 只疏散若干 region,暂停时间由 region 数量调节,这是 G1 可预测性的来源。
+3. Region 大小由堆大小除以 2048 再对齐到 2 的幂,大对象按连续 region 存放并单独记账,不再挤占普通代际结构。
 
 ## 参考分析
 
-### 逻辑分代与物理布局不同
+### 机制:角色流动的堆与基于统计的回收集
 
-G1 的堆由多个等大小 Region 组成，Region 可以在不同阶段承担年轻代或老年代角色，年轻代和老年代不要求物理连续。这样回收器能按当前存活和垃圾比例选择回收集合，而不是固定扫描整个连续区域。
-Region 不是对象隔离边界：对象仍可能被引用图跨 Region 连接，G1 需要记忆集等结构追踪跨区引用，相关维护也会消耗 CPU 和内存。类比开放式办公室：工位（region）不按部门固定划区，部门（分代）是工位集合的动态标签——物理布局与逻辑归属解耦。
+实测 64MB 堆的日志第一行给出 Heap Region Size: 1M(64MB/2048=32KB,向上取到最小 1MB)。G1 维护每个 region 的回收价值(疏散成本对释放空间的比值),young GC 后按暂停目标圈定回收集 CSet。region 化让"代"成为逻辑概念:Eden 与 Survivor 都是同一批物理 region 换角色。源码层面 g1CollectedHeap.cpp 管理分配与角色切换,region 分配器保证疏散源与目的不重叠。
 
-### 选择回收集合需要成本
+### 边界:region 化不解决的三个问题
 
-Young GC 主要处理年轻 Region，完成标记后 Mixed GC 可把部分垃圾较多的 Old Region 加入集合。回收收益、存活对象复制量、暂停目标和可用 to-space 会共同影响选择。
-如果存活对象很多，回收集合即使逻辑上合适也可能复制成本很高；如果分配速度超过回收能力，Region 设计不能阻止堆耗尽。
+第一,Humongous 对象仍然特殊:超过 region 一半的对象直接进老年代连续 region,碎片与回收策略与普通对象不同,实测日志里 Humongous regions 单独成行。第二,跨 region 引用靠 remembered set 维护,写屏障要记录跨区引用,内存与 CPU 有开销。第三,region 越大,region 内碎片浪费越明显,小堆配大 region 会放大这一点。
 
-### 大对象与 Region 大小的边界
+### 取舍:region 数量与灵活性的平衡
 
-超过一个 Region 一半大小的对象通常按 Humongous 对象处理，可能占用连续 Region，增加分配和回收压力。频繁创建大数组、序列化缓冲区或临时大对象时，应先检查生命周期和复用策略，再考虑 Region 参数。
-手动改变 G1HeapRegionSize 会改变 Humongous 阈值和管理粒度，不能脱离堆大小、对象分布和日志证据单独决定。
+大堆配大 region 减少元数据与 remembered set 开销;小 region 则让 CSet 圈选更细、暂停更可控。64MB 堆拿到 1MB region,4GB 堆约 2MB region——按 2048 份切分本身就是"元数据成本与调度粒度"的折中。业务侧需要记住的是:堆的几何形状不再是"新生代 1/3 老年代 2/3"的固定比例,排查问题时看 region 统计而不是旧比例。
+
+### 底座:Card Table 是 RSet 的原料层
+
+跨区引用的记忆不是直接写 RSet:写屏障先把包含跨区引用的 512 字节卡片(Card Table 条目)打脏标记,Concurrent Refinement 线程异步把脏卡片精化进目标 region 的 RSet——RSet 记的是"哪些卡片里有指向我的引用",粒度是卡片不是单个引用。这套两级结构把写屏障的同步开销压到"一次数组写",代价是 RSet 的内存与精化线程的 CPU。读 RSet 相关的开销问题必须从卡表入手,否则"RSet 记引用方"的描述解释不了开销为什么可接受。
 
 ## 案例
 
-### 对象分布对照
+### 实证:小堆上的 region 形态
 
-在隔离环境分别生成短命小对象、长寿命对象和接近 Region 阈值的大数组，记录 Region 使用、Young/Mixed GC、存活复制和 Humongous 日志。预期三类分配压力表现不同；不要把一次 Region 使用图当成通用性能结论。
+命令:-Xms64m -Xmx64m -Xlog:gc*,gc+humongous=trace,gc+heap=info HumExp(Java 17.0.17)。关键输出:
+```
+Heap Region Size: 1M
+GC(0) Humongous regions: 29->15
+GC(8) Humongous regions: 54->0
+```
+验证:同样命令重跑,region 大小与回收行为同量级;结果说明 region 角色统计直接出现在 GC 日志里,Humongous 有独立账本。
 
-### 配置验收
+### 追问链:region 三刀
 
-在相同负载下比较默认 Region 大小与调整后的版本，检查暂停分位数、GC CPU、堆碎片、Humongous 分配失败和应用吞吐。只有用户延迟与资源成本同时改善时才保留变更，并记录目标 JDK 版本。
+一刀:"region 大小能改吗?"——能,-XX:G1HeapRegionSize 显式指定,但默认值已经按堆/2048 折中,除非 Humongous 频发,否则不动。二刀:"跨 region 引用怎么保证疏散正确?"——写屏障把跨区引用记进 remembered set,疏散时按 RSet 找到引用方修正,这是 CPU 开销的来源之一。三刀:"region 和虚拟线程/新回收器什么关系?"——region 化是 G1 与 ZGC 共同的堆组织思路(ZGC 用 zPage/region 分层),学会看 region 统计,迁移回收器时排查框架不变。
 
 ## 总结点
 
-1. 工位不划部门，region 动态贴标签
-2. Region 支持按收益选择回收
-3. 逻辑分代不等于物理隔离
-4. 大对象阈值随 Region 大小变化
+1. 堆切两千份,角色随 GC 换
+2. 回收圈分区,暂停可预算
+3. 大对象走专线,RSet 记跨区

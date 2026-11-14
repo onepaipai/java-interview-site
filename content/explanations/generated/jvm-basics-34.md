@@ -30,7 +30,7 @@ mark 记住当前 position，reset 回到 mark（可撤销部分读取）；comp
 
 ### 取舍：直接缓冲与堆缓冲的选择
 
-HeapBuffer 数据在堆（受 GC 管理，经 socket 时会多一次拷贝到临时直接缓冲）；DirectBuffer 省拷贝但分配贵、释放靠 Cleaner（见第 33 题）。IO 型服务用池化 DirectBuffer，低频小量用 HeapBuffer——状态机部分两者完全一致，成本差异在数据落点。
+HeapBuffer 数据在堆（受 GC 管理，经 socket 时会多一次拷贝到临时直接缓冲）；DirectBuffer 经内部 address 字段直接持有堆外地址，socket I/O 免去这次拷贝——"省一次拷贝"的机制根源就在这个字段（零拷贝路径的落点）；代价是分配贵、释放靠 Cleaner（见第 33 题）。IO 型服务用池化 DirectBuffer，低频小量用 HeapBuffer——状态机部分两者完全一致，成本差异在数据落点。
 
 ## 案例
 

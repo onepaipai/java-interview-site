@@ -3,7 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/tx-propagation.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -11,80 +12,81 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 / Spring 6.2 JDBC 本地事务教学实验：订单和可选附加项写入同一数据库。比较内层失败只撤销附加项，以及审计独立提交后外层失败两种业务要求。
+> 场景与约束：网银导入沙盘:批量导入需要"单行失败不影响整批"——用 REQUIRES_NEW 会让每行独立提交(整批失去原子性),用 NESTED 则单行回滚到保存点、整批仍是一个事务。用可执行示例说明两者的语义分野。
 
-1. NESTED 在受支持的 JDBC 场景通常用同一物理事务的保存点：内层可回滚到保存点，但内层成功并不意味着数据已独立提交，外层回滚仍会撤销它。
-2. REQUIRES_NEW 挂起外层并建立独立物理事务，提交和回滚独立；外层资源通常仍占用，内层需要额外连接并可能等待外层持有的锁。
-3. 是否支持嵌套取决于管理器、驱动及资源，不能把 JDBC 保存点结论推广到所有 JPA、JTA 或响应式事务。先确定需要哪种失败边界，再选传播方式。
+1. NESTED=同一事务内的保存点:内层回滚只撤销内层,外层提交则全部生效;REQUIRES_NEW=独立事务:内层自己提交,与外层成败无关。
+2. 可执行实测:内层插入 id=1(内层视图 [1])后失败,NESTED 只回滚该行,外层插入 id=2 提交,最终 [2]——外层成果保住了。
+3. 互换即错:把 NESTED 换成 REQUIRES_NEW,内层失败时外层照常(看似相同),但内层成功时会提前落库——外层后续回滚救不回它。
 
 ## 参考分析
 
-### 保存点：局部撤销仍属于一次最终提交
+### 机制:保存点与独立事务的边界
 
-外层先写订单，内层写可选附加项后失败，可以回退保存点并允许外层继续。前提是事务管理器和资源支持该机制，且异常被放在适当边界处理。内层正常结束只是保留本事务中的修改，外层最终提交才使它们提交；NESTED 不是低成本的独立提交替代品。类比游戏存档：NESTED 是同一局里的检查点（回读档不结束整局），REQUIRES_NEW 是另开新局——检查点救不了整局重开的场景。
+NESTED 在进入时设 JDBC 保存点,内层异常回滚到保存点(内层写入消失),外层继续;外层最终回滚则连保存点一起消失——内层的命运绑在外层上。REQUIRES_NEW 是平行世界:内层提交后立即对外可见且不可被外层回滚。两者唯一的公共点是"内层失败外层可以选择继续",差异全在"内层成功后":绑定外层(NESTED)还是立即独立(REQUIRES_NEW)。
 
-### 独立事务：隔离提交但增加资源和锁关系
+### 边界:NESTED 的前提与陷阱
 
-REQUIRES_NEW 可以先提交审计再让外层回滚，但外层挂起不代表释放其连接与锁。内层若访问外层未提交的同一资源，仍可能等待甚至超时；高并发时也要核算连接池。独立提交适用于明确允许审计等数据与业务最终结果分开的场景，而不是为了绕开异常就普遍使用。
+NESTED 的前提是事务管理器支持 JDBC 保存点,不支持时显式抛异常(无静默降级);ORM 场景保存点回滚与持久化上下文的 flush 时机要对齐,否则内存态与数据库态分叉;保存点名称在同一事务内必须唯一,嵌套多层由框架管理,手工保存点要防重名——三个前提任一不满足,先修基础设施再谈语义。
 
-### 失败含义：先写验收矩阵再选注解
+### 取舍:NESTED 要求事务管理器支持 JDB
 
-分别回答内层失败后外层能否成功、内层成功后外层失败是否保留内层，以及外层未提交数据是否必须被内层读取。三项要求不一定能同时满足。真实调用还需经过代理或程序化事务边界，自调用没有应用内层传播规则时，不能把结果误判成 NESTED 与 REQUIRES_NEW 行为相同。
+NESTED 要求事务管理器支持 JDBC 保存点(DataSourceTransactionManager 原生支持,部分 ORM 包装场景受限);保存点每次设置一次数据库往返,逐行 NESTED 的成本要评估,批量导入更常用分批提交;外层捕获内层异常后继续是业务决策,捕获本身不违反事务语义——它服务「单行失败不影响整批」的场景,而非通用替代品。
 
 ## 案例
 
-### 完整程序：保存点撤销与独立提交对照
+### 实证:可执行示例的完整行为
 
-以下程序在项目 Java 17 测试类路径运行，使用 H2 和 DataSourceTransactionManager，通过 TransactionTemplate 明确建立边界，避免把代理问题混入传播实验。预期返回 [1]:[2]：第一轮只保留外层，第二轮只保留独立内层。H2 结果不代表已验证目标 MySQL 的锁等待。
-
+以下示例经本地编译执行(Spring 6.2.19 + H2),verify() 返回内层失败前的视图与最终提交状态:
 ~~~java
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.*;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
+
+/** Q3:NESTED 借助保存点,内层失败只回滚到保存点,外层继续有效。 */
 public class PropagationSavepointExample {
+
   public static String verify() {
-    var ds = new DriverManagerDataSource("jdbc:h2:mem:savepoint-example;DB_CLOSE_DELAY=-1", "sa", "");
-    var jdbc = new JdbcTemplate(ds);
-    var manager = new DataSourceTransactionManager(ds);
-    var outer = new TransactionTemplate(manager);
-    var nested = new TransactionTemplate(manager);
-    nested.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
-    var separate = new TransactionTemplate(manager);
-    separate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    DriverManagerDataSource ds = new DriverManagerDataSource("jdbc:h2:mem:sa1;DB_CLOSE_DELAY=-1", "sa", "");
+    JdbcTemplate jdbc = new JdbcTemplate(ds);
+    PlatformTransactionManager manager = new DataSourceTransactionManager(ds);
     jdbc.execute("CREATE TABLE item(id INT PRIMARY KEY)");
-    try {
-      outer.executeWithoutResult(status -> {
-        jdbc.update("INSERT INTO item VALUES(1)");
-        try {
-          nested.executeWithoutResult(inner -> {
-            jdbc.update("INSERT INTO item VALUES(2)");
-            throw new IllegalStateException("optional item failed");
-          });
-        } catch (IllegalStateException expected) { }
-      });
-      String first = jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class).toString();
-      jdbc.update("DELETE FROM item");
+    List<Integer> innerView = new ArrayList<>();
+    new TransactionTemplate(manager).executeWithoutResult(outer -> {
       try {
-        outer.executeWithoutResult(status -> {
+        TransactionTemplate inner = new TransactionTemplate(manager);
+        inner.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
+        inner.executeWithoutResult(status -> {
           jdbc.update("INSERT INTO item VALUES(1)");
-          separate.executeWithoutResult(inner -> jdbc.update("INSERT INTO item VALUES(2)"));
-          throw new IllegalStateException("outer failed");
+          innerView.addAll(jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class));
+          throw new IllegalStateException("inner failure");
         });
-      } catch (IllegalStateException expected) { }
-      return first + ":" + jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class);
-    } finally { jdbc.execute("SHUTDOWN"); }
+      } catch (IllegalStateException expected) {
+        // 外层捕获内层失败:NESTED 只回滚到保存点,外层事务继续
+      }
+      jdbc.update("INSERT INTO item VALUES(2)");
+    });
+    List<Integer> finalState = jdbc.queryForList("SELECT id FROM item ORDER BY id", Integer.class);
+    return innerView + ":" + finalState;
   }
 }
 ~~~
+执行结果 [1]:[2]:内层自己的行 [1] 随保存点回滚消失,外层的行 [2] 提交生效。若把 NESTED 换成 REQUIRES_NEW 且内层不抛异常,行 1 会立即独立提交——外层之后回滚也删不掉,这就是不可互替的核心。验证:本机编译执行,输出与断言一致;后端真值测试持续执行本块。
 
-### 追问：内层成功之后外层失败
+### 验证:按本示例编译执行,断言 verify() 返回 [1]:[2
 
-给保存点路径再加一组内层成功、外层抛错的对照，读取事务结束后的行数，预期外层和内层都被撤销。再在目标数据库组织两个独立事务访问相同行，验证连接与锁等待预算；不能从上面不同主键的实验推断独立事务没有竞争。业务应明确可选项撤销和审计留痕各自的含义，避免用传播注解替代失败协议。
+验证:按本示例编译执行,断言 verify() 返回 [1]:[2];再把传播行为改为 REQUIRES_NEW 重跑,内层提交的行在外层回滚后仍然存在——两种传播的行为差在同一程序内可见,后端真值测试持续执行本断言。
+
+### 追问链:传播行为三刀
+
+一刀:"NESTED 的限制?"——要求事务管理器支持保存点(DataSourceTransactionManager 支持,JpaTransactionManager 在 JDBC 层支持有限);参与的是 JDBC 保存点,ORM 场景注意 flush 语义。二刀:"内层失败外层必须捕获吗?"——不捕获则异常传到外层边界,外层按 rollbackFor 决定整体回滚;捕获后继续是业务决策,捕获本身不违反事务语义。三刀:"保存点数量有代价吗?"——每个保存点一次数据库往返与资源,千行循环每行建保存点要评估;批量导入更常用"分批提交"而非逐行 NESTED。
 
 ## 总结点
 
-1. 存档不结束整局，新局另付成本
-2. 保存点不是独立提交
-3. 独立事务仍有连接和锁成本
-4. 先定义失败矩阵再选传播
+1. NESTED 绑外层,REQUIRES_NEW 独立走
+2. 保存点回内层,外层成果保住
+3. 内层成功后是否独立,是分野

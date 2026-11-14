@@ -3,29 +3,30 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/tx-propagation.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
 
 </details>
 
 ## 参考回答
 
-1. REQUIRED 加入或创建事务；REQUIRES_NEW 建立独立事务并挂起外层；NESTED 在受支持资源上通常使用保存点，最终仍受外层提交约束。
-2. SUPPORTS 可参与已有事务，MANDATORY 要求已有事务，NOT_SUPPORTED 非事务执行并挂起已有事务，NEVER 拒绝已有事务。
+1. REQUIRED 加入或新建，REQUIRES_NEW 挂起外层并开独立事务。
+2. NESTED 依赖保存点支持；SUPPORTS、NOT_SUPPORTED 决定是否参与。
+3. MANDATORY 要求已有事务，NEVER 拒绝已有事务；连接预算也要考虑嵌套。
 
 ## 参考分析
 
-1. 传播描述调用遇到已有事务时的关系，不保证一定新建；需说明管理器和资源支持。
-2. 独立事务额外占连接且仍可能等外层锁；保存点不提供独立持久提交，自调用还可能绕过内层规则。
+1. 内部将共享事务标为回滚后，外层捕获异常也可能在提交时报 UnexpectedRollbackException。
+2. 提交后写库需新事务边界。
 
 ## 案例
 
-1. 教学场景：可选附加项失败允许订单继续，独立审计却要求订单失败时仍保留。
+1. 场景（教学示例）：订单失败后仍要独立保存失败审计。
+2. 处理：审计服务使用明确的独立事务并估算额外连接需求；核心订单异常继续正确传播。
 
-2. 分别用保存点与独立事务表达目标，再对照 REQUIRED 的共同回滚，确认调用真正跨边界。
-
-3. 验证最终行数与预期矩阵一致，目标数据库另测锁与连接预算，不靠传播名称猜结果。
+3. 验证：订单回滚而审计保留；若审计失败有告警，不把独立提交误当跨库原子性。
 
 ## 总结点
 
-1. 传播先看已有事务与资源。
-2. 保存点和独立提交不同。
+1. 传播决定提交边界。
+2. 跨库不自动同事务。

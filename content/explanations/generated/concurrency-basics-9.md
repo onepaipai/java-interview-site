@@ -40,7 +40,7 @@ synchronized 等锁、对象构造、传统 socket 读（非 NIO）不响应中�
 
 ### 追问：取消标志可以代替 interrupt 吗
 
-自定义 volatile 标志适合纯计算循环，但无法唤醒阻塞：线程睡在队列 take 上时，改标志毫无作用，还必须再发 interrupt。标准做法是两者并用：标志供快速路径检查，interrupt 负责唤醒阻塞；ExecutorService.shutdownNow 与 Future.cancel(true) 都是这个组合。
+自定义 volatile 标志适合纯计算循环，但无法唤醒阻塞：线程睡在队列 take 上时，改标志毫无作用，还必须再发 interrupt。标准做法是两者并用：标志供快速路径检查，interrupt 负责唤醒阻塞；ExecutorService.shutdownNow 与 Future.cancel(true) 都是这个组合。cancel 的两个形态：cancel(false) 只把未开始的任务从队列移除，不中断运行中的；cancel(true) 额外中断运行线程——mayInterruptIfRunning 的选择依据是"任务能否安全中断"；shutdownNow 等于清空队列并对全部工作线程 interrupt，语义上是对每个未完成任务 cancel(true)。
 
 ## 总结点
 

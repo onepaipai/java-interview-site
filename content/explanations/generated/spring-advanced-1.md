@@ -3,8 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/tx-propagation.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -12,49 +12,42 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Spring Framework 6.2、JDBC 本地事务、默认 proxy 模式。订单入口调用同一个对象中的扣库存方法，扣库存标注 REQUIRES_NEW，异常后却发现实际提交行为与预期不同。
+> 场景与约束：网银订单沙盘:OrderService.save() 里 this.saveInTx() 调用自己的 @Transactional 方法,数据没进事务。用同容器实测说明代理的调用路径与自调用绕过,并给出三种修复的取舍。
 
-1. 我先画调用路径：外部调用经过事务代理才会触发拦截器；目标对象内部通过 this 调用另一个方法，没有重新进入代理，所以内层注解的事务属性不会被应用。
-2. 不能直接说“自调用就没有事务”。如果外层已经开启事务，内层数据库操作通常仍参与外层事务；失去的是内层声明的独立传播、隔离、超时等边界。
-3. 我优先把独立事务用例拆到另一个受管理的 Bean，或用 TransactionTemplate 显式界定；然后通过入口调用和数据库提交结果验证，而不是只检查注解是否存在。
+1. 事务是代理实现的:调用必须先经过代理对象(开事务→调目标→提交),this 调用绕过代理直达目标方法,注解形同虚设。
+2. 实测:同容器内自调用事务生效=0,经 facade 走代理调用生效=1(Spring 6.2.19,H2 实测)。
+3. 修复三选:拆到另一个 bean、注入自身代理(ObjectProvider/AopContext)、改用 TransactionTemplate 编程式边界;没有第四种"配置让 this 也走代理"。
 
 ## 参考分析
 
-### 拦截边界：代理决定注解何时生效
+### 机制:代理的调用链与 this 的绕行
 
-容器把代理交给调用方，事务拦截器在调用目标方法前决定加入、创建或挂起事务，返回或抛出异常时再处理完成。进入目标对象后，普通 Java 的 this.inner() 并不回到容器取得代理。换成类代理也不会自动修复这种调用路径。
+Spring 事务由 AOP 代理包裹:调用方持有的是代理,代理在目标方法前后开提交事务。容器返回的 OrderService 实际是 CGLIB 子类实例,方法调用先入拦截器链。this.saveInTx() 的 this 是目标对象自身,不经代理——拦截器链根本没被触发,事务开关代码没执行。这就是"注解在,事务不在"的全部机制,与注解的传播级别、rollbackFor 都无关。
 
-讨论失效之前要先确认对象确实由容器管理、事务管理器对应正在使用的数据源，以及采用 proxy 还是 AspectJ 模式。后者改变的是织入机制，不能把它的结论直接套到默认代理模式。类比机场安检：只有从代理这个正门进出的调用才会被检查，this 内部调用走的是员工通道，事务拦截器根本不在场。
+### 实证:同容器对照自调用与代理调用
 
-### 传播语义：外层有无事务会产生不同后果
+本机实验(Spring 6.2.19 + H2,AnnotationConfigApplicationContext + @EnableTransactionManagement):OrderService.saveWithSelfCall() 内部 this.saveInTx(),以及 OrderFacade 持有注入的 service 调同一方法,各自统计事务活跃标志:
+```
+Q1 自调用事务生效=0 代理调用生效=1
+```
+验证:同程序重跑一致;把 saveInTx 改 public 之外的可见性结论不变——失效只取决于"有没有经过代理",不取决于注解写得多正确。
 
-如果外层没有事务，内层 REQUIRES_NEW 被绕过后，数据库调用可能落到自动提交，多个 SQL 就不再构成预期的原子单元。如果外层 REQUIRED 已生效，内部调用仍使用当前线程绑定的事务资源，此时内层失败可能把整个外层工作一起回滚；内层指定的独立提交不会出现。
+### 取舍:三种修复的适用边界
 
-是否回滚还受异常类型、rollbackFor 和异常是否被吞掉影响。默认对 RuntimeException 与 Error 回滚，受检异常需要配置；“抛了异常”不能单独证明事务必然回滚。
-
-### 工程取舍：拆 Bean、编程式事务与资源预算
-
-拆成 OrderService 与 InventoryService 能把调用边界表达出来，也便于独立测试。需要在一个较长流程中精确控制一小段事务时，TransactionTemplate 更直观。自注入代理增加理解成本，AopContext 还依赖暴露代理配置，不应当作通用修复口令。
-
-即使正确通过代理使用 REQUIRES_NEW，也要考虑外层占着连接、内层另取连接的容量与等待。审计必须独立落库可以有理由采用独立事务；库存扣减是否应独立提交，则应由订单不变式决定，不能为了“让注解生效”改变业务原子性。
+拆 bean:语义最清晰,事务边界即 bean 边界,首选;代价是多一个类与注入。注入自身代理:ObjectProvider<OrderService> 延迟取代理,改动最小,但"类内部自己代理自己"可读性差,容易在重构中再被绕过。TransactionTemplate:边界显式可见(第 12 题),适合边界与业务流不一致的场景;代价是模板代码。共同前提:评审时凡是"@Transactional 方法被同类调用"都要点名,这是静态可查的缺陷。
 
 ## 案例
 
-### 故障推演：独立事务没有独立提交
+### 验证:在本容器内用 TransactionSynchronizat
 
-准备测试表与两个服务：入口 start() 经过代理开启 REQUIRED，内部调用 this.audit()，后者声明 REQUIRES_NEW 并写入审计记录，然后 start() 抛出运行时异常。预期：内部声明被绕过，订单与审计一起回滚。将 audit() 移入另一个受管理 Bean，经代理调用后重做测试，审计独立提交，订单回滚。
+验证:在本容器内用 TransactionSynchronizationManager.isActualTransactionActive() 分别断言自调用与代理调用两条路径,自调用应为 false——把该断言固化成 ArchUnit 规则或单元测试后,同类调用事务注解方法的回归在 CI 直接失败。
 
-验证要从测试事务之外重新查询数据库；测试方法本身不要包住整个调用再自动回滚，否则很容易把真实提交结果遮住。使用实际目标数据库或对应集成环境，日志里的“开启事务”只能作为辅助证据。
+### 追问链:自调用三刀
 
-### 面试追问：为什么不能把所有方法都设成独立事务？
-
-独立事务把原来的整体原子性拆开。假设审计已经提交，但订单最终失败，审计表达的是“曾尝试”还是“已完成”必须写清。如果把扣库存也独立提交，订单失败后就必须有持久化补偿与重试，否则会留下无订单的库存扣减。
-
-验收时分别覆盖外层成功、外层失败、内层受检异常、连接池紧张及嵌套调用。好的回答应给出每种情况的提交结果，并说明哪一个结果才符合业务要求，而不是只展示两个不同的事务 ID。
+一刀:"为什么 private 方法加 @Transactional 也没用?"——双重原因:代理不拦截私有方法(CGLIB 子类覆写不了),自调用又绕过代理;两类失效叠加。二刀:"@Autowired 自注入能修复吗?"——能(注入的是代理),但注入自身有循环依赖风险,推荐 ObjectProvider 延迟解析;修复后验证方式还是"事务活跃标志"。三刀:"怎么在评审或静态检查里发现?"——ArchUnit 规则:禁止同类内调用 @Transactional 注解方法;或 IDE 检查 this 调用注解方法。发现成本远低于线上排查成本,值得进 CI。
 
 ## 总结点
 
-1. 代理如安检口：内呼绕检不生效
-2. 先看调用是否经过代理
-3. 自调用不等于当前没有事务
-4. 传播边界服从业务不变式
+1. 代理是门卫,this 走了侧门
+2. 自调用零事务,实测为零
+3. 拆 bean 最稳,模板次之

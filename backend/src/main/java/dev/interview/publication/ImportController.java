@@ -21,7 +21,8 @@ public class ImportController {
 
   @PostMapping("/preview")
   MarkdownImporter.Preview preview(@RequestParam("file") MultipartFile file) throws Exception {
-    if (file.isEmpty() || file.getSize() > 2_000_000) throw new IllegalArgumentException();
+    // 与导出体量对齐:全量导出已超 2MB,导入上限同步预留至 6MB(小于 multipart 的 10MB)
+    if (file.isEmpty() || file.getSize() > 6_000_000) throw new IllegalArgumentException();
     var decoder = StandardCharsets.UTF_8.newDecoder();
     return parser.parse(decoder.decode(java.nio.ByteBuffer.wrap(file.getBytes())).toString());
   }

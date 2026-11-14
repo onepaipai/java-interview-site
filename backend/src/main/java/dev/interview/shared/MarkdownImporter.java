@@ -60,7 +60,8 @@ public class MarkdownImporter {
   }
 
   public Preview parse(String markdown) {
-    if (markdown == null || markdown.length() > 2_000_000) throw new IllegalArgumentException();
+    // 上限随题库规模调整:16 个深度模块后全量导出约 3.5MB,预留至 6MB
+    if (markdown == null || markdown.length() > 6_000_000) throw new IllegalArgumentException();
     List<Item> items = new ArrayList<>();
     List<Document> docs = new ArrayList<>();
     List<String> warnings = new ArrayList<>();

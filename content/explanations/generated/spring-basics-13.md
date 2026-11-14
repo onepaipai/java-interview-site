@@ -3,8 +3,7 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/txadvice-settings.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
@@ -12,39 +11,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Spring 6.2 教学设计：查询服务声明 @Transactional(readOnly = true)，有人在其中增加一条审计 INSERT。区分事务元数据、JDBC 驱动行为与数据库真正的只读权限。
+> 场景与约束：网银查询沙盘:@Transactional(readOnly=true) 的方法里执行 UPDATE——Spring 的 readOnly 是"提示"非"强制":Hibernate 设置 FlushMode.MANUAL(ORM 层拦截);JDBC 层 setReadOnly(驱动可选);但直接 JDBC UPDATE 不受 ORM 拦截。
 
-1. 不能保证。readOnly 是事务定义中的提示或优化属性，是否以及怎样限制写入取决于事务管理器、ORM、驱动和数据库配置。
-2. 某些 ORM 会调整刷新行为，某些数据库或显式配置会拒绝写 SQL，但不能把这些环境相关效果当成统一的授权边界。
-3. 需要强制禁止写入时，使用数据库只读账号、权限或经过验证的数据库只读事务机制；同时检查加入既有事务后实际沿用的事务属性。
+1. readOnly 的三个层面：ORM 的 FlushMode.MANUAL 影响自动 flush；JDBC 的 setReadOnly 可能执行 SET SESSION TRANSACTION READ ONLY；Spring 只是设置这些语义，是否下传取决于配置。
+2. JdbcTemplate/原生 SQL 会绕过 ORM；MySQL InnoDB 的会话级只读在真正设置后会拒绝写入，但 Spring readOnly 不应当作权限防线。
+3. 正解:readOnly=true 用于"语义声明"(优化提示)——不用于"安全防护"(安全靠权限,第 18 题 方法级授权)。
 
 ## 参考分析
 
-### 提示传播：注解到数据库之间还有多层
+### 机制:readOnly 的三层
 
-Spring 读取 readOnly 后由具体事务管理器解释，JDBC 管理器可能设置连接的只读提示，ORM 管理器也可能改变刷新策略。连接提示并不等于所有驱动都会在服务端设置禁止写入的事务。必须说清使用的是哪种管理器、数据库及驱动版本，才能讨论一条 INSERT 最终是成功、失败还是被延后刷新。类比请勿打扰门牌：它是意图提示，酒店安保（数据库约束）才是强制力——挂牌不代表真的进不来人。
+ORM 层(Hibernate FlushMode.MANUAL)/JDBC 层(setReadOnly,MySQL 驱动会执行 SET SESSION TRANSACTION READ ONLY)/Spring 层——三层都是提示非强制,是否传递到 Connection 取决于配置。因此 readOnly 的效果随驱动与方言而异,切换数据源需重新验证,不可当作跨库保证。
 
-### 事务参与：内层声明未必建立新事务
+### 反例:readOnly 不阻止写入
 
-如果查询方法以 REQUIRED 加入了外层已有事务，通常沿用外层事务特征，不能假定内层只读标记重新配置了整个物理事务。反过来，在外层只读事务中调用写方法，也不能只看内层注解就推断已经变成可写。是否严格校验不兼容属性及传播方式都需要结合管理器配置。
+JdbcTemplate UPDATE 在 readOnly 事务内成功——绕过 ORM 的写入不受拦截。结论:写入防护靠权限与 SQL 审计,readOnly 只作优化提示与语义声明,不承担防线职责。
 
-### 保护边界：权限要独立于优化意图
+### 取舍:readOnly 的定位
 
-只读标记能表达意图并帮助优化，但安全限制应由数据库账号和授权等能够强制执行的边界承担。读副本路由也不是注解天然提供的功能，需要单独配置且处理复制延迟。将审计写入混进查询事务前，应先决定它是必须同步完成的业务动作还是可独立恢复的事件，避免为了“只读优化”悄悄丢审计。
+语义声明加性能优化提示,不用于安全防护——安全靠权限体系。审查时把 readOnly 当性能线索而非防线,读库路由、超时与权限才是读保护的主体——语义声明不承担安全职责。
 
 ## 案例
 
-### 目标环境实验：不要用 H2 代替生产判断
+### 验证:readOnly 的断言组
 
-在隔离数据库中创建允许写入的账号和真正受限的只读账号，记录管理器、驱动及数据库版本；分别在 readOnly 方法内执行查询与 INSERT，并核对实际事务属性、异常和最终行数。预期受限账号的写入被数据库拒绝；普通账号加注解是否拒写必须按实测报告，不能预先宣布统一结果。
+验证:JdbcTemplate 断言(readOnly=true 内 JdbcTemplate UPDATE 成功——不阻止);Hibernate 断言(Session 的 save 在 readOnly 下 flush 时不写入——ORM 层拦截);对照断言(无 readOnly 的 UPDATE 正常)——三组固化 readOnly 的语义边界。
 
-### 传播追问：外层写事务包住内层查询
+### 追问链:readOnly 三刀
 
-让外层开启可写 REQUIRED 事务，再通过另一个 Bean 调用只读 REQUIRED 方法，对照独立新事务的路径，观察实际属性与数据库状态。验证结论应解释是否加入既有事务，避免拿自调用样例混淆传播和只读设置。没有执行目标数据库实验前，只能说明语义与验收步骤，不能写已完成生产写保护验证。
+一刀:"readOnly 的性能收益?"——Hibernate 关闭脏检查(节省快照内存与比较时间)+驱动优化(只读事务不加锁)——性能收益是真实但依赖实现。二刀:"readOnly 与复制路由?"——readOnly 事务路由到从库(读写分离的路由依据)——readOnly 的路由价值(第 36 题 distributed 跨机房读)。三刀:"readOnly 的 Spring Data?"——Spring Data JPA 的 @Query(readOnly=true)/CrudRepository 的 findById(默认只读)——框架层的 readOnly 传播。
 
 ## 总结点
 
-1. 门牌是提示，安保才强制
-2. 只读标记是意图与优化属性
-3. 加入已有事务要看实际边界
-4. 强制禁写依赖数据库保护
+1. readOnly 是提示非强制
+2. ORM 层拦截 JDBC 不拦
+3. 语义声明,不用于安全

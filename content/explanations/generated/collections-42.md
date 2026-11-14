@@ -3,32 +3,46 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [github.com · 1](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/AbstractSet.java)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html)
 
 </details>
 
 ## 参考回答
 
-1. AbstractSet.removeAll 会参考两边大小选择遍历方向；若遍历 Set 并调用另一边 List.contains，可能退化为 O(nm)。
-2. 可在比较语义一致时把待删项建成 HashSet，使 contains 期望常数时间；建表成本和额外内存也应计入。
-3. TreeSet 比较器可能与 equals 不一致，直接换成 HashSet 会改变删除语义；优化前必须验证相等与去重契约。
+<!-- explanation:deep -->
+
+> 场景与约束：网银清理沙盘:100 万元素列表 removeAll(1 万个目标)——ArrayList.removeAll 对每个元素查目标集合(O(n×m) 若目标是 List)——目标是 HashSet 则 O(n)——"意外"来自目标集合的 contains 复杂度。
+
+1. removeAll 的实现:遍历列表元素,contains(目标集合) 判保留——目标集合的 contains 复杂度决定总成本:HashSet O(1)→O(n) 总;List O(m)→O(n×m) 总(百万×万=百亿)。
+2. 本机可测:目标 1 万个(List vs HashSet)——removeAll 耗时差百倍——"意外"的性能=数据结构选型的连锁(第 9 题 ArrayList/LinkedList 的局部性同源)。
+3. 正确姿势:目标集合先转 HashSet(new HashSet<>(targets)——一次 O(m) 构建)→removeAll O(n);或 removeIf(targets::contains)(谓词形式,等价);批量删除的位图优化(第 29 题,密集下标)。
+
+## 参考分析
+
+### 机制:contains 复杂度的乘法
+
+实现形态先说清:ArrayList.removeAll 内部不是"逐个 remove"(那是 O(n²)),而是双指针批量保留——一遍遍历用读写双指针把保留元素压到前段,最后一次截断(O(n) 搬移);真正的成本变量只有内层 contains。乘法结构:外层 O(n) × 内层 contains O(m 或 1)=O(n×m) 或 O(n)——n×m 的爆炸(百万×万=10^10 次操作,分钟级)。同一模式的其他 API:retainAll(保留交集)同构;removeIf 的位图标记+单次压缩同型——"批量操作的内层查找复杂度"是性能审查的固定检查点。
+
+### 反例:List 目标的百亿次操作
+
+沙盘:removeAll(overdueIds)——overdueIds 是 List(1 万)——contains 线性扫——百万列表×1 万=10^10 次比较(数十分钟)——接口超时。修复:转 HashSet(O(1) contains)→removeAll 秒级——一行修复百倍收益(数据结构的连锁选择)。同源:indexOf 循环(第 42 题N+1 的内层查找)、contains 循环——批量场景的内层查找全要哈希化。
+
+### 取舍:哈希化的成本与收益
+
+成本:HashSet 构建 O(m)+内存(哈希表开销)——1 万目标的构建毫秒级+内存可忽略;收益:O(n×m)→O(n)——构建成本在大 n 下总划算。边界:n 小(10 条)×m 大——构建成本可能不划算(直接 List.contains)——小数据不优化(第 50 题 avoid 伪优化)。
 
 ## 案例
 
-1. 场景（教学示例）：3 条订单对照一万项待删除编号，先转精确查找集合后按条件移除。
+### 验证:批量删除的断言组
 
-2. 核心代码。
+验证:对照断言(目标 List vs HashSet 的 removeAll 耗时——百倍差异实测);正确性断言(两种方式的删除结果一致);removeIf 对照(removeIf(targets::contains) 等价且简洁)——三组固化批量删除的姿势;大规模的耗时进团队性能基线。
 
-```java
-var orders = new ArrayList<>(List.of(1,2,3));
-var blocked = new HashSet<>(List.of(2,4,6));
-orders.removeIf(blocked::contains);
-System.out.println(orders);
-```
+### 追问链:removeAll 三刀
 
-3. 预期：[1, 3]；以 List 与 Set 两种待删输入计数 contains 和比较次数，覆盖大小关系与比较语义；不能仅用这个小例子宣称性能提升。
+一刀:"removeAll 与 removeIf 的选择?"——removeAll(集合)=删等值元素;removeIf(谓词)=删满足条件的——语义不同(hasAll 的语义),性能同源(内层 contains)。二刀:"保留交集呢?"——retainAll(保留 targets)——同样的 contains 乘法——同修。三刀:"流式的批量删除?"——流式数据(不落 List)的过滤=filter(流式谓词,无 removeAll 形态)——批量删除的形态跟随数据形态(静态列表 vs 流)。
 
 ## 总结点
 
-1. 批量删除要看查找成本。
-2. 先保比较语义再换结构。
+1. 目标集合的 contains 定生死
+2. 先哈希化,再批量删
+3. 小数据不优化,大数据必哈希

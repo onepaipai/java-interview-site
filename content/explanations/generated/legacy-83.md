@@ -3,30 +3,30 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-nature.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-extension.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
 
 </details>
 
 ## 参考回答
 
-1. 典型受管 Bean 经实例化、依赖填充、相关 Aware 回调、初始化前处理、初始化方法及初始化后处理，最终供调用者使用。
-2. BeanPostProcessor 可处理或替换实例，代理依赖相关扩展机制；适用 Bean 在容器关闭时执行销毁，具体扩展接口与作用域会改变细节。
+1. Bean 经过实例化、依赖填充、Aware、初始化前后处理及使用与销毁。
+2. BeanPostProcessor 作用于实例，BeanFactoryPostProcessor 调整定义。
+3. 代理可能在后处理阶段形成，避免初始化期依赖未就绪增强行为。
 
 ## 参考分析
 
-1. 定义后处理与实例后处理不同；不能在定义阶段提前 getBean 拉起业务对象。
-2. 初始化期间不假设自身最终代理有效，懒加载改变创建时机，prototype 也不由容器完整跟踪销毁。
+1. 构造器循环无法靠提前暴露实例解决。
+2. 早期引用可能造成代理与原对象差异，不能依赖三级缓存兜底设计。
 
 ## 案例
 
-1. 教学场景：客户端注入配置后打开资源，初始化后被包装，关闭时释放。
+1. 场景（教学示例）：订单与库存服务互相通过构造器引用。
+2. 处理：提取应用编排层，依赖方向单向；初始化工作不发起跨 Bean 的复杂业务调用。
 
-2. 记录构造、注入、初始化和包装探针，refresh 后获取最终对象，再关闭上下文，另测初始化失败。
-
-3. 验证调用者获得受管包装，资源正常和失败路径都正确释放，不把常规轨迹当所有扩展的固定顺序。
+3. 验证：启动无循环，事务与代理行为可测；关闭回调负责释放组件资源。
 
 ## 总结点
 
-1. 定义与实例处理分阶段。
-2. 资源释放覆盖失败和作用域。
+1. 先理依赖方向。
+2. 初始化别跑长业务。

@@ -49,15 +49,15 @@ npm run build
 
 纯 API 拦截的 `test:review` 仍可连接独立 preview 服务检查三种宽度；它不验证真实后端。历史浏览器脚本可能依赖已变化的页面选择器，执行结果以本次实际记录为准。
 
-`test:learning-reader` 已加入默认浏览器检查，覆盖管理员和普通账号的揭示答案、自评保存、笔记/收藏保留、阅读偏好、面包屑、继续阅读及待复习入口，并检查 1280/390/320 宽度。`node scripts/test-ui-content-fixes.mjs` 使用 Java 17 执行泛型擦除题内的完整示例，并保存执行记录到 `backend/target/ui-content-examples/execution.json`；它也检查本轮共享组不会回退到串题模板。
+`test:learning-reader` 已加入默认浏览器检查，覆盖管理员和普通账号的揭示答案、自评保存、笔记/收藏保留、阅读偏好、面包屑、继续阅读及待复习入口，并检查 1280/390/320 宽度。历史脚本 `test-ui-content-fixes.mjs` 已随内容重整退役（泛型擦除示例的执行验证由后端真值测试与审核台账承接）。
 
 `test:catalog` 同样加入默认入口，检查新目录的真实掌握进度、空自定义模块、知识点与领域筛选、学习路线和跳转、开始学习、偏好恢复及三种宽度。修改前端源码应在浏览器回归启动前完成，避免开发服务器热更新打断正在操作的弹窗。
 
 `test:spring-core-reader` 加入默认入口，对 Spring 基础模块全部 59 题核对导入内容摘要，并逐题检查 1280/390/320 宽度、阅读模式、段落目录、代码和页面溢出。截图和结果位于 `frontend/test-results/spring-core/`。
 
-`SpringCoreExamplesTest` 从生成正文中提取 3 段完整 Java 源码，通过 JDK 17 编译并执行，核对 prototype、后处理器与代理边界的结果，记录源码摘要到 `backend/target/spring-content-examples/`。另用独立 H2 连接对照默认受检异常、运行时异常和显式回滚规则；测试方法自身不包自动回滚事务。Maven 完成后运行 `node scripts/test-spring-core-answers.mjs`，校验模块完整覆盖、独立案例、已发布内容和执行证据是否匹配当前源码。这些检查不代表 MySQL 锁行为或完整事实审核通过。
+`SpringCoreExamplesTest` 从生成正文中提取 3 段完整 Java 源码，通过 JDK 17 编译并执行，核对 prototype、后处理器与代理边界的结果，记录源码摘要到 `backend/target/spring-content-examples/`。另用独立 H2 连接对照默认受检异常、运行时异常和显式回滚规则；测试方法自身不包自动回滚事务。历史脚本 `test-spring-core-answers.mjs` 已随内容重整退役，覆盖核对由 `validate-explanations.mjs` 与审核台账承接。这些检查不代表 MySQL 锁行为或完整事实审核通过。
 
-`test:spring-advanced-reader` 使用同一读取检查器的新配置，覆盖进阶模块全部 60 题的三种宽度、模式、段落目录、代码与精确导入内容。新增 `SpringAdvancedExamplesTest` 执行正文的三个 Java 程序，并以真实事务与事件适配器对照提交、回滚、无事务和两类提交后异常；`node scripts/test-spring-advanced-answers.mjs` 核对执行记录及当前发布。已加入默认验证入口，详细范围见 [进阶题解记录](../reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
+`test:spring-advanced-reader` 使用同一读取检查器的新配置，覆盖进阶模块全部 60 题的三种宽度、模式、段落目录、代码与精确导入内容。新增 `SpringAdvancedExamplesTest` 执行正文的三个 Java 程序，并以真实事务与事件适配器对照提交、回滚、无事务和两类提交后异常；历史脚本 `test-spring-advanced-answers.mjs` 已退役，发布核对由 `validate-explanations.mjs` 承接。已加入默认验证入口，详细范围见 [进阶题解记录](../reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
 
 ## MySQL 8.4
 
@@ -114,8 +114,8 @@ python scripts/test-restore.py G:/Git/bin/bash.exe
 
 正文示例验证：脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回（`git show bf8768a:scripts/prepare-review-examples.mjs > scripts/prepare-review-examples.mjs`）后运行，再用 Java 17 执行 `backend/target/ReviewExamples20261020.java`。
 
-发布后对快照运行 `node scripts/verify-explanation-upgrade.mjs <备份目录> expected-version-increments.json` 及 `node scripts/verify-review-fixes.mjs <备份目录>`。第三参数仅用于本次分阶段发布的显式版本次数；常规单次发布省略它，默认每题只增加一次版本。
+发布后对快照运行 `node scripts/sync-content-status.mjs --check` 核对内容状态与审核台账。历史脚本 `verify-explanation-upgrade.mjs`、`verify-review-fixes.mjs` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/<脚本名>`)。
 
-逐项结果见 [修复验收](../history/FIXES-20261020.md)。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围。
+逐项结果见各模块整改记录（如 `docs/reports/content/SPRING-CORE-CONTENT-20261023.md`）。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围，历史报告已从仓库移除，需要时从 git 历史恢复。
 
 以上不代表真实模型供应商、生产 MySQL 或远程部署已验收。

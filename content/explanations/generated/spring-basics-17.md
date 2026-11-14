@@ -3,8 +3,7 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/web/webmvc/mvc-config/interceptors.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-security/reference/6.5/servlet/authorization/authorize-http-requests.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
@@ -12,39 +11,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Servlet / Spring MVC 6.2 教学设计：应用同时提供控制器接口和静态资源，需要记录请求号、执行安全控制，并对特定处理方法记录业务耗时。
+> 场景与约束：网银网关沙盘:认证过滤器(Filter,在 Dispatcher 之前)vs 权限拦截器(HandlerInterceptor,感知 handler)——Filter 管 Servlet 层通用(编码/安全/日志),Interceptor 管 MVC 层特定(handler 感知/路径判断)。
 
-1. Filter 属于 Servlet 链，可在请求进入 DispatcherServlet 之前处理请求和响应，也可覆盖非 MVC 资源；具体范围取决于 URL、Servlet 和 dispatcher type 的注册。
-2. HandlerInterceptor 属于 MVC 处理器链，适合利用已选处理器信息做轻量上下文或观测。它不能自然覆盖所有入口，也不能像请求包装器那样统一替换请求体。
-3. 安全控制优先放在 Spring Security 等明确的过滤器链并在服务内守住资源授权。拦截器路径匹配与控制器映射可能有差异，不宜作为唯一安全边界。
+1. Filter 在 Servlet 规范层,容器级生效,不感知 MVC handler——适合编码/认证/CSRF/压缩等全局横切;Interceptor 在 Spring MVC 层,感知 handler 与路径映射——适合 handler 级权限、耗时统计等 MVC 语境逻辑。
+2. 时序:Filter→DispatcherServlet→Interceptor.pre→Handler→Interceptor.post→View→Interceptor.afterCompletion→Filter 链返回——Filter 在最外层,Interceptor 在 Dispatcher 内部。
+3. 选择:需要 handler 信息(路径/方法)→Interceptor;不需要(纯 Servlet 层)→Filter——Filter 的优先级高于 Interceptor(先执行)。
 
 ## 参考分析
 
-### 覆盖范围：注册决定实际经过哪些链
+### 机制:Filter 与 Interceptor 的时序
 
-Filter 在 Servlet 容器层注册，可以包住 DispatcherServlet、其他 Servlet 及部分静态资源，但不是写一个类就覆盖所有请求。URL 匹配、执行顺序和 REQUEST、ASYNC、ERROR 等分派类型都会改变触发次数。OncePerRequestFilter 也需要结合异步和错误分派配置理解，不能把名字解释成任意情形下永远只执行一次。类比围墙与楼层门禁：Filter 是围墙（覆盖所有进出），HandlerInterceptor 是楼层门禁（只管进 MVC 房间）——授权要考虑两层是否都覆盖。
+Filter 在 DispatcherServlet 之前(Servlet 层);Interceptor 在 DispatcherServlet 内部(MVC 层)——Filter 先执行。
 
-### 处理器上下文：知道方法不代表能接住所有失败
+### 反例:层级误选的后果
 
-MVC 已选到处理器后，HandlerInterceptor 可以读取 HandlerMethod 等信息，按方法注解记录耗时或增加上下文；preHandle 可以中止当前链。控制器异常、入口拒绝、序列化失败与异步分派会影响后续回调，清理逻辑要按生命周期实现。不要在拦截器中重复读取不可重放的请求流而破坏参数绑定。
+需要 handler 信息的逻辑放 Filter(拿不到 HandlerMethod);纯 Servlet 层逻辑放 Interceptor(多一跳)——层级错选=功能缺失或性能损耗。
 
-### 安全边界：观测挂点与授权职责分别设计
+### 取舍:Filter 的读 body 禁忌
 
-Spring 文档明确提示拦截器可能与注解控制器的路径匹配不一致，更适合使用 Spring Security 或 Servlet Filter 链做安全入口。资源归属与对象级权限还应在掌握业务数据的服务中验证。只给一个 MVC 拦截器加登录判断，无法证明另一个 Servlet、错误分派或新增入口也受到保护。
+Filter 读 body 后 Controller 读不到(流只能读一次)——需要读 body 用 ContentCachingRequestWrapper。
 
 ## 案例
 
-### 同步顺序实验：两层包装与处理器调用
+### 验证:时序与边界的断言组
 
-教学配置两个过滤器 F1、F2 和两个拦截器 I1、I2，显式固定顺序，对一个成功的同步控制器记录探针。预期进入顺序为 F1、F2、I1.pre、I2.pre、Controller；成功情况下 post 与 completion 按拦截器逆序执行，再退出 F2、F1。不要把该成功顺序直接当成所有异常和异步路径的固定模板。
+验证:时序断言(Filter.pre→Interceptor.pre→Controller→Interceptor.post→Filter.post——日志顺序);handler 感知断言(Interceptor 拿到 HandlerMethod[方法信息];Filter 拿不到);异常传播断言(Interceptor.pre 异常→ControllerAdvice;Filter 异常→容器 error page)——三组固化 Filter/Interceptor 边界。
 
-### 覆盖验证：静态资源、拒绝与异步分别测
+### 追问链:Filter 三刀
 
-补测静态文件、未认证控制器、主动返回 false 的拦截器和异步接口，记录各探针是否到达以及上下文是否清理。预期非 MVC 路径不会凭空获得控制器拦截器保护；入口安全拒绝时业务方法不执行；异步完成后不遗留线程上下文。此案例给出隔离测试设计，并未宣称已完成全应用入口安全审计。
+一刀:"Filter 的顺序?"——@Order/FilterRegistrationBean.setOrder(数值越小越先)——安全 Filter 在业务 Filter 之前(认证先行);Spring Security 的 FilterChainProxy 是一个特殊的 Filter(内部再分链,第 17 题 spring-advanced)。二刀:"Interceptor 的执行范围?"——addPathPatterns/excludePathPatterns(路径匹配)——Interceptor 的注册可精确到路径(第 17 题 spring-advanced 多链)。三刀:"Filter 读完 body?"——Filter 读 body 后 Controller 读不到(流只能读一次,第 26 题 spring-advanced)——ContentCachingRequestWrapper 解决——Filter 设计的读取纪律。
 
 ## 总结点
 
-1. 围墙管进出，楼层门禁管房间
-2. Filter 覆盖范围由注册决定
-3. 拦截器围绕 MVC 处理器
-4. 授权需覆盖入口和资源
+1. Filter 在外管 Servlet 层,Interceptor 在内管 MVC 层
+2. Filter 不感知 handler,Interceptor 感知
+3. Filter 先执行,读 body 要包装

@@ -32,6 +32,10 @@ acks=1 时 leader 写入即确认：leader 确认后、follower 复制前宕机�
 
 等待 ISR 确认增加往返延迟；补偿靠批量化（linger.ms 攒批）与幂等生产者的流水线——acks=all 不等于串行慢。真正的取舍在"确认层级 vs 消息价值"：日志类消息 acks=1 或 0 可接受，交易与状态变更必须 all。按消息价值分层配置，而不是全局一刀切。
 
+### 展开：配置组合的失效形态——ISR 收缩与脏选举
+
+acks=all 不是无条件更强，它依赖 ISR 的实际规模：follower 掉线使 ISR 收缩到小于 min.insync.replicas 时，acks=all 的写入直接被拒（NotEnoughReplicasException）——"宁拒绝不降级"的一致性选择，可用性靠副本数与监控兜底。配套开关 unclean.leader.election.enable（默认 false）：若允许非 ISR 副本当新 leader，丢消息窗口重新打开——acks=all 的保证以关闭脏选举为前提。完整发送端语义=acks=all+min.insync.replicas≥2+禁脏选举+幂等生产者；只配 acks=all 一项、其余默认漂移，保证是纸面的。
+
 ## 案例
 
 ### 对照操作：三种 acks 的丢失复现

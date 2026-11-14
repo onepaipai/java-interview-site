@@ -32,6 +32,10 @@ Java 17 没有虚拟线程（JEP 425 预览在 19、转正在 21），本题为�
 
 ScopedValue 的值与作用域绑定、不可变、随作用域自动消失——没有清理责任、没有泄漏路径，代价是要求值不可变且作用域结构化。ThreadLocal 仍适合"跨多层调用传递的可变组件"（如事务资源句柄），但这类场景本身就该优先考虑显式参数化。升级虚拟线程前完成这轮改造，比上线后救火便宜得多。
 
+### 底座：ThreadLocalMap 的弱引用键与经典泄漏链
+
+ThreadLocalMap.Entry 继承 WeakReference<ThreadLocal<?>>：键（ThreadLocal 实例）是弱引用，值是强引用。经典泄漏链（平台线程池）：Thread → ThreadLocalMap → Entry(key=null) → value——ThreadLocal 实例被回收后键变 null，但 value 沿强引用链无法回收。设计意图：键弱引用让 map 能探测过期条目（expungeStaleEntry 在后续 set/get/remove 时顺手清理 null 键条目）；值强引用是局限（map 无法知道业务何时不再需要它）。治理：池化线程必须在任务边界 remove，别依赖被动清理。虚拟线程一次性回收掩盖了泄漏，却把成本转成规模风险（见机制块）——同一结构，两种失效形态。
+
 ## 案例
 
 ### 对照操作：内存放大的量化预估

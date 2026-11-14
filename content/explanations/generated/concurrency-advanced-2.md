@@ -32,6 +32,10 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 队列管理、挂起唤醒、取消、超时逻辑两模式完全同构，只有"获取判定"与"放行宽度"不同。把差异收在 tryAcquire/tryAcquireShared 两个钩子里，子类只写状态协议。代价：共享传播逻辑复杂（doReleaseShared 的循环重试），读懂源码的门槛集中在这一段。
 
+### 底座：CLH 变体队列与 Node 状态机
+
+AQS 的等待队列是 CLH 变体：双向链表，每个 Node 持线程引用与 waitStatus。waitStatus 四态：CANCELLED(1,取消)、SIGNAL(-1,后继需要我 unpark)、CONDITION(-2,在 Condition 队列)、PROPAGATE(-3,共享唤醒需向后传播)。独占流程：获取失败→shouldParkAfterFailedAcquire 把前驱置 SIGNAL→park 挂起；释放→头节点为 SIGNAL 则 unpark 后继。共享模式的精髓在 doReleaseShared 的循环：头为 SIGNAL 则 CAS 清零并 unpark 后继；若恰为 0 则 CAS 置 PROPAGATE——补标一个"迟到的传播信号"，防止唤醒在链中间丢失。PROPAGATE 状态的存在就是为了修复这个丢失场景，这也是共享模式源码最难读的一段。
+
 ## 案例
 
 ### 对照操作：同一 AQS 写两种同步器

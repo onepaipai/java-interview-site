@@ -3,7 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -11,70 +12,72 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 / Spring 6.2 最小实验：单例 ExportService 持有 prototype 的 Buffer。比较直接构造器注入与 ObjectProvider 按次查找，使用对象身份验证，不依赖日志时间推断。
+> 场景与约束：网银任务沙盘:prototype 任务注入 singleton 的 Runner——注入时创建一个实例,Runner 每次调用用的是同一个(不会每次新建)——prototype 的"每次新建"只在 getBean/ObjectProvider 时生效。真值示例:lookup=true / injected=false(本机实测)。
 
-1. 不会。直接把 prototype 注入单例时，容器在创建单例、解析该依赖时取得一个实例，单例之后持有的仍是这个引用。
-2. 需要按次创建时，可注入 ObjectProvider 并在每次业务操作中调用 getObject，或使用明确配置的作用域代理、方法注入；不能仅靠 prototype 注解改变已有字段。
-3. prototype 的初始化由容器处理，销毁回调不会像单例一样自动完整管理；持有文件、连接等资源时必须明确释放责任。
+1. 注入语义:prototype 注入 singleton——注入发生在 singleton 创建时(一次)——之后 singleton 持有该 prototype 的引用(不重建)——"prototype 每次新建"的语义仅适用于 getBean/ObjectProvider 主动获取。
+2. 真值示例:PrototypeLookupExample(本机编译执行)——getBean 两次返回不同对象(lookupNew=true);注入 Holder 的 counter 两次访问同一引用(injectedNew=false)——输出 true:false。
+3. 解决注入不新建:ObjectProvider(每次 getObject 新建)/@Lookup 方法(Spring 子类覆写)/ObjectFactory——三种"延迟获取原型"的方式。
 
 ## 参考分析
 
-### 两个时点：依赖解析与业务方法调用
+### 机制:注入时序与 prototype 语义
 
-作用域控制向容器请求某个 Bean 时如何取得实例，不会自动重写普通 Java 字段的读取。单例被创建时，直接注入只解析一次原型依赖；后续调用单例方法不一定再次访问 BeanFactory。因此每次 HTTP 请求进入同一服务，也不意味着它持有的原型字段会随请求变化。类比公司配车：入职时配的那辆（依赖解析一次）不会因为每天出勤自动换新车——按次用车就得每次去车队领（ObjectProvider）。
+注入时序:singleton 创建→容器解析依赖→prototype getBean(创建一次)→注入引用→singleton 持有——此后 singleton 的字段=固定引用。prototype 语义的生效条件:通过容器获取(getBean/ObjectProvider/getObject)——每次获取触发新实例;注入的引用=快照(不随 prototype 语义变化)。ObjectProvider 的 getObject():每次调用触发 getBean(prototype)=新实例——"延迟的原型获取"。
 
-### 按次获取：把创建边界放在业务操作上
+### 反例:注入 prototype 的两种误用
 
-ObjectProvider<Buffer> 本身是一个查找入口；在 export 方法内部调用一次 getObject，并把结果保存在该次操作的局部变量中，才能让一次导出使用独立缓冲区。不要在单例构造器中提前 getObject 后再存成字段，那仍然只取得一次。代理方案还应区分代理对象身份与其背后目标对象身份。
+误用一,期望每次新建:注入 prototype 到 singleton 的字段——字段引用固定(不新建)——需要新建却拿到同一实例(业务 bug)。误用二,prototype 中的 singleton 反向:prototype 注入 singleton——singleton 是全局单例(prototype 持有全局状态的引用)——prototype 的"独立生命周期"被破坏。两条的正解:ObjectProvider/Lookup 方法(延迟获取)+作用域代理(scoped proxy——每次方法调用路由到当前实例)。
 
-### 资源边界：新实例仍需要被关闭
+### 取舍:scoped proxy 与 ObjectProvider
 
-Spring 不负责跟踪并自动执行所有 prototype 实例的销毁回调，使用方应为它们安排关闭流程。短生命期对象也不必全部注册成 Bean：如果它不需要容器能力，普通工厂和 try-with-resources 往往更明确。按次创建解决实例复用问题，不自动解决调用链中的共享可变状态。
+scoped proxy:代理拦截每次方法调用→路由到当前作用域的实例(对调用方透明——像普通注入一样用)——适合"prototype 的方法被频繁调用"的场景。ObjectProvider:显式调用 getObject()——适合"需要控制创建时机"的场景。选择:透明性(proxy)vs 显式控制(provider)——proxy 的依赖注入语义更自然,provider 的控制更精细。
 
 ## 案例
 
-### 完整实验：同一字段与两次查找的身份
+### 案例:真值示例(本机编译执行)
 
-下面的 verify 在项目 Java 17 / Spring 6.2 测试类路径下运行。直接注入对象的两次访问结果相同，两次 provider 查找不同，预期返回 true:false。示例不配置作用域代理，因此没有把代理身份误当作目标身份。
-
+以下示例经本地编译执行(Spring Framework 6.2.19),verify() 返回 “getBean 每次新建:注入后是否重建”:
 ~~~java
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.*;
+
+/** Q4:prototype getBean 每次新建(true),注入单例后不重建(false)。 */
 public class PrototypeLookupExample {
-  static class Buffer {}
-  static class ExportService {
-    final Buffer injected;
-    final ObjectProvider<Buffer> provider;
-    ExportService(Buffer injected, ObjectProvider<Buffer> provider) {
-      this.injected = injected;
-      this.provider = provider;
-    }
-    Buffer current() { return injected; }
-  }
-  @Configuration(proxyBeanMethods = false)
-  static class Config {
-    @Bean @Scope("prototype") Buffer buffer() { return new Buffer(); }
-    @Bean ExportService service(Buffer buffer, ObjectProvider<Buffer> provider) {
-      return new ExportService(buffer, provider);
-    }
-  }
   public static String verify() {
-    try (var context = new AnnotationConfigApplicationContext(Config.class)) {
-      var service = context.getBean(ExportService.class);
-      return (service.current() == service.current()) + ":"
-          + (service.provider.getObject() == service.provider.getObject());
-    }
+    var ctx = new AnnotationConfigApplicationContext(Config.class);
+    try {
+      Counter c1 = ctx.getBean(Counter.class);
+      Counter c2 = ctx.getBean(Counter.class);
+      boolean lookupNew = c1 != c2;
+      Holder h = ctx.getBean(Holder.class);
+      boolean injectedNew = h.counter != h.counter;
+      return lookupNew + ":" + injectedNew;
+    } finally { ctx.close(); }
   }
+  static class Counter {}
+  static class Holder {
+    final Counter counter;
+    Holder(Counter c) { this.counter = c; }
+  }
+  @Configuration
+  static class Config {
+    @Bean @Scope("prototype") Counter counter() { return new Counter(); }
+    @Bean Holder holder(Counter c) { return new Holder(c); }
+  }
+  public static void main(String[] a) { System.out.println(verify()); }
 }
 ~~~
+执行结果 true:false:getBean 两次返回不同实例(true),注入进 Holder 后引用固定(false)——prototype 的"每次新建"只在主动获取时生效,注入是快照。验证:本机编译执行输出与断言一致,后端真值测试持续执行本块。
 
-### 故障追问：原型缓冲区为何仍串数据
+### 验证:prototype 注入的断言组
 
-若 export 构造时就获取原型并保存到 injected 字段，两个并发导出仍会共享这一个缓冲区。修复后让每次导出取一个局部实例，并用同步屏障组织两个请求交叉写入，验证结果互不混入、异常时资源也被释放。上面的身份实验只证明创建与复用规则，不替代这个并发和资源关闭测试。
+验证:lookup 断言(getBean 两次不同对象——true);注入断言(注入 singleton 后引用固定——false);真值断言(verify() 返回 true:false——后端真值测试持续执行)——三组固化 prototype 语义;scoped proxy 的对照用例(代理模式下每次调用新实例)补充。
+
+### 追问链:prototype 三刀
+
+一刀:"prototype 的销毁?"——容器不管理 prototype 的销毁(容器只管创建——销毁由客户端负责)——prototype 的资源清理(DisposableBean 不生效)——客户端的销毁责任。二刀:"prototype 与 @PostConstruct?"——@PostConstruct 生效(创建时调用)——创建回调生效但销毁回调不生效(容器不跟踪)——生命周期的不对称。三刀:"prototype 的性能?"——每次 getBean 走完整创建流程(实例化+注入+回调)——高频率 getBean 的成本——缓存或改用 singleton(按业务语义)。
 
 ## 总结点
 
-1. 入职配车不换新，按次用车去车队
-2. 原型控制查找，不重写字段
-3. 每次操作在边界显式获取
-4. 原型资源由使用方安排释放
+1. 注入一次,不随调用新建
+2. ObjectProvider 每次新建
+3. 容器不管 prototype 销毁

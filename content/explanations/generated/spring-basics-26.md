@@ -3,29 +3,46 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-security/reference/6.5/servlet/authentication/session-management.html)
+- [Google SRE · 1](https://sre.google/sre-book/addressing-cascading-failures/)
 
 </details>
 
 ## 参考回答
 
-1. 攻击者若事先知道或诱导用户使用某个会话标识，用户登录后继续沿用它，攻击者可能复用该标识获得登录态。
-2. 认证成功时应采用框架的会话固定防护，例如在支持的 Servlet 容器中更换 session ID；保留必要状态但不能让旧标识继续有效。
+<!-- explanation:deep -->
+
+> 场景与约束：网银登录沙盘:攻击者预取 Session ID,诱导受害者用该 ID 登录——身份绑定到攻击者已知的 ID,攻击者用同一 ID 冒充受害者(会话固定)。登录成功后更换 Session ID 是标准防御。
+
+1. 攻击链:攻击者获取未登录的空 Session ID→发给受害者(链接携带)→受害者用该 ID 登录→身份绑定到攻击者已知的 ID→攻击者用同一 ID 访问冒充。防御:登录成功后 invalidate 旧 Session,创建新 Session。
+2. Spring Security 默认由 SessionAuthenticationStrategy 自动处理(sessionFixation=changeSessionId);自定义认证流程需手动处理。
+3. 匿名 Session 的迁移:登录时迁移匿名 Session 数据(购物车合并)+换 ID——匿名到认证的过渡处理。
 
 ## 参考分析
 
-1. 登录前的匿名会话可存购物车等数据，所以需要明确哪些属性保留；单纯设置 HttpOnly 不会使已知标识自动失效。
-2. 自定义登录控制器或过滤器要正确接入会话认证策略和安全上下文持久化，不能只手工设置一个用户字段。
+### 机制:会话固定的攻击链
+
+攻击链:攻击者先访问登录页获取空 Session ID→构造钓鱼链接携带该 JSESSIONID→受害者点击并用该 ID 登录→服务端把身份绑定到攻击者已知的 ID→攻击者用同一 ID 访问,冒充受害者。防御:Spring Security 的 SessionFixationProtectionStrategy 在认证成功后自动换 ID(changeSessionId);自定义认证流程(手写 filter)需手动处理。
+
+### 反例:无会话固定防御的事故
+
+沙盘:网银登录不换 Session ID;攻击者发钓鱼链接携带预取的 Session ID;受害者登录;攻击者用同一 ID 访问,执行资金操作。修复:启用 SessionFixationProtectionStrategy 自动换 ID;自定义认证流程需手动调用 changeSessionId 或重建 Session。
+
+### 取舍:会话固定防御的粒度
+
+changeSessionId:保留 Session 数据(购物车等),只换 ID——体验好,默认推荐。invalidate+create:销毁旧 Session 全部重建——更安全但丢失匿名数据。选择:有匿名数据的先迁移再换 ID;无匿名数据直接 invalidate+create。
 
 ## 案例
 
-1. 教学场景：匿名浏览器先获得会话，再完成登录；记录登录前后的会话标识作为测试输入。
+### 验证:会话固定的断言组
 
-2. 在隔离环境比较标识是否更换，拿旧标识新建独立客户端访问受保护接口，再用新标识访问。
+验证:固定断言——登录前后 Session ID 相同(复现攻击面);防御断言——changeSessionId 后 ID 变化,旧 ID 不可用;Spring Security 断言——默认策略生效,认证后 ID 变化。三组固化会话固定防御。
 
-3. 验证旧标识不能获得新登录权限，新标识成功，必要匿名状态按协议保留；日志不可保存完整可复用凭证。
+### 追问链:会话固定三刀
+
+一刀:Token 类的会话固定——攻击者预取 refresh token;refresh token 的生成必须随机(CSPRNG)+绑定用户。二刀:匿名 Session——购物车等匿名数据在登录时迁移合并+换 ID。三刀:多设备会话——同一用户多设备登录产生多个独立 Session,会话固定的防御按 Session 独立。
 
 ## 总结点
 
-1. 登录时更新已知会话标识。
-2. 自定义认证仍需会话策略。
+1. 登录换 ID,旧 ID 失效
+2. Spring Security 默认处理
+3. 匿名迁移数据换新 ID

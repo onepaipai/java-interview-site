@@ -15,7 +15,7 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 > 场景与约束：Java 17 教学场景：运维报告里"G1 发生 Full GC"与"Parallel 发生 Full GC"含义完全不同。梳理各回收器的回收命名与触发语义，避免用 CMS 时代的术语误读 G1 日志。
 
 1. 术语没有跨回收器的标准：Parallel 时代 Minor/Major/Full 有较清晰的分代含义，G1 里对应的是 young GC、并发标记周期与 mixed GC。
-2. G1 的 Full GC 是失败兜底（并发标记或 mixed 跟不上分配速率），单线程（Java 17 前的并行 Full GC 有限）且暂停最长——日志里出现 Full GC 是告警不是常态。
+2. G1 的 Full GC 是失败兜底（并发标记或 mixed 跟不上分配速率），JDK 10 起已并行化但暂停仍远超 young/mixed 目标——日志里出现 Full GC 是告警不是常态。
 3. ZGC/Shenandoah 没有分代回收概念，日志只有并发周期与短暂停；用"Minor/Full"框架去读它们的日志会完全对不上。
 
 ## 参考分析

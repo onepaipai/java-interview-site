@@ -3,8 +3,8 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/dependencies/factory-collaborators.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-boot/3.5/reference/appendix/application-properties/index.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
 
 </details>
 
@@ -12,39 +12,42 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 <!-- explanation:deep -->
 
-> 场景与约束：Spring 6.2 / Boot 3.5 教学场景：OrderService 构造器必须接收 InventoryService，后者构造器又必须接收 OrderService。两者都要求构造完成时依赖有效。
+> 场景与约束：网银沙盘:A 构造器需要 B,B 构造器需要 A——两者都没完成构造,无法提前暴露——构造器循环=鸡生蛋蛋生鸡的死结(spring-advanced 31 题的深入版:三级缓存为何救不了构造器循环)。
 
-1. 创建 A 必须先得到 B，创建 B 又必须先得到 A；在两个构造器都尚未完成时，没有已构造实例可供注入，所以会出现无法解析的创建循环。
-2. 优先把编排提到独立应用服务，或拆出共同依赖，让依赖图单向。Setter、@Lazy 或 Provider 可能推迟解析，但没有自动消除业务耦合。
-3. 早期引用机制不能概括成“三级缓存能解决所有循环依赖”。是否允许循环、代理一致性和实例状态都有约束；Boot 默认也不允许循环引用。
+1. 三级缓存的边界:三级缓存(early reference)在"实例化后、属性注入前"提前暴露——构造器循环在"实例化"阶段就卡住(两者都未完成实例化,无东西可暴露)——属性注入循环可自解,构造器循环不可。
+2. 实测形态:构造器循环启动抛 BeanCurrentlyInCreationException(本机 spring-advanced 31 题实验:根因=BeanCurrentlyInCreationException);属性注入循环默认可解(spring-advanced 31 题:allowCircularReferences 默认 true)。
+3. 解法优先级:重构解循环(抽公共依赖/事件解耦)>ObjectProvider 延迟>allowCircularReferences 开关(最后手段,第 31 题 spring-advanced)。
 
 ## 参考分析
 
-### 创建时序：不是找不到类型，而是对象尚不存在
+### 机制:三级缓存与构造器死结
 
-A 与 B 的定义可能都已注册，类型检查也能通过，但实例创建仍需要一个先后顺序。容器为 A 解析构造参数 B 时，B 又请求正在创建的 A；此时 A 的构造器没有完成，没有可以安全交出的普通实例。把字段改成接口不会改变这个创建顺序，接口解耦与实例依赖循环是两个维度。类比两人互相等对方先递名片才肯自我介绍：字段注入可以先签合同后补名片，构造器注入要求见面即交换——环就卡在这里。
+三级缓存:singletonObjects(成品)/earlySingletonObjects(半成品)/singletonFactories(ObjectFactory——可生成早期引用)。属性注入循环:A 实例化(构造完成)→提前暴露→注入 B→B 实例化→B 注入 A(从三级缓存拿 A 的早期引用)→B 完成→A 完成注入→A 完成。构造器循环:A 构造需要 B→创建 B→B 构造需要 A→创建 A→A 又需要 B——循环在"构造"阶段(连半成品都没有)——三级缓存的提前暴露无法介入。
 
-### 结构修复：把双向业务协作改成明确编排
+### 反例:构造器循环的启动失败
 
-如果订单调用库存预占，库存又回调订单改状态，通常是一个用例的编排被分散到两个服务。可以引入 CheckoutApplicationService，先调用库存再更新订单，两个领域服务不互相创建依赖。共同校验规则也可以提到独立策略，但应保留事务边界及失败恢复含义，不能只为了启动成功抽一个无职责接口。
+沙盘:A(B b) 构造器注入 B,B(A a) 构造器注入 A——启动抛 BeanCurrentlyInCreationException(rootCause,第 31 题 spring-advanced 实验:根因=BeanCurrentlyInCreationException)。修复:改属性注入(降级——引入可变字段,第 2 题 spring-basics)、抽公共依赖(重构首选)、事件解耦(第 13 题)。禁止:allowCircularReferences=true 长期开启(掩盖设计问题)。
 
-### 延迟策略：把风险移到调用时也需要验收
+### 取舍:构造器注入与循环依赖的矛盾
 
-@Lazy 注入代理或 ObjectProvider 可在真正调用时再解析某个对象，适合确实允许延迟的关系；如果初始化期间立即调用它，循环仍可能暴露。允许某些 Setter 循环时，还要考虑早期对象未初始化及代理引用一致性。打开允许循环的开关只是改变容器行为，不是业务设计已经合理的证据。
+构造器注入的优点(不可变+显式依赖)与缺点(不支持循环)是同一枚硬币的两面——不可变=构造时全依赖就绪=循环无法满足。设计上的解:构造器注入+禁止循环=设计质量的守门(循环依赖在启动期暴露——好过运行期)。属性注入的"灵活"=循环依赖可隐藏=设计债(第 37 题)。
+
+### 展开:三级缓存的延迟决策——为什么两级不够
+
+三级缓存存的是 ObjectFactory 而不是引用本身:工厂回调 getEarlyBeanReference(SmartInstantiationAwareBeanPostProcessor),bean 需要 AOP 代理时才生成代理,不需要时返回裸对象——早期引用的形态延迟到"第一次有人要"才决定。若只有两级(直接存早期引用),就必须在实例化后立刻决定是否代理:要么所有 bean 提前代理(改变生命周期语义),要么循环场景注入裸对象(与最终 bean 类型不一致)。工厂是"代理不确定性"与"提前暴露需求"之间的折中——这是三级结构真正的设计动机,也是"背过三级缓存"与"理解三级缓存"的分水岭。
 
 ## 案例
 
-### 失败路径：两个构造器互相请求
+### 验证:构造器循环的断言组
 
-教学测试用最小上下文只注册 OrderService 与 InventoryService，两个构造器相互依赖；刷新上下文并检查异常因果链中正在创建的 Bean。预期启动失败，证据应定位到这条依赖环，而不是误判为组件扫描缺失。测试不要开启允许循环的配置后就忽略实际调用，构造器环本身也不能靠普通早期引用自动完成。
+验证:抛异常断言(构造器循环启动抛 BeanCurrentlyInCreationException——spring-advanced 31 题实测);属性注入对照断言(属性注入循环自解——allowCircularReferences 默认 true 时);解法断言(重构后启动成功+行为不变)——三组固化循环依赖的治理;spring-advanced 31 题的实验为本机制的直接证据。
 
-### 修复验收：拆编排后再验证失败语义
+### 追问链:循环依赖三刀
 
-加入独立结算编排者后，让订单和库存只依赖仓储或策略，先验证上下文可启动；再分别注入库存不足、订单写入失败等故障，检查本地事务回滚或补偿状态。预期依赖图没有环且失败不会遗留无主库存预占。启动通过只覆盖结构问题，业务一致性还必须由这些用例证明。
+一刀:"Spring Boot 3 的变化?"——Boot 2.x 默认允许循环(可配),Boot 3 默认禁止——升级时存量循环集中暴露(第 49 题 distributed 回归集)。二刀:"三级缓存为什么需要三个?"——一级(成品)+二级(半成品)+三级(工厂)——三级存在的目的=处理 AOP 代理的提前引用(需要生成代理而不是裸对象)——三级的设计动机。三刀:"循环依赖与设计?"——循环依赖=职责边界模糊(第 2 题 distributed 领域边界)——解循环=重新划边界——循环依赖的治理即架构治理。
 
 ## 总结点
 
-1. 见面即交换名片，环卡在第一句
-2. 构造器环没有可提前注入的实例
-3. 优先拆编排和依赖方向
-4. 延迟解析不自动消除耦合
+1. 构造器循环:无半成品可暴露
+2. 属性注入可自解,构造器不可
+3. Boot 3 默认禁,升级集中暴露

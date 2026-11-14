@@ -3,30 +3,46 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/autowired-primary.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/core/beans/annotation-config/autowired-qualifiers.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
 ## 参考回答
 
-1. @Primary 在多个匹配候选中表达优先选择，适合默认实现；@Qualifier 收窄候选集合，适合在具体注入点表达业务含义。
-2. 限定符不是任意实现的唯一全局名称；仍需先有类型匹配的候选。集合注入和单值注入的选择含义也不同。
+<!-- explanation:deep -->
+
+> 场景与约束：网银渠道沙盘:PaymentService 接口 3 个实现注入时歧义 NoUniqueBeanDefinitionException,Primary 设默认 Qualifier 精确指定两者配合默认加覆盖。
+
+1. Primary 多实现中的默认注入时无 Qualifier 则取 Primary 一个类型只能一个 Primary;Qualifier 精确指定按 bean 名注入覆盖 Primary。配合 Primary 设默认 Qualifier 精确切换。
+2. 与注册表的衔接多实现加路由注册表管按参数路由 Primary Qualifier 管静态注入两种模式编译期注入 vs 运行期路由。
+3. 类型安全限定符自定义注解防字符串 typo 编译期不可查改类型安全限定符自定义注解。
 
 ## 参考分析
 
-1. 明确的业务限定符比依赖参数名巧合更稳定；出现两个 Primary 或限定后仍有多个候选时，装配仍可能歧义失败。
-2. 注入 List<PaymentPort> 通常希望取得多个候选，Primary 并不等于把列表过滤为唯一默认项。
+### 机制:Primary 与 Qualifier 的解析
+
+Primary 多实现中的默认注入时无 Qualifier 则取 Primary 的实现一个类型只能一个 Primary。Qualifier 精确指定按 bean 名或限定符注入覆盖 Primary。解析优先级 Qualifier 大于 Primary 大于唯一实现大于异常。组合 Primary 设默认加 Qualifier 精确覆盖默认加覆盖的模式。
+
+### 反例:多实现注入的歧义
+
+沙盘 PaymentService 有 3 个实现注入时无 Primary 无 Qualifier 启动抛 NoUniqueBeanDefinitionException 启动期暴露好过运行时。修复 Primary 设默认加 Qualifier 精确切换或集合注入 List 获取全部。
+
+### 取舍:类型安全限定符
+
+字符串 Qualifier wechat 的 typo 运行时才发现 NoSuchBeanDefinitionException 类型安全限定符自定义注解编译期检查自定义 WeChatChannel 注解加 Qualifier 作为元注解注入时用 WeChatChannel typo 在编译期暴露。
 
 ## 案例
 
-1. 教学场景：银行卡和钱包都实现 PaymentPort，普通下单默认用银行卡，退款服务必须指定钱包。
+### 验证:多实现注入的断言组
 
-2. 为默认实现标 Primary，为特定注入点使用明确 Qualifier；小上下文分别获取单值默认、限定单值和候选列表。
+验证:Primary 断言无 Qualifier 注入 Primary 实现;Qualifier 断言 Qualifier wechat 注入 WeChat 实现;歧义断言无 Primary 无 Qualifier 的多实现注入抛异常——三组固化多实现注入。
 
-3. 验证默认与限定实现符合预期，候选列表仍包含所需实现；删除限定或增加冲突候选时应明确失败而非随机选择。
+### 追问链:注入三刀
+
+一刀 Qualifier 的元注解自定义限定符类型安全的 Qualifier 字符串 typo 编译期不可查改类型安全限定符。二刀 集合注入 List 注入全部实现注册表的收集。三刀 Profile 的作用环境维度条件装配与 Qualifier 正交环境 vs 实现。
 
 ## 总结点
 
-1. Primary 表达默认优先。
-2. Qualifier 表达候选限定。
+1. Primary 设默认 Qualifier 精确覆盖
+2. 集合注入获取全部实现
+3. 类型安全限定符防 typo

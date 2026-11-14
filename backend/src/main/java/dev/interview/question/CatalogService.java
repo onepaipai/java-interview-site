@@ -88,7 +88,8 @@ public class CatalogService {
 
   private static void document(String title, String content) {
     name(title, 200);
-    if (content == null || content.length() > 2_000_000) throw new IllegalArgumentException();
+    // 与导入/导出链路上限对齐:预留至 6MB
+    if (content == null || content.length() > 6_000_000) throw new IllegalArgumentException();
   }
 
   @Transactional

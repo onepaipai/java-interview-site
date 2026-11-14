@@ -3,31 +3,46 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-boot/3.5/reference/how-to/application.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-boot/3.5/reference/features/developing-auto-configuration.html)
-- [Spring Framework 6.2 参考 · 3](https://docs.spring.io/spring-boot/3.5/reference/features/external-config.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
 ## 参考回答
 
-1. 让缺失配置、依赖歧义、端口冲突和迁移失败在启动期给出可定位原因，保留异常因果链与必要环境信息，不暴露秘密。
-2. 结合 Boot FailureAnalyzer、条件报告和结构化日志缩小范围；不要把所有启动错误统一改成连接失败。
+<!-- explanation:deep -->
+
+> 场景与约束：网银启动沙盘:启动失败只看到 ApplicationContext 生成失败,不知道哪个 bean 什么原因——可诊断性三件套:条件评估报告(--debug)、FailureAnalyzer 结构化输出、启动追踪(ApplicationStartup)。
+
+1. 诊断手段:--debug 的条件评估报告(每个自动配置的匹配/不匹配);FailureAnalyzer(内置的结构化失败分析:端口占用、bean 缺失、绑定错误的友好提示);自定义 FailureAnalyzer;启动日志的 bean 创建轨迹。
+2. 常见启动失败:bean 缺失、条件不满足、循环依赖、端口占用、配置绑定失败(类型不匹配)——每种都有内置 FailureAnalyzer,自定义失败可注册自己的 Analyzer。
+3. 启动的可观测:ApplicationStartup(Spring 6 的启动步骤追踪,bean 创建耗时、慢 bean 识别);启动失败进监控(失败率、原因分布)——可诊断性=排查时间从小时到分钟。
 
 ## 参考分析
 
-1. 构造器依赖和类型化配置验证可提前暴露错误；条件未匹配与 Bean 创建后初始化失败是不同阶段。
-2. 应用启动、端口监听、内容导入完成与 readiness 需要明确状态，避免进程活着却无法使用。
+### 机制:启动失败的结构化诊断
+
+诊断手段:--debug 的条件评估报告(每个自动配置的匹配/不匹配)、FailureAnalyzer(内置的结构化失败分析:端口占用、bean 缺失、绑定错误的友好提示)、自定义 FailureAnalyzer、启动日志的 bean 创建轨迹。常见启动失败(bean 缺失/循环依赖/端口占用/配置绑定)每种有内置 Analyzer。
+
+### 反例:启动失败不可诊断的代价
+
+沙盘:启动失败只看到堆栈,无结构化提示,排查耗时数小时。修复:FailureAnalyzer 友好提示+--debug 条件评估报告+ApplicationStartup 启动追踪(慢 bean 识别)。启动失败的可诊断性=排查时间从小时到分钟。
+
+### 取舍:诊断的投入与收益
+
+投入:自定义 FailureAnalyzer(每类失败一个)+启动追踪配置。收益:排查时间从小时到分钟。度量:启动失败的排查耗时对比改进前后。边界:通用失败用内置 Analyzer,业务失败自研,投入以"高频失败优先"排序,避免为低频路径堆工具。
 
 ## 案例
 
-1. 教学场景：启动只打印 Application failed，实际原因是必需地址缺失，排查者误重启数据库。
+### 验证:启动诊断的断言组
 
-2. 保留根因与配置键，必要时增加定制 FailureAnalyzer；用缺配置、端口占用和非法迁移分别验证错误分类。
+验证:报告断言(--debug 的条件评估报告每个自动配置的匹配状态);FailureAnalyzer 断言(端口占用的友好提示而非原始堆栈);启动追踪断言(ApplicationStartup 的步骤耗时慢 bean 识别)——三组固化启动诊断。
 
-3. 预期日志说明失败阶段及可采取动作，监控能识别未就绪；输出不包含密码、完整令牌或敏感连接参数。
+### 追问链:启动诊断三刀
+
+一刀:FailureAnalyzer 的自定义——实现 FailureAnalyzer 接口,注册到 META-INF/spring.factories,业务校验失败、依赖缺失等自定义失败的分析器。二刀:启动失败的告警——失败率、失败原因分布进监控,告警与值班响应。三刀:诊断的文档化——常见启动失败的排查指南(端口/循环/条件/绑定各一节),进运维手册的启动章节。
 
 ## 总结点
 
-1. 保留根因和失败阶段。
-2. 启动状态与业务就绪分开。
+1. 条件评估报告+FailureAnalyzer 结构化
+2. 启动追踪慢 bean 识别
+3. 启动失败进监控与告警

@@ -3,30 +3,52 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jfr.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jcmd.html)
 
 </details>
 
 ## 参考回答
 
-1. 检查锁等待、I/O、线程池排队、CPU 限流和系统调度，避免把所有 Java 延迟都归因于 GC。
-2. 按请求路径建立分段证据。
+<!-- explanation:deep -->
+
+> 场景与约束：网银接入层沙盘:用户报卡顿,GC 日志干净、CPU 不高,值班一度"无案可办"。给出 GC 无罪后的排查漏斗:安全点与应用侧停顿、锁与线程池、下游与 IO、宿主层(限流/ stealing),逐层附可观察证据。
+
+1. 先立"GC 无罪"的证据:暂停分布无尖刺加 safepoint 日志 sync 正常(本机实测常态微秒级),再进入非 GC 排查,避免在 GC 上空转。
+2. 应用侧停顿有自己的名单:JFR 的 Allocation Stall 类事件(本机 ZGC 实测 59.822ms)、类加载锁、JIT 编译队列堵、日志同步 IO——它们不叫 GC 但同样停世界或停线程。
+3. 往下走漏斗:锁竞争与线程池饱和(等待事件)、下游慢(链路追踪超时分布)、宿主层(CPU 限流/steal/页回收)——每层有独立证据,别靠猜。
 
 ## 参考分析
 
-1. CPU 采样看不到大量休眠等待。
-2. 单次栈存在采样偏差。
-3. GC 正常也可能因池排队或节流造成卡顿。
+### 机制:卡顿归因的四层漏斗
+
+第一层 JVM 停顿:GC 暂停、安全点等待(safepoint 日志)、偏向锁撤销(17 已无偏置锁)、类加载与 JIT 队列——JFR 时间线可见。第二层应用并发:锁竞争(JavaMonitorEnter)、线程池排队(ThreadPark 频度与池水位)、连接池等待。第三层依赖与 IO:下游延迟、DNS/连接建立、磁盘 IO。第四层宿主:CPU 限流(throttled 统计)、CPU steal(虚拟化)、内存回收与 swap。漏斗顺序按"证据获取成本"排列,上层便宜先查。
+
+### 反例:被"GC 正常"带偏的两小时
+
+接入层卡顿,值班反复看 GC 日志两小时(确实干净)。真正原因:某配置热更触发的全量类加载持锁,请求线程排队在类加载锁上——JFR 的 JavaMonitorEnter 事件 10 分钟就能定位。教训:GC 干洁只是排除了一层,卡顿的证据面还有四层;JFR 常开(第 22 题)时,10 分钟与 2 小时的差别就是有没有时间线。
+
+### 取舍:排查的记录与升级规则
+
+规则:每层查完记录"证据与结论"再下一层(安全点日志、JFR 摘要、链路追踪、宿主指标四份材料);两层无果升级二线(带齐材料),避免单人反复横跳。常态化:JFR default 常开、safepoint 日志常开、宿主 throttled 指标进监控——三层证据提前就位,卡顿案变成对齐时间戳的功课。
 
 ## 案例
 
-1. 场景（教学示例）：请求耗时升高且进程 CPU 未满。
-2. 处理：比较 CPU 与墙钟剖析，关联 throttling、排队年龄与 safepoint 日志。
+### 实证:GC 之外的两类停顿证据
 
-3. 验证：能够区分算力不足、锁等待和外部阻塞；采集限制时间与开销。
+本机证据(Java 17.0.17):
+```
+ZGC Allocation Stall (main) 59.822ms   (堆满,应用线程等回收腾空间)
+安全点 sync 全程 ≤67us(6 次 Full GC)   (GC 侧无嫌疑的量化依据)
+```
+解读:第一行是"不叫 GC 的停顿"实锤——统计口径里它不是 Pause,业务感受却与 GC 尖刺无异;第二行证明 GC 与安全点无罪后,排查方向必须转移。验证:同负载重跑,Allocation Stall 与堆水位重合、安全点保持微秒,证据可复现。
+
+### 追问链:卡顿排查三刀
+
+一刀:"为什么锁竞争监控常缺失?"——synchronized 与 AQS 等待默认无业务指标,JFR 事件是主要来源;关键路径的锁要主动埋点(获取耗时分位)。二刀:"线程池怎么看出饱和?"——队列长度与拒绝计数是表象,JFR ThreadPark 加线程栈(池内线程全 WAITING 于 take)证明"忙在等待",结合上游流量判断是容量还是依赖慢。三刀:"宿主层怎么快速取证?"——throttled/steal/swap 三个计数器加页面回收事件,各一行命令;容器与虚机环境这层经常是答案,却最晚被查——把它前移到监控基线里。
 
 ## 总结点
 
-1. 慢不一定耗 CPU。
-2. 等待需要墙钟剖析。
+1. GC 无罪要证据,停顿有名单
+2. 四层漏斗,逐层留证
+3. JFR 常开,卡顿变对表

@@ -7,8 +7,7 @@ docs/
 ├── README.md    本导航页
 ├── openapi.json 接口契约（scripts/api-contract.mjs 生成）
 ├── guide/       常青指南：测试、部署、AI/RAG
-├── reports/     轮次报告：architecture / ui / content 三类
-└── history/     历史归档（不代表当前状态）
+└── reports/     轮次报告：architecture / ui / content 三类
 ```
 
 ## 常青指南（docs/guide/）
@@ -65,31 +64,4 @@ docs/
 
 ## 报告归档约定
 
-新增轮次报告放入 `reports/` 对应主题子目录（`architecture/`、`ui/`、`content/`），文件名用「大写英文短名-日期」格式（如 `DOCS-UX-CONCURRENCY-20261024.md`），中文标题写在文内首行，顶部用一段引用说明状态与适用范围；后续轮次取代其结论时，把文件移入 `history/` 并按历史横幅格式改写开头。常青指南放入 `guide/`。
-
-## 历史归档（docs/history/）
-
-以下文档描述当时的实现与验收，不代表当前功能或测试结果。
-
-- [ANSWER-FIX-20261015](history/ANSWER-FIX-20261015.md)（配套数据 [ANSWER-FIX-20261015.json](history/ANSWER-FIX-20261015.json)）
-- [ANSWER-QUALITY-20261015](history/ANSWER-QUALITY-20261015.md)
-- [CHANGES-20261014](history/CHANGES-20261014.md)
-- [CONTENT-DEPTH-20261021](history/CONTENT-DEPTH-20261021.md)
-- [CORE](history/CORE.md)
-- [DEEP-REVIEW-20261019](history/DEEP-REVIEW-20261019.md)
-- [EXPLANATIONS-20261015](history/EXPLANATIONS-20261015.md)
-- [FIXES-20261020](history/FIXES-20261020.md)
-- [INTERACTIONS](history/INTERACTIONS.md)
-- [KNOWLEDGE-POLISH-20261015](history/KNOWLEDGE-POLISH-20261015.md)
-- [MARKDOWN-UI](history/MARKDOWN-UI.md)
-- [MODULE-MANAGEMENT](history/MODULE-MANAGEMENT.md)
-- [READER-POLISH-20261015](history/READER-POLISH-20261015.md)
-- [REDESIGN](history/REDESIGN.md)
-- [REVIEW-20261015](history/REVIEW-20261015.md)
-- [REVIEW-BASELINE-20261015](history/REVIEW-BASELINE-20261015.md)（配套数据 [REVIEW-SECOND-20261015.json](history/REVIEW-SECOND-20261015.json)）
-- [REVIEW-SECOND-20261015](history/REVIEW-SECOND-20261015.md)
-- [SELF-REVIEW-20261015](history/SELF-REVIEW-20261015.md)
-- [UI-REVIEW-20261015](history/UI-REVIEW-20261015.md)
-- [UX-REVIEW](history/UX-REVIEW.md)
-- [VALIDATION](history/VALIDATION.md)
-- [WORKBENCH](history/WORKBENCH.md)
+新增轮次报告放入 `reports/` 对应主题子目录（`architecture/`、`ui/`、`content/`），文件名用「大写英文短名-日期」格式（如 `DOCS-UX-CONCURRENCY-20261024.md`），中文标题写在文内首行，顶部用一段引用说明状态与适用范围。历史轮次的报告不留在仓库内（需要时从 git 历史恢复），常青指南放入 `guide/`。

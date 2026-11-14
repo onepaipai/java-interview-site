@@ -3,29 +3,30 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-boot/3.5/reference/features/developing-auto-configuration.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
+- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
 
 </details>
 
 ## 参考回答
 
-1. 将依赖聚合与自动配置职责划分清楚，定义专属配置前缀、默认 Bean、启用条件和用户覆盖契约。
-2. Boot 3 通过 AutoConfiguration.imports 发布候选，避免宽扫描；使用小上下文和独立打包宿主验证，而非只在同仓源码运行。
+1. 拆分自动配置与依赖聚合，Boot 3 用 imports 注册候选。
+2. 按类路径和已有 Bean 条件启用，配置属性类型化并校验。
+3. 提供业务覆盖、最小上下文与版本兼容测试，避免宽泛组件扫描。
 
 ## 参考分析
 
-1. 可选依赖需避免条件生效前的类加载失败，依赖版本与宿主 Boot 兼容范围要明确。
-2. 测试缺库、关闭、默认、用户 Bean 和属性非法分支，日志及配置报告不泄露秘密。
+1. 多实例同时启动会放大连接和 DDL 竞争。
+2. 宽泛扫描可能污染业务 Bean，配置半更新会形成不一致规则。
 
 ## 案例
 
-1. 教学场景：团队给多个服务提供通知能力，希望默认可用且允许各服务替换。
+1. 场景（教学示例）：二十个副本同时启动并执行数据库迁移。
+2. 处理：迁移放独立受控步骤，实例连接渐进建立；规则用带版本的不可变快照。
 
-2. 配置类按缺失 Bean 和开关退让，starter 引入必需依赖，打包检查 imports 和类型化配置。
-
-3. 验证独立宿主默认装配，用户实现不冲突，禁用后不污染原应用，非法必需项在启动明确失败。
+3. 验证：只有预定迁移执行者生效；失败配置不覆盖旧版本，启动不会冲垮数据库。
 
 ## 总结点
 
-1. 依赖聚合与自动配置分责。
-2. 产物发现和覆盖分支都验证。
+1. 装配不污染业务。
+2. 迁移与扩容分开。

@@ -3,25 +3,46 @@
 
 Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/rolling-back.html)
+- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
 </details>
 
 ## 参考回答
 
-1. 通常默认对 RuntimeException 和 Error 回滚；受检异常若代表业务失败，需配置 rollbackFor 或明确回滚状态。
-2. 异常被方法捕获后正常返回，拦截器看不到该异常；不能假定所有捕获都自动回滚。
-3. 加入外层共享事务后，内层可能已标记 rollback-only；外层吞异常也可能在提交时收到 UnexpectedRollbackException。
+<!-- explanation:deep -->
+
+> 场景与约束：网银转账沙盘:@Transactional 默认只回滚 RuntimeException 与 Error——checked 异常(如自定义 ValidationException extends Exception)不回滚——半截数据提交。rollbackFor=Exception.class 全覆盖或精确控制。
+
+1. 默认规则:RuntimeException+Error→回滚;checked Exception(非 RuntimeException 的 Exception 子类)→不回滚——checked 异常抛出后事务照常提交(半截数据)。
+2. 局限三:一是 checked 不回滚(需 rollbackFor);二是 noRollbackFor 的粒度(精确到类,不能按条件);三是私有方法/非 public 方法不生效(第 6 题 spring-advanced)。
+3. 正解:rollbackFor=Exception.class(全回滚)+noRollbackFor 精确排除(业务上不需要回滚的 checked)——或者统一用 RuntimeException(业务异常继承 RuntimeException,第 11 题 java-language)。
+
+## 参考分析
+
+### 机制:默认回滚规则
+
+RuntimeException/Error→回滚(程序缺陷或不可恢复);checked→不回滚(调用方应该处理)——规则的设计意图与实际效果的差距。落地纪律:业务异常继承 RuntimeException 或显式 rollbackFor,不依赖对默认规则的记忆。
+
+### 反例:checked 不回滚的后果
+
+ValidationException extends Exception→抛出后事务提交——半截数据入库(资金风险)。验证:本机 H2 实测 checked 抛出后行数仍为 1,补 rollbackFor 后回滚为 0——规则靠断言固化。
+
+### 取舍:rollbackFor 的策略
+
+统一 RuntimeException(业务异常继承运行时)或 rollbackFor=Exception.class(全回滚)+noRollbackFor 精确排除。
 
 ## 案例
 
-1. 场景（教学示例）：事务方法插入订单后抛 IOException，调用方在事务外捕获异常。
+### 验证:回滚规则的断言组
 
-2. 处理：先用默认注解验证，再添加 rollbackFor=IOException.class；测试本身不包外层事务，异常后用独立连接查询。
+验证:checked 不回滚断言(抛 checked 异常,数据已提交——复现);rollbackFor 断言(rollbackFor=Exception.class 后 checked 也回滚);noRollbackFor 断言(noRollbackFor 的异常不回滚)——三组固化回滚规则。
 
-3. 预期：在无其他回滚原因的前提下，默认受检异常路径可提交，显式规则路径回滚。另测吞异常及已标记 rollback-only 的区别。
+### 追问链:回滚三刀
+
+一刀:"异常嵌套的回滚?"——内层抛 RuntimeException 被外层 catch——rollback-only 标记已设(spring-advanced 4 题)——外层提交抛 UnexpectedRollbackException。二刀:"readOnly 的效果?"——readOnly=true 是提示(Hibernate flush 模式/驱动优化)——非硬约束(不阻止写入,第 13 题)。三刀:"事务的传播行为?"——REQUIRED(参与/新建)/REQUIRES_NEW(独立)/NESTED(保存点)/SUPPORTS/NOT_SUPPORTED/MANDATORY/NEVER——七种传播的语义与连接占用(第 2 题 spring-advanced)。
 
 ## 总结点
 
-1. 回滚规则看异常和事务状态。
-2. 查库验证不要被测试事务掩盖。
+1. 默认只回滚 RuntimeException
+2. checked 异常默认提交
+3. rollbackFor 全覆盖或精确排除

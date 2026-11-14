@@ -32,6 +32,10 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 优先把状态放进实例、用实例锁；确实需要全局状态时，考虑 AtomicLong、ConcurrentHashMap 等并发容器，或在应用层按 key 分片降低 Class 锁竞争。锁定 Class 的代码要注释清楚"这是全局锁"，避免他人误加 synchronized(this) 后以为受到了保护。跨实例部署时，JVM 内的任何锁都不构成分布式互斥，需外部协调。
 
+### 底座：锁信息存在对象头的 Mark Word 里
+
+两把锁的物理载体是对象头 Mark Word 中的锁标志位：实例锁记录在该对象自己的 Mark Word，Class 锁记录在 Class 对象的 Mark Word——对象与它的类各有一份头，互不相干，这就是"两把实体锁"的根源。字节码层面，synchronized 块编译为 monitor enter/exit 两条指令，方法则由 ACC_SYNCHRONIZED 标志标记，进入时 JVM 按锁状态走对应路径。轻量级阶段锁状态直接写在 Mark Word 里；膨胀为重量级后，Mark Word 指向堆上的 ObjectMonitor（含 owner、入口队列 EntryList、等待队列 WaitSet）。面试追问"锁存在哪"答到 Mark Word 与 ObjectMonitor 即闭环。
+
 ## 案例
 
 ### 对照操作：三种组合的互斥矩阵

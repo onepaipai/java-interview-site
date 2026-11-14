@@ -3,8 +3,7 @@
 
 Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-4.html#jls-4.6)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/tutorial/java/generics/erasure.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/reflect/Type.html)
 
 </details>
 
@@ -12,59 +11,38 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 教学示例：外部接口返回一组对象，业务希望把它当作 List<String> 使用。需要区分编译期约束、对象运行期类型和反射可读到的声明信息，避免把强制转换当成元素验证。
+> 场景与约束：网银接口沙盘:List<String> 与 List<Integer> 运行期是同一个 Class(擦除)——instanceof List<String> 编译不过、反射可塞 Integer 进 List<String>。用擦除实验说明泛型的编译期本质与运行期的护栏(J2 实验:同一 Class/ClassCastException)。
 
-1. 泛型参数通常被擦除为上界或 Object，List<String> 和 List<Integer> 的实例不因此具有不同的运行期 Class；普通 instanceof 不能验证完整元素参数。
-2. List<?> 可以做实例类型检查，但不能据此证明每个元素都是 String。原始类型和未检查转换会把错误推迟到读取元素时。
-3. 反射可能读到字段或父类声明中的泛型信息，这与对象携带全部实参不是一回事。反序列化边界需要明确目标类型并验证实际元素。
+1. 擦除的本质:泛型信息只在编译期(类型检查+自动插桥),运行期 List<String> 就是 List——Class 对象唯一(本机实验:两个泛型列表 getClass 相同=true)。
+2. 运行期的三个限制:instanceof 泛型不可(List<String> instanceof 编译错)、运行期创建泛型数组不可(new T[] 报错)、反射可绕过泛型(塞 Integer 进 List<String>——J2 实验成功,取值时 ClassCastException)。
+3. 护栏正解:运行期需要类型信息的场景用显式 Class 参数( TypeToken 模式/Gson 的 TypeToken)、边界校验(外部输入入集合前校验,第 25 题)、Collections.checkedList(运行期强制类型检查的调试工具)。
 
 ## 参考分析
 
-### 擦除后保留什么：类身份与编译器插入的转换
+### 机制:擦除的编译期与运行期
 
-编译器在类型检查之后进行擦除，必要时在使用点插入类型转换；类型变量的擦除与其上界有关，不总是 Object。两个相同实现类的列表，不会因为元素类型不同而产生两个 Class。因此通过 getClass 比较实例不能验证元素约束，未检查转换也不会逐项遍历容器。类比快递面单只写一箱书而不写书目：运行期只知道是个箱子（List），箱里每件是什么要看发货清单（编译期检查）。
+编译期:泛型做类型检查(类型不匹配编译错)+自动桥方法(泛型类实现 Comparable<T> 的桥)+类型推断(diamond)。运行期:擦除为上限(raw List/Object)——桥方法保留(运行期分派用;J2b 实测:javap -v 显示 compareTo(BridgeExp) 与 compareTo(Object) 两个方法,后者 flags 含 ACC_BRIDGE+ACC_SYNTHETIC,方法体强转后转发强类型版本);get 后的强转(checkcast)由编译器插入——擦除后塞入错误类型,取值时才 ClassCastException(J2 实验:反射塞 42 成功,取值 cast 失败)。
 
-### 可具体化类型：检查容器不等于检查参数
+### 反例:擦除误判的两种事故
 
-List<?> 的元素类型未知，它可以用于 instanceof 的运行期容器检查；List<String> 一般不能用于该检查，new T() 和直接创建非可具体化元素类型的泛型数组也受到限制。通配符的读写能力是编译期规则，与运行期能否识别完整实参是两个问题，不应拿 PECS 的复制案例代替本题。
+事故一,instanceof 泛型:if (obj instanceof List<String>) 编译不过——运行期类型检查只能 instanceof List(裸)+元素逐个判——设计上避免(方法不该依赖泛型运行期类型)。事故二,反射绕过后的延迟爆炸:反射塞 Integer 进 List<String>——编译期无告警,取值时 ClassCastException(爆炸点远离塞入点)——边界校验(外部数据入集合前逐个校验,第 25 题)。
 
-### 反射边界：声明信息与真实数据分别验证
+### 取舍:泛型信息的保留手段
 
-字段若声明为 List<String>，反射可能取得该声明的 ParameterizedType；对象被以原始类型污染后，该声明不会自动改变，也不能保证数据合规。框架的类型令牌帮助描述反序列化目标，但外部不可信数据的大小、空值及元素约束仍需校验。错误应在边界报告，而不是等到后面的业务读取才暴露。
+手段一,显式 Class 参数:方法签名带 Class<T>(运行期可用 T 的信息——反序列化的目标类型)。手段二,超类型令牌(Gson TypeToken/TypeReference:new TypeReference<List<String>>(){} 的匿名子类保留泛型签名——getGenericSuperclass 反射读取)——框架(反序列化)的标准形态。手段三,checkedList:Collections.checkedList(list, String.class)——运行期插入校验(违规即时抛 ClassCastException,爆炸点前移到塞入处——J2 实验的修复形态)。
 
 ## 案例
 
-### 可执行对照：错误为什么到读取时才出现
+### 验证:擦除限制的断言组
 
-以下 Java 17 完整程序比较相同实现类，再通过原始类型污染列表。预期先输出 true，随后在取出第二个元素并赋给 String 时捕获 ClassCastException；这说明编译期声明没有变成逐元素运行期验证。编译时的 unchecked 警告应保留并修复，不应作为消除错误的方法。
-```java
-import java.util.ArrayList;
-import java.util.List;
-public class GenericErasureReview {
-  public static void main(String[] args) {
-    List<String> words = new ArrayList<>();
-    List<Integer> numbers = new ArrayList<>();
-    System.out.println(words.getClass() == numbers.getClass());
-    words.add("ok");
-    List raw = words;
-    raw.add(42);
-    try {
-      String value = words.get(1);
-      System.out.println(value);
-    } catch (ClassCastException expected) {
-      System.out.println("element cast failed");
-    }
-  }
-}
-```
+验证:Class 同一断言(两泛型列表 getClass 相同——J2 实测);反射绕过断言(塞 Integer 成功+取值 ClassCastException——护栏缺失的形态);checkedList 断言(checkedList 下塞入即抛——爆炸点前移)——三组固化擦除语义;checkedList 的用法进"运行期类型护栏"指南。
 
-### 边界追问：如何接收外部列表
+### 追问链:泛型三刀
 
-把入口参数视为未知数据，先验证是所需容器，再逐项检查元素类型、空值及数量约束，构造新的受控列表后交给领域逻辑。教学测试分别输入字符串列表、混入数字的列表、空列表和非列表。预期合法数据成功，混合元素在入口给出明确错误；不能只做一次 List<String> 强制转换就声明验证完成。
+一刀:"泛型的桥方法?"——泛型类实现 Comparable<T> 编译器自动生成桥方法 compareTo(Object)(J2b javap -v 实测:flags 含 ACC_BRIDGE+ACC_SYNTHETIC),方法体把 Object 强转后转发强类型版本——擦除后 Object 签名的调用得以正确分派到泛型实现;桥方法是"重载变重写"混乱的根源之一。二刀:"泛型与重载?"——两个方法仅泛型参数不同(erase 后同签名)——编译错("clashes with erasure")——重载设计要避开擦除冲突。三刀:"泛型数组?"——new T[] 与 new List<String>[] 不可(协变写入的类型安全)——用 ArrayList<T> 或 @SuppressWarnings 显式。
 
 ## 总结点
 
-1. 面单只写一箱书，书目看清单
-2. 擦除不产生每种实参的独立 Class
-3. 检查容器不能证明元素类型
-4. 声明类型信息不能替代数据校验
+1. 泛型是编译期护栏,运行期全擦除
+2. 爆炸点前移:边界校验加 checkedList
+3. 运行期类型信息用 Class 参数

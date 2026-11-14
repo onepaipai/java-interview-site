@@ -49,10 +49,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -136,10 +138,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/reflect/Type.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -520,10 +524,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -896,10 +902,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -1919,10 +1927,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -2006,10 +2016,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -2057,10 +2069,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -2468,10 +2482,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -2519,10 +2535,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -2642,10 +2660,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -3017,10 +3037,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/BitSet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -3068,10 +3090,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -3515,10 +3539,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -3892,10 +3918,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -3999,10 +4027,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -4287,10 +4317,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -4522,10 +4554,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicLong.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -4702,10 +4736,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -4772,10 +4808,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -5117,10 +5155,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -5242,10 +5282,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReadWriteLock.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -5642,10 +5684,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -5951,10 +5995,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -6220,10 +6266,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Timer.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -6455,10 +6503,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -7060,10 +7110,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/jeps/421"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -7186,10 +7238,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -7238,10 +7292,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -7584,10 +7640,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -7969,10 +8027,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/Buffer.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -8058,10 +8118,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -8554,10 +8616,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -8606,10 +8670,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/migrate/develop-migrating-jdk-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -8917,10 +8983,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -8999,10 +9067,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9081,10 +9151,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9163,10 +9235,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9260,10 +9334,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9342,10 +9418,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9423,10 +9501,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9474,10 +9554,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9570,10 +9652,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/addressing-cascading-failures/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9637,10 +9721,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9703,10 +9789,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9850,10 +9938,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -9931,10 +10021,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10012,10 +10104,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10078,10 +10172,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10144,10 +10240,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10210,10 +10308,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10291,10 +10391,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10357,10 +10459,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10423,10 +10527,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10489,10 +10595,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10555,10 +10663,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10708,10 +10818,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -10942,10 +11054,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11318,10 +11432,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11414,10 +11530,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11480,10 +11598,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11561,10 +11681,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -11782,10 +11904,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -12140,10 +12264,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/index-condition-pushdown-optimization.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -14597,10 +14723,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc9112.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -14686,10 +14814,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc793.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -14738,10 +14868,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc793.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -14790,10 +14922,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc793.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -15173,10 +15307,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc9113.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -15277,10 +15413,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc5280.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -15329,10 +15467,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc5246.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -15862,10 +16002,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc9110.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -16099,10 +16241,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/load-balancing-datacenter/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -16262,10 +16406,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc1191.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18544,10 +18690,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/AbstractQueuedSynchronizer.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18593,10 +18741,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/AbstractQueuedSynchronizer.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18867,10 +19017,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/17/docs/api/java.base/java/util/concurrent/atomic/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18990,10 +19142,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19079,10 +19233,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19131,10 +19287,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19217,10 +19375,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19303,10 +19463,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19352,10 +19514,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19401,10 +19565,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://www.rfc-editor.org/rfc/rfc3339"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19450,10 +19616,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19536,10 +19704,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ForkJoinPool.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19585,10 +19755,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ForkJoinTask.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19637,10 +19809,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/jeps/444"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19686,10 +19860,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/25/core/virtual-threads.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19735,10 +19911,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/jeps/425"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19861,10 +20039,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/projects/code-tools/jcstress/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19910,10 +20090,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/projects/code-tools/jmh/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19959,10 +20141,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20561,10 +20745,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20613,10 +20799,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20733,10 +20921,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21017,10 +21207,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21099,10 +21291,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://openjdk.org/jeps/377"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21814,10 +22008,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://github.com/openjdk/jdk17u/blob/master/src/hotspot/share/runtime/safepoint.cpp"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22682,10 +22878,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22734,10 +22932,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23039,10 +23239,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23277,10 +23479,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23619,10 +23823,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -24515,10 +24721,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://docs.spring.io/spring-framework/reference/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -25781,10 +25989,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/mysql-indexes.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -25944,10 +26154,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/mysql-indexes.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26033,10 +26245,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/mysql-indexes.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26233,10 +26447,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26670,10 +26886,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-consistent-read.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26756,10 +26974,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26805,10 +27025,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26854,10 +27076,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/replication-semisync.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26903,10 +27127,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/replication-semisync.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -26952,10 +27178,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://dev.mysql.com/doc/refman/8.4/en/replication-threads-monitor.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -27001,10 +27229,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://kafka.apache.org/41/design/design/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -27753,10 +27983,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://redis.io/docs/latest/develop/use/client-side-caching/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -27891,10 +28123,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -28271,10 +28505,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -28541,10 +28777,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://kafka.apache.org/documentation/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -28889,10 +29127,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://kafka.apache.org/41/design/design/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -33592,10 +33832,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -33923,10 +34165,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -33976,10 +34220,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -34122,10 +34368,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -34251,10 +34499,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -34736,10 +34986,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -35345,10 +35597,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -35710,10 +35964,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://raft.github.io/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -38461,10 +38717,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -38586,10 +38844,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/addressing-cascading-failures/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -39421,10 +39681,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://raft.github.io/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -39756,10 +40018,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/introduction/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -39811,10 +40075,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/introduction/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -40424,10 +40690,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -40793,10 +41061,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -41174,10 +41444,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -44378,10 +44650,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://sre.google/sre-book/introduction/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -44445,10 +44719,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://redis.io/docs/latest/commands/decr/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -44631,10 +44907,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "2026-11 九批审查修订+官方文档核读(内容自审查后未变更)",
+        "evidence": [
+          "https://martinfowler.com/articles/patterns-of-distributed-systems/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [

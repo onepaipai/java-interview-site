@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "packVersion": "explanations-v32",
+  "packVersion": "explanations-v34",
   "meaning": "结构校验、案例执行、事实核验和业务库人工合并独立记录；正文摘要变化使旧审核证据失效。业务库人工改动由 /api/admin/publications/status 动态判断。",
   "entries": [
     {
@@ -29928,634 +29928,1298 @@
     {
       "sourceKey": "2415387ce7cf026e8974991a401141f1dccabd737f4dc3c01341f8ca0f5c8229",
       "title": "如何为 RAG 建立可归因的分层评测？",
-      "answerSha256": "488f16bb454c3a10e175b03fdf7c794f1906b7a7a374824ae71057c31cd83962",
+      "answerSha256": "dc79b9177e848b49029e668d72e2ca932f945b8c099034257ed04c9b52f054b6",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.15217",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "488f16bb454c3a10e175b03fdf7c794f1906b7a7a374824ae71057c31cd83962",
+          "title": "如何为 RAG 建立可归因的分层评测？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c836692538b1aa8f5f00eff7143a904307f7517f44af118c8415eca42a80a932",
       "title": "Recall@K 与 MRR 适合观察什么差异？",
-      "answerSha256": "fb36f6392881db50bec3165def90424dd36cbe89910ebb1c47ea046995ad3190",
+      "answerSha256": "05b26f9082dfbaa396df986433f5988dc5334b6282a5292e659312445d3f882e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.15217",
+          "https://arxiv.org/abs/2210.07316"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fb36f6392881db50bec3165def90424dd36cbe89910ebb1c47ea046995ad3190",
+          "title": "Recall@K 与 MRR 适合观察什么差异？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "34698526126895e899876817bc7601c696569617e5713e90346fce3855f7164f",
       "title": "怎样构造检索评测中的困难负样本？",
-      "answerSha256": "65fff92cc41516ee5efcc32410982bb30b2f07aec8d1c6f18a5fd5e192ebdbbf",
+      "answerSha256": "c026e244bb2a0f9bc70bf4fbb88332097073947e9c3f37b4a51ca5b3bc81907f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.15217",
+          "https://arxiv.org/abs/2210.07316"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "65fff92cc41516ee5efcc32410982bb30b2f07aec8d1c6f18a5fd5e192ebdbbf",
+          "title": "怎样构造检索评测中的困难负样本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "cb8f51c3bf96db4c0a25cc19b79becf894d2783ee8192181d408cd1a08a7effd",
       "title": "BM25 与向量检索怎样融合比较稳健？",
-      "answerSha256": "79d741558a18cd7aaf55faaaf7aa186c23d0274436fa4d72d3b48fcf7a1bf7e9",
+      "answerSha256": "086ad8baa0c66c0890e68a3d9138315c1e119c38052209eedc8715378c1d196e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "79d741558a18cd7aaf55faaaf7aa186c23d0274436fa4d72d3b48fcf7a1bf7e9",
+          "title": "BM25 与向量检索怎样融合比较稳健？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fafe40648c288a745a889e5f70e10121ad57375862574571b3ecf45e4238670b",
       "title": "何时应该采用查询改写或多路查询？",
-      "answerSha256": "ae8bc3e5bd20234967fbf53cf59110b88138153225153dc9dbb3b95eb4c8b947",
+      "answerSha256": "978bbf2eccf9ac385f57f85872ec05dfb54398cbbf692570cc5fa2913593508a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2310.11511"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ae8bc3e5bd20234967fbf53cf59110b88138153225153dc9dbb3b95eb4c8b947",
+          "title": "何时应该采用查询改写或多路查询？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "36984e99a31f6dc13baeaff8f10353547bd6cc3f0fae370223adfd744737ce10",
       "title": "HyDE 类方法可能带来哪些偏差？",
-      "answerSha256": "ced979cb00eea748a74071c6e94d7af878275383473e0728c65a43cb6adc8fc8",
+      "answerSha256": "07ac2f56f7f098a9b5a2b47dc9b8565c646416ddf39bea56b6b83f3c3d0f72fb",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2212.10496",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ced979cb00eea748a74071c6e94d7af878275383473e0728c65a43cb6adc8fc8",
+          "title": "HyDE 类方法可能带来哪些偏差？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f303df6aaf5aec6e3c15f5a0d015ce4227a9c44bbd40c1a688e72eee731856ae",
       "title": "父子分块如何平衡召回精度与上下文完整性？",
-      "answerSha256": "274bea72c54cc84a01a9dde852d81d845b626ab04cebeeb2749bb94756a185e3",
+      "answerSha256": "7d4b0d7ed1c2acae983c8db843056ab9b159ed888e24cbc2fffc0e0f7587a934",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2307.03172"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "274bea72c54cc84a01a9dde852d81d845b626ab04cebeeb2749bb94756a185e3",
+          "title": "父子分块如何平衡召回精度与上下文完整性？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1595e20a2851eb18c899e7a7e0a386889b967d3653558f839126972f03893a1a",
       "title": "表格和代码文档为何不宜按固定字符数盲切？",
-      "answerSha256": "32f8c9cf4922336aa2b9592433ce43e237d7e590cbb219663d646413bfe6d3a4",
+      "answerSha256": "0b34825274d6121b6f949b9ccc60e4bead2675383dae9b13d1184205c0836184",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2307.03172"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "32f8c9cf4922336aa2b9592433ce43e237d7e590cbb219663d646413bfe6d3a4",
+          "title": "表格和代码文档为何不宜按固定字符数盲切？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "06af49218f5025a6b480a92ed3406c11b8606d9a79e5ac854cae801bb7233f17",
       "title": "文档解析中的脚注、页眉和重复段落应如何治理？",
-      "answerSha256": "4a72a0f1b3f4dbcd2091a3cbd0185873ab095e94d15a028923a67c70571e886a",
+      "answerSha256": "db827af3fa1ccefe16158c63465bed39d1effdaed86bfe24af27afb33b22eb51",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4a72a0f1b3f4dbcd2091a3cbd0185873ab095e94d15a028923a67c70571e886a",
+          "title": "文档解析中的脚注、页眉和重复段落应如何治理？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "aaa7a04c5765aa32a1e6683370b08f99ec8a1e482ab8b3f86fdce6b1199b0161",
       "title": "如何处理同一知识点的多个有效版本？",
-      "answerSha256": "67e6efc2d0456f6b8251a5e59347fec585f4f2739fd9d4a2c0232191742711da",
+      "answerSha256": "a4f5325fe7db99859eabd612d185f40c4ca440afc36d22f0a707e23b62eb8a0b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "67e6efc2d0456f6b8251a5e59347fec585f4f2739fd9d4a2c0232191742711da",
+          "title": "如何处理同一知识点的多个有效版本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "947f94989d062969189d73f2e3b5866fa00a12cca44344fd344447a969bbb65c",
       "title": "Embedding 模型升级怎样避免新旧向量混用？",
-      "answerSha256": "e1d1ce1ca868757e0744999bb6180a279606042744cf9da766f33957fe363305",
+      "answerSha256": "6a21efdea7ba62c80c9efa0338ce592b1a8f8fda13f91035839f98603748226f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2210.07316",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e1d1ce1ca868757e0744999bb6180a279606042744cf9da766f33957fe363305",
+          "title": "Embedding 模型升级怎样避免新旧向量混用？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5a8ba3969d7c387e96c07c63fc8e2f243a7f1d3ef8be1780f2ea65eb250192a3",
       "title": "向量维度相同是否意味着可以混合检索？",
-      "answerSha256": "9958a13415da9ea998aa6cbde71ee3756b6f88e41709754cd02aafc860e544fb",
+      "answerSha256": "8e72fec6b18002922cb57eb061a3f11dacc4648fa76e4224c5fb933bef78a3f1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2210.07316",
+          "https://arxiv.org/abs/1603.09320"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9958a13415da9ea998aa6cbde71ee3756b6f88e41709754cd02aafc860e544fb",
+          "title": "向量维度相同是否意味着可以混合检索？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d40bb16c35aac7441907ec2a6459f1875f31a84e6065bf4c36a84d4c6f76eb91",
       "title": "ANN 检索的召回与延迟怎样权衡？",
-      "answerSha256": "8acf33e14d936e1f3ad47dc207e9fc385edfe0961bbe6ee4bbb6e64945763b2b",
+      "answerSha256": "6eff979bf1e32b1e1c429d71e8b5a3b3d65f318e8a2d39112d16988b0e42ab82",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/1603.09320",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8acf33e14d936e1f3ad47dc207e9fc385edfe0961bbe6ee4bbb6e64945763b2b",
+          "title": "ANN 检索的召回与延迟怎样权衡？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eca64a1d309d2b882ee29d112ad29da73aa97ab1a64c296ef5e35ffbd702c5ee",
       "title": "HNSW 的参数选择为什么要结合更新负载？",
-      "answerSha256": "8493f6dde1303f2715d39905b47648d50ffd206ff76b2a856c200ebbeaf1dfc2",
+      "answerSha256": "022dcf71a62bf550842d1f4e59f47509cf5e993e488935de3d85a4fec3a197a8",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/1603.09320",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8493f6dde1303f2715d39905b47648d50ffd206ff76b2a856c200ebbeaf1dfc2",
+          "title": "HNSW 的参数选择为什么要结合更新负载？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ec6f4849fe50a0fc5279930b75d56141c000e9dc3c28f87ecf3ef11a4b84df4b",
       "title": "向量量化为何可能损害特定领域的召回？",
-      "answerSha256": "0682dd59dbc1ffde980b9efc4f65b9b90762b7f8bfd2f33a9319bde82d98daac",
+      "answerSha256": "02bc538e9ea8eb68e2e3460e62496b25f5e0531f2c64408ee4d54c6da24f377a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2210.17323",
+          "https://arxiv.org/abs/1603.09320"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0682dd59dbc1ffde980b9efc4f65b9b90762b7f8bfd2f33a9319bde82d98daac",
+          "title": "向量量化为何可能损害特定领域的召回？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2c43bef6b6e1640c635c5daacd99896221fde08fa854c1ef6f8885a0ba90d5a6",
       "title": "权限过滤与近似索引怎样配合？",
-      "answerSha256": "10c36662d3ce20cae727ca32066ff0073c901861ace3aeca4b93ea6e91c74cdf",
+      "answerSha256": "c9dc86786091f0d27cb5d9607f3bf34be5bb1458cb1db33d7cce860d7604b698",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/1603.09320",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "10c36662d3ce20cae727ca32066ff0073c901861ace3aeca4b93ea6e91c74cdf",
+          "title": "权限过滤与近似索引怎样配合？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f8dad962280971a9b4eafafb4255417c7678141e6e315cbd60fc40dafe5ee941",
       "title": "如何让删除和权限撤销及时反映到检索结果？",
-      "answerSha256": "f614c8c9b3686caf810e3f3dbba5e3f6bce538713b5866718c860d4f51a51c8e",
+      "answerSha256": "cb301c6e74aee3cafd62033f92d3fc10888f1b9e7963d8cf9f793e18f9ffe7b1",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f614c8c9b3686caf810e3f3dbba5e3f6bce538713b5866718c860d4f51a51c8e",
+          "title": "如何让删除和权限撤销及时反映到检索结果？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "6aeaa7f522c9bbdd956561f8c4531c4539085a530627f7717af03192d33212a2",
       "title": "增量索引为什么需要内容指纹与稳定来源键？",
-      "answerSha256": "e632ea8c124068c1b75f95f8221d7bd7b7fb4e1ea264316a962c7c7935940d6a",
+      "answerSha256": "87f7424c36abdc844a52bdf5b32dcc3703c6683ad3032a566e0dd57c5e5121e5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e632ea8c124068c1b75f95f8221d7bd7b7fb4e1ea264316a962c7c7935940d6a",
+          "title": "增量索引为什么需要内容指纹与稳定来源键？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "dddd7a84d3dedb9363753a63eb580e22a94f19b684643af0ef12681adddc08e6",
       "title": "索引更新事务失败怎样避免暴露半份文档？",
-      "answerSha256": "5e0b7d92dcba24f28a3521018f2b1b32946a9d8ba4025f37d55149cc41817c96",
+      "answerSha256": "2d8b54c999a089131aaf4580911dc0d6f504fa312decc65918902a4812d54be7",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5e0b7d92dcba24f28a3521018f2b1b32946a9d8ba4025f37d55149cc41817c96",
+          "title": "索引更新事务失败怎样避免暴露半份文档？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4003a7aeea6713ae3e3707992139fe3671767b0e59c059a0c97d9e4a9d86ab85",
       "title": "检索缓存如何跟随索引版本失效？",
-      "answerSha256": "20090e5a6eda925e0ef11952a598d93b45937a5353a97f931379f829f4918251",
+      "answerSha256": "ed046173e43c98f100b2195d1f409e5c0f46c1b96b2477b144f8f4c6df81670b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "20090e5a6eda925e0ef11952a598d93b45937a5353a97f931379f829f4918251",
+          "title": "检索缓存如何跟随索引版本失效？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eb9afce41a80027e6877c0557ffbefedc396e06c4fec536a8126386365e65b8f",
       "title": "如何减少每次查询都全量分词的开销？",
-      "answerSha256": "989adbf206019147bd8fbae8f27362b6926d54ff773a3ba8715a3fde9f2e63c7",
+      "answerSha256": "25094776b5764d30efe7ed62fe746c7bda653dc7a45870d44fe4b1406339742d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "989adbf206019147bd8fbae8f27362b6926d54ff773a3ba8715a3fde9f2e63c7",
+          "title": "如何减少每次查询都全量分词的开销？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ce5025b997b51c90cc6c35afa42e1d4d21d747bfb1608849d1a50921682201eb",
       "title": "重排模型超时应怎样降级？",
-      "answerSha256": "cc08938e1d344c217c32126891c645c088212c27414a74363c6fd971b3dbfcad",
+      "answerSha256": "9c09c6056d398564fcf32d3b4234c19a525940e80e22e4884d614d5a28cd5703",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2310.11511",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cc08938e1d344c217c32126891c645c088212c27414a74363c6fd971b3dbfcad",
+          "title": "重排模型超时应怎样降级？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "152f30bb66469c88b293d790719570cc802b5049690d3f13b04bac65407df531",
       "title": "向量接口失败是否应该让整个问答失败？",
-      "answerSha256": "adc1bfcb12af9edc97944d8d3102100de03ebb91157080f6c3317dcba6fa75c7",
+      "answerSha256": "9dc5e7f008ed82be4fba8f30d4e24a30ec494b7d747630b67e5503ec76361bfd",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2310.11511",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "adc1bfcb12af9edc97944d8d3102100de03ebb91157080f6c3317dcba6fa75c7",
+          "title": "向量接口失败是否应该让整个问答失败？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f08a37a667dff319b726991c166837089a0b38697f17e6250c9005f225020ff2",
       "title": "怎样评估答案是否忠实于检索内容？",
-      "answerSha256": "c9a7b7c898077ce3223790b48fabe91244a1d109f46d60336bf31a6daeec741b",
+      "answerSha256": "c3fcaf171ea1c1555b2d3c0cc813857ba8d2f45e2a56b4580a861e3f54cacfb2",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.15217",
+          "https://arxiv.org/abs/2310.11511"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c9a7b7c898077ce3223790b48fabe91244a1d109f46d60336bf31a6daeec741b",
+          "title": "怎样评估答案是否忠实于检索内容？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "31b98ea02e89bdb12fac455f57ea5c3f2cd500fa3bc677f53cb0f5ab947cb8fa",
       "title": "如何防止模型把检索片段当作系统指令？",
-      "answerSha256": "4ff07d7bf2148d9fbd82a5ccd82634ad6ce91e105e6fff412518d4c8d008d037",
+      "answerSha256": "ec2b0cc3e6d2a4c0cc5c9a17a14068c58772a9510db86da3db3781cdbb84bebb",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4ff07d7bf2148d9fbd82a5ccd82634ad6ce91e105e6fff412518d4c8d008d037",
+          "title": "如何防止模型把检索片段当作系统指令？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "967be9d2be689ec4937051809716d3e9ec053f7a6262ad06047998249a1c907f",
       "title": "长上下文中的证据排序应该考虑什么？",
-      "answerSha256": "3f52bec8dcd0b9520d8912eb2cef4f552ed2508418b6bb793ca15dccd37b8d9d",
+      "answerSha256": "c31ae71318e35baf0c0b69fc72b5036bc4a7a414cbbdc364c4818d0571462597",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2307.03172",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3f52bec8dcd0b9520d8912eb2cef4f552ed2508418b6bb793ca15dccd37b8d9d",
+          "title": "长上下文中的证据排序应该考虑什么？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "3f895b9a1d25be3efb98a33b89c09577ed922e3f1f8e0276ac630725fc1023b0",
       "title": "如何让引用能定位到原文而不是只有文档名？",
-      "answerSha256": "046ce91da5799201132cd3e8baec4ad638b5cc44fc3e5ffda82730bc976cff58",
+      "answerSha256": "2292a47d1730dc16dadc6ab61cb8306b5ac65b59b0bd105c5f1c36920200f1ea",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "046ce91da5799201132cd3e8baec4ad638b5cc44fc3e5ffda82730bc976cff58",
+          "title": "如何让引用能定位到原文而不是只有文档名？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "24807a7e90ea71295d39b80096a1cf34d08e4dc9f928d3b282407b26dc0f0a5c",
       "title": "如何处理模型引用了不存在的片段编号？",
-      "answerSha256": "9c573eb29e6b590a777c031743fecad9e99aadd73e982219033e7ab779b06d32",
+      "answerSha256": "2d6fbef1708b0df5d54020234468d33c8a8b958907b1e0a63429d9feeed84f1d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2310.11511",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9c573eb29e6b590a777c031743fecad9e99aadd73e982219033e7ab779b06d32",
+          "title": "如何处理模型引用了不存在的片段编号？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f2eca7fc163861288e8805178b5a059928391620c67d287cd94e6de8782b246f",
       "title": "LoRA 训练数据怎样避免把评测答案泄漏进去？",
-      "answerSha256": "8be08b774d0c8d104380d853e4e0873f1c9e5ef138219878d40434eef2f382a4",
+      "answerSha256": "5da4753de90ce75db3d7f4195f07948e55fcbab1cb937ece0b0cea6d2ff5c289",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2106.09685",
+          "https://arxiv.org/abs/2210.07316"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8be08b774d0c8d104380d853e4e0873f1c9e5ef138219878d40434eef2f382a4",
+          "title": "LoRA 训练数据怎样避免把评测答案泄漏进去？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f8bb62bc811da2783ad0b78c39938979b70a14357e3f3b4390e129d3802e9385",
       "title": "微调改善格式却降低通用能力时如何分析？",
-      "answerSha256": "2dce10903d88b338f2d35c913240ac46bb1587a57ab4d6aeb86adf2d61288610",
+      "answerSha256": "6b9c1aa61ffb79bd2a3b7882155876c5852161c81d7d3c3004e1bccb9a773ca9",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2106.09685",
+          "https://arxiv.org/abs/2210.07316"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "2dce10903d88b338f2d35c913240ac46bb1587a57ab4d6aeb86adf2d61288610",
+          "title": "微调改善格式却降低通用能力时如何分析？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7b09ec264c0581de6e5df537c956b8d8b7fbd14f634cccbf6dd545b8118f7387",
       "title": "为什么微调不是更新每天变化业务知识的首选？",
-      "answerSha256": "d995f1213ecef615c0d6087354c7151c98eec3eeee908040958de3891f3c491e",
+      "answerSha256": "04de012ef11d26f95d4b0d7621443d60d846754cdcf3e5c418ba8f8006d1bb90",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2106.09685",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "d995f1213ecef615c0d6087354c7151c98eec3eeee908040958de3891f3c491e",
+          "title": "为什么微调不是更新每天变化业务知识的首选？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "bc45ec23617ebb9376b45f2820291c88406e21958d7752791296cd4602292171",
       "title": "如何选择模型上下文压缩与摘要方案？",
-      "answerSha256": "cb608738f2789b0fa61325819b60895c987a7f16b9bb635c386b851041e6e05f",
+      "answerSha256": "e180038dcc5f952c36d4f8fa778fbbe255acd9e3105d742290e6fa555b82311f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2310.05736",
+          "https://arxiv.org/abs/2307.03172"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cb608738f2789b0fa61325819b60895c987a7f16b9bb635c386b851041e6e05f",
+          "title": "如何选择模型上下文压缩与摘要方案？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "03db3d6f9d596d5c43d10227d357b72fabd29fa4fe6ffb30cc060a0b3afef810",
       "title": "KV Cache 为什么影响推理并发与内存？",
-      "answerSha256": "9efdad8c5c0659c57c7d60ec6ff4244774137299f24b77f638ba8c12626c399d",
+      "answerSha256": "ff04722869ad2b2ff26271c625c047df716d4eacefbfd702ca1ace0d5c47f97e",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://arxiv.org/abs/2310.05736"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9efdad8c5c0659c57c7d60ec6ff4244774137299f24b77f638ba8c12626c399d",
+          "title": "KV Cache 为什么影响推理并发与内存？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0d61dd2ef9a622f8abdace907d665ac457f5f30a138f5688c6877313079e7a24",
       "title": "批处理推理怎样兼顾吞吐与尾延迟？",
-      "answerSha256": "245b788ab0468a3adfbd9e1275790aee5c487ab91080fff4aa0a6370be1bfba4",
+      "answerSha256": "98e1348695ab02a27da51170cc18eb9767c2846679312382d10ba152400933e9",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://arxiv.org/abs/2211.17192"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "245b788ab0468a3adfbd9e1275790aee5c487ab91080fff4aa0a6370be1bfba4",
+          "title": "批处理推理怎样兼顾吞吐与尾延迟？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "63532abcf615cfe09992bfcc2f3656f6b07c2950fb7bb09d1a7fa98c0fc24438",
       "title": "模型量化后应该怎样做回归评估？",
-      "answerSha256": "9b6d71e258dd5f48df20f7ff41a19eeed7fc01c76fe5e0e8b9bca6b58bbb7fa2",
+      "answerSha256": "4b730e924bbaffbbb696ab896b9ee180b73e90da3daccbf11924a8c693b4d54d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2210.17323",
+          "https://arxiv.org/abs/2210.07316"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
         {
           "answerSha256": "858e9eb9eb0b46710077e9a9736452f08aeade802f6eecda7185d30dc42c7a89",
+          "title": "模型量化后应该怎样做回归评估？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9b6d71e258dd5f48df20f7ff41a19eeed7fc01c76fe5e0e8b9bca6b58bbb7fa2",
           "title": "模型量化后应该怎样做回归评估？",
           "example": {
             "status": "pending",
@@ -30574,272 +31238,557 @@
     {
       "sourceKey": "05e0a1b45717e313189a8fd3541b739ab4291081c2689fcbaeb668c0ae66dec7",
       "title": "推测解码的收益为什么依赖任务和模型组合？",
-      "answerSha256": "53c8088ba71d87dc2fbcb37cb81b42beea6d7024a0df355598a39bedcd96e336",
+      "answerSha256": "592da7c9480ac9d47a695ef1125911229a67d61a3c2af807c2b826a483bec0e0",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2211.17192",
+          "https://arxiv.org/abs/2309.06180"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "53c8088ba71d87dc2fbcb37cb81b42beea6d7024a0df355598a39bedcd96e336",
+          "title": "推测解码的收益为什么依赖任务和模型组合？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "19ddd23d54790992099f9395240d52fb05ab4a663c6c00a485f24a77feb80413",
       "title": "工具调用参数校验应分为哪些层？",
-      "answerSha256": "4b2f3d11acbd2f45fae0ab6d29ed25ff27aeb3f58d461064562aa7da5c8188df",
+      "answerSha256": "21780129eb86298e01d9b1a8d9c9dbaa0b29ae55e80a32a2cb28c08f3fc54da2",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4b2f3d11acbd2f45fae0ab6d29ed25ff27aeb3f58d461064562aa7da5c8188df",
+          "title": "工具调用参数校验应分为哪些层？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0d4522c444cb78a27519341edf9d4bdea751491c5da78d5c386691e38644aadc",
       "title": "Agent 如何避免重复执行已成功的工具动作？",
-      "answerSha256": "65eb32cb1ab91c6cd7b207d965a858e51143356ef0d7eb74f434a9dbf6f14e5a",
+      "answerSha256": "b834abbbe26833843093138052d832839737e94a08f2ec41eb10fe146c0d36a9",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "65eb32cb1ab91c6cd7b207d965a858e51143356ef0d7eb74f434a9dbf6f14e5a",
+          "title": "Agent 如何避免重复执行已成功的工具动作？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "fec384903d976bdfd1eeb078d50497dc6ca7308ef51d0351551f7888b0040b9a",
       "title": "多工具 Agent 如何处理一个步骤成功后另一步失败？",
-      "answerSha256": "9c599ec25736cc8aacf256a4c1e41510589613a0dbffb777fee83e05c25b94dc",
+      "answerSha256": "563bf505e5d624fc54ec5776df167e18fc04b4fcb57fa2cd1a795b8b16efc6c7",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9c599ec25736cc8aacf256a4c1e41510589613a0dbffb777fee83e05c25b94dc",
+          "title": "多工具 Agent 如何处理一个步骤成功后另一步失败？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "70a09db424afc7a2e121e5dde7e1751468856e238b9613fa3ca63b921f229d69",
       "title": "怎样为 Agent 设计沙箱和最小权限？",
-      "answerSha256": "47e6ad487d0bdb07226718de5682ed396d7317878972ecd5c1a447109923d6b9",
+      "answerSha256": "1913bd3d244f0d85687eb73e63037ffd6fb0c30e0abcf9b948308139f588efaf",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "47e6ad487d0bdb07226718de5682ed396d7317878972ecd5c1a447109923d6b9",
+          "title": "怎样为 Agent 设计沙箱和最小权限？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "de30f86c2f85406b6e367dcfe3b82c3b2dc18bdea81eb9ef6f4d9c00bd1308f3",
       "title": "多 Agent 方案为何可能比单 Agent 更差？",
-      "answerSha256": "d167da574bf1b77787bf659a3210c50ab04ac771ae19dd4aa4663155b5d072be",
+      "answerSha256": "0476d074da1f8d4eafe78e84a3fe65d40b38cbe5f8a91d8d8d73bbb3e9b017de",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "d167da574bf1b77787bf659a3210c50ab04ac771ae19dd4aa4663155b5d072be",
+          "title": "多 Agent 方案为何可能比单 Agent 更差？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "946c40f00a9fd1fa4b3323e00fa36b6325b506ebde73dc5aa8e88d0f4ba1a91f",
       "title": "如何发现评测中的模型裁判偏差？",
-      "answerSha256": "fa25d3027bb6be8c79cc168d47633ff032e6eca52bf7a9e7a9ca80613e04c2de",
+      "answerSha256": "ed3fadedbc46d44ecb4ae9fc61f638f871fa7123e1f6b40c3d9ff9ae9583869b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2306.05685",
+          "https://arxiv.org/abs/2309.15217"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fa25d3027bb6be8c79cc168d47633ff032e6eca52bf7a9e7a9ca80613e04c2de",
+          "title": "如何发现评测中的模型裁判偏差？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9ebc95c708ed3d22cee2b8b49cf45a7e753b252d74c8b3df4943551ba83d7ccf",
       "title": "如何建立面向业务的红队测试集？",
-      "answerSha256": "ab86cb5a6ab87c4dbbe21da256b330fc2ce1d503d2cb3f5864696cb3db3c79d3",
+      "answerSha256": "16a0f79207f19436b589c41a2f1c07be72fe4c94987a67e886871851f5708e6d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ab86cb5a6ab87c4dbbe21da256b330fc2ce1d503d2cb3f5864696cb3db3c79d3",
+          "title": "如何建立面向业务的红队测试集？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "770e01b7ad79486f5b94e422782e249038dc47a321972c2f496c43f1aa0475b6",
       "title": "为什么 AI 日志不能默认保存完整提示和对话？",
-      "answerSha256": "063bfe69e06527a114e13fb074892eddbe3cdf3f06008f8b04b41d78f3011de2",
+      "answerSha256": "ddee118f009725c349e2a981edd7472d80f8db492a4fb397fd8e95d890491790",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "063bfe69e06527a114e13fb074892eddbe3cdf3f06008f8b04b41d78f3011de2",
+          "title": "为什么 AI 日志不能默认保存完整提示和对话？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "737d800ef47ce99828d3af2d9f9ea9a64d8a7f354ab9465995b5b93796d2addb",
       "title": "如何设计模型网关的公平配额？",
-      "answerSha256": "f42745d1c4da7570b3493756d923d6aa3fd737e9cef7fa5b4fc87468af3c9bdb",
+      "answerSha256": "8d116369e4d923d8792fbd21683cec1ddb1ee92bcc9343ea6de50a7ed32c143a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2309.06180"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f42745d1c4da7570b3493756d923d6aa3fd737e9cef7fa5b4fc87468af3c9bdb",
+          "title": "如何设计模型网关的公平配额？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "22596d522a3007ad42c33ff110651ffd4cd1f3b6b661a111d3f916cc1403b4b7",
       "title": "如何建立模型故障的可解释降级链？",
-      "answerSha256": "024a780d3319996c51b7e82fce9f87bacb0e1d815f9892caa886f40a934f7357",
+      "answerSha256": "e32c19294bab490f65251665bc51fc03343c2bfa2b7bfd5cfcd5a833721cac4b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "024a780d3319996c51b7e82fce9f87bacb0e1d815f9892caa886f40a934f7357",
+          "title": "如何建立模型故障的可解释降级链？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4877ef0325aee15e124fb9f04df165761ff756f484fb9e02d50e11e7b253a18d",
       "title": "模型回答质量突然下降怎样定位？",
-      "answerSha256": "4049ef72f855b9a10d4e1ca5e994b16e47f9b7f126379eafafecfdf24ed9dc41",
+      "answerSha256": "dc7028b90ca06822e4ae0231b9ed539a379ecd274cc5aa6e48e945af9beb6aab",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4049ef72f855b9a10d4e1ca5e994b16e47f9b7f126379eafafecfdf24ed9dc41",
+          "title": "模型回答质量突然下降怎样定位？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0cf77cab88eff6958f274eca884fac1a6b4dcbd411aa348707ca5163ddc8992d",
       "title": "离线效果好而线上失败多时应检查什么？",
-      "answerSha256": "fba5278e465a95d0245fe7e126239c5131cc978cf1ce7b02f96263b1cf1244cd",
+      "answerSha256": "3ac2b4fab2d4cfa7f00d02c22acfcb4e8b6f6cf261319413206162a290c65ccb",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "fba5278e465a95d0245fe7e126239c5131cc978cf1ce7b02f96263b1cf1244cd",
+          "title": "离线效果好而线上失败多时应检查什么？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2186d792875289cad22f3dac61760354a615f8f5905e40d93d17923cd34858da",
       "title": "怎样设计 AI 实验的上线与回滚标准？",
-      "answerSha256": "061b84846e86cedca37624b4785f6308a49b5fbb092b15bf9ceb2642be2201bd",
+      "answerSha256": "c65f208ca9ddd7138aefddd937751aca03f843bb70c0dcbe41c2f667923e6f5d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2309.15217",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "061b84846e86cedca37624b4785f6308a49b5fbb092b15bf9ceb2642be2201bd",
+          "title": "怎样设计 AI 实验的上线与回滚标准？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "2111cbc4197f8f245b61702c5083e42c2244f44eb6f89d4d273e07775d3cf561",
       "title": "资深开发应如何解释 RAG 方案的适用边界？",
-      "answerSha256": "1b2d6e3e6e6ac62d722e95b07f933a428c34402dc25dfc9fc81f5f7602f27dce",
+      "answerSha256": "9c357805d75b2970b3490664ab0f675ff7e2385e0021861cf780c55958c210ca",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(X1/X2/X3 确定性模拟)",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1b2d6e3e6e6ac62d722e95b07f933a428c34402dc25dfc9fc81f5f7602f27dce",
+          "title": "资深开发应如何解释 RAG 方案的适用边界？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4883b9cd72d09a2696b1b12fe43ed8f55ef12317a5832ac615fd708c8e477b6f",
@@ -39892,92 +40841,187 @@
     {
       "sourceKey": "2001d4d62b9ae3e335cbe4bed9b36a98a23cc5e01f7280724324fbd53e6372a9",
       "title": "企业知识助手上线前怎样确定最小可用范围？",
-      "answerSha256": "e5d6b9855aae23ae50284600fe8e7233eafc8880183a893842663efe87031bb4",
+      "answerSha256": "d8c5d082f567b6aa3894bcc2f0a5090c226a30c8ef223c84998d6fcdae4b0ae4",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e5d6b9855aae23ae50284600fe8e7233eafc8880183a893842663efe87031bb4",
+          "title": "企业知识助手上线前怎样确定最小可用范围？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d636b57bfae14e90891c6fe4bb6f58326708c3d3b7bc732be81230594c5f17ea",
       "title": "知识文档导入链路应该包含哪些治理步骤？",
-      "answerSha256": "06abac10d84bba5bb6f85829f7700ff2407c97c3e598c8ee765e538f539602b5",
+      "answerSha256": "748ccbcb30f285bf16198ad8127758dd14e8f397952f5768f67066942ce85e07",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "06abac10d84bba5bb6f85829f7700ff2407c97c3e598c8ee765e538f539602b5",
+          "title": "知识文档导入链路应该包含哪些治理步骤？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4422ee3ae02bd1a68d29ae16853eea6556047f198d0d5185cf59cc7cd96c9041",
       "title": "扫描 PDF 和普通文本在入库时有何不同？",
-      "answerSha256": "8b8cc1a700bc394dbc5a34bec84aa1177fd0608aa8357f50eab150746490b761",
+      "answerSha256": "bcb547e6fea1453e31ddd08547146a03c220ec0d6fdebb3d97a32e5906510f05",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "8b8cc1a700bc394dbc5a34bec84aa1177fd0608aa8357f50eab150746490b761",
+          "title": "扫描 PDF 和普通文本在入库时有何不同？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a8dc1ac7a11fe847716a1ccc4d697d2510cf9f36a6f217b155cc25ee218642bd",
       "title": "如何让业务人员发现知识库中的错误资料？",
-      "answerSha256": "5bfbdc6ed5cd6212edf673dc0f06889937ed880d62206eb04abcd24cdc701acf",
+      "answerSha256": "57dcf73c6b8ca1dc08af48dab3afe3da37f12cd19636afa738e5cb94967aff98",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5bfbdc6ed5cd6212edf673dc0f06889937ed880d62206eb04abcd24cdc701acf",
+          "title": "如何让业务人员发现知识库中的错误资料？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b3f93792d73a056473918e1b7ed22e89571e5218526570d27db80f31a9994d45",
       "title": "知识删除为什么必须考虑所有副本？",
-      "answerSha256": "9639d059617b28895f632e10d6d83b259f8c486191625b7311f214a4ef205eb2",
+      "answerSha256": "0936926ed3a47a28896eba02754fa6eeef14af0c21415f03260249cbcd0b5952",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9639d059617b28895f632e10d6d83b259f8c486191625b7311f214a4ef205eb2",
+          "title": "知识删除为什么必须考虑所有副本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "f7687608d35db523205b65fb587b4e79db9b8eacfc712c009240814da9e0d847",
@@ -39989,10 +41033,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search",
+          "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -40046,560 +41093,1149 @@
     {
       "sourceKey": "6044c9368706b389a199064c06a054d9c045ef66313b84b13a6b371093a5c2f3",
       "title": "企业权限继承如何映射到知识片段？",
-      "answerSha256": "2433832f2ba609277307438459bcf5d14f8af8fb625dd8531f2694a6d67098ee",
+      "answerSha256": "42650742823c2a9240eaa9e1f1e2992810a1a4c0c36f1d89b548e882713c06e3",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "2433832f2ba609277307438459bcf5d14f8af8fb625dd8531f2694a6d67098ee",
+          "title": "企业权限继承如何映射到知识片段？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "bcd6021e93e398846d10c4c4aa806c6762fab7cf1542bfc06f2279ced2327035",
       "title": "如何解释 AI 功能的资料发送范围？",
-      "answerSha256": "93093b67edc9799e7454539e35ffafdc390268f18368d6df8458225de8375c9d",
+      "answerSha256": "e49fa2165b68f09f010970eb4dd2a15cb606e9dfed6756ddf75992c0f258740d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "93093b67edc9799e7454539e35ffafdc390268f18368d6df8458225de8375c9d",
+          "title": "如何解释 AI 功能的资料发送范围？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "665edbaa70279b95a880efa818693ead25dc5cc547e96814f4fb7208dbfbeded",
       "title": "模型服务商切换需要验证哪些兼容行为？",
-      "answerSha256": "e032e367253c87ce52f13d8619311fc02010fca1e7cb330a6620c00f8f88b9d9",
+      "answerSha256": "2854abf5f096ec5befe2be310937de0854cb842c25e7add29986266582a5c44b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e032e367253c87ce52f13d8619311fc02010fca1e7cb330a6620c00f8f88b9d9",
+          "title": "模型服务商切换需要验证哪些兼容行为？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9d0fe94baf26c24a919d2b57e44613880382dcecbf42ea551ef3fe75f5863625",
       "title": "如何设计可轮换的模型连接配置？",
-      "answerSha256": "122ac678d11b799f898a78791a7427380d7ce9c50a5ecd47fcdafa15ca1fddf2",
+      "answerSha256": "f594393e0cbb957a19e7762df8072e5c6f50406e9d538368823aaa00432bbeba",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "122ac678d11b799f898a78791a7427380d7ce9c50a5ecd47fcdafa15ca1fddf2",
+          "title": "如何设计可轮换的模型连接配置？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a160ad7148c041f0140afa66976f45002911799fa121471ea818766ea0ee52df",
       "title": "模型网关怎样隔离聊天与向量任务？",
-      "answerSha256": "1170d08ad8fb7ec032a91910733efdc6a9ed0b6fb1a852fea56451614a423d55",
+      "answerSha256": "69ee1e914766c98e9228076d2fce063e34a2af199d7f6520b68680a305706b01",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1170d08ad8fb7ec032a91910733efdc6a9ed0b6fb1a852fea56451614a423d55",
+          "title": "模型网关怎样隔离聊天与向量任务？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0fb00333eb0dd7df55fde91530569152c612a3f3fb04af38ec2a8aa5944cf712",
       "title": "为什么索引构建需要分批和可恢复进度？",
-      "answerSha256": "9d2f3ab65b54b34cfaf6c8246bfcaf3d0231154a18c414c6b5e3f6f4e27a40f6",
+      "answerSha256": "25c4d88d826d532721e39f60077ca342162c6a06ab9c087833312cb0db44a202",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9d2f3ab65b54b34cfaf6c8246bfcaf3d0231154a18c414c6b5e3f6f4e27a40f6",
+          "title": "为什么索引构建需要分批和可恢复进度？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "e961f5bf89d3b994b18a372d3322af1108471c2468bbfcb77fa114cbdd8e2c81",
       "title": "构建向量期间题目被编辑怎样避免索引污染？",
-      "answerSha256": "725bec50c468704b147bb2331ef52197f0ffc31ac0efabe6a6d372fe21d3b39b",
+      "answerSha256": "67a41e81a75eae72fc6e6b8511cc35486c47276db2535b221a2e1c390f4e4e6b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "725bec50c468704b147bb2331ef52197f0ffc31ac0efabe6a6d372fe21d3b39b",
+          "title": "构建向量期间题目被编辑怎样避免索引污染？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "944a4d0819df9cccfd725130e75654761a9614274e4354943df3b070c8e5c6a1",
       "title": "模型或向量接口暂时故障时如何保持可用？",
-      "answerSha256": "4fd5f7594a13bbaf88c48559614f94a432aa851c896a4319e1adaf7fbdef5d80",
+      "answerSha256": "2882dc7b684543bbef98fe42bc6a0d5e54ed91e611db83e14bf7040abddbc571",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4fd5f7594a13bbaf88c48559614f94a432aa851c896a4319e1adaf7fbdef5d80",
+          "title": "模型或向量接口暂时故障时如何保持可用？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "aaf93247cbda8f1584eb3677b572485640bbd6b42597fd06ebd0b39fd21822b3",
       "title": "如何为 AI 请求设计账号和全局并发限制？",
-      "answerSha256": "4b57c02f69b15b3e34ab40c582f40e577e27f5276cae150b9220cb8101b97f86",
+      "answerSha256": "cf41d963655c214537f84b09e0501cdca11615f46877e0e88a25e76ace711fa6",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2309.06180"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4b57c02f69b15b3e34ab40c582f40e577e27f5276cae150b9220cb8101b97f86",
+          "title": "如何为 AI 请求设计账号和全局并发限制？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0805617015aa48c337839a1c84d922b510c83d6fcab1acf2554d42169800d980",
       "title": "浏览器超时后如何避免服务端继续无限生成？",
-      "answerSha256": "83a1d4f3abb506b789f38dcf3626a5798270731cfd4d9397bdd4e62ee080af48",
+      "answerSha256": "715fd48a6be0d725faf018e83e73de41c69dd95d00cb65ed69d14ccadd5ed9ee",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "83a1d4f3abb506b789f38dcf3626a5798270731cfd4d9397bdd4e62ee080af48",
+          "title": "浏览器超时后如何避免服务端继续无限生成？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c8121970fac9762b260673b2c49a4477cfa7c83fcd6f3a18ff8b3b13f9dd3b6b",
       "title": "流式 AI 页面如何处理断线和重复内容？",
-      "answerSha256": "c8e84a22941689681f5bf89397f327839ee671ebc5f166f7d84cdf1d8d14785f",
+      "answerSha256": "e6b4b901a0be7000217172ff0e8d39df5bc887dabb4cfc53892795173bedd9ab",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c8e84a22941689681f5bf89397f327839ee671ebc5f166f7d84cdf1d8d14785f",
+          "title": "流式 AI 页面如何处理断线和重复内容？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "bf1f11046ea95493ff8e44a25f079cc2b64c2b64c8f5577a17aa3d123f8a686d",
       "title": "AI 回答怎样进入正式题库才可控？",
-      "answerSha256": "4b69388fd59640e900ecba3ab37c99e4b73e03f41b2a10fd8238db7c05b75d25",
+      "answerSha256": "2610b74f9b992a03a86e2a6fd19273c729d48a62acc361527817c0bc64552f49",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4b69388fd59640e900ecba3ab37c99e4b73e03f41b2a10fd8238db7c05b75d25",
+          "title": "AI 回答怎样进入正式题库才可控？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9043c16f0c21f69595cecb423461838a5c05c1dc40af219b78e206e478dc0a61",
       "title": "如何把 AI 生成来源和人工编辑历史分开？",
-      "answerSha256": "7c877d8bc378eb3b25b596ac8347e64dadad6c5cfcaf9fea1f40b26276967d2f",
+      "answerSha256": "803294598c40a7eaf61790c17cbb0e4c49934758550d2ef15f386d3dc07bd436",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "7c877d8bc378eb3b25b596ac8347e64dadad6c5cfcaf9fea1f40b26276967d2f",
+          "title": "如何把 AI 生成来源和人工编辑历史分开？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "049db8815251dd2eef3df63addecb88f2b191408906989ab6d11bf3fdf32a361",
       "title": "如何防止模型自我生成内容污染后续 RAG？",
-      "answerSha256": "2310907a0783df2da7c0244d87a98e16fe33405e9f6e67f9306cc642f927961f",
+      "answerSha256": "d5393f5d4d550c9510cc51e0f08ce3da50d30113bb121c8ea79200066a77f9ef",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "2310907a0783df2da7c0244d87a98e16fe33405e9f6e67f9306cc642f927961f",
+          "title": "如何防止模型自我生成内容污染后续 RAG？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "292ecbe08674dfd8d911620b2257229e83a1aca09001f44fee50eafed8ccf308",
       "title": "AI 日志应该如何兼顾排障与隐私？",
-      "answerSha256": "89e57d5713b55e7ee66718dc6f4543df4dcb80bbd65b03834bffd573950a60b7",
+      "answerSha256": "e3fdefe7557038d0bf62ca2c123f0a60197ead6f0fa8b871ad655bbda74d8072",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "89e57d5713b55e7ee66718dc6f4543df4dcb80bbd65b03834bffd573950a60b7",
+          "title": "AI 日志应该如何兼顾排障与隐私？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5c048956bb06eb39fbf7556b04491cb976528bb25ee08990c55ea76766b52c0d",
       "title": "如何估算每天的 AI 预算？",
-      "answerSha256": "07c193d7df92fb21690b5e869a112a173464404346de1f5b4823d1a8b36da092",
+      "answerSha256": "cae54acd2ab597da77c7170d2f9464fa4a47e471b832b852b438bcfcd2dd390b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2309.06180"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "07c193d7df92fb21690b5e869a112a173464404346de1f5b4823d1a8b36da092",
+          "title": "如何估算每天的 AI 预算？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a3d42078b56341b6135f9bd17e1780b7bc4f7910adb97bf62f0626ef265ada84",
       "title": "多轮对话历史怎样设置保留策略？",
-      "answerSha256": "5283e7c7e61b70376afbde24d2be10414b4462fd4c3cdba5eb79514cdc29212d",
+      "answerSha256": "8d89c6d6bf9ba8d5eca7b2e01cffbdea075e00eb17f4d68ff68aa865c18154d5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2310.05736",
+          "https://arxiv.org/abs/2307.03172"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5283e7c7e61b70376afbde24d2be10414b4462fd4c3cdba5eb79514cdc29212d",
+          "title": "多轮对话历史怎样设置保留策略？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4e12c3ae5b8745aecc0bc84beadc0440e91897b71cae4c7eed4ab3c4414459de",
       "title": "缓存 AI 结果时如何避免权限变化后泄漏？",
-      "answerSha256": "05762609d788e415c8c4aeaa4dde1ebd7d3416629e707f7eb6127c4c52ba4859",
+      "answerSha256": "1ec2d592c4c93da06b04df6fd51fe42bfe98564c4725d56ff6ccd8f6ff8b2a29",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "05762609d788e415c8c4aeaa4dde1ebd7d3416629e707f7eb6127c4c52ba4859",
+          "title": "缓存 AI 结果时如何避免权限变化后泄漏？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "b443d00eb16286522a108004cefb7f4d0a80739d3955b8ce105fbaa8bb5276c0",
       "title": "如何给企业术语和缩写建立检索支持？",
-      "answerSha256": "e544e5c3e70e16b30d1167291bf0ced2a37f1840ae0f139e49f760c6f8947ad5",
+      "answerSha256": "87cd7a139d425984af408e9365ed039c1035880f12832fa61db212cb5a7aeb71",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e544e5c3e70e16b30d1167291bf0ced2a37f1840ae0f139e49f760c6f8947ad5",
+          "title": "如何给企业术语和缩写建立检索支持？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d74f00f85f616c612bde015e92ab139765d8eae99c8862eea86292e78b9a53f2",
       "title": "评测集如何覆盖资料缺失与过期资料？",
-      "answerSha256": "e9832619ab53544abcadb12b8f939aecdaccc522dd3166c50a9fefcb793deed6",
+      "answerSha256": "3a4a3f12e9b73e70ccca30f2a5ed083224b5a4f40ce40d5bcde2c7db176d8a8a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "e9832619ab53544abcadb12b8f939aecdaccc522dd3166c50a9fefcb793deed6",
+          "title": "评测集如何覆盖资料缺失与过期资料？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5c10504bb1cc11e8324f23b455d8a9cb0bbbfacf57612e1d047a07a3639003c8",
       "title": "怎样在线收集有用的 AI 反馈？",
-      "answerSha256": "ea27c7137c08699d7e730dd2b62c3b478a56d57bf90d0b27eb0add4741f3da28",
+      "answerSha256": "b2f6ecd674d67942104225aa13b8da6b6bd9c96e1bdec1d77582a64368fe3910",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "ea27c7137c08699d7e730dd2b62c3b478a56d57bf90d0b27eb0add4741f3da28",
+          "title": "怎样在线收集有用的 AI 反馈？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "be81f2e7485ae85f50012a01c01a26e14ef55b1439a00bd62155c4fd3149530f",
       "title": "如何设计高风险回答的人工复核？",
-      "answerSha256": "f808ce9388fdbf9d7596b737b0494bac005b381c50ae50ccab07ea4b12462f32",
+      "answerSha256": "e2162678f40cc619ff0d984bf5012f105d583bbc466daefef0bf5a398a88c3a5",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "f808ce9388fdbf9d7596b737b0494bac005b381c50ae50ccab07ea4b12462f32",
+          "title": "如何设计高风险回答的人工复核？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "91de37fe73a78d5588a98609e49e3b41f764427de885560239fee4a7ff6f36f1",
       "title": "让模型查询数据库时应限制哪些能力？",
-      "answerSha256": "1cbb97d93f1c4ca5ffd264441f138c1dccbc53fecd7f9e1b1de07d2f3f64f867",
+      "answerSha256": "3c7161dce53e3a247c4a639a8fd9826c4360a480342fb6a07d67016c9c7d6480",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1cbb97d93f1c4ca5ffd264441f138c1dccbc53fecd7f9e1b1de07d2f3f64f867",
+          "title": "让模型查询数据库时应限制哪些能力？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "0d37c15b05d4c2cac2d2d8d083ac7f8b61d73600e63aa28ec744a29d982ec94e",
       "title": "AI 工具涉及修改数据时如何设置边界？",
-      "answerSha256": "1c17b56cd4994022c3a3a80d4fdf66f6310ccccf4cba3b02428056184c5f5ece",
+      "answerSha256": "058caf7590d98dcdd2fc9d22e403cf317c56c9f16bf0a5bef95ea5ecae7957e4",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "1c17b56cd4994022c3a3a80d4fdf66f6310ccccf4cba3b02428056184c5f5ece",
+          "title": "AI 工具涉及修改数据时如何设置边界？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ec4e6e6c5b7dff4a9b1bdc1741f5e3156c6d2d0b6be897730dd40005c93e87ca",
       "title": "客服 Agent 怎样避免擅自承诺退款或补偿？",
-      "answerSha256": "4e03817518ae89eb2163f17f0517d421b33687188c2d6f1dcc218fc548987d0b",
+      "answerSha256": "6491476004daf395c4c5aa98c1ac1f61d50ffafa8feba02aef1b3d3d49191e6d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "4e03817518ae89eb2163f17f0517d421b33687188c2d6f1dcc218fc548987d0b",
+          "title": "客服 Agent 怎样避免擅自承诺退款或补偿？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5dd99008cdf24bdfeb05807f54e5c8c89399a1ae8fe342eb9f11fd1796da63ae",
       "title": "如何给 Agent 的外部网络访问设限？",
-      "answerSha256": "702e7194255e224f3deb509b80773b0188a21d7bbbbdd18e8705f193e206b17b",
+      "answerSha256": "95a3da37afa70913afe32f286fee1f7eb2470a2a33743f4f438875520a7a7462",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "702e7194255e224f3deb509b80773b0188a21d7bbbbdd18e8705f193e206b17b",
+          "title": "如何给 Agent 的外部网络访问设限？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "9dbc8217a26c9b51fabb85291bd5a7b9efe847131713a6a65f06c3541f36ac3e",
       "title": "文档中的隐藏指令如何在上线前测试？",
-      "answerSha256": "0fad5978f81fa7a94bc023a4605820e5cdbfe1df2142b05911fcd701ace8de50",
+      "answerSha256": "ff82ed1a495e7e580c7afbae3c8664942c7922d8d485d2e052cdd608db172adc",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0fad5978f81fa7a94bc023a4605820e5cdbfe1df2142b05911fcd701ace8de50",
+          "title": "文档中的隐藏指令如何在上线前测试？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "6f326810c50b089dab69166361ebd0dad18f1527c60cffef0b40d6aec325ba3f",
       "title": "如何设计 Agent 的任务状态机？",
-      "answerSha256": "a35412c4a4de0056c4cbacabf09a831de3698cb1c3e1645efd040d0a5a85c52e",
+      "answerSha256": "6f1a64db3198ef76be8cfebc52256f14889bff8736e0b5e744f715e16e9ff2d2",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "a35412c4a4de0056c4cbacabf09a831de3698cb1c3e1645efd040d0a5a85c52e",
+          "title": "如何设计 Agent 的任务状态机？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ccc25e30f93dd1e9f0dd52462c99d30164f189f8a38a446f494be69f9ea4b537",
       "title": "多步工具调用失败怎样恢复到可解释状态？",
-      "answerSha256": "3558eec3bda291c5e45b71008066cbae9196f8ba93ae019092dec621502d5fe6",
+      "answerSha256": "a3b9daead2dcd41c704ac8ecf31b430012dfb176fcf5f3fa7168d2c4178b416c",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3558eec3bda291c5e45b71008066cbae9196f8ba93ae019092dec621502d5fe6",
+          "title": "多步工具调用失败怎样恢复到可解释状态？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "ae682d3b4ff30d9b48f8c2117d040ff5a98d68a2e6339713b6b8a62b1d770ac4",
       "title": "如何限制 AI 功能对主业务数据库的影响？",
-      "answerSha256": "0d2f7d086e4d03dad115ec35a1b3fd10e8525c0658663736e64283db13ccd198",
+      "answerSha256": "35980a132acba7544bb11e0284d9c729043a5c84c42587d26125074b9fd8028f",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2309.06180"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "0d2f7d086e4d03dad115ec35a1b3fd10e8525c0658663736e64283db13ccd198",
+          "title": "如何限制 AI 功能对主业务数据库的影响？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "c811f349cc6e370fcff32fa8bd9634af663997f4801a95019fc784e89731266b",
       "title": "嵌入式向量存储何时需要迁移到专门系统？",
-      "answerSha256": "5407900054f2194dff31bea416a23a67af723b402c96614b7d0780236a52979c",
+      "answerSha256": "7caed383b66d42826556c8c1ef634b3c71cdb6e7539a945054fd09926c56b236",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "5407900054f2194dff31bea416a23a67af723b402c96614b7d0780236a52979c",
+          "title": "嵌入式向量存储何时需要迁移到专门系统？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "52c519c4e87b658b633db6c3b3662dcd383b5601b0dcc454cdcc6b11fb8487ac",
@@ -40611,10 +42247,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/handling-overload/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": []
@@ -40622,200 +42260,409 @@
     {
       "sourceKey": "2008eea29ad8fbc7e60721973832000e4994c44aa38d8fc75a1265d2b1fed1be",
       "title": "AI 上线灰度应该怎样按用户和任务划分？",
-      "answerSha256": "83895f60e6a7b7c44ca23d976267ff567dad1bf5a68e0029d07561de864277e1",
+      "answerSha256": "68c14e1bd6d6e8e8605f10ee7c236366d77a349481d755d4a26ea7d69e1a2481",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "83895f60e6a7b7c44ca23d976267ff567dad1bf5a68e0029d07561de864277e1",
+          "title": "AI 上线灰度应该怎样按用户和任务划分？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "42fbc5acaf97796e16fd75418242fec1c0506d4f19000c35540e23fd85c1f162",
       "title": "模型升级后参考答案风格变化怎样治理？",
-      "answerSha256": "dc3e79bf778f3fd1e88a649f5c1b9f7b38fbbb1fc2df0b2351dd5f27136e6d82",
+      "answerSha256": "ded9484cc458c1872bf5f7cc93ec402f44efeaa8192221c615c8ba301c209e9d",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2306.05685",
+          "https://arxiv.org/abs/2005.11401"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "dc3e79bf778f3fd1e88a649f5c1b9f7b38fbbb1fc2df0b2351dd5f27136e6d82",
+          "title": "模型升级后参考答案风格变化怎样治理？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "d5ff1c20ffa800951d2cd97ffd207c7b8f2df5acc6d88cb44fa8e49081e1874e",
       "title": "如何处理供应商返回空回答或异常结构？",
-      "answerSha256": "9b38dd81a5787947f13941b9ffb903a4d8ad2935211b57a0b175252ec2886795",
+      "answerSha256": "af33cf0957d8f431bd37aee6fe5c239f9271d817c453d975232d3fff5ab83ed4",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9b38dd81a5787947f13941b9ffb903a4d8ad2935211b57a0b175252ec2886795",
+          "title": "如何处理供应商返回空回答或异常结构？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "059172b3236c1e802820684ade72e44254e309b15eb797b3320721d9f025adaf",
       "title": "AI 系统健康检查应该检测到什么程度？",
-      "answerSha256": "12d574361a3623f67f9606dc84de7dd5d2a843272b9ebb645bf713b51bdf61cf",
+      "answerSha256": "b928108bbc33a02d53ef4fc237aed9132bba44aa73c703d63c68adb20429eb28",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "12d574361a3623f67f9606dc84de7dd5d2a843272b9ebb645bf713b51bdf61cf",
+          "title": "AI 系统健康检查应该检测到什么程度？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "7d1b85baaedffc031d92741b9e7753b3bcfc3cd282e0a7a5f5a2fe9543f3610c",
       "title": "如何设计 AI 功能的紧急关闭开关？",
-      "answerSha256": "76bf69ac2eb05567a7e7813dcbad9900f144c89f0777fea26eb2800efc6cb5a4",
+      "answerSha256": "88ffccda31d7d90f10f2caf53fc122e8004f3e8fc7f5852dfbbe88bae56e347a",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "76bf69ac2eb05567a7e7813dcbad9900f144c89f0777fea26eb2800efc6cb5a4",
+          "title": "如何设计 AI 功能的紧急关闭开关？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eb808aa2cd2513cc1efdc62736d88bee30291ca4991bd14abdcaed0cba14de24",
       "title": "如何确保 AI 问答不会突破现有账号权限？",
-      "answerSha256": "9c3e2fe280f3d0c7586a12c07ae95f0a3519b5491fb54acf4fd1c3b6f275ee0a",
+      "answerSha256": "60ae8ab731b2678574d2f899675fd0877bff8e83c5d66fb5a31a02ea3c9f1c41",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9c3e2fe280f3d0c7586a12c07ae95f0a3519b5491fb54acf4fd1c3b6f275ee0a",
+          "title": "如何确保 AI 问答不会突破现有账号权限？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "5c35f3da2c5d254768b0c9733f315c63fe33eebcb768fec9eab5b31c3b08b115",
       "title": "如何解释本地模型与远程服务的成本取舍？",
-      "answerSha256": "c14e8503b7cb04073a34d27f69aee1c1058aa8af0dec6b3ea5e483b51379f717",
+      "answerSha256": "da1ed0147bbe51389ce7595773e3a3470a6d45f969cac958d59b8860c36f955b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2309.06180",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "c14e8503b7cb04073a34d27f69aee1c1058aa8af0dec6b3ea5e483b51379f717",
+          "title": "如何解释本地模型与远程服务的成本取舍？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "1ad5aefac076558ec818eb200d534be980ca36e09f00cae437e19520091d52b5",
       "title": "如何为 AI 事故提供可复现证据？",
-      "answerSha256": "cfced0b8c848ff940bbd173545e3eb50d58beed3d4362f994a65c5b87b972d0b",
+      "answerSha256": "814eee7de1a63c02e11165464708cc94b194c6d892bbabe7f00d5584a2db26dd",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://genai.owasp.org/",
+          "https://sre.google/sre-book/service-level-objectives/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "cfced0b8c848ff940bbd173545e3eb50d58beed3d4362f994a65c5b87b972d0b",
+          "title": "如何为 AI 事故提供可复现证据？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "4e5b248a11f58bac2c7c5b62912444ebd1854caf3d3af9addfa776a04b64155e",
       "title": "如何让产品文案准确描述 AI 能力边界？",
-      "answerSha256": "9b81a3308a40ca3c34447f260c9398c9e163f02ddcd12f11bfe0e1e075eff83e",
+      "answerSha256": "f8df948b6720860aa3f7d61569d17695d206d36e9684083fd22cc47b73057044",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "9b81a3308a40ca3c34447f260c9398c9e163f02ddcd12f11bfe0e1e075eff83e",
+          "title": "如何让产品文案准确描述 AI 能力边界？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "eff563a6d297242144aeb9742a262474f7de638c3a3ccd9ba6f2d00e625bc6a6",
       "title": "怎样判断一个 AI 试点值得继续投入？",
-      "answerSha256": "6a53f81ac95a669f4ae6d88c33c93b0e729867dd6c54b695818996eb9b44ea48",
+      "answerSha256": "4540489f36aa29d8c2af961cd470944c7347e728641a39cd1f23d974d6d61e02",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://arxiv.org/abs/2306.05685"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "6a53f81ac95a669f4ae6d88c33c93b0e729867dd6c54b695818996eb9b44ea48",
+          "title": "怎样判断一个 AI 试点值得继续投入？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "a3066812c242b4dbe2890d46c8d86a2b7b7cd3cef4bd70a6a8cebc13d9b84e7c",
       "title": "AI 落地方案应该交付哪些运维材料？",
-      "answerSha256": "3c928b3e0404634dc7ed14fcbdbc479823b9d1d3f106b8ee30818240c8f1e823",
+      "answerSha256": "9bf728c8551006c2ab0c111cf255160e5436547bf30bf220dc463aa5ae0e8687",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://sre.google/sre-book/service-level-objectives/",
+          "https://genai.owasp.org/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
-      "history": []
+      "history": [
+        {
+          "answerSha256": "3c928b3e0404634dc7ed14fcbdbc479823b9d1d3f106b8ee30818240c8f1e823",
+          "title": "AI 落地方案应该交付哪些运维材料？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        }
+      ]
     },
     {
       "sourceKey": "40a3e7783976c27dfd7b14dba3a0b58ddbb6f64cd46391d1160570d87e3166dc",
@@ -40827,10 +42674,15 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17.0.17 实测(Y1/Y2 确定性模拟)+本仓库实践锚点",
+        "evidence": [
+          "https://arxiv.org/abs/2005.11401",
+          "https://arxiv.org/abs/1706.03762",
+          "https://arxiv.org/abs/2106.09685",
+          "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        ],
+        "reviewer": "zcode-review-20261114"
       },
       "manualMerge": "not-assessed",
       "history": [

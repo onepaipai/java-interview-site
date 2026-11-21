@@ -306,6 +306,7 @@ class ArchitectureTest {
   @Test
   void accountBudgetAndFailedWorkReleaseSlots() {
     var gate = new AiGate(2, 2, new OperationalMetrics());
+    // 失败的调用退还预留：模型故障不消耗额度，槽位立即释放。
     assertThrows(IllegalStateException.class, () ->
       gate.execute(
         () -> "reader",
@@ -314,6 +315,7 @@ class ArchitectureTest {
         }
       )
     );
+    assertEquals("ok", gate.execute(() -> "reader", () -> "ok"));
     assertEquals("ok", gate.execute(() -> "reader", () -> "ok"));
     assertEquals(
       429,

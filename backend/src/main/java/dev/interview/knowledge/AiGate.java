@@ -60,24 +60,39 @@ public class AiGate {
     }
     boolean acquired = slots.tryAcquire();
     long start = System.nanoTime();
+    boolean reserved = false;
     try {
       if (!acquired) {
         metrics.increment("ai.rejected.busy");
         throw new ResponseStatusException(TOO_MANY_REQUESTS, "AI 服务繁忙，请稍后重试");
       }
       reserve(name);
+      reserved = true;
       metrics.increment("ai.accepted");
       T result = work.get();
       metrics.increment("ai.succeeded");
       return result;
     } catch (ResponseStatusException e) {
       metrics.increment("ai.status." + e.getStatusCode().value());
+      refundOnFailure(name, reserved);
+      throw e;
+    } catch (RuntimeException e) {
+      metrics.increment("ai.failed");
+      refundOnFailure(name, reserved);
       throw e;
     } finally {
       metrics.add("ai.duration.nanos", System.nanoTime() - start);
       if (acquired) slots.release();
       active.remove(name);
     }
+  }
+
+  /** 上游调用失败时退还本次预留，让模型故障不消耗用户每小时额度。 */
+  private synchronized void refundOnFailure(String name, boolean reserved) {
+    if (!reserved) return;
+    var queue = usage.get(name);
+    if (queue != null && !queue.isEmpty()) queue.removeLast();
+    metrics.increment("ai.refunded");
   }
 
   public int availableSlots() {

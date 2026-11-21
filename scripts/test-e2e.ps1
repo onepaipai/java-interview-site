@@ -1,7 +1,8 @@
 param([string[]]$Suite=@('test:learning-reader','test:catalog','test:e2e','test:review','test:deep-reader','test:spring-core-reader','test:spring-advanced-reader','test:database-basics-reader'),[int]$BackendPort=18081,[int]$WebPort=15181)
+$AllSuites=@('test:e2e','test:review','test:interactions','test:ai','test:regressions','test:details','test:knowledge','test:knowledge-layout','test:polish','test:explanations','test:explanation-reader','test:deep-reader','test:learning-reader','test:catalog','test:spring-core-reader','test:spring-advanced-reader','test:database-basics-reader','test:explanation-pack')
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
-foreach($case in $Suite){if($case -notin @('test:e2e','test:review','test:interactions','test:ai','test:regressions','test:details','test:knowledge','test:knowledge-layout','test:polish','test:explanation-reader','test:deep-reader','test:learning-reader','test:catalog','test:spring-core-reader','test:spring-advanced-reader','test:database-basics-reader','test:explanation-pack')){throw "Unknown E2E suite: $case"}}
+foreach($case in $Suite){if($case -notin $AllSuites){throw "Unknown E2E suite: $case"}}
 foreach($port in @($BackendPort,$WebPort)){if(Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue){throw "Test port $port is already in use"}}
 $runId=[guid]::NewGuid().ToString('N')
 $runPath=Join-Path $root "backend/target/e2e-$runId"

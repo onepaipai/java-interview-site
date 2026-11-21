@@ -12,7 +12,9 @@ try {
     try {
       const page = await context.newPage(), errors = [], requests = [];
       page.on('pageerror', error => errors.push(error.message));
+      // mastery/note/favorite 是题目接口的固定字段：QuestionDetail 渲染直接读取，缺失会让页面崩溃。
       const questions = [1, 2].map(id => ({ id, title: '测试题目 ' + id, answer: '原有回答 ' + id,
+        mastery: 'NEW', note: '', favorite: false,
         category_id: 2, category: '测试模块', difficulty: '基础', sort_order: id, tags: [], version: 0 }));
       let delayed = false, began, release, providerFails = false, askCount = 0;
       let gate;

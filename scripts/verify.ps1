@@ -12,7 +12,7 @@ try {
  try {$mavenArguments=@('-B','clean','package','-DforkCount=0');if($Offline){$mavenArguments=@('-o')+$mavenArguments};Run-Check 'mvn' $mavenArguments}finally{Pop-Location}
  Push-Location frontend
  try {
-  Run-Check 'npm' @('ci');Run-Check 'npm' @('test');Run-Check 'npm' @('run','format:check');Run-Check 'npm' @('run','build')
+  Run-Check 'npm' @('ci');Run-Check 'npm' @('test');Run-Check 'npm' @('run','format:check');Run-Check 'npm' @('run','build');Run-Check 'npm' @('run','test:knowledge-core')
  } finally {Pop-Location}
  Run-Check 'node' @('frontend/node_modules/prettier/bin/prettier.cjs','--plugin=./frontend/node_modules/prettier-plugin-java/dist/index.mjs','--check','backend/src/**/*.java')
  foreach($script in @('check-deployment-config.mjs','verify-contract.mjs','sync-content-status.mjs','validate-content.mjs','validate-explanations.mjs','test-database-basics-answers.mjs','test-explanation-publication.mjs','test-deep-answers.mjs')){

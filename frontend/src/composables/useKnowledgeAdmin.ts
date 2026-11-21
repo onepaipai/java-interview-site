@@ -337,7 +337,12 @@ export function useKnowledgeAdmin() {
     const input = event.target as HTMLInputElement,
       file = input.files?.[0];
     input.value = '';
-    if (!file || busy.value) return;
+    if (!file) return;
+    // 忙碌期间给出可见反馈，避免选中的文件被静默丢弃。
+    if (busy.value) {
+      error.value = '正在处理其他操作，请等待完成后再上传';
+      return;
+    }
     notice.value = '';
     error.value = '';
     if (!/\.(md|txt)$/i.test(file.name) || file.size === 0 || file.size > 1_500_000) {

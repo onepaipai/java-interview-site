@@ -1,7 +1,8 @@
 name: java-interview
 services:
   db:
-    image: mysql:8.4
+    # digest 固定保证部署可复现；升级补丁时用 docker buildx imagetools inspect mysql:8.4 取新摘要。
+    image: mysql:8.4@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: interview

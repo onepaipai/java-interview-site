@@ -23,7 +23,7 @@ try {
         await expect(page.locator('main h2')).toHaveText(['参考回答','参考分析','案例','总结点']);
         await expect(page.locator('.explanation-section')).toHaveCount(4);
         const legacy = await page.evaluate(async () => {
-          const { formatExplanation } = await import('/src/explanations.ts');
+          const { formatExplanation } = await import('/src/lib/explanations.ts');
           const html = '<h2>原有回答</h2><p>保持旧版内容与目录</p>';
           return formatExplanation(html) === html;
         });

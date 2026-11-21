@@ -46,10 +46,17 @@ try {
       };
       await page.route('**/api/questions?*',nextPageRoute);
       await page.getByRole('button',{name:/^下一题(?: →)?$/}).click();await began;
-      await page.getByRole('button',{name:'题库',exact:true}).click();
+      // 导航会中止在途的分页请求（requestfailed 而非 requestfinished）：先注册事件监听再导航，
+      // 断言语义是"请求无论中止或完成都必须落定"，不能悬挂。
+      const settled=Promise.race([
+        page.waitForEvent('requestfinished',{predicate:request=>new URL(request.url()).searchParams.get('page')==='2'}),
+        page.waitForEvent('requestfailed',{predicate:request=>new URL(request.url()).searchParams.get('page')==='2'})
+      ]);
+      // 手机端阅读态隐藏头部导航（learning.css 的 .reader-open nav{display:none}），
+      // 改用两端都有的面包屑"知识目录"离开，语义不变：中途导航触发在途请求中止。
+      await page.getByRole('button',{name:'知识目录',exact:true}).click();
       await page.getByRole('heading',{name:'知识目录',exact:true}).waitFor();
-      const finished=page.waitForEvent('requestfinished',{predicate:request=>new URL(request.url()).searchParams.get('page')==='2'});
-      release();await finished;
+      release();await settled;
       await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       await expect(page).toHaveURL(/#\/catalog$/);
       await page.unroute('**/api/questions?*',nextPageRoute);

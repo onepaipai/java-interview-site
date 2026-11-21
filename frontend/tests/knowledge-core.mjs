@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile, unlink } from 'node:fs/promises';
 import ts from 'typescript';
 
-const source = await readFile(new URL('../src/knowledge.ts', import.meta.url), 'utf8');
+const source = await readFile(new URL('../src/lib/knowledge.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
 const temporaryModule = new URL('.knowledge-core-' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.mjs', import.meta.url);
 await writeFile(temporaryModule, compiled, { flag: 'wx' });

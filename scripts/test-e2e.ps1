@@ -34,7 +34,7 @@ try {
  }
  if(!$healthy){throw "Test services did not become ready; inspect $runPath"}
  Push-Location "$root/frontend"
- try {foreach($case in $Suite){npm run $case;if($LASTEXITCODE -ne 0){throw "E2E suite failed: $case"}}}finally{Pop-Location}
+ try {foreach($case in $Suite){npm run $case;if($LASTEXITCODE -ne 0){Write-Output "::error::E2E suite failed: $case（详见上方 npm run $case 输出）"; throw "E2E suite failed: $case"}}}finally{Pop-Location}
 } finally {
  foreach($process in @($webProcess,$backendProcess)){if($process -and !$process.HasExited){Stop-Process -Id $process.Id -ErrorAction SilentlyContinue}}
  foreach($name in $environmentNames){[Environment]::SetEnvironmentVariable($name,$saved[$name],'Process')}

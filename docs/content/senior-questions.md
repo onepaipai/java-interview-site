@@ -6,27 +6,27 @@
 
 | 模块 | 题数 | 文件 |
 | --- | ---: | --- |
-| Java 语言 | 50 | [java-language.tsv](java-language.tsv) |
-| 集合 | 50 | [collections.tsv](collections.tsv) |
-| 并发基础 | 50 | [concurrency-basics.tsv](concurrency-basics.tsv) |
-| JVM 基础 | 50 | [jvm-basics.tsv](jvm-basics.tsv) |
-| Spring 基础 | 50 | [spring-basics.tsv](spring-basics.tsv) |
-| 数据库基础 | 50 | [database-basics.tsv](database-basics.tsv) |
-| 网络与其他 | 50 | [network.tsv](network.tsv) |
-| AI 基础 | 50 | [ai-basics.tsv](ai-basics.tsv) |
-| 并发进阶 | 50 | [concurrency-advanced.tsv](concurrency-advanced.tsv) |
-| JVM 进阶 | 50 | [jvm-advanced.tsv](jvm-advanced.tsv) |
-| Spring 进阶 | 50 | [spring-advanced.tsv](spring-advanced.tsv) |
-| 数据库进阶 | 50 | [database-advanced.tsv](database-advanced.tsv) |
-| 缓存与消息队列 | 50 | [cache-messaging.tsv](cache-messaging.tsv) |
-| 手写与算法 | 50 | [algorithms.tsv](algorithms.tsv) |
-| AI 进阶 | 50 | [ai-advanced.tsv](ai-advanced.tsv) |
-| 网银业务核心 | 50 | [banking.tsv](banking.tsv) |
-| 分布式与高并发 | 50 | [distributed.tsv](distributed.tsv) |
-| 线上稳定性 | 50 | [reliability.tsv](reliability.tsv) |
-| 架构与工程 | 50 | [architecture.tsv](architecture.tsv) |
-| AI 落地 | 50 | [ai-production.tsv](ai-production.tsv) |
-| 专家级：系统设计与架构 | 50 | [system-design.tsv](system-design.tsv) |
+| Java 语言 | 50 | [java-language.tsv](../../content/senior/java-language.tsv) |
+| 集合 | 50 | [collections.tsv](../../content/senior/collections.tsv) |
+| 并发基础 | 50 | [concurrency-basics.tsv](../../content/senior/concurrency-basics.tsv) |
+| JVM 基础 | 50 | [jvm-basics.tsv](../../content/senior/jvm-basics.tsv) |
+| Spring 基础 | 50 | [spring-basics.tsv](../../content/senior/spring-basics.tsv) |
+| 数据库基础 | 50 | [database-basics.tsv](../../content/senior/database-basics.tsv) |
+| 网络与其他 | 50 | [network.tsv](../../content/senior/network.tsv) |
+| AI 基础 | 50 | [ai-basics.tsv](../../content/senior/ai-basics.tsv) |
+| 并发进阶 | 50 | [concurrency-advanced.tsv](../../content/senior/concurrency-advanced.tsv) |
+| JVM 进阶 | 50 | [jvm-advanced.tsv](../../content/senior/jvm-advanced.tsv) |
+| Spring 进阶 | 50 | [spring-advanced.tsv](../../content/senior/spring-advanced.tsv) |
+| 数据库进阶 | 50 | [database-advanced.tsv](../../content/senior/database-advanced.tsv) |
+| 缓存与消息队列 | 50 | [cache-messaging.tsv](../../content/senior/cache-messaging.tsv) |
+| 手写与算法 | 50 | [algorithms.tsv](../../content/senior/algorithms.tsv) |
+| AI 进阶 | 50 | [ai-advanced.tsv](../../content/senior/ai-advanced.tsv) |
+| 网银业务核心 | 50 | [banking.tsv](../../content/senior/banking.tsv) |
+| 分布式与高并发 | 50 | [distributed.tsv](../../content/senior/distributed.tsv) |
+| 线上稳定性 | 50 | [reliability.tsv](../../content/senior/reliability.tsv) |
+| 架构与工程 | 50 | [architecture.tsv](../../content/senior/architecture.tsv) |
+| AI 落地 | 50 | [ai-production.tsv](../../content/senior/ai-production.tsv) |
+| 专家级：系统设计与架构 | 50 | [system-design.tsv](../../content/senior/system-design.tsv) |
 
 ## 导入与维护
 

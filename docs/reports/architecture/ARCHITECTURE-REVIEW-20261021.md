@@ -1,5 +1,7 @@
 # 架构与代码审查 · 2026-10-21
 
+> 文档状态：历史快照（本地链接可能失效） · 审查基线（结论以当时源码为准）。
+
 审查对象为根目录当前源码，不包含 release、backups 中的历史副本。此次新增审查文档，没有修改业务实现或业务数据库。结论基于源码、配置、当前内容清单和本轮实际测试；未连接真实模型供应商、生产 MySQL 或远程服务器，也未重新执行整套浏览器回归。
 
 ## 总体判断
@@ -20,7 +22,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 1. P1：AI 请求缺少覆盖正文读取的截止时间
 
-**位置：** [ModelClient.java](../../../backend/src/main/java/dev/interview/ModelClient.java:32)、[AiController.java](../../../backend/src/main/java/dev/interview/AiController.java:14)。
+**位置：** ModelClient.java（`../../../backend/src/main/java/dev/interview/ModelClient.java:32`）、AiController.java（`../../../backend/src/main/java/dev/interview/AiController.java:14`）。
 
 代码使用 Java 17 的 `HttpRequest.timeout` 配合阻塞 `http.send`，并通过 `BoundedBody` 限制响应字节数。Java 17 的请求超时不能保证响应正文在截止时间内读完；上游及时返回响应头、随后停止发送正文时，字节限制也无法触发。Java 团队说明这一超时范围在 Java 26 才扩展到正文消费，参见 [Oracle Java 团队的 Timeout Update](https://inside.java/2026/03/04/jdk-26-http-client/)。
 
@@ -32,7 +34,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 2. P1：部署配置模板含字面量换行转义
 
-**位置：** [.env.example](../../../.env.example:7)。
+**位置：** .env.example（`../../../.env.example:7`）。
 
 已读取确认：AI 配置被写在同一物理行，以 `\n# Optional AI / RAG\nAI_ENABLED=false...` 开头。这不是独立的注释和环境变量，按部署说明直接复制不能得到预期 AI 配置，也可能造成解析错误。[Compose 环境文件规则](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#env-file-syntax)要求逐行定义变量。
 
@@ -40,7 +42,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 3. P1：默认浏览器测试可以写入日常数据库
 
-**位置：** [package.json](../../../frontend/package.json:9)、[smoke.mjs](../../../frontend/tests/smoke.mjs:3)、[smoke.mjs](../../../frontend/tests/smoke.mjs:34)。
+**位置：** package.json（`../../../frontend/package.json:9`）、smoke.mjs（`../../../frontend/tests/smoke.mjs:3`）、smoke.mjs（`../../../frontend/tests/smoke.mjs:34`）。
 
 `npm test` 默认连接 5173，并读取日常后端的管理员密码文件。测试会创建题目、模块、账号和图片。结束时删除题目属于软删除，不能恢复数据库到测试前状态；上传图片也不会随这些题目清理。文档已有隔离提醒，但脚本没有强制边界。
 
@@ -50,7 +52,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 4. P2：搜索重复读取并清洗全量答案，列表返回完整详情
 
-**位置：** [QuestionService.java](../../../backend/src/main/java/dev/interview/QuestionService.java:35)、[QuestionService.java](../../../backend/src/main/java/dev/interview/QuestionService.java:51)、[GlobalSearch.vue](../../../frontend/src/GlobalSearch.vue:8)、[useWorkbench.ts](../../../frontend/src/useWorkbench.ts:261)。
+**位置：** QuestionService.java（`../../../backend/src/main/java/dev/interview/QuestionService.java:35`）、QuestionService.java（`../../../backend/src/main/java/dev/interview/QuestionService.java:51`）、GlobalSearch.vue（`../../../frontend/src/GlobalSearch.vue:8`）、useWorkbench.ts（`../../../frontend/src/useWorkbench.ts:261`）。
 
 非空搜索将候选题目的标题和完整答案全部取回 Java，再清洗 Markdown、匹配并排序。搜索定位接口重复同一过程；详情页还会接着请求当前列表。列表使用 `q.*`，连完整答案、笔记等字段一起返回，前端只为摘要又做一次提取。全局搜索有防抖和过期结果校验，但没有取消已发出的请求。
 
@@ -62,7 +64,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 5. P2：Controller、业务规则和数据访问边界混杂
 
-**位置：** [QuestionController.java](../../../backend/src/main/java/dev/interview/QuestionController.java:12)、[LearningController.java](../../../backend/src/main/java/dev/interview/LearningController.java:11)、[AuthController.java](../../../backend/src/main/java/dev/interview/AuthController.java:17)。
+**位置：** QuestionController.java（`../../../backend/src/main/java/dev/interview/QuestionController.java:12`）、LearningController.java（`../../../backend/src/main/java/dev/interview/LearningController.java:11`）、AuthController.java（`../../../backend/src/main/java/dev/interview/AuthController.java:17`）。
 
 题目 Controller 同时维护题目、模块、标签、资料和导出，直接执行 SQL；其他 Controller 依赖 `AuthController` 解析用户身份。事务入口也分布在 Controller 和 Service 中。这会使新增批量操作、定时任务或管理入口时容易绕开原有规则。
 
@@ -70,7 +72,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 6. P2：前端工作台承担过多职责，源码可读性影响维护
 
-**位置：** [useWorkbench.ts](../../../frontend/src/useWorkbench.ts:15)、[App.vue](../../../frontend/src/App.vue:17)、[AiPanel.vue](../../../frontend/src/AiPanel.vue:1)。
+**位置：** useWorkbench.ts（`../../../frontend/src/useWorkbench.ts:15`）、App.vue（`../../../frontend/src/App.vue:17`）、AiPanel.vue（`../../../frontend/src/AiPanel.vue:1`）。
 
 `useWorkbench.ts` 约 657 行，集中处理登录、手写路由、历史恢复、列表、编辑、删除、AI 采用和图片弹窗；App 解构大量内部状态。另一些组件和后端类将整个函数压在单行，修改和审查都难以定位到小范围。
 
@@ -80,7 +82,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 7. P2：接口输出与表结构耦合，部分更新无法区分记录不存在
 
-**位置：** [QuestionService.java](../../../backend/src/main/java/dev/interview/QuestionService.java:59)、[QuestionController.java](../../../backend/src/main/java/dev/interview/QuestionController.java:49)、[QuestionController.java](../../../backend/src/main/java/dev/interview/QuestionController.java:55)、[api.ts](../../../frontend/src/api.ts:45)。
+**位置：** QuestionService.java（`../../../backend/src/main/java/dev/interview/QuestionService.java:59`）、QuestionController.java（`../../../backend/src/main/java/dev/interview/QuestionController.java:49`）、QuestionController.java（`../../../backend/src/main/java/dev/interview/QuestionController.java:55`）、api.ts（`../../../frontend/src/api.ts:45`）。
 
 后端大量返回数据库 Map 和 `SELECT *`，前端 `api<T = any>` 容易让字段变化绕过编译检查。标签和资料的部分 PUT 操作没有检查更新行数，目标不存在时仍可返回成功。当前源码范围未发现 OpenAPI 或可运行的 Postman 契约。
 
@@ -88,7 +90,7 @@ P1 表示建议在正式对外发布或日常默认操作前解决；P2 表示�
 
 ### 8. P2：生产 MySQL 与交付产物缺少自动验证链路
 
-**位置：** [SiteTest.java](../../../backend/src/test/java/dev/interview/SiteTest.java:18)、[RegressionTest.java](../../../backend/src/test/java/dev/interview/RegressionTest.java:29)、[package-release.ps1](../../../scripts/package-release.ps1:14)、[backend/Dockerfile](../../../backend/Dockerfile:6)。
+**位置：** SiteTest.java（`../../../backend/src/test/java/dev/interview/SiteTest.java:18`）、RegressionTest.java（`../../../backend/src/test/java/dev/interview/RegressionTest.java:29`）、package-release.ps1（`../../../scripts/package-release.ps1:14`）、backend/Dockerfile（`../../../backend/Dockerfile:6`）。
 
 本轮 41 项后端测试全部通过，但数据库集成使用 H2 MySQL 模式；这不能验证生产 MySQL 的排序规则、锁与死锁、时间和迁移行为。发布脚本直接打包现有源码、现有 JAR 和现有 dist，没有保证三者来自同一轮构建；Docker 后端构建跳过测试。当前目录未被 Git 识别为仓库，也未发现 `.github` 工作流，这可能是交付副本，不能据此断言源仓库没有版本管理或 CI。
 
@@ -98,7 +100,7 @@ MySQL 优先验证迁移、模块归档与保存/恢复竞争、并发创建相�
 
 ### 9. P2：单实例状态和 AI 资源预算需要明确运行边界
 
-**位置：** [SecurityConfig.java](../../../backend/src/main/java/dev/interview/SecurityConfig.java:13)、[AiController.java](../../../backend/src/main/java/dev/interview/AiController.java:14)、[KnowledgeIndex.java](../../../backend/src/main/java/dev/interview/KnowledgeIndex.java:18)、[KnowledgeService.java](../../../backend/src/main/java/dev/interview/KnowledgeService.java:131)。
+**位置：** SecurityConfig.java（`../../../backend/src/main/java/dev/interview/SecurityConfig.java:13`）、AiController.java（`../../../backend/src/main/java/dev/interview/AiController.java:14`）、KnowledgeIndex.java（`../../../backend/src/main/java/dev/interview/KnowledgeIndex.java:18`）、KnowledgeService.java（`../../../backend/src/main/java/dev/interview/KnowledgeService.java:131`）。
 
 会话撤销、AI 并发控制、索引脏标记和检索快照都在进程内。现有文档也声明单实例设计；直接增加副本会使撤销、限流及索引更新不再具有全站一致性。当前没有必要为此立即分布式化，但部署必须遵守这个边界。
 
@@ -108,7 +110,7 @@ MySQL 优先验证迁移、模块归档与保存/恢复竞争、并发创建相�
 
 ### 10. P2：内容质量状态与当前文档发生漂移
 
-**位置：** [coverage.json](../../../content/explanations/coverage.json:6)、[README.md](../../../README.md:41)、[解析规范](../../../content/explanations/README.md:95)。
+**位置：** coverage.json（`../../../content/explanations/coverage.json:6`）、[项目说明](../../project.md)、解析规范（`../../content/explanations.md:95`）。
 
 本轮实际校验通过；当前清单为 1,215 道题解，340 道题目级正文、2 道固定样例、873 道主题正文。当前 README 和解析规范仍写 244 / 2 / 969。历史验收报告应保留当时结果，但当前入口文档应跟随最新清单。
 

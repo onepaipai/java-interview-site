@@ -47,16 +47,16 @@ for (const entry of verified) {
 }
 const count = { questionSpecific: Object.keys(questions).length, sampleSpecific: coverage.qualityReview.sampleSpecific, remainingTopicContent: coverage.qualityReview.remainingTopicContent };
 assert.equal(count.questionSpecific + count.sampleSpecific + count.remainingTopicContent, manifest.count);
-const summary = `<!-- content-status:start -->\n当前解析包为 \`${manifest.version}\`，共 ${manifest.count} 道：${count.questionSpecific} 道题目级正文、${count.sampleSpecific} 道固定样例、${count.remainingTopicContent} 道主题正文。独立正文不等于事实核验完成；审核台账中 ${verified.length} 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](content/explanations/review-ledger.json)。\n<!-- content-status:end -->`;
+const summary = `<!-- content-status:start -->\n当前解析包为 \`${manifest.version}\`，共 ${manifest.count} 道：${count.questionSpecific} 道题目级正文、${count.sampleSpecific} 道固定样例、${count.remainingTopicContent} 道主题正文。独立正文不等于事实核验完成；审核台账中 ${verified.length} 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](../content/explanations/review-ledger.json)。\n<!-- content-status:end -->`;
 const outputs = new Map([
   ['content/explanations/review-ledger.json', JSON.stringify(ledger, null, 2) + '\n'],
 ]);
-for (const file of ['README.md', 'content/explanations/README.md']) {
+for (const file of ['docs/project.md', 'docs/content/explanations.md']) {
   let text = await read(file);
-  const body = file === 'README.md' ? summary : summary.replace('(content/explanations/review-ledger.json)', '(review-ledger.json)');
+  const body = file === 'docs/project.md' ? summary : summary.replace('../content/explanations/review-ledger.json', '../../content/explanations/review-ledger.json');
   if (text.includes('<!-- content-status:start -->')) text = text.replace(/<!-- content-status:start -->[\s\S]*?<!-- content-status:end -->/, body);
   else text = text.replace(/当前解析包为[^\n]+|当前发布为[^\n]+/, body);
-  if (file.endsWith('explanations/README.md')) {
+  if (file.endsWith('content/explanations.md')) {
     text = text.replace(/当前为 \d+ 道题目级修订及 \d+ 道独立样例。/g, `当前为 ${count.questionSpecific} 道题目级修订及 ${count.sampleSpecific} 道独立样例。`)
       .replace(/剩余 \d+ 道仍使用主题级/g, `剩余 ${count.remainingTopicContent} 道仍使用主题级`);
   }

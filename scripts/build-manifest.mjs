@@ -8,7 +8,7 @@ const hash=data=>createHash('sha256').update(data).digest('hex');
 async function files(directory){const entries=[];for(const item of await readdir(path.join(root,directory),{withFileTypes:true})){const name=directory+'/'+item.name;if(item.isDirectory())entries.push(...await files(name));else if(item.isFile())entries.push(name);}return entries.sort();}
 async function tree(names){const result={};for(const name of names.sort())result[name]=hash(await readFile(path.join(root,name)));return result;}
 const directories=['backend/src','frontend/src','frontend/public','frontend/tests','content','deploy','docs','scripts','.github'];
-const roots=['README.md','compose.yml','compose.test.yml','.env.example','.gitignore','.dockerignore','.prettierrc.json','.prettierignore','backend/pom.xml','backend/Dockerfile','backend/.dockerignore','frontend/package.json','frontend/package-lock.json','frontend/index.html','frontend/tsconfig.json','frontend/vite.config.ts','frontend/Dockerfile','frontend/nginx.conf','frontend/.dockerignore'];
+const roots=['compose.yml','compose.test.yml','.env.example','.gitignore','.dockerignore','.prettierrc.json','.prettierignore','backend/pom.xml','backend/Dockerfile','backend/.dockerignore','frontend/package.json','frontend/package-lock.json','frontend/index.html','frontend/tsconfig.json','frontend/vite.config.ts','frontend/Dockerfile','frontend/nginx.conf','frontend/.dockerignore'];
 const inputs=[...roots];for(const directory of directories)inputs.push(...await files(directory));
 const source=await tree(inputs);
 const artifacts=await tree(['backend/target/interview-site-1.0.0.jar',...await files('frontend/dist')]);

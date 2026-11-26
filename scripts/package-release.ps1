@@ -14,7 +14,7 @@ foreach($relative in $directories){
  [IO.Directory]::CreateDirectory($parent) | Out-Null
  Copy-Item -LiteralPath (Join-Path $root $relative) -Destination (Join-Path $stage $relative) -Recurse
 }
-$files=@('README.md','compose.yml','compose.test.yml','.env.example','.gitignore','.dockerignore','.prettierrc.json','.prettierignore','backend/pom.xml','backend/Dockerfile','backend/.dockerignore','frontend/package.json','frontend/package-lock.json','frontend/index.html','frontend/tsconfig.json','frontend/vite.config.ts','frontend/Dockerfile','frontend/nginx.conf','frontend/.dockerignore')
+$files=@('compose.yml','compose.test.yml','.env.example','.gitignore','.dockerignore','.prettierrc.json','.prettierignore','backend/pom.xml','backend/Dockerfile','backend/.dockerignore','frontend/package.json','frontend/package-lock.json','frontend/index.html','frontend/tsconfig.json','frontend/vite.config.ts','frontend/Dockerfile','frontend/nginx.conf','frontend/.dockerignore')
 foreach($relative in $files){Copy-Item -LiteralPath (Join-Path $root $relative) -Destination (Join-Path $stage $relative)}
 Copy-Item -LiteralPath (Join-Path $root 'backend/target/verification.json') -Destination (Join-Path $stage 'build-manifest.json')
 Copy-Item -LiteralPath (Join-Path $root 'backend/target/interview-site-1.0.0.jar') -Destination (Join-Path $release "interview-site-$stamp.jar")

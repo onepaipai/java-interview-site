@@ -27,15 +27,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
 
 ## 文档
 
-- [文档导航](docs/README.md)：按功能分类的统一入口（架构与接口、部署运维、测试验证、内容题解、轮次报告与历史归档）。
-- [部署、备份和恢复](docs/guide/deployment.md)：Docker Compose、MySQL、HTTPS 与恢复步骤。
+- [文档导航](README.md)：按用途分类的统一入口（项目入口、常青指南、内容规范、接口契约与轮次报告）。
+- [部署、备份和恢复](guide/deployment.md)：Docker Compose、MySQL、HTTPS 与恢复步骤。
 
 ## 内容与升级
 
 首次导入 165 道原始题和 21 个模块各 50 道高级题，共 1,215 道。原始 `content/Java.md` 不改写。高级题包按稳定来源去重，解析升级保留人工修改及主动删除，旧包不能覆盖已记录的更高版本。数据库迁移目前为 V1–V6，升级前备份。
 
 <!-- content-status:start -->
-当前解析包为 `explanations-v37`，共 1215 道：1215 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 1215 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](content/explanations/review-ledger.json)。
+当前解析包为 `explanations-v37`，共 1215 道：1215 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 1215 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](../content/explanations/review-ledger.json)。
 <!-- content-status:end -->
 
 ## 日志维护

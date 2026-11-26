@@ -3,7 +3,7 @@
 面向资深 Java 开发和架构设计面试。复习提纲与深入题解分开维护：旧版短题解仍兼容，复杂工程题使用场景、口述结论、机制与取舍、故障推演及追问。题量、字数和格式检查都不代表内容达到资深水平。
 
 <!-- content-status:start -->
-当前解析包为 `explanations-v37`，共 1215 道：1215 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 1215 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](review-ledger.json)。
+当前解析包为 `explanations-v37`，共 1215 道：1215 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 1215 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](../../content/explanations/review-ledger.json)。
 <!-- content-status:end -->
 
 ## 写作规则
@@ -44,7 +44,7 @@
 9. 参考分析必须比参考回答多出机制或反例；把同一句换词不算分析。手写题的案例必须给核心实现，不能仅调用现成库。
 10. 案例中的代码输出要实际运行；外部系统场景未实测时写“预期”或“判断”，不虚构耗时、吞吐及故障恢复成绩。
 
-通用骨架见 [TEMPLATE.md](TEMPLATE.md)。不以长篇幅或题量替代内容质量。
+通用骨架见 [template.md](template.md)。不以长篇幅或题量替代内容质量。
 
 ## 图示规则
 
@@ -61,9 +61,9 @@
 
 | 原题 | 样例 |
 | --- | --- |
-| equals 与 hashCode 的契约为何会影响领域对象设计？ | [Java 语言第 1 题](samples/java-language-001.md) |
-| 事务代理为什么会在同类自调用时失效？ | [Spring 进阶第 1 题](samples/spring-advanced-001.md) |
-| 库存扣减怎样避免先查后改的超卖？ | [数据库进阶第 26 题](samples/database-advanced-026.md) |
+| equals 与 hashCode 的契约为何会影响领域对象设计？ | [Java 语言第 1 题](../../content/explanations/samples/java-language-001.md) |
+| 事务代理为什么会在同类自调用时失效？ | [Spring 进阶第 1 题](../../content/explanations/samples/spring-advanced-001.md) |
+| 库存扣减怎样避免先查后改的超卖？ | [数据库进阶第 26 题](../../content/explanations/samples/database-advanced-026.md) |
 
 三道样例保留用于旧格式与图文排版回归；Spring 第 1 题的正式正文已由深入题解替换。全量清单包含新增 1,050 题与原始 165 题，共 1,215 题。
 
@@ -118,9 +118,9 @@ senior-v1 保留原来的 1,050 道题及稳定来源键；解析使用独立的
 3. `node scripts/test-explanation-publication.mjs` 验证失败生成保留旧清单和不可变文件；`test-explanation-corrections.mjs` 等历史一次性验收脚本已退役(git 历史可恢复)。
 4. 正文中的 Java 示例由后端 `*ExamplesTest` 编译执行（舍入、二分、前缀和、背包和零钱案例等），另验证错误捕获片段编译失败。历史脚本 `verify-reviewed-examples.ps1` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/verify-reviewed-examples.ps1`)。
 5. 历史脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回(`git show bf8768a:scripts/prepare-review-examples.mjs`)后提取正文代码，再以 Java 17 执行 `backend/target/ReviewExamples20261020.java`；包含交接、丢更新、LRU、空值、顺序和可见性等 14 项验证。
-6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；执行证据由 `SpringCoreExamplesTest` 与审核台账承接(历史核对脚本已退役)。完整范围及限制见 [整改记录](../../docs/reports/content/SPRING-CORE-CONTENT-20261023.md)。
-7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；执行证据由 `SpringAdvancedExamplesTest` 与审核台账承接(历史核对脚本已退役)。范围和未验证部分见 [进阶整改记录](../../docs/reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
-8. 数据库基础模块现有 59 题均有独立正文，新增 53 道修订及 12 道深入格式。`DatabaseBasicsExamplesTest` 执行正文中 3 组 SQL 并记录 H2 结果，`node scripts/test-database-basics-answers.mjs` 核对证据。相同 SQL 接入显式隔离 MySQL 8.4 门禁，本机未运行该门禁，不以 H2 结果代替索引或锁验证；范围见 [数据库整改记录](../../docs/reports/content/DATABASE-BASICS-CONTENT-20261023.md)。
+6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；执行证据由 `SpringCoreExamplesTest` 与审核台账承接(历史核对脚本已退役)。完整范围及限制见 [整改记录](../reports/content/SPRING-CORE-CONTENT-20261023.md)。
+7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；执行证据由 `SpringAdvancedExamplesTest` 与审核台账承接(历史核对脚本已退役)。范围和未验证部分见 [进阶整改记录](../reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
+8. 数据库基础模块现有 59 题均有独立正文，新增 53 道修订及 12 道深入格式。`DatabaseBasicsExamplesTest` 执行正文中 3 组 SQL 并记录 H2 结果，`node scripts/test-database-basics-answers.mjs` 核对证据。相同 SQL 接入显式隔离 MySQL 8.4 门禁，本机未运行该门禁，不以 H2 结果代替索引或锁验证；范围见 [数据库整改记录](../reports/content/DATABASE-BASICS-CONTENT-20261023.md)。
 
 ## 版本核对依据
 

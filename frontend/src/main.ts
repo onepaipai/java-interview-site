@@ -8,4 +8,5 @@ import './styles/explanations.css';
 import './styles/reader.css';
 import './styles/learning.css';
 import './styles/catalog.css';
+import './styles/data.css';
 createApp(App).mount('#app');

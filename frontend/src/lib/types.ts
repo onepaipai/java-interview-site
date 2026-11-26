@@ -4,6 +4,11 @@ export interface Category {
   sort_order: number;
   question_count: number;
 }
+export interface ArchivedCategory {
+  id: number;
+  archived_name: string;
+  question_count: number;
+}
 export interface LearningSummary {
   total: number;
   mastered: number;

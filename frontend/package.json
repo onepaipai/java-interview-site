@@ -26,6 +26,7 @@
     "test:database-basics-reader": "node tests/spring-core-reader.mjs database-basics",
     "test:explanation-pack": "node tests/explanation-pack.mjs",
     "test:review": "node tests/review.mjs",
+    "test:data-admin": "node tests/data-admin.mjs",
     "test:e2e": "node tests/smoke.mjs",
     "format": "prettier --write src tests/unit package.json vite.config.ts",
     "format:check": "prettier --check src tests/unit package.json vite.config.ts"

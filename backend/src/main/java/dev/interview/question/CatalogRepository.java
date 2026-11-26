@@ -21,6 +21,31 @@ public class CatalogRepository {
     );
   }
 
+  public List<Map<String, Object>> archivedCategories() {
+    return db.queryForList(
+      "SELECT c.id,c.archived_name,(SELECT COUNT(*) FROM questions q WHERE q.category_id=c.id AND q.deleted=FALSE) AS question_count FROM categories c WHERE c.deleted=TRUE ORDER BY c.archived_name,c.id"
+    );
+  }
+
+  public boolean nameTaken(String name) {
+    return !db.queryForList("SELECT id FROM categories WHERE name=?", Long.class, name).isEmpty();
+  }
+
+  public String archivedName(long id) {
+    return db.queryForObject(
+      "SELECT archived_name FROM categories WHERE id=? AND deleted=TRUE",
+      String.class,
+      id
+    );
+  }
+
+  public void restoreCategory(long id) {
+    db.update(
+      "UPDATE categories SET name=archived_name,archived_name=NULL,deleted=FALSE WHERE id=? AND deleted=TRUE",
+      id
+    );
+  }
+
   public long createCategory(String name, int order) {
     return keys.insert("INSERT INTO categories(name,sort_order) VALUES(?,?)", name, order);
   }
@@ -38,6 +63,10 @@ public class CatalogRepository {
 
   public boolean lockCategory(long id) {
     return keys.lockCategory(id);
+  }
+
+  public boolean lockArchivedCategory(long id) {
+    return keys.lockArchivedCategory(id);
   }
 
   public long activeQuestions(long id) {

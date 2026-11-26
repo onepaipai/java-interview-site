@@ -58,6 +58,7 @@ export function useWorkbench() {
     knowledge: '知识库',
     modules: '模块管理',
     accounts: '账号管理',
+    data: '数据管理',
     password: '密码设置',
   };
   watch(
@@ -247,6 +248,7 @@ export function useWorkbench() {
         (url.pathname === '/accounts' ||
           url.pathname === '/modules' ||
           url.pathname === '/knowledge' ||
+          url.pathname === '/data' ||
           url.pathname === '/new' ||
           match?.[2]) &&
         !admin.value
@@ -261,6 +263,8 @@ export function useWorkbench() {
         tab.value = 'modules';
       } else if (url.pathname === '/accounts') {
         tab.value = 'accounts';
+      } else if (url.pathname === '/data') {
+        tab.value = 'data';
       } else if (url.pathname === '/password') {
         tab.value = 'password';
       } else {

@@ -53,7 +53,10 @@ npm run build
 .\scripts\test-e2e.ps1 -Suite test:spring-core-reader
 .\scripts\test-e2e.ps1 -Suite test:spring-advanced-reader
 .\scripts\test-e2e.ps1 -Suite test:database-basics-reader
+.\scripts\test-e2e.ps1 -Suite test:data-admin
 ```
+
+`test:data-admin` 覆盖数据管理页的导入预览与提交、题库导出下载、解析发布状态，以及知识模块的归档与取消归档；它写入隔离测试环境的可丢弃数据，不指向日常应用数据。
 
 运行器生成随机凭据和环境标识，数据库、图片和日志全部位于 `backend/target/e2e-<id>/`。测试先校验该环境的 `/api/test-environment` 标识，再允许写入；正常部署没有这个端点。结束后停止本轮启动的进程，保留可丢弃的诊断资料。直接运行写入型测试且缺少目标、凭据或环境标识时会失败，不能回退到日常服务。
 

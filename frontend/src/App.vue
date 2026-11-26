@@ -31,6 +31,7 @@ function lazy(loader: () => Promise<any>) {
 const ModuleManager = lazy(() => import('./components/ModuleManager.vue')),
   AccountManager = lazy(() => import('./components/AccountManager.vue')),
   KnowledgeManager = lazy(() => import('./components/KnowledgeManager.vue')),
+  DataManager = lazy(() => import('./components/DataManager.vue')),
   QuestionForm = lazy(() => import('./components/QuestionForm.vue'));
 const {
   imageDialog,
@@ -172,6 +173,9 @@ const {
             @click="navigate('knowledge')"
           >
             AI 知识库
+          </button>
+          <button v-if="admin" :class="{ active: tab === 'data' }" @click="navigate('data')">
+            数据管理
           </button>
         </nav>
         <button class="search-launcher" aria-label="搜索全部内容 Ctrl K" @click="showSearch">
@@ -441,6 +445,7 @@ const {
           </template>
         </section>
         <KnowledgeManager v-else-if="tab === 'knowledge' && admin" />
+        <DataManager v-else-if="tab === 'data' && admin" />
         <ModuleManager
           v-else-if="tab === 'modules' && admin"
           :categories="categories"

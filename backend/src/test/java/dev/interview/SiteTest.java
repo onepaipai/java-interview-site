@@ -15,6 +15,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -410,5 +411,84 @@ class SiteTest {
         new QuestionService.Edit("无效模块", category, "基础", "", 0, List.of(), null)
       )
     );
+  }
+
+  @Test
+  void restoreArchivedCategoryReusesOriginalName() throws Exception {
+    String name = "恢复模块-" + UUID.randomUUID();
+    long category = service.category(name);
+    long id = service.save(
+      null,
+      new QuestionService.Edit("历史题", category, "基础", "历史答案", 0, List.of(), null)
+    );
+    mvc
+      .perform(
+        delete("/api/admin/questions/" + id)
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+      )
+      .andExpect(status().isOk());
+    mvc
+      .perform(
+        delete("/api/admin/categories/" + category)
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+      )
+      .andExpect(status().isOk());
+    String archived = mvc
+      .perform(get("/api/admin/categories/archived").with(user("admin").roles("ADMIN")))
+      .andReturn()
+      .getResponse()
+      .getContentAsString();
+    assertTrue(archived.contains(name));
+
+    mvc
+      .perform(
+        post("/api/admin/categories/" + category + "/unarchive")
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+      )
+      .andExpect(status().isOk());
+    assertEquals(
+      name,
+      db.queryForObject("SELECT name FROM categories WHERE id=?", String.class, category)
+    );
+    assertEquals(
+      false,
+      db.queryForObject("SELECT deleted FROM categories WHERE id=?", Boolean.class, category)
+    );
+    assertTrue(
+      mvc
+        .perform(get("/api/categories").with(user("admin").roles("ADMIN")))
+        .andReturn()
+        .getResponse()
+        .getContentAsString()
+        .contains(name)
+    );
+
+    long other = service.category(name + "-占用");
+    mvc
+      .perform(
+        delete("/api/admin/categories/" + category)
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+      )
+      .andExpect(status().isOk());
+    mvc
+      .perform(
+        put("/api/admin/categories/" + other)
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+          .contentType(MediaType.APPLICATION_JSON)
+          .content("{\"name\":\"" + name + "\",\"sortOrder\":0}")
+      )
+      .andExpect(status().isOk());
+    mvc
+      .perform(
+        post("/api/admin/categories/" + category + "/unarchive")
+          .with(user("admin").roles("ADMIN"))
+          .with(csrf())
+      )
+      .andExpect(status().isConflict());
   }
 }

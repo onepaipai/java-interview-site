@@ -29,6 +29,24 @@ public class CatalogService {
     return repository.categories();
   }
 
+  public List<Map<String, Object>> archived() {
+    return repository.archivedCategories();
+  }
+
+  @Transactional
+  public void restore(long id) {
+    if (!repository.lockArchivedCategory(id)) throw new ResponseStatusException(
+      NOT_FOUND,
+      "归档模块不存在"
+    );
+    String name = repository.archivedName(id);
+    if (
+      name == null || name.isBlank() || repository.nameTaken(name)
+    ) throw new ResponseStatusException(CONFLICT, "同名模块已存在，无法取消归档");
+    repository.restoreCategory(id);
+    events.publishEvent(new KnowledgeChanged(null));
+  }
+
   public List<Map<String, Object>> tags() {
     return repository.tags();
   }

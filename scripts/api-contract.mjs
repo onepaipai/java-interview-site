@@ -69,6 +69,8 @@ const operations = {
   'DELETE /api/admin/questions/{id}': ['Soft-delete active question; missing target returns 404'],
   'POST /api/admin/questions/{id}/restore': ['Restore archived question; archived module returns 409'],
   'GET /api/categories': ['List active modules', array(ref('Category'))],
+  'GET /api/admin/categories/archived': ['List archived modules with name and question count', array({ type: 'object' })],
+  'POST /api/admin/categories/{id}/unarchive': ['Restore archived module under its original name; name conflict returns 409'],
   'POST /api/admin/categories': ['Create module', 'Id', 'Name'],
   'PUT /api/admin/categories/{id}': ['Rename/reorder active module; missing target returns 404', null, 'Name'],
   'DELETE /api/admin/categories/{id}': ['Archive empty module; nonempty module returns 409'],

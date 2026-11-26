@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount, nextTick, watch } from 'vue';
+import { ref, computed, onBeforeUnmount, nextTick, watch, onMounted } from 'vue';
 import { api } from '../lib/api';
 import { categoryName, categoryGroup } from '../lib/display';
 import Icon from './Icon.vue';
 import { confirmAction } from '../lib/confirm';
 import { trapDialogTab } from '../lib/dialog';
-import type { Category } from '../lib/types';
+import type { Category, ArchivedCategory } from '../lib/types';
 const props = defineProps<{ categories: Category[] }>();
 const emit = defineEmits<{ refresh: [Category[]]; open: [Category]; dirty: [boolean] }>();
 const deleting = ref(false),
@@ -20,6 +20,8 @@ const query = ref(''),
   error = ref(''),
   notice = ref(''),
   modalOpen = ref(false);
+const archived = ref<ArchivedCategory[]>([]);
+const archivedLoading = ref(false);
 const namePrefix = computed(
   () => editing.value?.name.match(/^(\d+\.\d+\s*|[一二三四五六七八]、\s*)/)?.[0] || '',
 );
@@ -33,13 +35,14 @@ watch([name, modalOpen], () =>
   ),
 );
 let timer: ReturnType<typeof setTimeout> | undefined;
-const visible = computed(() =>
-  props.categories.filter(
+const visible = computed(() => {
+  if (filter.value === 'archived') return [];
+  return props.categories.filter(
     (c) =>
       categoryName(c.name).toLowerCase().includes(query.value.trim().toLowerCase()) &&
       (filter.value !== 'empty' || Number(c.question_count) === 0),
-  ),
-);
+  );
+});
 const questionCount = computed(() =>
   props.categories.reduce((sum, c) => sum + Number(c.question_count), 0),
 );
@@ -121,16 +124,16 @@ async function remove(c: Category) {
         categoryName(c.name) +
         '」内有 ' +
         c.question_count +
-        ' 道题目，请先进入模块，将题目修改为其他所属模块后再删除。',
+        ' 道题目，请先进入模块，将题目修改为其他所属模块后再归档。',
       '知道了',
     );
     return;
   }
   if (
     !(await confirmAction(
-      '删除「' + categoryName(c.name) + '」？',
-      '这个模块当前没有题目，删除后将从知识目录移除。',
-      '删除模块',
+      '归档「' + categoryName(c.name) + '」？',
+      '这个模块当前没有题目，归档后将从知识目录移除，可在“已归档”中恢复。',
+      '归档模块',
       true,
     ))
   )
@@ -140,13 +143,56 @@ async function remove(c: Category) {
   try {
     await api('/admin/categories/' + c.id, 'DELETE');
     emit('refresh', await api<Category[]>('/categories'));
-    success('模块已删除');
+    await loadArchived();
+    success('模块已归档');
   } catch (e) {
-    error.value = e instanceof Error ? e.message : '删除失败，请重试';
+    error.value = e instanceof Error ? e.message : '归档失败，请重试';
   } finally {
     deleting.value = false;
   }
 }
+
+async function loadArchived() {
+  archivedLoading.value = true;
+  try {
+    archived.value = await api<ArchivedCategory[]>('/admin/categories/archived');
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : '已归档模块加载失败';
+  } finally {
+    archivedLoading.value = false;
+  }
+}
+
+async function restore(a: ArchivedCategory) {
+  if (processing.value) return;
+  error.value = '';
+  if (
+    !(await confirmAction(
+      '恢复「' + a.archived_name + '」？',
+      '模块将以原名称重新出现在知识目录；若已有同名模块则会失败。',
+      '取消归档',
+    ))
+  )
+    return;
+  deleting.value = true;
+  try {
+    await api('/admin/categories/' + a.id + '/unarchive', 'POST');
+    emit('refresh', await api<Category[]>('/categories'));
+    archived.value = archived.value.filter((item) => item.id !== a.id);
+    success('模块已恢复');
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : '恢复失败，请重试';
+  } finally {
+    deleting.value = false;
+  }
+}
+
+watch(filter, (value) => {
+  if (value === 'archived') loadArchived();
+});
+onMounted(() => {
+  loadArchived();
+});
 onBeforeUnmount(() => {
   clearTimeout(timer);
   emit('dirty', false);
@@ -177,7 +223,10 @@ onBeforeUnmount(() => {
         <button :class="{ active: filter === 'all' }" @click="filter = 'all'">
           全部模块 <span>{{ categories.length }}</span></button
         ><button :class="{ active: filter === 'empty' }" @click="filter = 'empty'">
-          空模块 <span>{{ categories.filter((c) => Number(c.question_count) === 0).length }}</span>
+          空模块
+          <span>{{ categories.filter((c) => Number(c.question_count) === 0).length }}</span></button
+        ><button :class="{ active: filter === 'archived' }" @click="filter = 'archived'">
+          已归档 <span>{{ archived.length }}</span>
         </button>
       </div>
       <span class="module-manager-total">共 {{ questionCount }} 道题目</span>
@@ -185,10 +234,20 @@ onBeforeUnmount(() => {
     <div v-if="notice" class="module-manager-notice" role="status">
       <Icon name="check" :size="16" />{{ notice }}
     </div>
+    <div
+      v-if="filter === 'archived' && archivedLoading"
+      class="module-manager-notice"
+      role="status"
+    >
+      正在加载已归档模块…
+    </div>
     <div v-if="error" class="error feedback" role="alert">
       {{ error }}<button @click="error = ''">关闭</button>
     </div>
-    <div v-if="visible.length" class="managed-module-grid">
+    <div
+      v-if="visible.length || (filter === 'archived' && archived.length)"
+      class="managed-module-grid"
+    >
       <article v-for="c in visible" :key="c.id" class="managed-module-card">
         <button
           class="managed-module-open"
@@ -213,11 +272,36 @@ onBeforeUnmount(() => {
             <Icon name="edit" :size="14" />重命名</button
           ><button
             class="managed-module-delete"
-            :aria-label="'删除' + categoryName(c.name) + '模块'"
+            :aria-label="'归档' + categoryName(c.name) + '模块'"
             :disabled="processing"
             @click="remove(c)"
           >
-            <Icon name="trash" :size="14" />删除
+            <Icon name="trash" :size="14" />归档
+          </button>
+        </div>
+      </article>
+      <article
+        v-for="a in archived"
+        v-show="filter === 'archived'"
+        :key="'archived-' + a.id"
+        class="managed-module-card"
+      >
+        <div class="managed-module-open archived-module">
+          <div class="managed-module-top">
+            <span class="managed-module-icon" :class="'tone-' + (a.id % 3)"
+              ><Icon name="layers" :size="22" /></span
+            ><span class="managed-module-label">已归档</span>
+          </div>
+          <h2>{{ a.archived_name }}</h2>
+          <p><span>道题目（历史）</span></p>
+        </div>
+        <div class="managed-module-card-footer">
+          <button
+            :aria-label="'恢复' + a.archived_name + '模块'"
+            :disabled="processing"
+            @click="restore(a)"
+          >
+            <Icon name="check" :size="14" />取消归档
           </button>
         </div>
       </article>
@@ -239,7 +323,9 @@ onBeforeUnmount(() => {
             ? '没有找到对应模块'
             : filter === 'empty'
               ? '所有模块都有题目了'
-              : '从第一个模块开始'
+              : filter === 'archived'
+                ? '还没有归档的模块'
+                : '从第一个模块开始'
         }}
       </h2>
       <p>
@@ -248,11 +334,13 @@ onBeforeUnmount(() => {
             ? '尝试缩短关键词，或清空搜索。'
             : filter === 'empty'
               ? '可以切换到全部模块继续管理。'
-              : '例如 Java 基础、JVM、数据库。'
+              : filter === 'archived'
+                ? '归档的空模块会出现在这里，可随时恢复。'
+                : '例如 Java 基础、JVM、数据库。'
         }}
       </p>
       <button
-        v-if="query || filter === 'empty'"
+        v-if="query || filter === 'empty' || filter === 'archived'"
         @click="
           query = '';
           filter = 'all';
@@ -262,7 +350,7 @@ onBeforeUnmount(() => {
       ><button v-else class="primary" :disabled="processing" @click="edit(null)">新建模块</button>
     </div>
     <div class="module-manager-hint">
-      <Icon name="info" :size="15" /><span>点击卡片查看题目；模块有题目时，先转移题目再删除。</span
+      <Icon name="info" :size="15" /><span>点击卡片查看题目；模块有题目时，先转移题目再归档。</span
       ><span>{{ visible.length }} / {{ categories.length }} 个模块</span>
     </div>
     <dialog

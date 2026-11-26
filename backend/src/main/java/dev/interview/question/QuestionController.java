@@ -114,6 +114,16 @@ public class QuestionController {
     return catalog.categories();
   }
 
+  @GetMapping("/admin/categories/archived")
+  Object archivedCategories() {
+    return catalog.archived();
+  }
+
+  @PostMapping("/admin/categories/{id}/unarchive")
+  void unarchive(@PathVariable long id) {
+    catalog.restore(id);
+  }
+
   @GetMapping("/tags")
   Object tags() {
     return catalog.tags();

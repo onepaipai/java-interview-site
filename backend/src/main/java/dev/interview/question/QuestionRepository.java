@@ -278,6 +278,16 @@ public class QuestionRepository {
       .isEmpty();
   }
 
+  public boolean lockArchivedCategory(long id) {
+    return !db
+      .queryForList(
+        "SELECT id FROM categories WHERE id=? AND deleted=TRUE FOR UPDATE",
+        Long.class,
+        id
+      )
+      .isEmpty();
+  }
+
   public long write(Long id, QuestionService.Edit e) {
     if (id == null) return insert(
       "INSERT INTO questions(title,category_id,difficulty,answer,sort_order) VALUES(?,?,?,?,?)",

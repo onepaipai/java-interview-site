@@ -823,7 +823,7 @@
     display: none;
   }
 }
-\n.module-rail-mini {
+.module-rail-mini {
   display: flex;
   flex-direction: column;
   align-items: center;

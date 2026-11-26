@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { api } from '../lib/api';
 import { markdown } from '../lib/markdown';
 import { copyCodeButton } from '../lib/clipboard';
+import { normalizeTurns, renderTurns, trimTurns, newTurnId, type AiTurn } from '../lib/aiTurns';
 import type { KnowledgeStatus } from '../lib/types';
 import Icon from './Icon.vue';
 const props = defineProps<{ questionId: number; admin: boolean }>();
@@ -14,46 +15,40 @@ type Source = {
   chunk: number;
   content: string;
 };
-type Turn = { role: 'user' | 'assistant'; content: string; sources?: Source[] };
+type Turn = AiTurn<Source>;
+const MAX_TURNS = 12;
 const opened = ref(false),
   enabled = ref(false),
-  rag = ref(true),
+  rag = ref(false),
   busy = ref(false),
   prompt = ref(''),
   error = ref(''),
   turns = ref<Turn[]>([]),
   model = ref('');
 const chatKey = 'zhixu-ai-chat-' + props.questionId;
+const htmlCache = new Map<string, string>();
 const renderedTurns = computed(() =>
-  turns.value.map((turn) => ({
-    ...turn,
-    html: turn.role === 'assistant' ? markdown(turn.content, { media: false }) : '',
-  })),
+  renderTurns(turns.value, (content) => markdown(content, { media: false }), htmlCache),
 );
-watch(
-  turns,
-  (value) => {
-    try {
-      sessionStorage.setItem(chatKey, JSON.stringify(value));
-    } catch {}
-  },
-  { deep: true },
-);
+watch(turns, (value) => {
+  try {
+    sessionStorage.setItem(chatKey, JSON.stringify(trimTurns(value, MAX_TURNS)));
+  } catch {}
+});
 function loadTurns() {
   try {
-    const value = JSON.parse(sessionStorage.getItem(chatKey) || 'null');
-    if (Array.isArray(value)) {
-      turns.value = value.filter(
-        (t): t is Turn =>
-          !!t && (t.role === 'user' || t.role === 'assistant') && typeof t.content === 'string',
-      );
-    }
+    turns.value = normalizeTurns<Source>(
+      JSON.parse(sessionStorage.getItem(chatKey) || 'null'),
+      MAX_TURNS,
+    );
   } catch {}
 }
 let disposed = false;
-const statusLoading = ref(true),
+const statusLoading = ref(false),
   statusError = ref(''),
+  statusChecked = ref(false),
   controller = new AbortController();
+let askController: AbortController | undefined;
 async function loadStatus() {
   statusLoading.value = true;
   statusError.value = '';
@@ -68,6 +63,7 @@ async function loadStatus() {
     if (!disposed) {
       enabled.value = s.enabled;
       model.value = s.model;
+      statusChecked.value = true;
     }
   } catch (e) {
     if (!disposed) statusError.value = (e as Error).message;
@@ -75,14 +71,18 @@ async function loadStatus() {
     if (!disposed) statusLoading.value = false;
   }
 }
-onMounted(() => {
-  loadStatus();
-  loadTurns();
+watch(opened, (value) => {
+  if (value && !statusChecked.value && !statusLoading.value) loadStatus();
 });
+loadTurns();
 onBeforeUnmount(() => {
   disposed = true;
   controller.abort();
+  askController?.abort();
 });
+function stopAsking() {
+  askController?.abort();
+}
 async function ask(text = prompt.value) {
   if (busy.value || !enabled.value || statusLoading.value || !text.trim()) return;
   if (text.length > 3000) {
@@ -91,6 +91,7 @@ async function ask(text = prompt.value) {
   }
   error.value = '';
   busy.value = true;
+  askController = new AbortController();
   const history = turns.value
     .slice(-8)
     .map((t) => ({ role: t.role, content: t.content.slice(0, 8000) }));
@@ -100,17 +101,22 @@ async function ask(text = prompt.value) {
       'POST',
       { prompt: text, history, rag: rag.value },
       120000,
-      controller.signal,
+      askController.signal,
     );
     if (disposed) return;
-    turns.value.push(
-      { role: 'user', content: text },
-      { role: 'assistant', content: result.answer, sources: result.sources },
+    turns.value = trimTurns(
+      [
+        ...turns.value,
+        { id: newTurnId(), role: 'user', content: text },
+        { id: newTurnId(), role: 'assistant', content: result.answer, sources: result.sources },
+      ],
+      MAX_TURNS,
     );
     if (prompt.value === text) prompt.value = '';
   } catch (e) {
-    if (!disposed) error.value = (e as Error).message;
+    if (!disposed && !askController.signal.aborted) error.value = (e as Error).message;
   } finally {
+    askController = undefined;
     if (!disposed) busy.value = false;
   }
 }
@@ -119,6 +125,7 @@ async function copy(e: MouseEvent) {
   if (b) await copyCodeButton(b);
 }
 </script>
+
 <template>
   <section class="ai-panel">
     <button
@@ -134,7 +141,15 @@ async function copy(e: MouseEvent) {
         ></span
       ><span class="ai-panel-state"
         ><span>{{
-          statusLoading ? '检查中' : statusError ? '连接异常' : enabled ? '继续追问' : '暂未启用'
+          !statusChecked && !statusLoading && !statusError
+            ? '展开后连接'
+            : statusLoading
+              ? '检查中'
+              : statusError
+                ? '连接异常'
+                : enabled
+                  ? '继续追问'
+                  : '暂未启用'
         }}</span
         ><Icon name="right" :size="15"
       /></span>
@@ -163,7 +178,10 @@ async function copy(e: MouseEvent) {
           </button>
         </div>
         <div class="ai-turns" aria-live="polite">
-          <article v-for="(turn, i) in renderedTurns" :key="i" :class="'ai-turn ' + turn.role">
+          <p v-if="!turns.length" class="ai-empty muted">
+            展开后可以围绕本题继续提问，对话只保存在当前标签页。
+          </p>
+          <article v-for="turn in renderedTurns" :key="turn.id" :class="'ai-turn ' + turn.role">
             <strong>{{ turn.role === 'user' ? '我的问题' : 'AI 回答' }}</strong>
             <p v-if="turn.role === 'user'">{{ turn.content }}</p>
             <div v-else class="markdown" @click="copy" v-html="turn.html"></div>
@@ -205,8 +223,9 @@ async function copy(e: MouseEvent) {
             ></textarea></label
           ><button class="primary" :disabled="busy || !prompt.trim()">发送</button>
         </form>
+        <button v-if="busy" class="ai-stop" @click="stopAsking">停止生成</button>
         <p class="ai-caption">
-          回答由模型生成，请核对后采用。对话按题目暂存，关闭标签页后清除。
+          回答由模型生成，请核对后采用。对话按题目暂存，关闭标签页后清除。默认不检索知识库，需要引用资料时勾选「使用知识库」。
         </p></template
       >
       <p v-if="error" class="error" role="alert">{{ error }}</p>

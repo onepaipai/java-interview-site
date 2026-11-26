@@ -317,7 +317,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="data-manager page-section">
+  <section class="data-manager">
     <header class="data-manager-heading">
       <div>
         <h1>数据管理</h1>
@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
           <h2>解析发布状态</h2>
           <button :disabled="statusLoading || !!busy" @click="loadStatus">刷新</button>
         </div>
-        <div v-if="statusLoading" class="muted">加载中…</div>
+        <div v-if="statusLoading" class="muted" role="status">加载中…</div>
         <template v-else-if="status">
           <dl class="status-stats">
             <div>
@@ -419,7 +419,7 @@ onBeforeUnmount(() => {
         <p class="muted">
           业务库审核工作区，与仓库内发布台账相互独立；结论写入 explanation_reviews 表。
         </p>
-        <div v-if="reviewLoading" class="muted">加载中…</div>
+        <div v-if="reviewLoading" class="muted" role="status">加载中…</div>
         <template v-else-if="reviews">
           <dl class="status-stats">
             <div v-for="key in REVIEW_STATUSES" :key="key">

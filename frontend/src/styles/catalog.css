@@ -263,7 +263,7 @@
 .catalog-card-progress > span {
   display: block;
   height: 100%;
-  background: var(--accent-soft);
+  background: var(--accent);
   border-radius: inherit;
 }
 .catalog-home .module-card-bottom {

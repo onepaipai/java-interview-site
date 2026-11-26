@@ -25,6 +25,14 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px;
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.data-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
 }
 .data-card h2 {
   margin: 0 0 8px;
@@ -55,10 +63,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 34px;
-  padding: 6px 12px;
+  min-height: var(--control-h);
+  padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   background: var(--surface-2);
   color: var(--text);
   font-size: 13px;
@@ -290,4 +298,27 @@
 }
 .data-mode label input[type='checkbox'] {
   margin-right: 6px;
+}
+@media (max-width: 720px) {
+  .data-manager-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .data-card {
+    padding: 16px;
+  }
+}
+@media (max-width: 480px) {
+  .data-manager-heading h1 {
+    font-size: 22px;
+  }
+  .status-stats {
+    gap: 8px;
+  }
+  .data-actions {
+    flex-direction: column;
+  }
+  .data-actions button {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

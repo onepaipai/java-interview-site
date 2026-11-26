@@ -22,6 +22,15 @@
   --inverse-surface: #202b40;
   --inverse-text: #d0d9e8;
   --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(38, 50, 72, 0.06);
+  --shadow-md: 0 6px 20px rgba(38, 50, 72, 0.08);
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --control-h: 40px;
   --small: 13px;
   --body: 16px;
   font-family: Inter, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
@@ -1388,13 +1397,14 @@ dialog::backdrop {
   color: var(--danger);
 }
 .danger-primary {
-  background: var(--danger-soft);
+  background: var(--danger);
   color: white;
   border-color: var(--danger);
 }
 .danger-primary:hover {
-  background: var(--danger-soft);
+  background: var(--danger);
   border-color: var(--danger);
+  filter: brightness(0.9);
 }
 .icon-button {
   border: 0;
@@ -1426,6 +1436,10 @@ dialog::backdrop {
 }
 .global-search-input input:focus {
   outline: none;
+}
+.global-search-input:focus-within {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
 }
 .global-search-input > button {
   border: 0;
@@ -2551,10 +2565,6 @@ dialog::backdrop {
   }
 }
 @media (min-width: 360px) and (max-width: 540px) {
-  .managed-module-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
   .managed-module-open {
     padding: 16px 13px 13px;
   }
@@ -2825,4 +2835,37 @@ dialog::backdrop {
   font-size: 13px;
   color: var(--warn);
   background: var(--warn-soft);
+}
+
+/* 全局细节：统一禁用态、文本选区、滚动条与动效偏好 */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

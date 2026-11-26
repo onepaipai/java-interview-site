@@ -3,8 +3,10 @@ package dev.interview.publication;
 import java.util.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class ReviewRepository {
 
   private final JdbcTemplate db;
@@ -51,8 +53,17 @@ public class ReviewRepository {
     String evidence,
     String reviewer
   ) {
-    db.update(
-      "INSERT INTO explanation_reviews(source_key,answer_sha256,status,applicable_version,evidence,reviewer,updated_at) VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE answer_sha256=VALUES(answer_sha256),status=VALUES(status),applicable_version=VALUES(applicable_version),evidence=VALUES(evidence),reviewer=VALUES(reviewer),updated_at=CURRENT_TIMESTAMP",
+    int updated = db.update(
+      "UPDATE explanation_reviews SET answer_sha256=?,status=?,applicable_version=?,evidence=?,reviewer=?,updated_at=CURRENT_TIMESTAMP WHERE source_key=?",
+      answerSha256,
+      status,
+      applicableVersion,
+      evidence,
+      reviewer,
+      sourceKey
+    );
+    if (updated == 0) db.update(
+      "INSERT INTO explanation_reviews(source_key,answer_sha256,status,applicable_version,evidence,reviewer,updated_at) VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)",
       sourceKey,
       answerSha256,
       status,

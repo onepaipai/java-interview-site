@@ -103,7 +103,7 @@ bash deploy/restore.sh backups/20261013T000000Z
 发布新版本前备份，再上传源码（保留 .env、Docker 卷和部署配置），执行 docker compose up -d --build。
 保存每次发布的源码压缩包或 Git 提交及构建镜像，便于回滚。
 普通回滚使用上个应用版本；涉及数据库结构变更须确认旧版本兼容性，必要时使用对应数据库备份。
-当前迁移版本为 V7；后续结构变更追加 V8 及更高版本文件，不修改已经执行的迁移。
+当前迁移版本为 V8；后续结构变更追加 V9 及更高版本文件，不修改已经执行的迁移。V8 把审核表的 evidence 列统一为 MySQL 8.4 与 H2 都支持的 MEDIUMTEXT。
 docker compose down 保留卷；不要使用 down -v，后者会删除题库和图片。
 
 ## 验收清单

@@ -58,7 +58,7 @@ npm run build
 ```
 
 `test:ai` 覆盖折叠面板展开后才检查状态、勾选「使用知识库」后的提问、Markdown 清洗与来源展开，以及 1440/390/320 三种宽度。
-`test:data-admin` 覆盖数据管理页的导入预览与资料勾选、题库与完整备份下载、解析发布状态、业务库审核结论写回，以及知识模块的归档/取消归档与题目批量移动；它写入隔离测试环境的可丢弃数据，不指向日常应用数据。
+`test:data-admin` 覆盖数据管理页的导入预览与资料勾选、题库与完整备份下载、解析发布状态、业务库审核结论写回，以及知识模块的归档/取消归档与题目批量移动；它写入隔离测试环境的可丢弃数据，不指向日常应用数据。该套件已加入 GitHub Actions 浏览器回归的 ui 分组，与 `test:ai` 等管理端用例一起执行。
 
 运行器生成随机凭据和环境标识，数据库、图片和日志全部位于 `backend/target/e2e-<id>/`。测试先校验该环境的 `/api/test-environment` 标识，再允许写入；正常部署没有这个端点。结束后停止本轮启动的进程，保留可丢弃的诊断资料。直接运行写入型测试且缺少目标、凭据或环境标识时会失败，不能回退到日常服务。
 
@@ -82,7 +82,7 @@ npm run build
 .\scripts\test-mysql.ps1
 ```
 
-此入口启动 `compose.test.yml` 的临时 MySQL，使用 13316 端口和内存数据目录；结束后只删除该测试 Compose 项目。测试库名必须以 `_test` 结尾，连接只允许 localhost/127.0.0.1。集成测试继承归档/恢复竞争、会话撤销、搜索定位、上传限额等回归，另验 MySQL 8.4、迁移和字符集。GitHub Actions 同样使用临时 MySQL 服务。CI 文件存在不代表它已经在远程运行。
+此入口启动 `compose.test.yml` 的临时 MySQL，使用 13316 端口和内存数据目录；结束后只删除该测试 Compose 项目。测试库名必须以 `_test` 结尾，连接只允许 localhost/127.0.0.1。集成测试继承归档/恢复竞争、会话撤销、搜索定位、上传限额等回归，另验 MySQL 8.4、迁移和字符集。GitHub Actions 同样使用临时 MySQL 服务，并在 `mvn -B clean verify` 中执行 V1–V8 全量迁移；V8 用 `MODIFY evidence MEDIUMTEXT` 统一审核表列类型，避免 V7 的 `CLOB` 在 MySQL 8.4 上不兼容。CI 文件存在不代表它已经在远程运行。
 
 运行器现同时执行 `DatabaseMySqlContentExamplesTest`，在真实 8.4 测试库运行同一组正文 SQL，并单独记录到 `backend/target/database-content-examples/mysql/`。缺少显式隔离配置时整类跳过，参数化方法在未展开时的跳过数可能按方法报告；不据此推断所有 SQL 已在 MySQL 通过。此检查仍不覆盖死锁、断电、复制与备份恢复实验。
 

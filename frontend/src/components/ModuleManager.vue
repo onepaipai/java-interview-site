@@ -5,6 +5,7 @@ import { categoryName, categoryGroup } from '../lib/display';
 import Icon from './Icon.vue';
 import { confirmAction } from '../lib/confirm';
 import { trapDialogTab } from '../lib/dialog';
+import { bulkMoveQuestions, moduleQuestionIds } from '../lib/bulkMove';
 import type { Category, ArchivedCategory } from '../lib/types';
 const props = defineProps<{ categories: Category[] }>();
 const emit = defineEmits<{ refresh: [Category[]]; open: [Category]; dirty: [boolean] }>();
@@ -22,6 +23,11 @@ const query = ref(''),
   modalOpen = ref(false);
 const archived = ref<ArchivedCategory[]>([]);
 const archivedLoading = ref(false);
+const moveDialog = ref<HTMLDialogElement>();
+const moveSource = ref<Category | null>(null);
+const moveTarget = ref('');
+const moveBusy = ref(false);
+const moveError = ref('');
 const namePrefix = computed(
   () => editing.value?.name.match(/^(\d+\.\d+\s*|[一二三四五六七八]、\s*)/)?.[0] || '',
 );
@@ -152,6 +158,52 @@ async function remove(c: Category) {
   }
 }
 
+async function openMove(c: Category) {
+  if (processing.value || Number(c.question_count) === 0) return;
+  moveSource.value = c;
+  moveTarget.value = '';
+  moveError.value = '';
+  await nextTick();
+  moveDialog.value?.showModal();
+}
+
+function closeMove() {
+  if (moveBusy.value) return;
+  moveDialog.value?.close();
+  moveSource.value = null;
+}
+
+async function moveQuestions() {
+  const source = moveSource.value;
+  if (!source || moveBusy.value) return;
+  const target = Number(moveTarget.value);
+  if (!target) {
+    moveError.value = '请选择目标模块';
+    return;
+  }
+  if (target === source.id) {
+    moveError.value = '目标模块不能与当前模块相同';
+    return;
+  }
+  moveBusy.value = true;
+  moveError.value = '';
+  try {
+    const ids = await moduleQuestionIds(source.id);
+    if (!ids.length) {
+      moveError.value = '当前模块没有可移动的题目';
+      return;
+    }
+    const result = await bulkMoveQuestions(ids, target);
+    emit('refresh', await api<Category[]>('/categories'));
+    closeMove();
+    success('已移动 ' + result.moved + ' 道题目');
+  } catch (e) {
+    moveError.value = e instanceof Error ? e.message : '批量移动失败，请重试';
+  } finally {
+    moveBusy.value = false;
+  }
+}
+
 async function loadArchived() {
   archivedLoading.value = true;
   try {
@@ -270,6 +322,13 @@ onBeforeUnmount(() => {
         <div class="managed-module-card-footer">
           <button :disabled="processing" @click="edit(c)">
             <Icon name="edit" :size="14" />重命名</button
+          ><button
+            v-if="Number(c.question_count) > 0"
+            :aria-label="'批量移动' + categoryName(c.name) + '模块的题目'"
+            :disabled="processing || moveBusy"
+            @click="openMove(c)"
+          >
+            <Icon name="right" :size="14" />批量移动</button
           ><button
             class="managed-module-delete"
             :aria-label="'归档' + categoryName(c.name) + '模块'"
@@ -391,6 +450,46 @@ onBeforeUnmount(() => {
           <button type="button" :disabled="saving" @click="close">取消</button
           ><button class="primary" :disabled="saving || !name.trim()">
             {{ saving ? '保存中…' : editing ? '保存修改' : '创建模块' }}
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      ref="moveDialog"
+      class="module-edit-dialog"
+      @keydown.capture="(e) => trapDialogTab(e, moveDialog)"
+      @cancel.prevent="closeMove"
+    >
+      <form @submit.prevent="moveQuestions">
+        <div class="module-edit-dialog-top">
+          <span><Icon name="layers" :size="24" /></span
+          ><button type="button" aria-label="关闭批量移动" :disabled="moveBusy" @click="closeMove">
+            <Icon name="close" :size="20" />
+          </button>
+        </div>
+        <h2>批量移动题目</h2>
+        <p v-if="moveSource">
+          将「{{ categoryName(moveSource.name) }}」的
+          {{ moveSource.question_count }}
+          道题目整体移动到目标模块，题目的回答、标签与学习进度保持不变。
+        </p>
+        <label
+          >目标模块<select v-model="moveTarget" :disabled="moveBusy" required>
+            <option value="" disabled>请选择模块</option>
+            <option
+              v-for="c in categories.filter((item) => item.id !== moveSource?.id)"
+              :key="c.id"
+              :value="String(c.id)"
+            >
+              {{ categoryName(c.name) }}
+            </option>
+          </select></label
+        >
+        <div v-if="moveError" class="module-form-error" role="alert">{{ moveError }}</div>
+        <div class="module-dialog-actions">
+          <button type="button" :disabled="moveBusy" @click="closeMove">取消</button
+          ><button class="primary" :disabled="moveBusy || !moveTarget">
+            {{ moveBusy ? '移动中…' : '确认移动' }}
           </button>
         </div>
       </form>

@@ -288,6 +288,20 @@ public class QuestionRepository {
       .isEmpty();
   }
 
+  public int bulkMove(List<Long> ids, long categoryId) {
+    if (ids.isEmpty()) return 0;
+    String placeholders = String.join(",", Collections.nCopies(ids.size(), "?"));
+    Object[] args = new Object[ids.size() + 1];
+    args[0] = categoryId;
+    for (int i = 0; i < ids.size(); i++) args[i + 1] = ids.get(i);
+    return db.update(
+      "UPDATE questions SET category_id=?,version=version+1,updated_at=CURRENT_TIMESTAMP WHERE id IN (" +
+        placeholders +
+        ") AND deleted=FALSE",
+      args
+    );
+  }
+
   public long write(Long id, QuestionService.Edit e) {
     if (id == null) return insert(
       "INSERT INTO questions(title,category_id,difficulty,answer,sort_order) VALUES(?,?,?,?,?)",

@@ -1,0 +1,9 @@
+CREATE TABLE explanation_reviews (
+ source_key VARCHAR(64) PRIMARY KEY,
+ answer_sha256 VARCHAR(64) NOT NULL,
+ status VARCHAR(20) NOT NULL,
+ applicable_version VARCHAR(200) NOT NULL,
+ evidence CLOB NOT NULL,
+ reviewer VARCHAR(80) NOT NULL,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

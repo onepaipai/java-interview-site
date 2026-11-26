@@ -48,6 +48,11 @@ const schemas = {
   Library: object({ items: array(ref('LibrarySource')), total: integer, page: integer, size: integer, counts: object({ question: integer, reference: integer, upload: integer }) }),
   IndexResult: object({ indexed: integer, remaining: integer }),
   Metrics: object({ mode: { const: 'single-instance' }, availableAiSlots: integer, counters: { type: 'object', additionalProperties: integer } }),
+  BulkMove: object({ ids: { ...array(integer), minItems: 1, maxItems: 1000, uniqueItems: true }, categoryId: integer }),
+  BulkMoveResult: object({ moved: integer, skipped: integer }),
+  Backup: object({ version: integer, exportedAt: string(), scope: string(), categories: array({ type: 'object' }), archivedCategories: array({ type: 'object' }), tags: array({ type: 'object' }), documents: array({ type: 'object' }), questions: array({ type: 'object' }), trash: array({ type: 'object' }), publications: { type: 'object' } }),
+  Review: object({ status: { enum: ['pending', 'verified', 'rejected', 'stale'] }, applicableVersion: string(200), evidence: array(string()), reviewer: string(80) }, ['status']),
+  ReviewSummary: object({ counts: object({ pending: integer, verified: integer, rejected: integer, stale: integer }), items: array({ type: 'object' }) }),
 };
 const query = (name, schema, required = false) => ({ name, in: 'query', required, schema });
 const operations = {
@@ -105,6 +110,10 @@ const operations = {
   'GET /api/admin/metrics': ['Single-instance aggregate counters; excludes prompts, keys and account identifiers', 'Metrics'],
   'GET /api/admin/snapshot/questions': ['Admin-only paged full records for backup/content audits; includes source keys and only the current administrator’s progress', { type: 'object' }],
   'GET /api/admin/publications/status': ['Read-only human-edit reconciliation against publication hashes', { type: 'object' }],
+  'POST /api/admin/questions/batch-move': ['Atomically move active questions to another module', 'BulkMoveResult', 'BulkMove'],
+  'GET /api/admin/backup': ['Export a full JSON backup; progress is limited to the current administrator', 'Backup'],
+  'GET /api/admin/reviews': ['List business-database review conclusions grouped by status', 'ReviewSummary'],
+  'PUT /api/admin/reviews/{sourceKey}': ['Write one review conclusion; verified requires version, reviewer and evidence', { type: 'object' }, 'Review'],
   'GET /api/test-environment': ['Disposable E2E marker; disabled in normal deployments', object({ id: string() })],
 };
 

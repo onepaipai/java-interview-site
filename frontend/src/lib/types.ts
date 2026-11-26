@@ -9,6 +9,38 @@ export interface ArchivedCategory {
   archived_name: string;
   question_count: number;
 }
+export interface BulkMoveResult {
+  moved: number;
+  skipped: number;
+}
+export interface ReviewItem {
+  questionId: number;
+  sourceKey: string;
+  title: string;
+  answerSha256: string;
+  status: 'pending' | 'verified' | 'rejected' | 'stale';
+  applicableVersion: string;
+  evidence: string[];
+  reviewer: string;
+  updatedAt: string;
+}
+export interface ReviewSummary {
+  counts: Record<ReviewItem['status'], number>;
+  items: ReviewItem[];
+}
+export interface PublicationStatus {
+  packVersion: string;
+  published: number;
+  archived: number;
+  manualChanges: number;
+  items: {
+    questionId: number;
+    title: string;
+    version: number;
+    publication: string;
+    status: string;
+  }[];
+}
 export interface LearningSummary {
   total: number;
   mastered: number;

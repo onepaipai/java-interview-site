@@ -202,3 +202,92 @@
   cursor: default;
   opacity: 0.75;
 }
+.status-title[href] {
+  color: var(--accent);
+  text-decoration: none;
+}
+.status-title[href]:hover {
+  text-decoration: underline;
+}
+.review-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.review-filter button {
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.review-filter button.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.review-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--muted);
+}
+.review-badge[data-status='verified'] {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.review-badge[data-status='rejected'] {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.review-badge[data-status='stale'] {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.review-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.review-row-actions button {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+}
+.review-field {
+  display: block;
+  margin: 10px 0;
+  font-size: 13px;
+}
+.review-field input,
+.review-field select,
+.review-field textarea {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+.data-mode label input[type='checkbox'] {
+  margin-right: 6px;
+}

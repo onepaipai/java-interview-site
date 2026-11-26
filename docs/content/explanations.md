@@ -128,3 +128,7 @@ senior-v1 保留原来的 1,050 道题及稳定来源键；解析使用独立的
 2. 快照读的隔离级别差异按 [MySQL 8.4 一致性读](https://dev.mysql.com/doc/refman/8.4/en/innodb-consistent-read.html) 核对；教学用 H2 不替代生产数据库验证。
 3. 虚拟线程固定问题区分 JDK 21 与 24 之后的实现，参见 [Oracle JDK 24 迁移指南](https://docs.oracle.com/en/java/javase/24/migrate/jdk-migration-guide.pdf)。项目 Java 17 示例不混用虚拟线程 API。
 4. 租约与持有者校验参考 [Redis 分布式锁说明](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)；消息投递边界参考 [Kafka 4.1 设计](https://kafka.apache.org/41/design/design/)。模块资料是延伸阅读，不冒充每条教学场景的生产证据。
+
+## 业务库审核工作区
+
+数据管理页的「题解审核」把审核结论写入数据库表 `explanation_reviews`（V7 迁移），按 `pending/verified/rejected/stale` 四态维护；`verified` 必须同时填写适用版本、审核人与证据链接。这是运行时的业务库工作区，与 `content/explanations/review-ledger.json` 发布台账相互独立：后者仍由 `scripts/sync-content-status.mjs` 从正文哈希与审核证据离线生成，并受 `verify.ps1`/CI 的哈希门禁保护。页面上的结论不会改写仓库文件，也不会让台账的 `--check` 失效；发布台账仍以仓库内静态 JSON 为准。

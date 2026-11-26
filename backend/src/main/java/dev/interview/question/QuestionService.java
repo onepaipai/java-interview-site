@@ -157,6 +157,28 @@ public class QuestionService {
   }
 
   @Transactional
+  public Map<String, Integer> moveQuestions(List<Long> ids, long categoryId) {
+    if (
+      ids == null ||
+      ids.isEmpty() ||
+      ids.size() > 1000 ||
+      ids.stream().anyMatch(Objects::isNull) ||
+      new HashSet<>(ids).size() != ids.size()
+    ) throw new IllegalArgumentException();
+    if (!repository.lockCategory(categoryId)) throw new ResponseStatusException(
+      BAD_REQUEST,
+      "请选择有效分类"
+    );
+    int moved = repository.bulkMove(ids, categoryId);
+    if (moved != ids.size()) throw new ResponseStatusException(
+      CONFLICT,
+      "部分题目不存在或已删除，请重新选择后重试"
+    );
+    for (long id : ids) events.publishEvent(new KnowledgeChanged("question:" + id));
+    return Map.of("moved", moved, "skipped", 0);
+  }
+
+  @Transactional
   public long save(Long id, Edit e) {
     validate(e);
     long current = id == null ? 0 : repository.answerLength(id);

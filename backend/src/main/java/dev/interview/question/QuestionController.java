@@ -109,6 +109,13 @@ public class QuestionController {
     service.restore(id);
   }
 
+  record BulkMove(List<Long> ids, long categoryId) {}
+
+  @PostMapping("/admin/questions/batch-move")
+  Map<String, Integer> batchMove(@RequestBody BulkMove body) {
+    return service.moveQuestions(body.ids(), body.categoryId());
+  }
+
   @GetMapping("/categories")
   Object categories() {
     return catalog.categories();

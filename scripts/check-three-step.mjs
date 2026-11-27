@@ -23,6 +23,11 @@ for (const [key, v] of Object.entries(questions)) {
   const answer = md.slice(md.indexOf('## 参考回答'), md.indexOf('## 参考分析'));
   if (!/^\d+\./m.test(answer)) note('三步走', key, '缺第一步编号');
 
+  const stepTwo = [...md.matchAll(/^### 第二步扩展([①②③④⑤⑥])\s·?/gm)].map(m => m[1]);
+  const expectedSteps = ['①', '②', '③', '④', '⑤', '⑥'].slice(0, v.analysis?.length || 0);
+  if (stepTwo.length !== (v.analysis?.length || 0) || stepTwo.some((step, i) => step !== expectedSteps[i]))
+    note('第二步序号', key, '扩展标题序号缺失、不连续或数量不匹配');
+
   // 排版：围栏配对、粗体闭合、超长列表项、堆段落
   for (const ch of ['```', '~~~'])
     if ((md.split(ch).length - 1) % 2 !== 0) note('围栏', key, ch + ' 不配对');

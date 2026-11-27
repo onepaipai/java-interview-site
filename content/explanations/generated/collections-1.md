@@ -26,6 +26,8 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 - 扩容触发:size>capacity×0.75——1024 桶在 768 个元素时扩到 2048。
 - 规划公式:预期 n 个元素不扩容,initialCapacity≥n/0.75(再由 tableSizeFor 取幂)。
 - n=10000→13334→16384。
+- JDK 7 构造时 threshold 已预乘负载因子。
+- JDK 8 构造阶段 threshold 先存目标桶数,首次 resize 后才重算为 cap×loadFactor——混谈这两态是容量规划的经典误区。
 
 ### 第二步扩展② 反例:容量失误的两种代价
 
@@ -39,13 +41,6 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 - 调高(0.8+):省内存但冲突链变长——查询型 HashMap 不建议。
 - Guinness 规则:默认 0.75 适合绝大多数。
 - 只对"极端读多写少+内存敏感"或"极端冲突敏感"才动它,动之前用负载画像数据说话。
-
-### 第二步扩展④ 展开:threshold 的版本语义差异
-
-- JDK 7:构造时 threshold=capacity×loadFactor(预乘负载因子)。
-- JDK 8:构造阶段 threshold 存的是 tableSizeFor(initialCapacity)——"期望容量取幂后的目标桶数",尚未乘负载因子。
-- 首次 resize 分配表时才把它重算为 cap×loadFactor 作为运行期扩容线。
-- 两版语义不同:JDK 8 的"构造 threshold"是目标桶数,"运行 threshold"才是扩容线——混谈这两态是容量规划的经典误区,也是本题实测(1000→1024 桶、768 触发扩容)的机制解释。
 
 ## 案例
 

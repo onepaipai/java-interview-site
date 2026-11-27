@@ -18,10 +18,9 @@ export default {
       '代价的两面:大容量=内存预占(空桶的引用开销)+小容量=扩容抖动(rehash 全量迁移)——按"元素数/0.75 取 2 的幂"规划,读多写少的缓存可再上浮。',
     ],
     [
-      block('机制:构造阈值、懒初始化与扩容触发', '构造:new HashMap<>(1000) 只设置 threshold=tableSizeFor(1000)=1024,**不分配表**(懒初始化,实测验证:put 前反射读 table=null 的形态,put 后=1024)。首次 put:resize() 按 threshold 分配桶数组。扩容触发:size>capacity×0.75——1024 桶在 768 个元素时扩到 2048。规划公式:预期 n 个元素不扩容,initialCapacity≥n/0.75(再由 tableSizeFor 取幂);n=10000→13334→16384。'),
+      block('机制:构造阈值、懒初始化与扩容触发', '构造:new HashMap<>(1000) 只设置 threshold=tableSizeFor(1000)=1024,**不分配表**(懒初始化,实测验证:put 前反射读 table=null 的形态,put 后=1024)。首次 put:resize() 按 threshold 分配桶数组。扩容触发:size>capacity×0.75——1024 桶在 768 个元素时扩到 2048。规划公式:预期 n 个元素不扩容,initialCapacity≥n/0.75(再由 tableSizeFor 取幂);n=10000→13334→16384。JDK 7 构造时 threshold 已预乘负载因子;JDK 8 构造阶段 threshold 先存目标桶数,首次 resize 后才重算为 cap×loadFactor——混谈这两态是容量规划的经典误区。'),
       block('反例:容量失误的两种代价', '代价一,默认容量:未传容量放 1 万元素——16 起步经历 16→…→16384 共 10 次扩容,每次全量 rehash(写路径尾延迟抖动,第 10 题ArrayList 同构)。代价二,过度预分配:预估 100 万实际 1 千——百万空桶的引用内存(每桶 8 字节引用+Entry 开销)白白占堆。实测锚点:容量 1000 首次 put 即 1024 桶——"传多少得多少的下一个幂",多传不多得,少传必扩容。'),
       block('取舍:负载因子调整的边界', '调低负载因子(0.5):冲突少查询快,内存翻倍——内存富余的缓存场景可调。调高(0.8+):省内存但冲突链变长——查询型 HashMap 不建议。 Guinness 规则:默认 0.75 适合绝大多数;只对"极端读多写少+内存敏感"或"极端冲突敏感"才动它,动之前用负载画像数据说话。'),
-      block('展开:threshold 的版本语义差异', 'JDK 7:构造时 threshold=capacity×loadFactor(预乘负载因子)。JDK 8:构造阶段 threshold 存的是 tableSizeFor(initialCapacity)——"期望容量取幂后的目标桶数",尚未乘负载因子;首次 resize 分配表时才把它重算为 cap×loadFactor 作为运行期扩容线。两版语义不同:JDK 8 的"构造 threshold"是目标桶数,"运行 threshold"才是扩容线——混谈这两态是容量规划的经典误区,也是本题实测(1000→1024 桶、768 触发扩容)的机制解释。'),
     ],
     [
       block('验证:容量实测的断言组', '验证:本机实验(反射读 table,--add-opens):new HashMap<>(1000)+put 后桶数=1024;1000 元素分批插入断言扩容发生在 768;传 13334 断言 16384 桶且 1 万元素零扩容——三组断言固化容量语义(含懒初始化:put 前表为 null 的断言)。'),

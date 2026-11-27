@@ -31,17 +31,12 @@
 - 误判二:把 syncookies 触发当攻击——偶发 SYN 突发触发 cookie 模式,性能下降被误报为 DDoS。
 - 两条的正解:两个队列分别监控(SYN_RCVD 计数/Recv-Q/溢出计数)。
 
-### 第二步扩展③ 取舍:队列长度的权衡
+### 第二步扩展③ 取舍:队列长度的权衡与排查
 
 - backlog 调大:抗瞬时突发,但掩盖 accept 线程慢的问题且内存占用增。
 - 调小:快速暴露应用瓶颈但突发丢连接。
-- 经验:backlog 与 accept 线程吞吐匹配(突发峰值×平均 accept 延迟),同时监控溢出计数——队列是缓冲不是解药,accept 速度才是。
-
-### 第二步扩展④ 排查:队列观察的命令链
-
-- 三步链:一,ss -lnt 看 Listen 态的 Recv-Q/Send-Q——Recv-Q=已握手未 accept 的连接数(全连接队列水位),上限即 backlog。
-- 二,netstat -s 按关键字看累计溢出计数(listen queue overflow/SYN overflow,历史漏接的直接证据)。
-- 三,sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog 看内核上限(应用 backlog 受 somaxconn 截断)——"现在多少/历史溢了多少/上限多少"三问分别对应三个命令,排查按序对照。
+- 经验:backlog 与 accept 线程吞吐匹配(突发峰值×平均 accept 延迟),同时监控溢出计数。
+- 排查按三步走:一看 ss -lnt 的 Recv-Q/Send-Q(水位),二查 netstat -s 的溢出计数(历史证据),三查 syn_backlog/somaxconn 上限——队列是缓冲不是解药,accept 速度才是。
 
 ## 案例
 

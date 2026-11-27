@@ -301,7 +301,7 @@ exceptionally、handle 和 whenComplete 也只是定义 Future 链的完成处�
 验收覆盖副本重启、应用线程锁等待、主库切换及客户端写后读。`),
     ],
     summary: ['送达邮箱不等于已读，分层观测', '半同步确认不等于全副本可读', '接收、持久化、应用要分层观测', '关键读要携带新鲜度要求'],
-    references: ['https://dev.mysql.com/doc/refman/8.4/en/replication-semisync.html', 'https://dev.mysql.com/doc/refman/8.4/en/replication-threads-monitor.html'],
+    references: ['https://dev.mysql.com/doc/refman/8.4/en/replication-semisync.html', 'https://dev.mysql.com/doc/refman/8.4/en/replication-administration-status.html'],
   },
   'database-advanced/30': {
     format: 'deep', title: '复制延迟上升应如何区分产生端与应用端瓶颈？',
@@ -326,7 +326,7 @@ Seconds_Behind 等派生值还可能受时间戳、空闲状态和大事务影�
 若恢复期间切换了读路由，验证路由回切不会把旧副本再次暴露给关键请求。`),
     ],
     summary: ['出餐、运输、配送三段钟，分段归因', '按生成传输应用阶段定位延迟', '大事务和锁等待会制造假象', '恢复必须验证数据而非只看延迟归零'],
-    references: ['https://dev.mysql.com/doc/refman/8.4/en/replication-threads-monitor.html', 'https://dev.mysql.com/doc/refman/8.4/en/replication-features.html'],
+    references: ['https://dev.mysql.com/doc/refman/8.4/en/replication-administration-status.html', 'https://dev.mysql.com/doc/refman/8.4/en/replication-features.html'],
   },
   'database-advanced/31': {
     format: 'deep', title: 'CDC 消费为什么必须处理重复和断点？',
@@ -1428,7 +1428,7 @@ Region 不是对象隔离边界：对象仍可能被引用图跨 Region 连接�
   "summary": ["水位必须落在零与容量之间", "先定义边界和不变式", "证据优先于直觉判断", "验证恢复与异常路径"],
   "references": [
     "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html",
-    "https://openjdk.org/jeps/266/"
+    "https://openjdk.org/jeps/266"
   ]
 },  'architecture/15': {
     format: 'deep', title: 'BFF 层什么时候有价值，什么时候会膨胀？',

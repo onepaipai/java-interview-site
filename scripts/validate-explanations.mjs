@@ -8,8 +8,8 @@ const root=new URL('../content/explanations/',import.meta.url);
 const publicRoot=new URL('../frontend/public/',import.meta.url);
 const read=async file=>readFile(new URL(file,root),'utf8');
 const manifest=JSON.parse(await read('manifest.json'));
-assert.equal(manifest.count,1215);assert.equal(manifest.entries.length,1215);
-assert.equal(new Set(manifest.entries.map(entry=>entry.sourceKey)).size,1215);
+assert.equal(manifest.count,1227);assert.equal(manifest.entries.length,1227);
+assert.equal(new Set(manifest.entries.map(entry=>entry.sourceKey)).size,1227);
 assert.deepEqual((await readdir(new URL('generated/',root))).filter(name=>name.endsWith('.md')).sort(),manifest.entries.map(entry=>entry.file.split('/').at(-1)).sort());
 const corrections=await loadQuestionContents();
 for(const [key,content] of Object.entries(corrections.questions)){
@@ -31,4 +31,4 @@ for(const entry of [...manifest.entries,...(await readdir(new URL('samples/',roo
 const coverage=JSON.parse(await read('coverage.json'));
 assert.equal(coverage.unmatched.length,0);
 assert.equal(coverage.qualityReview.questionSpecific,Object.keys(corrections.questions).length);
-console.log(`PASS: 1215 explanations + 3 samples; structure, hashes, ${diagrams} diagrams and ${Object.keys(corrections.questions).length} question-specific corrections. This is not a full factual review.`);
+console.log(`PASS: ${manifest.count} explanations + 3 samples; structure, hashes, ${diagrams} diagrams and ${Object.keys(corrections.questions).length} question-specific corrections. This is not a full factual review.`);

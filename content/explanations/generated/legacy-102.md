@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/innodb-transaction-model.html)
-- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/optimization.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,42 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
 ## 参考分析
 
-### 机制:Online DDL 的"并行"原理
+### 第二步扩展① 机制:Online DDL 的"并行"原理
 
-ADD INDEX 的 INPLACE:构建临时索引文件→同时应用 DML 变更(online log)→合并(重建索引末尾应用 DML log)——DML 与 DDL 并行(InnoDB 的 online log 保证不丢);MDL 锁(Metadata Lock)在 DDL 开始与结束时短暂获取(如果长事务持 MDL→DDL 等待→后续所有查询阻塞——DDL 前查长事务)。
+- ADD INDEX 的 INPLACE:构建临时索引文件→同时应用 DML 变更(online log)→合并(重建索引末尾应用 DML log)——DML 与 DDL 并行(InnoDB 的 online log 保证不丢)。
+- MDL 锁(Metadata Lock)在 DDL 开始与结束时短暂获取(如果长事务持 MDL→DDL 等待→后续所有查询阻塞——DDL 前查长事务)。
 
-### 反例:DDL 的两种事故
+### 第二步扩展② 反例:DDL 的两种事故
 
-事故一:长事务阻塞 DDL——DDL 需要 MDL 排他锁→长事务持有 MDL 共享锁→DDL 等待→后续所有查询排在 DDL 后面(全库阻塞);修复=DDL 前检查长事务(information_schema.innodb_trx)+设 lock_wait_timeout(超时放弃)。事故二:DDL 大事务产生的 binlog 回放慢——从库回放 DDL 的时间=主库执行时间(大表 DDL 从库延迟飙升,第 100 题);修复=gh-ost 的可控限速+从库延迟监控。
+- 事故一:长事务阻塞 DDL——DDL 需要 MDL 排他锁→长事务持有 MDL 共享锁→DDL 等待→后续所有查询排在 DDL 后面(全库阻塞)。
+- 修复=DDL 前检查长事务(information_schema.innodb_trx)+设 lock_wait_timeout(超时放弃)。
+- 事故二:DDL 大事务产生的 binlog 回放慢——从库回放 DDL 的时间=主库执行时间(大表 DDL 从库延迟飙升,第 100 题)。
+- 修复=gh-ost 的可控限速+从库延迟监控。
 
-### 取舍:三种方案的选择
+### 第二步扩展③ 取舍:三种方案的选择
 
-Online DDL:MySQL 原生+简单(DDL 语句直接跑)+风险=MDL 锁+不可暂停;gh-ost:可控(暂停/限速/切换)+无触发器+风险=额外存储+延迟(通过 binlog 同步);pt-osc:成熟工具+触发器开销+大表性能差——按表大小(千万以下 Online DDL,亿级 gh-ost)+可控性需求选。
+- Online DDL:MySQL 原生+简单(DDL 语句直接跑)+风险=MDL 锁+不可暂停。
+- gh-ost:可控(暂停/限速/切换)+无触发器+风险=额外存储+延迟(通过 binlog 同步)。
+- pt-osc:成熟工具+触发器开销+大表性能差——按表大小(千万以下 Online DDL,亿级 gh-ost)+可控性需求选。
 
 ## 案例
 
-### 验证:DDL 的走查核对
+### 第三步发散·验证与推演 验证:DDL 的走查核对
 
-验证:Online DDL 断言(ALGORITHM=INPLACE 成功+DML 并行执行不阻塞);gh-ost 断言(限速生效/暂停/切换原子);MDL 风险断言(长事务+DDL→后续查询阻塞——复现并预防);从库延迟断言(DDL 期间从库延迟+gh-ost 限速后缓解)。验证:DDL 的断言可在测试环境复现(生产 DBA 评审执行)。
+- 验证:Online DDL 断言(ALGORITHM=INPLACE 成功+DML 并行执行不阻塞)。
+- gh-ost 断言(限速生效/暂停/切换原子)。
+- MDL 风险断言(长事务+DDL→后续查询阻塞——复现并预防)。
+- 从库延迟断言(DDL 期间从库延迟+gh-ost 限速后缓解)。
+- 验证:DDL 的断言可在测试环境复现(生产 DBA 评审执行)。
 
-### 追问链:DDL 三刀
+### 第三步发散·追问扩展 追问链:DDL 三刀
 
-一刀:"DDL 的 ALGORITHM 有哪些?"——COPY(重建表,锁表)/INPLACE(原表修改,不锁)/INSTANT(仅元数据,秒级——ADD COLUMN MySQL 8.0.12+)——优先 INSTANT>INPLACE>COPY(ALGORITHM=INPLACE 显式声明,不支持则报错不静默降级)。二刀:"列类型变更的风险?"——改列类型可能需要 COPY(锁表)+数据截断风险(长度缩小)+索引重建——类型变更=最高风险 DDL,需 DBA 评审+备份+回滚方案。三刀:"DDL 的回滚?"——Online DDL 的回滚=执行反向 DDL(加的索引删掉)+耗时(与正向相同);gh-ost 的回滚=切回原表(秒级)——gh-ost 的回滚更可控(大表场景)。
+- **Q1：DDL 的 ALGORITHM 有哪些?**
+  - 答：COPY(重建表,锁表)/INPLACE(原表修改,不锁)/INSTANT(仅元数据,秒级——ADD COLUMN MySQL 8.0.12+)——优先 INSTANT>INPLACE>COPY(ALGORITHM=INPLACE 显式声明,不支持则报错不静默降级)。
+- **Q2：列类型变更的风险?**
+  - 答：改列类型可能需要 COPY(锁表)+数据截断风险(长度缩小)+索引重建——类型变更=最高风险 DDL,需 DBA 评审+备份+回滚方案。
+- **Q3：DDL 的回滚?**
+  - 答：Online DDL 的回滚=执行反向 DDL(加的索引删掉)+耗时(与正向相同);gh-ost 的回滚=切回原表(秒级)——gh-ost 的回滚更可控(大表场景)。
 
 ## 总结点
 

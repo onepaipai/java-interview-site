@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html)
 
@@ -19,27 +19,45 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:modCount 与三种姿势的原理
+### 第二步扩展① 机制:modCount 与三种姿势的原理
 
-CME 机制:list.remove 改 modCount→iterator.next 的 checkForComodification 对比 expectedModCount→不等抛。iterator.remove:调用 ListItr.remove(同步 expectedModCount=modCount)——合法。removeIf:ArrayList 重写(位图标记保留位+一次搬移+一次 modCount 更新)——O(n) 总成本。倒序下标:从后往前删除(删除不影响前方索引)——正序漏删(删 i 后 i+1 变 i)。
+- CME 机制:list.remove 改 modCount→iterator.next 的 checkForComodification 对比 expectedModCount→不等抛。
+- iterator.remove:调用 ListItr.remove(同步 expectedModCount=modCount)——合法。
+- removeIf:ArrayList 重写(位图标记保留位+一次搬移+一次 modCount 更新)——O(n) 总成本。
+- 倒序下标:从后往前删除(删除不影响前方索引)——正序漏删(删 i 后 i+1 变 i)。
 
-### 反例:删除姿势的三种事故
+### 第二步扩展② 反例:删除姿势的三种事故
 
-事故一,正序漏删:[1,1,2] 删所有 1——i=0 删后列表 [1,2],i 跳到 1(第二个 1 被跳过)。事故二,增强 for 抛 CME:remove 倒数第二以外的元素——偶发(取决于位置,本机实验:倒数第二个不抛)——"测试时没抛"的假安全感。事故三,removeIf 的谓词副作用:谓词里修改外部状态(顺序相关的副作用)——removeIf 的执行顺序不保证(并行流更甚)——谓词必须纯。三条的正解按场景:迭代器(边遍历边多逻辑)、removeIf(纯过滤)、倒序(简单下标逻辑)。
+- 事故一,正序漏删:[1,1,2] 删所有 1——i=0 删后列表 [1,2],i 跳到 1(第二个 1 被跳过)。
+- 事故二,增强 for 抛 CME:remove 倒数第二以外的元素——偶发(取决于位置,本机实验:倒数第二个不抛)——"测试时没抛"的假安全感。
+- 事故三,removeIf 的谓词副作用:谓词里修改外部状态(顺序相关的副作用)——removeIf 的执行顺序不保证(并行流更甚)——谓词必须纯。
+- 三条的正解按场景:迭代器(边遍历边多逻辑)、removeIf(纯过滤)、倒序(简单下标逻辑)。
 
-### 取舍:三姿势的选择
+### 第二步扩展③ 取舍:三姿势的选择
 
-iterator.remove:遍历中需要"多逻辑+删除"(其他处理与删除共存)。removeIf:纯过滤(谓词独立)——最简洁高效(优先)。倒序下标:数组式思维/非 List(自维护结构的删除)。HashMap 的对照:迭代中删键用 entrySet().iterator().remove(CHM 的迭代器支持 remove,弱一致语义;第 2 题)——不同容器姿势不同,原理同源(结构性修改的协调)。
+- iterator.remove:遍历中需要"多逻辑+删除"(其他处理与删除共存)。
+- removeIf:纯过滤(谓词独立)——最简洁高效(优先)。
+- 倒序下标:数组式思维/非 List(自维护结构的删除)。
+- HashMap 的对照:迭代中删键用 entrySet().iterator().remove(CHM 的迭代器支持 remove,弱一致语义。
+- 第 2 题)——不同容器姿势不同,原理同源(结构性修改的协调)。
 
 ## 案例
 
-### 验证:删除姿势的断言组
+### 第三步发散·验证与推演 验证:删除姿势的断言组
 
-验证:本机实验断言(增强 for remove 倒数第二不抛 CME——"尽力而为"的证据;其他位置抛);漏删断言(正序循环删重复元素,断言漏删);三姿势对照(同过滤需求:iterator/removeIf/倒序——结果一致且 removeIf 最快)——四组把删除语义完整固化。
+- 验证:本机实验断言(增强 for remove 倒数第二不抛 CME——"尽力而为"的证据。
+- 其他位置抛)。
+- 漏删断言(正序循环删重复元素,断言漏删)。
+- 三姿势对照(同过滤需求:iterator/removeIf/倒序——结果一致且 removeIf 最快)——四组把删除语义完整固化。
 
-### 追问链:删除三刀
+### 第三步发散·追问扩展 追问链:删除三刀
 
-一刀:"removeIf 为什么快?"——单次搬移(位图决定保留位,一次 System.arraycopy 压缩)vs 循环 remove 的多次搬移——O(n) vs O(n²)(第 42 题批量 removeAll 同族)。二刀:"并发容器的删除?"——CHM 迭代中 remove 不抛 CME(弱一致迭代器,自身 remove 支持)——容器语义决定姿势(第 2 题)。三刀:"删除与索引结构?"——删除后索引结构的失效(排序索引/缓存索引同步,第 47 题归属)——删除不只是列表的事,关联结构要联动。
+- **Q1：removeIf 为什么快?**
+  - 答：单次搬移(位图决定保留位,一次 System.arraycopy 压缩)vs 循环 remove 的多次搬移——O(n) vs O(n²)(第 42 题批量 removeAll 同族)。
+- **Q2：并发容器的删除?**
+  - 答：CHM 迭代中 remove 不抛 CME(弱一致迭代器,自身 remove 支持)——容器语义决定姿势(第 2 题)。
+- **Q3：删除与索引结构?**
+  - 答：删除后索引结构的失效(排序索引/缓存索引同步,第 47 题归属)——删除不只是列表的事,关联结构要联动。
 
 ## 总结点
 

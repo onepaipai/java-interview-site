@@ -2,7 +2,7 @@
 // 证据基准:JDK 17.0.17 本机实测(F:\tmp-col-exp,--add-opens 读内部结构);未实测写明"推演"。
 const pod = 'https://martinfowler.com/articles/patterns-of-distributed-systems/';
 const sre = 'https://sre.google/sre-book/addressing-cascading-failures/';
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const block = (title, body) => ({ title, body });
 const deep = (title, scenario, answer, analysis, cases, summary, references) => ({
   format: 'deep', title, scenario, answer, analysis, case: cases, summary, references,
@@ -54,12 +54,12 @@ export default {
     [
       '定位手段:反射/调试观测桶分布(每桶链表长度直方图——本机实验用 --add-opens 读 table 统计);或从键的 hashCode 反推(同一 hashCode=必然同桶)。健康画像:绝大多数桶 0-2 个元素,长尾桶>8 即冲突异常。',
       '冲突的根源三类:hashCode 实现差(恒定值/分布窄)、键的自然聚集(连续 ID 被 mask 截断)、容量不足(桶太少挤)——治理对应:重写 hashCode(充分散列)、扩容(第 1 题)、树化兜底(JDK 8 自动,第 4 题)。',
-      '恶意冲突(HashDoS):攻击者构造同桶键使 O(n) 查询——防御:键加随机盐(String 的 hash 有随机种子机制)、限制输入、树化把最坏 O(n) 降 O(log n)。',
+      '恶意冲突(HashDoS):攻击者构造同桶键使 O(n) 查询——防御:JDK HashMap 靠树化把最坏 O(n) 降 O(log n)（注意 Java 的 String.hashCode 没有随机种子，那是 Python 的机制，别混）、限制输入。',
     ],
     [
       block('机制:冲突的量化与树化兜底', '量化:桶 i 的元素数=链表长度(或树节点数);冲突率=非空桶中链表>1 的占比。本机实验(BadKey hashCode=42):12 个键全进同一桶——桶分布极端化;树化(桶 128≥64)把该桶转红黑树——查询从 O(12) 降 O(log 12),但插入维护成本升。HashMap 内部还有一道抗冲突防线:扰动函数 h=key.hashCode()^(h>>>16)——把高 16 位混入低位,让高位特征也参与 (n-1)&hash 的桶定位,对抗"低位聚集"(hashCode 只在低位变化时整列冲突);讲冲突治理必须提这道内部再处理。定位优先级:先看 hashCode 质量(源码+分布统计),再看容量,再看是否恶意。'),
       block('反例:hashCode 差的两种事故', '事故一,恒定 hashCode:所有键 hash 相同——HashMap 退化成链表(树化前),万级元素查询 O(n)——接口超时。事故二,分布窄:hashCode=低 8 位(对象 ID 截断)——1024 桶时每桶平均 4 倍冲突——性能慢性劣化。修复:hashCode 用 Objects.hash(关键域)(充分混合)+测试断言分布(键集的桶分布直方图进单测)。'),
-      block('取舍:治理手段的顺序', '顺序:改 hashCode(治本,分布质量)→扩容(治标,稀释冲突)→换容器(键无序但需范围查询换 TreeMap,需并发换 CHM)——树化是 JDK 的兜底不是优化手段(树化=冲突已经严重到需要兜底)。HashDoS 防御的特例:外部输入做键(String 键的 hash 种子随机化由 JDK 保证)——自定义键类做外部输入键时, hashCode 要加不可预测成分或限流。'),
+      block('取舍:治理手段的顺序', '顺序:改 hashCode(治本,分布质量)→扩容(治标,稀释冲突)→换容器(键无序但需范围查询换 TreeMap,需并发换 CHM)——树化是 JDK 的兜底不是优化手段(树化=冲突已经严重到需要兜底)。HashDoS 防御的特例:JDK 对 String 键的稳定性意味着外部输入可构造同 hash 串——靠树化兜底（不是 hash 随机化）；自定义键类做外部输入键时, hashCode 要避免廉价可枚举的冲突,并配合输入限流。'),
     ],
     [
       block('验证:桶分布的观测断言', '验证:本机实验形态(--add-opens 读 table):BadKey(恒定 hash)12 键全部同桶(树化桶=1);正常 Integer 键 1 万个的桶分布直方图(绝大多数桶≤2)——异常与健康的桶画像对照固化成工具,排查时直接复用。'),
@@ -536,7 +536,7 @@ export default {
     ],
     [
       block('机制:Vector 遗留与 ArrayDeque 设计', 'Stack 的问题:继承 Vector(公开 elementAt/set——栈被旁路)+方法同步(历史兼容,去不掉)+迭代顺序反直觉(iterator 从底到顶,与 pop 序相反)。ArrayDeque:循环数组(头尾指针,满时扩容)+无锁(单线程)+两端 O(1)——push=addFirst,pop=removeFirst;内存连续(局部性,第 9 题);容量循环利用(出队后空间复用,不扩容直到真满)。'),
-      block('反例:Stack 的两种实际伤害', '伤害一,语义旁路:代码里 stack.insertElementAt(x, 0)(Vector 方法)——栈的 LIFO 被破坏(逻辑 bug 难查)。伤害二,锁开销:高频 push/pop(解析器热点)——synchronized 的成本(偏向锁移除后,每次加解锁真实付费,第 21 题 JVM)——单线程解析器平白付锁税。两条:换 ArrayDeque 全消(语义纯+零锁)。'),
+      block('反例:Stack 的两种实际伤害', '伤害一,语义旁路:代码里 stack.insertElementAt(x, 0)(Vector 方法)——栈的 LIFO 被破坏(逻辑 bug 难查)。伤害二,锁开销:高频 push/pop(解析器热点)——synchronized 的成本(偏向锁默认禁用后,每次加解锁真实付费,第 21 题 JVM)——单线程解析器平白付锁税。两条:换 ArrayDeque 全消(语义纯+零锁)。'),
       block('取舍:栈场景的容器选择', 'ArrayDeque:默认(单线程栈/队列)。LinkedDeque(手写/第三方):需要 O(1) 任意移除(带节点引用的 LRU,第 6 题)。Stack:仅遗留代码兼容。并发栈:ConcurrentLinkedDeque(无锁)/BlockingDeque(生产消费)——并发场景另选。ArrayDeque 的 null 禁止:deque.addFirst(null) 抛 NPE——null 的空间留给"空"的语义(第 18 题 null 政策一致)。'),
     ],
     [

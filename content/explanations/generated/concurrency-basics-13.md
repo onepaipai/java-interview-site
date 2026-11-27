@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/AtomicLong.html)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html)
@@ -20,27 +20,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：乐观重试是"再试一次"而非"排队等"
+### 第二步扩展① 机制：乐观重试是"再试一次"而非"排队等"
 
-CAS 类比多人同时抢一台自助咖啡机的预约屏：失败者不拿号排队，而是立刻回头再抢。人少时这比排队快（无上下文切换），人一多，绝大多数努力都浪费在"抢而不得"上，屏幕（缓存行）本身成为瓶颈。硬件层面：CAS 编译为 x86 的 lock cmpxchg——lock 前缀把该缓存行锁独占（现代 CPU 锁缓存行，旧架构锁总线），MESI 协议把其他核的同一行副本置为 Invalid，核间一致性报文来回就是开销；LongAdder 的 Cell 数组正是把这一个热点行拆成多个（Cell 用 @Contended 填充防伪共享，第 47 题）——分片把"一行排队"变成"多行各忙各的"。
+- CAS 类比多人同时抢一台自助咖啡机的预约屏：失败者不拿号排队，而是立刻回头再抢。
+- 人少时这比排队快（无上下文切换），人一多，绝大多数努力都浪费在"抢而不得"上，屏幕（缓存行）本身成为瓶颈。
+- 硬件层面：CAS 编译为 x86 的 lock cmpxchg——lock 前缀把该缓存行锁独占（现代 CPU 锁缓存行，旧架构锁总线），MESI 协议把其他核的同一行副本置为 Invalid，核间一致性报文来回就是开销。
+- LongAdder 的 Cell 数组正是把这一个热点行拆成多个（Cell 用 @Contended 填充防伪共享，第 47 题）——分片把"一行排队"变成"多行各忙各的"。
 
-### 边界：低争用 CAS 仍然便宜
+### 第二步扩展② 边界：低争用 CAS 仍然便宜
 
-无争用或低争用时 CAS 通常一次成功，没有系统调用也没有挂起唤醒，比锁快。原子类不适合保护多变量一致性或复杂不变式——CAS 只保证单个变量的一次读改写原子，组合逻辑要么循环重算，要么换锁。把"用了原子类"当成"线程安全解决了"，会漏掉复合操作的竞态。
+- 无争用或低争用时 CAS 通常一次成功，没有系统调用也没有挂起唤醒，比锁快。
+- 原子类不适合保护多变量一致性或复杂不变式——CAS 只保证单个变量的一次读改写原子，组合逻辑要么循环重算，要么换锁。
+- 把"用了原子类"当成"线程安全解决了"，会漏掉复合操作的竞态。
 
-### 取舍：计数选 Adder，状态选 Atomic
+### 第二步扩展③ 取舍：计数选 Adder，状态选 Atomic
 
-统计类（QPS 计数、指标累加）写多读少，LongAdder 的分片写几乎线性扩展；需要"读到确切当前值再做决定"（如限流阈值判断、引用替换）时用 AtomicLong/AtomicReference 的 CAS 语义。Javadoc 对这个边界写得明确：Adder 牺牲精确瞬时值换写吞吐。监控报表可接受分片汇总，限流决策不行。
+- 统计类（QPS 计数、指标累加）写多读少，LongAdder 的分片写几乎线性扩展。
+- 需要"读到确切当前值再做决定"（如限流阈值判断、引用替换）时用 AtomicLong/AtomicReference 的 CAS 语义。
+- Javadoc 对这个边界写得明确：Adder 牺牲精确瞬时值换写吞吐。
+- 监控报表可接受分片汇总，限流决策不行。
 
 ## 案例
 
-### 对照操作：单变量争用的 CPU 对比
+### 第三步发散·验证与推演 对照操作：单变量争用的 CPU 对比
 
-教学验证：128 线程各累加 100 万次，分别用 AtomicLong.incrementAndGet 与 LongAdder.increment，记录墙钟时间与进程 CPU 时间（可用 ThreadMXBean 或操作系统工具）。预期 AtomicLong 版本耗时与 CPU 明显更高且随线程数恶化，LongAdder 接近线性。实验可在任意多核 Java 17 环境复跑；具体倍数依硬件不同，趋势稳定。
+- 教学验证：128 线程各累加 100 万次，分别用 AtomicLong.incrementAndGet 与 LongAdder.increment，记录墙钟时间与进程 CPU 时间（可用 ThreadMXBean 或操作系统工具）。
+- 预期 AtomicLong 版本耗时与 CPU 明显更高且随线程数恶化，LongAdder 接近线性。
+- 实验可在任意多核 Java 17 环境复跑。
+- 具体倍数依硬件不同，趋势稳定。
 
-### 追问：CAS 的 ABA 在计数场景要担心吗
+### 第三步发散·追问① 追问：CAS 的 ABA 在计数场景要担心吗
 
-纯计数只关心数值不关心历史，ABA 无害。需要"值没变过"以外还要求"中间没发生过任何变化"的语义（如无锁栈的节点复用）才需要版本化：AtomicStampedReference 带戳记。把 ABA 警告无差别套在所有 CAS 上，会导致不必要的复杂化，边界是"对象引用是否会被复用"。
+- 纯计数只关心数值不关心历史，ABA 无害。
+- 需要"值没变过"以外还要求"中间没发生过任何变化"的语义（如无锁栈的节点复用）才需要版本化：AtomicStampedReference 带戳记。
+- 把 ABA 警告无差别套在所有 CAS 上，会导致不必要的复杂化，边界是"对象引用是否会被复用"。
 
 ## 总结点
 

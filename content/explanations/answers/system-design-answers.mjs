@@ -389,7 +389,7 @@ export default {
     ],
     [
       "https://sre.google/sre-book/introduction/",
-      "https://martinfowler.com/articles/rag.html",
+      "https://martinfowler.com/articles/patterns-of-distributed-systems/",
     ],
   ),
   "system-design/13": deep(
@@ -1253,7 +1253,7 @@ export default {
     ],
     [
       "https://martinfowler.com/articles/patterns-of-distributed-systems/",
-      "https://gh-ost.readthedocs.io/",
+      "https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl.html",
     ],
   ),
   "system-design/40": deep(

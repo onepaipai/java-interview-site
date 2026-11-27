@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,41 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:自动装配的"约定优于配置"
+### 第二步扩展① 机制:自动装配的"约定优于配置"
 
-Spring Boot 的核心理念=classpath 有什么→自动装配什么(有 spring-web→配 DispatcherServlet;有数据源驱动→配 DataSource)——"约定优于配置"的实现=条件注解(探测 classpath/已有 bean/配置属性)+starter 聚合依赖(一个 starter 带来一组依赖+一组自动配置)。
+- Spring Boot 的核心理念=classpath 有什么→自动装配什么(有 spring-web→配 DispatcherServlet。
+- 有数据源驱动→配 DataSource)——"约定优于配置"的实现=条件注解(探测 classpath/已有 bean/配置属性)+starter 聚合依赖(一个 starter 带来一组依赖+一组自动配置)。
 
-### 反例:自动装配的两种事故
+### 第二步扩展② 反例:自动装配的两种事故
 
-事故一:自动配置与用户配置冲突——用户定义了 DataSource 但自动配置也注册了一个→冲突(@ConditionalOnMissingBean 保证用户优先——用户定义了就跳过自动配置);修复=理解"用户优先"的机制(第 88 题排序)。事故二:自动装配不可控——不需要的功能也装配了(多余 bean);修复=排除(@SpringBootApplication(exclude=...))+--debug 条件评估报告(第 49 题诊断)。
+- 事故一:自动配置与用户配置冲突——用户定义了 DataSource 但自动配置也注册了一个→冲突(@ConditionalOnMissingBean 保证用户优先——用户定义了就跳过自动配置)。
+- 修复=理解"用户优先"的机制(第 88 题排序)。
+- 事故二:自动装配不可控——不需要的功能也装配了(多余 bean)。
+- 修复=排除(@SpringBootApplication(exclude=...))+--debug 条件评估报告(第 49 题诊断)。
 
-### 取舍:starter 的粒度
+### 第二步扩展③ 取舍:starter 的粒度
 
-粗粒度 starter(一个 starter 包含全部相关依赖):使用简单但可能引入不需要的依赖;细粒度 starter(按功能拆分):精确控制但 starter 数量多——按"依赖的聚合力"定(同一功能域的依赖打包在一起)。
+- 粗粒度 starter(一个 starter 包含全部相关依赖):使用简单但可能引入不需要的依赖。
+- 细粒度 starter(按功能拆分):精确控制但 starter 数量多——按"依赖的聚合力"定(同一功能域的依赖打包在一起)。
 
 ## 案例
 
-### 验证:自动装配的走查核对
+### 第三步发散·验证与推演 验证:自动装配的走查核对
 
-验证:条件评估断言(--debug 输出每个自动配置的匹配/不匹配——第 49 题诊断);@ConditionalOnMissingBean 断言(用户定义 DataSource→自动配置跳过);starter 断言(引入 starter→相关 bean 自动注册);排除断言(exclude→不装配)。验证:自动装配的断言可程序化(Spring Boot 测试切片:@WebMvcTest/@DataJpaTest 的条件装配)。
+- 验证:条件评估断言(--debug 输出每个自动配置的匹配/不匹配——第 49 题诊断)。
+- @ConditionalOnMissingBean 断言(用户定义 DataSource→自动配置跳过)。
+- starter 断言(引入 starter→相关 bean 自动注册)。
+- 排除断言(exclude→不装配)。
+- 验证:自动装配的断言可程序化(Spring Boot 测试切片:@WebMvcTest/@DataJpaTest 的条件装配)。
 
-### 追问链:装配三刀
+### 第三步发散·追问扩展 追问链:装配三刀
 
-一刀:"自动装配的顺序?"——用户 bean 先注册→自动配置评估(@ConditionalOnMissingBean 看用户是否有)→自动配置的 bean 注册——用户优先=配置顺序的关键(第 88 题排序)。二刀:"Spring Boot 3 的变化?"——spring.factories→AutoConfiguration.imports(文件路径变化)+Jakarta EE( javax→jakarta)+GraalVM Native 支持——升级时注意自动配置文件路径变化。三刀:"自动装配的调试?"——--debug(条件评估报告)+actuator/beans(所有 bean 列表)+actuator/conditions(条件报告)——排障的三把钥匙(第 49 题诊断)。
+- **Q1：自动装配的顺序?**
+  - 答：用户 bean 先注册→自动配置评估(@ConditionalOnMissingBean 看用户是否有)→自动配置的 bean 注册——用户优先=配置顺序的关键(第 88 题排序)。
+- **Q2：Spring Boot 3 的变化?**
+  - 答：spring.factories→AutoConfiguration.imports(文件路径变化)+Jakarta EE( javax→jakarta)+GraalVM Native 支持——升级时注意自动配置文件路径变化。
+- **Q3：自动装配的调试?**
+  - 答：debug(条件评估报告)+actuator/beans(所有 bean 列表)+actuator/conditions(条件报告)——排障的三把钥匙(第 49 题诊断)。
 
 ## 总结点
 

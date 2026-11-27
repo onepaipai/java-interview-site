@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/innodb-consistent-read.html)
-- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/innodb-multi-versioning.html)
+- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/)
+- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/innodb-transaction-isolation-levels.html)
 
 </details>
 
@@ -20,27 +20,38 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
 ## 参考分析
 
-### 机制:MVCC 为什么读不阻塞写
+### 第二步扩展① 机制:MVCC 为什么读不阻塞写
 
-读走版本链(快照读,无锁)与写(当前读,加锁)并行——读写不互斥=并发度大增;代价=旧版本存储(undo 膨胀:长事务期间旧版本不能清理→undo 表空间涨+清理线程被拖慢)——“长事务是 MVCC 的天敌”:事务开 1 小时,这 1 小时的所有历史版本都得留着(第 137 题长事务监控同源)。
+- 读走版本链(快照读,无锁)与写(当前读,加锁)并行——读写不互斥=并发度大增。
+- 代价=旧版本存储(undo 膨胀:长事务期间旧版本不能清理→undo 表空间涨+清理线程被拖慢)——“长事务是 MVCC 的天敌”:事务开 1 小时,这 1 小时的所有历史版本都得留着(第 137 题长事务监控同源)。
 
-### 反例:MVCC 的两种事故
+### 第二步扩展② 反例:MVCC 的两种事故
 
-事故一:长事务+高频写表——undo 持续膨胀(磁盘涨/查询变慢——沿版本链遍历变长);修复=拆小事务+information_schema INNODB_TRX 监控长事务告警。事故二:误以为 MVCC 全程无锁——快照读无锁,但 update/for update 是当前读(加锁)——MVCC 只优化“读”,写并发仍靠锁(第 43 题混合读写的漂移问题同源)。
+- 事故一:长事务+高频写表——undo 持续膨胀(磁盘涨/查询变慢——沿版本链遍历变长)。
+- 修复=拆小事务+information_schema INNODB_TRX 监控长事务告警。
+- 事故二:误以为 MVCC 全程无锁——快照读无锁,但 update/for update 是当前读(加锁)——MVCC 只优化“读”,写并发仍靠锁(第 43 题混合读写的漂移问题同源)。
 
-### 取舍:快照时机的设计含义
+### 第二步扩展③ 取舍:快照时机的设计含义
 
-RC=新鲜度优先(每次看最新已提交,适合读最新状态的短查询);RR=稳定性优先(同一快照,适合报表/对账/一致读);业务把关键读写进同一事务+显式当前读(for update)才强一致——MVCC 提供“不阻塞的一致读”,不替代“强一致的写序”。
+- RC=新鲜度优先(每次看最新已提交,适合读最新状态的短查询)。
+- RR=稳定性优先(同一快照,适合报表/对账/一致读)。
+- 业务把关键读写进同一事务+显式当前读(for update)才强一致——MVCC 提供“不阻塞的一致读”,不替代“强一致的写序”。
 
 ## 案例
 
-### 验证:可见性的实测走查
+### 第三步发散·验证与推演 验证:可见性的实测走查
 
-验证:RC 断言(A 事务两次读同一行,B 中间提交修改→两次值不同);RR 断言(同场景两次值相同——快照复用);活跃集断言(B 未提交时 A 的 Read View 判其不可见,B 提交后新语句(RC)可见);版本链断言(锁分析/undo 空间观测:长事务期间 undo 不回收——数据库模块 19 题 Read View 实验同源可复跑)。预期:四条判定规则与两级别对照全部成立。
+- 验证:RC 断言(A 事务两次读同一行,B 中间提交修改→两次值不同)。
+- RR 断言(同场景两次值相同——快照复用)。
+- 活跃集断言(B 未提交时 A 的 Read View 判其不可见,B 提交后新语句(RC)可见)。
+- 版本链断言(锁分析/undo 空间观测:长事务期间 undo 不回收——数据库模块 19 题 Read View 实验同源可复跑)。
+- 预期:四条判定规则与两级别对照全部成立。
 
-### 追问链:MVCC 三刀
+### 第三步发散·发散要点 追问链:MVCC 三刀
 
-一刀:undo 回收=purge 线程清理无 Read View 引用的版本——长事务阻塞 purge(历史列表长度监控)。二刀:幻读的 MVCC 面=快照读防幻(新插入行 trx_id>=max 不可见);当前读防幻靠 next-key 锁(第 43 题)。三刀:大事务定位=INNODB_TRX 的 trx_started/trx_rows_locked+performance_schema——长事务治理的日常抓手。
+- **追问①·undo 回收**：purge 线程清理无 Read View 引用的版本——长事务阻塞 purge(历史列表长度监控)
+- **追问②·幻读的 MVCC 面**：快照读防幻(新插入行 trx_id>=max 不可见);当前读防幻靠 next-key 锁(第 43 题)
+- **追问③·大事务定位**：INNODB_TRX 的 trx_started/trx_rows_locked+performance_schema——长事务治理的日常抓手
 
 ## 总结点
 

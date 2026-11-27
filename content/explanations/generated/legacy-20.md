@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html)
 
 </details>
 
@@ -19,27 +20,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:wait 为什么必须在 synchronized 内
+### 第二步扩展① 机制:wait 为什么必须在 synchronized 内
 
-wait/notify 语义绑定 monitor:wait=释放 monitor 并进入该对象的 WAITING 集,notify=从该对象等待集唤醒一个——不在 monitor 内调用=没有 monitor 可释放(Immediate IllegalMonitorStateException);释放锁是 wait 的关键副作用(否则其他线程永远拿不到锁改条件=死锁)。
+- wait/notify 语义绑定 monitor:wait=释放 monitor 并进入该对象的 WAITING 集,notify=从该对象等待集唤醒一个——不在 monitor 内调用=没有 monitor 可释放(Immediate IllegalMonitorStateException)。
+- 释放锁是 wait 的关键副作用(否则其他线程永远拿不到锁改条件=死锁)。
 
-### 反例:wait/notify 的两种事故
+### 第二步扩展② 反例:wait/notify 的两种事故
 
-事故一:notify 丢通知——两个条件(队列空/满)共用一个锁,生产者 notify 唤醒了另一个生产者→消费者永远睡;修复=notifyAll 或按条件拆锁(Lock+Condition 多等待集)。事故二:if 判条件——虚假唤醒后直接执行(条件实际不成立)→队列越界/空取;修复=while 循环判条件(规约级写法)。
+- 事故一:notify 丢通知——两个条件(队列空/满)共用一个锁,生产者 notify 唤醒了另一个生产者→消费者永远睡。
+- 修复=notifyAll 或按条件拆锁(Lock+Condition 多等待集)。
+- 事故二:if 判条件——虚假唤醒后直接执行(条件实际不成立)→队列越界/空取。
+- 修复=while 循环判条件(规约级写法)。
 
-### 取舍:Object.wait vs Lock/Condition
+### 第二步扩展③ 取舍:Object.wait vs Lock/Condition
 
-Object.wait/notify:一个对象一个等待集,多条件只能 notifyAll(低效);ReentrantLock+多个 Condition:每个条件独立等待集,signal 精准唤醒(数组阻塞队列的实现);生产大多数场景直接用 BlockingQueue(封装好条件队列)。
+- Object.wait/notify:一个对象一个等待集,多条件只能 notifyAll(低效)。
+- ReentrantLock+多个 Condition:每个条件独立等待集,signal 精准唤醒(数组阻塞队列的实现)。
+- 生产大多数场景直接用 BlockingQueue(封装好条件队列)。
 
 ## 案例
 
-### 验证:等待唤醒的实测走查
+### 第三步发散·验证与推演 验证:等待唤醒的实测走查
 
-验证:锁释放断言(wait 期间另一线程可获同一把锁,sleep 期间获不到——对照实验);IllegalMonitorStateException 断言(块外 wait);虚假唤醒断言(无 notify 的 wait 超时返回——while 重检);notify 丢失断言(两条件一锁,notify 唤醒错线程——notifyAll 修复对照);并发模块条件队列实验可复用。预期:while+notifyAll 组合在所有扰动下收敛。
+- 验证:锁释放断言(wait 期间另一线程可获同一把锁,sleep 期间获不到——对照实验)。
+- IllegalMonitorStateException 断言(块外 wait)。
+- 虚假唤醒断言(无 notify 的 wait 超时返回——while 重检)。
+- notify 丢失断言(两条件一锁,notify 唤醒错线程——notifyAll 修复对照)。
+- 并发模块条件队列实验可复用。
+- 预期:while+notifyAll 组合在所有扰动下收敛。
 
-### 追问链:等待三刀
+### 第三步发散·发散要点 追问链:等待三刀
 
-一刀:sleep(0)/yield 的语义=让出时间片建议(调度提示,不释放锁)。二刀:Thread.interrupt 与 wait——wait 被中断抛 InterruptedException 并恢复中断标志;中断是协作式取消。三刀:Condition.awaitUntil/awaitNanos=限时等待(避免永久 WAITING——超时兜底)。
+- **追问①·sleep(0)/yield 的语义**：让出时间片建议(调度提示,不释放锁)
+- **追问②**：Thread.interrupt 与 wait——wait 被中断抛 InterruptedException 并恢复中断标志;中断是协作式取消
+- **追问③**：Condition.awaitUntil/awaitNanos=限时等待(避免永久 WAITING——超时兜底)
 
 ## 总结点
 

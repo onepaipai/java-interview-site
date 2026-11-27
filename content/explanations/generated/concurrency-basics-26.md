@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/Condition.html)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html)
@@ -20,27 +20,41 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：分队列通知等于按部门叫人
+### 第二步扩展① 机制：分队列通知等于按部门叫人
 
-Object 的等待队列只有一条，notify 是广播里随机挑人；Condition 是多条队列，signal 精准呼叫某个部门。类比医院叫号按科室分开：抽血号不会叫到放射科。但叫到号不等于轮到就诊——排到你时前面可能插入了急诊（条件被改变），所以"被叫到先看屏幕确认"（while 重验）依然是铁律。
+- Object 的等待队列只有一条，notify 是广播里随机挑人。
+- Condition 是多条队列，signal 精准呼叫某个部门。
+- 类比医院叫号按科室分开：抽血号不会叫到放射科。
+- 但叫到号不等于轮到就诊——排到你时前面可能插入了急诊（条件被改变），所以"被叫到先看屏幕确认"（while 重验）依然是铁律。
 
-### 反例：三类丢唤醒事故
+### 第二步扩展② 反例：三类丢唤醒事故
 
-事故一：把 signalNotFull 写在生产者侧却 signal 了 notFull 队列自己人，消费者永远无信号——队列对应关系写反。事故二：signal 后、解锁前，另一个消费者获取锁消费了元素，被 signal 的消费者醒来时队列又空了，若用 if 就直接取空抛异常。事故三：任务在未持锁分支调 signal 抛异常，通知根本没发出。三类都指向同一条纪律：谓词、队列、锁三位一体对应。
+- 事故一：把 signalNotFull 写在生产者侧却 signal 了 notFull 队列自己人，消费者永远无信号——队列对应关系写反。
+- 事故二：signal 后、解锁前，另一个消费者获取锁消费了元素，被 signal 的消费者醒来时队列又空了，若用 if 就直接取空抛异常。
+- 事故三：任务在未持锁分支调 signal 抛异常，通知根本没发出。
+- 三类都指向同一条纪律：谓词、队列、锁三位一体对应。
 
-### 取舍：多 Condition 的维护成本
+### 第二步扩展③ 取舍：多 Condition 的维护成本
 
-两个 Condition 是手写阻塞队列的标准形态；谓词超过三个时，signal 配对关系容易写错，评审成本陡增，此时优先换 ArrayBlockingQueue/LinkedBlockingDeque。需要"超时等待""批量唤醒"时 Condition.awaitNanos、signalAll 都有对应语义。Condition 不替代正确性设计，它只是把 Object 的单队列模型拆细。
+- 两个 Condition 是手写阻塞队列的标准形态。
+- 谓词超过三个时，signal 配对关系容易写错，评审成本陡增，此时优先换 ArrayBlockingQueue/LinkedBlockingDeque。
+- 需要"超时等待""批量唤醒"时 Condition.awaitNanos、signalAll 都有对应语义。
+- Condition 不替代正确性设计，它只是把 Object 的单队列模型拆细。
 
 ## 案例
 
-### 对照操作：单队列 notify 与双 Condition 的对比
+### 第三步发散·验证与推演 对照操作：单队列 notify 与双 Condition 的对比
 
-教学验证：容量 1 的手写队列各实现两版。单 notify 版在高并发下预期出现消费者全部 WAITING 而队列非空的卡死（信号给了生产者）；双 Condition 版同一负载长期稳定，notFull 队列只含生产者。压测脚本可复跑，复现依赖时序，结论依据通知语义推演。
+- 教学验证：容量 1 的手写队列各实现两版。
+- 单 notify 版在高并发下预期出现消费者全部 WAITING 而队列非空的卡死（信号给了生产者）。
+- 双 Condition 版同一负载长期稳定，notFull 队列只含生产者。
+- 压测脚本可复跑，复现依赖时序，结论依据通知语义推演。
 
-### 追问：signal 与 signalAll 怎么选
+### 第三步发散·追问① 追问：signal 与 signalAll 怎么选
 
-条件谓词"每次状态变化至多让一个等待者满足"（如放入一个元素只解锁一个消费者）用 signal，精准且少切换；一次变化可能满足多个等待者（如批量放入、关闭操作）用 signalAll。拿不准时 signalAll 优先——与 Object.wait 的 notifyAll 同理：先保证不错过，再优化唤醒开销。
+- 条件谓词"每次状态变化至多让一个等待者满足"（如放入一个元素只解锁一个消费者）用 signal，精准且少切换。
+- 一次变化可能满足多个等待者（如批量放入、关闭操作）用 signalAll。
+- 拿不准时 signalAll 优先——与 Object.wait 的 notifyAll 同理：先保证不错过，再优化唤醒开销。
 
 ## 总结点
 

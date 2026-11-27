@@ -1,7 +1,7 @@
 // Spring 进阶 50 题 · v2 深度标准(2026-11-08)· 50 题全量
 // 证据基准:Spring Framework 6.2.19 + H2 2.3.232 本机实测(JDK 17,程序在 F:\tmp-spring-exp);未实测的推演写明"推演"。
 // Q3/Q4/Q19 的第一个 ~~~java 代码块为后端真值测试(编译执行 verify())的契约源码,不可改动语义。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const sre = 'https://sre.google/sre-book/addressing-cascading-failures/';
 const sprref = 'https://docs.spring.io/spring-framework/reference/';
 const sprjapi = 'https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/';
@@ -1184,7 +1184,7 @@ export default {
       block("机制:语义断言为什么是核心",
       "手工回归测\"功能还能用\",测不出\"语义变了\"——事务监听阶段、传播行为、默认超时这类框架语义变化,功能层面无感,线上才炸。语义断言=把框架契约写成测试(仓库的四断言范本);真值测试=把关键代码路径真实执行(编译+运行+输出断言)。两者在 CI 里自动暴露漂移——升级回归的可信度来自\"断言了什么\",不来自\"点了多少页面\"。"),
       block("实证:真值测试即升级探针(本仓库内置)",
-      "本仓库后端真值测试(SpringAdvancedExamplesTest)的形态:\n```\n读发布稿 spring-advanced-3/4/19.md → 提取 ~~~java 源码\n→ --release 17 编译 → 执行 verify() → 断言输出精确匹配\n([1]:[2] / true:0 / alice:anonymous)\n```\n解读:这三个测试在 Spring 6.2.19 上通过=事务保存点、rollback-only、安全上下文传播三项语义未漂移。升级 6.3/7.0 后重跑:通过=语义保持;失败=漂移点即回归重点——真值测试就是升级的探针。验证:随构建真实执行(本批内容已对齐)。"),
+      "本仓库后端真值测试(SpringAdvancedExamplesTest)的形态:\n```\n读发布稿 spring-advanced-3/4/19.md → 提取 Java 源码块\n→ --release 17 编译 → 执行 verify() → 断言输出精确匹配\n([1]:[2] / true:0 / alice:anonymous)\n```\n解读:这三个测试在 Spring 6.2.19 上通过=事务保存点、rollback-only、安全上下文传播三项语义未漂移。升级 6.3/7.0 后重跑:通过=语义保持;失败=漂移点即回归重点——真值测试就是升级的探针。验证:随构建真实执行(本批内容已对齐)。"),
       block("取舍:回归集的边界与维护",
       "边界:覆盖\"框架语义面\"(事务/缓存/安全/事件/MVC)+业务关键路径——全覆盖不可行,语义面必保。维护:语义断言随框架特性新增(新特性=新断言);断言失败先查\"是 bug 还是契约变化\"——契约变化更新断言并记录(可追溯的语义变更史)。对照实验:升级前后性能基准(分布式 42 题框架:同负载双版本)——性能回归与语义回归并重。产出物:升级报告(语义 diff+性能 diff+默认值变化清单)——第 42 题的对照报告最低字段集。"),
     ],
@@ -1220,4 +1220,43 @@ export default {
     ],
     ["四问问证据,砍到锚点为止", "代理事务失效一致性,升级可信", "触发器保留,回滚条件先行"], ["https://docs.spring.io/spring-framework/reference/", "https://sre.google/sre-book/addressing-cascading-failures/"],
   ),
+  'spring-advanced/51': deep(
+    '声明式 HTTP Interface 相比手写 Feign 客户端解决什么问题？',
+    '网关沙盘:多个服务各自手写 Feign 接口与配置，重复的 URL 拼接、错误解码与超时设置让升级困难；团队评估改用 Spring Framework 6 的 HTTP Interface。',
+    [
+      'HTTP Interface 把远程 HTTP 端点声明为带注解的 Java 接口，由框架生成代理；与 Feign 类似，但不是同一个实现，能力以所用 Spring 版本为准。',
+      '它让接口契约、序列化与错误映射集中到一处，减少手写 URI 与样板代码；团队收益主要在统一治理和减少重复配置。',
+      '选型仍要看版本和可观测性:Spring 6.0 起有 HTTP Interface 支持，旧项目若依赖 Feign 的完整生态，迁移应按接口逐步做并保留契约测试。',
+    ],
+    [
+      block('机制:代理把接口调用变成 HTTP 请求', '启动时框架为声明式接口生成代理；方法参数被映射到路径、查询或请求体，返回值由转换器从响应体还原。类比旅行社代办:你只说"订哪天去哪"（接口方法），代理负责填表、递交通知和取票（URI、头、解码）——协议细节不散落在业务代码里。'),
+      block('边界:抽象没有消除网络失败', '声明式接口不会自动带来重试、幂等或超时；这些仍要显式配置并按接口语义设定。错误响应若只映射成通用异常，调用方无法区分 4xx 与 5xx；代理隐藏了 HTTP 细节，但没有隐藏分布式失败。'),
+      block('取舍:与 Feign 共存的迁移路径', '新接口可用 HTTP Interface，存量 Feign 保持不动，按边界逐步替换；关键是契约测试对齐 URL、头、状态码与超时行为。若团队依赖 Feign 的负载均衡、编码器生态或既有拦截器，迁移收益要扣除生态重建成本。'),
+    ],
+    [
+      block('验证:接口契约对照的推演', '教学验证:对同一远端端点分别写 Feign 接口与 HTTP Interface，用本地 Mock 服务断言路径、查询参数、Header、JSON 绑定及 4xx/5xx 异常映射一致；预期两边行为对齐。这是迁移设计，不代表本项目已实际运行双客户端对照。'),
+      block('追问:它和 RestClient 是什么关系', 'HTTP Interface 是声明式接口层，RestClient 可作为其底层客户端之一；一个管"接口怎么描述"，一个管"请求怎么执行"。回答时分层，不要把它们当成互斥的两个 HTTP 客户端。'),
+    ],
+    ['接口即契约，代理代办请求', '网络失败不因抽象消失', '逐个接口迁移，契约测试守门'], ['https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface', 'https://docs.spring.io/spring-framework/reference/'],
+  ),
+  'spring-advanced/52': deep(
+    'Spring AI 的 ChatClient 与直接调用模型 API 如何取舍？',
+    '知识助手沙盘:团队在 Spring Boot 3 + Spring AI 1.x 项目里评估用 ChatClient 封装模型调用；需要说明框架带来的抽象、版本边界与什么时候该绕过抽象。',
+    [
+      'ChatClient 把提示、模型选项、工具调用与响应映射封装成流式 API，减少重复的 HTTP/SSE 解析与 JSON 绑定代码。',
+      '抽象便于切换模型供应商，但"可切换"不等于零成本:不同厂商的流式事件、工具调用格式与错误码仍有差异，要做兼容测试。',
+      '当需要对超时、分帧、取消、计费细节做精确控制，或框架版本暂不支持某能力时，保留直接调用路径，不要把"全量套框架"当目标。',
+    ],
+    [
+      block('机制:框架封装了哪些重复劳动', '直接调用模型 REST API 要自己处理鉴权、SSE 分帧、增量拼接、工具调用的参数解析与错误重试；ChatClient 把这些做成一致的调用链，并配合 Advisor 机制做检索增强与记忆。类比网购:直接调 API 像自己联系工厂发货，框架像平台下单——省事，但退换货规则仍要看平台条款。'),
+      block('边界:抽象层不会消灭模型差异', 'Streaming 的结束标志、工具调用的增量片段、token 计量与限流响应，不同供应商有差异；框架版本升级也可能改变默认行为。切换模型或升级 Spring AI 时，用固定评测集核对输出结构、流式事件和错误映射，不能只因为接口编译通过就认为等价。'),
+      block('取舍:核心链路与边缘链路', '流式输出、提示模板和工具编排适合用框架提高开发效率；涉及合规、精确计费、极端延迟优化的链路可以保留直接调用。关键是统一超时、取消、审计与密钥管理口径，避免两套实现两套安全标准。'),
+    ],
+    [
+      block('验证:兼容性的推演', '教学验证:同一组提示在两个模型供应商上分别用 ChatClient 调用，断言流式片段拼接后的最终文本、工具调用参数结构、错误响应分类一致；记录差异清单。这是验证设计，不代表本项目已完成双供应商实测。'),
+      block('追问:Spring AI 版本怎么讲', ' Spring AI 1.x 适配 Spring Boot 3；后续 2.x 随 Spring Boot 4 演进。回答要按项目实际使用的 Boot 与 Spring AI 版本核对官方文档，不要混用不同大版本的 API。'),
+    ],
+    ['框架省样板，差异仍需测', '流式与工具按版本核对', '核心链路可绕开抽象'], ['https://docs.spring.io/spring-ai/reference/', 'https://docs.spring.io/spring-framework/reference/integration/rest-clients.html'],
+  ),
+
 };

@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [mybatis.org · 1](https://mybatis.org/mybatis-3/sqlmap-xml.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/)
 
 </details>
 
@@ -19,27 +20,41 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:预编译为什么防注入
+### 第二步扩展① 机制:预编译为什么防注入
 
-PreparedStatement 先发送 SQL 模板(结构固定)再传参数——参数永远被当“数据”(即使包含引号/分号也不会改变语句结构);拼接则让数据混进结构(OR 1=1/分号续写);这是 SQL 防注入的根治手段(比转义可靠——转义有字符集绕过风险)。
+- PreparedStatement 先发送 SQL 模板(结构固定)再传参数——参数永远被当“数据”(即使包含引号/分号也不会改变语句结构)。
+- 拼接则让数据混进结构(OR 1=1/分号续写)。
+- 这是 SQL 防注入的根治手段(比转义可靠——转义有字符集绕过风险)。
 
-### 反例:${} 的两种事故
+### 第二步扩展② 反例:${} 的两种事故
 
-事故一:where name='${name}' 接前端——name=1' OR '1'='1 拖全表(注入复现);修复=#{name}。事故二:order by ${sort} 无白名单——sort=(select sleep(5)) 盲注/报错探查;修复=枚举映射后端白名单(前端只传 key)。事故三(加分):like '%${kw}%' 拼接——既要模糊匹配又防注入=CONCAT('%',#{kw},'%')(#{} 传值,结构仍模板)。
+- 事故一:where name='${name}' 接前端——name=1' OR '1'='1 拖全表(注入复现)。
+- 修复=#{name}。
+- 事故二:order by ${sort} 无白名单——sort=(select sleep(5)) 盲注/报错探查。
+- 修复=枚举映射后端白名单(前端只传 key)。
+- 事故三(加分):like '%${kw}%' 拼接——既要模糊匹配又防注入=CONCAT('%',#{kw},'%')(#{} 传值,结构仍模板)。
 
-### 取舍:${} 的合法空间
+### 第二步扩展③ 取舍:${} 的合法空间
 
-表名分表(order by 日期分表/按租户分表)——参数是程序生成的枚举(非用户输入)+白名单;排序方向 ASC/DESC——枚举白名单;除此之外一律 #{}——代码评审把 ${} 当高危标记(必须能说明白为什么不是注入)。
+- 表名分表(order by 日期分表/按租户分表)——参数是程序生成的枚举(非用户输入)+白名单。
+- 排序方向 ASC/DESC——枚举白名单。
+- 除此之外一律 #{}——代码评审把 ${} 当高危标记(必须能说明白为什么不是注入)。
 
 ## 案例
 
-### 验证:注入面的实测走查
+### 第三步发散·验证与推演 验证:注入面的实测走查
 
-验证:注入断言(#{} 传 1' OR '1'='1→按字面查(无结果);${} 同值→全表返回——对照立现);预编译断言(开 psqlLog/MySQL general log 看 ? 占位);like 安全断言(CONCAT+#{})——四组固化分界,数据库模块测试可复跑。预期:${} 出现处必有白名单,否则评审拦截。
+- 验证:注入断言(#{} 传 1' OR '1'='1→按字面查(无结果)。
+- ${} 同值→全表返回——对照立现)。
+- 预编译断言(开 psqlLog/MySQL general log 看 ? 占位)。
+- like 安全断言(CONCAT+#{})——四组固化分界,数据库模块测试可复跑。
+- 预期:${} 出现处必有白名单,否则评审拦截。
 
-### 追问链:MyBatis 三刀
+### 第三步发散·发散要点 追问链:MyBatis 三刀
 
-一刀:动态 SQL 标签=<if>/<choose>/<foreach>/<where>(自动去首 AND)/<set>(去尾逗号)——复杂逻辑仍建议 Java 层组装(规约第 23 条同源)。二刀:一级缓存(SqlSession 级)/二级(namespace 级,脏读风险——分布式下禁用)。三刀:分页=PageHelper 拦截器改写 SQL 或手写 limit #{offset},#{size}(深分页延迟关联,第 48 题)。
+- **追问①·动态 SQL 标签**：<if>/<choose>/<foreach>/<where>(自动去首 AND)/<set>(去尾逗号)——复杂逻辑仍建议 Java 层组装(规约第 23 条同源)
+- **追问②**：一级缓存(SqlSession 级)/二级(namespace 级,脏读风险——分布式下禁用)
+- **追问③·分页**：PageHelper 拦截器改写 SQL 或手写 limit #{offset},#{size}(深分页延迟关联,第 48 题)
 
 ## 总结点
 

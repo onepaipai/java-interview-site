@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-12.html#jls-12.4.2)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/BlockingQueue.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/array/ArrayBlockingQueue.html)
 
 </details>
 
@@ -20,27 +20,39 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:两道题考的是什么
+### 第二步扩展① 机制:两道题考的是什么
 
-DCL 考 JMM 与重排序(volatile 的必要性=可见性+有序性而非原子性,第 22 题);生产者消费者考条件队列(wait/notify 与锁的配对)或 BlockingQueue 的内部实现(ArrayBlockingQueue=两把锁两条件/LinkedBlockingQueue=两锁提高吞吐)——两题都是“用正确的原语组合出并发正确性”。
+- DCL 考 JMM 与重排序(volatile 的必要性=可见性+有序性而非原子性,第 22 题)。
+- 生产者消费者考条件队列(wait/notify 与锁的配对)或 BlockingQueue 的内部实现(ArrayBlockingQueue=两把锁两条件/LinkedBlockingQueue=两锁提高吞吐)——两题都是“用正确的原语组合出并发正确性”。
 
-### 反例:手写的两种事故
+### 第二步扩展② 反例:手写的两种事故
 
-事故一:DCL 无 volatile——压测下字段读到默认值(对象引用非 null 但字段未初始化);修复=volatile 或 Holder。事故二:生产者消费者 notify 丢失——两条件(空/满)共用锁时 notify 唤醒错方→永久等待;修复=notifyAll 或 Lock+两个 Condition 精准唤醒(ArrayBlockingQueue 实现)。
+- 事故一:DCL 无 volatile——压测下字段读到默认值(对象引用非 null 但字段未初始化)。
+- 修复=volatile 或 Holder。
+- 事故二:生产者消费者 notify 丢失——两条件(空/满)共用锁时 notify 唤醒错方→永久等待。
+- 修复=notifyAll 或 Lock+两个 Condition 精准唤醒(ArrayBlockingQueue 实现)。
 
-### 取舍:手写 vs 标准库
+### 第二步扩展③ 取舍:手写 vs 标准库
 
-面试手写=展示并发理解;生产=BlockingQueue(Disruptor 高性能场景另说)/单例=Holder 或枚举(零手写风险)——手写版本的评审点=volatile/wait 语义/条件判断三处,缺一即错;标准库把正确性封装好,只在实现库时才手写。
+- 面试手写=展示并发理解。
+- 生产=BlockingQueue(Disruptor 高性能场景另说)/单例=Holder 或枚举(零手写风险)——手写版本的评审点=volatile/wait 语义/条件判断三处,缺一即错。
+- 标准库把正确性封装好,只在实现库时才手写。
 
 ## 案例
 
-### 验证:两题的实测走查
+### 第三步发散·验证与推演 验证:两题的实测走查
 
-验证:DCL 断言(并发 getInstance 返回同一实例/反射验证字段无默认值场景——复杂,常靠代码评审;Holder 版天然安全);生产者消费者断言(多生产者多消费者跑 10 万条目无丢失/无越界/结束干净;notifyAll 版与 BlockingQueue 版对照)——并发模块实验可复用。预期:BlockingQueue 版在所有压力下正确,手写版错误点可复现。
+- 验证:DCL 断言(并发 getInstance 返回同一实例/反射验证字段无默认值场景——复杂,常靠代码评审。
+- Holder 版天然安全)。
+- 生产者消费者断言(多生产者多消费者跑 10 万条目无丢失/无越界/结束干净。
+- notifyAll 版与 BlockingQueue 版对照)——并发模块实验可复用。
+- 预期:BlockingQueue 版在所有压力下正确,手写版错误点可复现。
 
-### 追问链:并发编码三刀
+### 第三步发散·发散要点 追问链:并发编码三刀
 
-一刀:DCL 为什么两次判空=第一次免锁/第二次防竞态——顺序不可换。二刀:BlockingQueue 家族=Array(有界两锁)/Linked(可选有界)/Synchronous(零容量交接)/Priority(优先级)——容量与交接语义选型。三刀:中断配合=put/take 响应中断(优雅停机的钩子——关闭时中断+队尾消费完)。
+- **追问①·DCL 为什么两次判空**：第一次免锁/第二次防竞态——顺序不可换
+- **追问②·BlockingQueue 家族**：Array(有界两锁)/Linked(可选有界)/Synchronous(零容量交接)/Priority(优先级)——容量与交接语义选型
+- **追问③·中断配合**：put/take 响应中断(优雅停机的钩子——关闭时中断+队尾消费完)
 
 ## 总结点
 

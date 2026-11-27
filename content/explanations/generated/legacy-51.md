@@ -3,9 +3,8 @@
 
 教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Google SRE · 1](https://sre.google/sre-book/table-of-contents/)
-- [Raft 论文 · 2](https://raft.github.io/raft.pdf)
-- [HTTP 语义规范 · 3](https://www.rfc-editor.org/rfc/rfc9110.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [OWASP 提示注入风险 · 2](https://genai.owasp.org/)
 
 </details>
 
@@ -21,27 +20,40 @@
 
 ## 参考分析
 
-### 机制:金融交易选 TCP 的理由
+### 第二步扩展① 机制:金融交易选 TCP 的理由
 
-交易必须可靠到达且有序(TCP 保证);UDP 丢包=交易丢失(不可接受);TCP 重传确保到达——代价=延迟,但金融可靠性>延迟。行情推送容忍丢包→UDP 可选。
+- 交易必须可靠到达且有序(TCP 保证)。
+- UDP 丢包=交易丢失(不可接受)。
+- TCP 重传确保到达——代价=延迟,但金融可靠性>延迟。
+- 行情推送容忍丢包→UDP 可选。
 
-### 反例:TCP/UDP 误用两种事故
+### 第二步扩展② 反例:TCP/UDP 误用两种事故
 
-事故一:UDP 做交易——丢包=交易丢失,应用层重传=重新发明 TCP;修复=交易走 TCP。事故二:TCP 做实时推送——Nagle+确认增加延迟;修复=TCP_NODELAY 或 UDP 组播。
+- 事故一:UDP 做交易——丢包=交易丢失,应用层重传=重新发明 TCP。
+- 修复=交易走 TCP。
+- 事故二:TCP 做实时推送——Nagle+确认增加延迟。
+- 修复=TCP_NODELAY 或 UDP 组播。
 
-### 取舍:连接管理
+### 第二步扩展③ 取舍:连接管理
 
-长连接复用(省握手,第 8 题)+连接池;TIME_WAIT 堆积(短连接高频,第 6 题);三次握手延迟(1-RTT,HTTPS 加 TLS 再加 1-2 RTT,第 1 题)——连接复用是性能主线。
+- 长连接复用(省握手,第 8 题)+连接池。
+- TIME_WAIT 堆积(短连接高频,第 6 题)。
+- 三次握手延迟(1-RTT,HTTPS 加 TLS 再加 1-2 RTT,第 1 题)——连接复用是性能主线。
 
 ## 案例
 
-### 验证:TCP/UDP 的走查核对
+### 第三步发散·验证与推演 验证:TCP/UDP 的走查核对
 
-验证:N3 实验(超时/拒绝/读取三形态);N4 实验(复用 0.29ms vs close 0.9ms);N2 实验(TIME_WAIT=30/CLOSE_WAIT 随 close 消失)——network 批次实验可复用。验证:握手状态机断言可程序化(netstat)。
+- 验证:N3 实验(超时/拒绝/读取三形态)。
+- N4 实验(复用 0.29ms vs close 0.9ms)。
+- N2 实验(TIME_WAIT=30/CLOSE_WAIT 随 close 消失)——network 批次实验可复用。
+- 验证:握手状态机断言可程序化(netstat)。
 
-### 追问链:TCP 三刀
+### 第三步发散·发散要点 追问链:TCP 三刀
 
-一刀:拥塞控制=慢启动→拥塞避免→快重传→快恢复(第 17 题)。二刀:TCP 粘包=应用层分帧(长度前缀/分隔符,第 4 题)。三刀:TIME_WAIT 优化=连接池+tcp_tw_reuse(第 6 题)。
+- **追问①·拥塞控制**：慢启动→拥塞避免→快重传→快恢复(第 17 题)
+- **追问②·TCP 粘包**：应用层分帧(长度前缀/分隔符,第 4 题)
+- **追问③·TIME_WAIT 优化**：连接池+tcp_tw_reuse(第 6 题)
 
 ## 总结点
 

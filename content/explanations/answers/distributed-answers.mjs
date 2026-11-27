@@ -1,6 +1,6 @@
 // 分布式 50 题 · v2 深度标准(2026-11-07)· 50 题全量
 // 证据基准:JDK 17.0.17 本机确定性模拟与真实并发实验(2026-11-07,程序在 F:\tmp-dist-exp);未实测的推演写明"推演"。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const juc = api('java/util/concurrent/package-summary');
 const pod = 'https://martinfowler.com/articles/patterns-of-distributed-systems/';
 const sre = 'https://sre.google/sre-book/addressing-cascading-failures/';

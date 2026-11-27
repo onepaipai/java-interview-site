@@ -7,9 +7,9 @@ import { loadQuestionContents } from '../../scripts/question-contents.mjs';
 const { base, password } = await testTarget();
 const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--disable-gpu'] });
 const contents = await loadQuestionContents();
-// 阅读渲染器的固定小节标题（渲染时把参考回答/参考分析/案例/总结点映射为口述阅读标题）；
+// 阅读渲染器的固定小节标题（渲染时把参考回答/参考分析/案例/总结点映射为三步走标题）；
 // h3 是分析与案例的块标题，数量 = 块数之和。
-const deepH2 = ['面试口述', '机制与取舍', '故障推演与追问', '关键判断'];
+const deepH2 = ['第一步 · 速记结论', '第二步 · 逐点扩展', '第三步 · 发散追问', '关键口诀'];
 // 固定包含两个内容锚点题，其余按固定步长抽样：全量源码↔发布包一致性由 validate-explanations 覆盖。
 const deepKeys = Object.keys(contents.questions).filter(key => contents.questions[key].format === 'deep').sort();
 const stride = Math.max(1, Math.floor(deepKeys.length / 6));

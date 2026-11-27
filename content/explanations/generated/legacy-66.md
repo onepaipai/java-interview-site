@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/locks/StampedLock.html)
 
 </details>
 
@@ -20,27 +20,43 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:非公平锁的"插队"为什么提升吞吐
+### 第二步扩展① 机制:非公平锁的"插队"为什么提升吞吐
 
-非公平锁:释放锁后,新到的线程可直接 CAS 抢(不等队列)——省去"唤醒队列线程+上下文切换"的成本(唤醒延迟);公平锁:严格按队列顺序(每个新请求都入队等)——吞吐低但无饥饿。类比银行:VIP 客户可插队(非公平,整体吞吐高)vs 严格叫号(公平,但所有人都等)。
+- 非公平锁:释放锁后,新到的线程可直接 CAS 抢(不等队列)——省去"唤醒队列线程+上下文切换"的成本(唤醒延迟)。
+- 公平锁:严格按队列顺序(每个新请求都入队等)——吞吐低但无饥饿。
+- 类比银行:VIP 客户可插队(非公平,整体吞吐高)vs 严格叫号(公平,但所有人都等)。
 
-### 反例:锁模式的两种事故
+### 第二步扩展② 反例:锁模式的两种事故
 
-事故一:非公平锁饥饿——写线程长期拿不到读锁(读源源不断);修复=公平模式或写优先策略。事故二:StampedLock 不可重入死锁——同线程二次获取→自锁自己;修复=不用 StampedLock(需要重入时用 ReentrantReadWriteLock)或小心设计(乐观读内不获取其他锁)。
+- 事故一:非公平锁饥饿——写线程长期拿不到读锁(读源源不断)。
+- 修复=公平模式或写优先策略。
+- 事故二:StampedLock 不可重入死锁——同线程二次获取→自锁自己。
+- 修复=不用 StampedLock(需要重入时用 ReentrantReadWriteLock)或小心设计(乐观读内不获取其他锁)。
 
-### 取舍:三种锁的适用矩阵
+### 第二步扩展③ 取舍:三种锁的适用矩阵
 
-ReentrantLock:需要 tryLock/可中断/Condition 时;ReentrantReadWriteLock:读多写少+读临界区较长+需要重入;StampedLock:读极多写极少+不需要重入+性能敏感——三者按"功能需求+性能需求"选(并发基础 25 题的取舍矩阵)。
+- ReentrantLock:需要 tryLock/可中断/Condition 时。
+- ReentrantReadWriteLock:读多写少+读临界区较长+需要重入。
+- StampedLock:读极多写极少+不需要重入+性能敏感——三者按"功能需求+性能需求"选(并发基础 25 题的取舍矩阵)。
 
 ## 案例
 
-### 验证:锁模式的走查核对
+### 第三步发散·验证与推演 验证:锁模式的走查核对
 
-验证:公平/非公平断言(公平锁 FIFO,非公平锁插队——并发压测的获取顺序统计);读写锁断言(读并发/写互斥/写饥饿);StampedLock 乐观读断言(校验失败→升级读锁→重读);不可重入断言(同线程二次获取死锁)。验证:锁行为的断言可程序化(并发压测+线程转储分析)。
+- 验证:公平/非公平断言(公平锁 FIFO,非公平锁插队——并发压测的获取顺序统计)。
+- 读写锁断言(读并发/写互斥/写饥饿)。
+- StampedLock 乐观读断言(校验失败→升级读锁→重读)。
+- 不可重入断言(同线程二次获取死锁)。
+- 验证:锁行为的断言可程序化(并发压测+线程转储分析)。
 
-### 追问链:锁模式三刀
+### 第三步发散·追问扩展 追问链:锁模式三刀
 
-一刀:"读写锁的升级?"——读锁升级写锁(ReentrantReadWriteLock 不支持——读锁释放后重新获取写锁,中间可能被插入);降级支持(写锁降读锁——保持原子性)。二刀:"StampedLock 的 tryOptimisticRead?"——返回非零戳(无锁);validate(stamp) 校验——期间有写则校验失败→升级读锁;乐观读是"无锁的读"。三刀:"锁的公平性对性能的影响?"——公平锁吞吐低于非公平(上下文切换多,并发基础 23 题)——非公平是默认(吞吐优先),公平按"饥饿风险"决定是否开启。
+- **Q1：读写锁的升级?**
+  - 答：读锁升级写锁(ReentrantReadWriteLock 不支持——读锁释放后重新获取写锁,中间可能被插入);降级支持(写锁降读锁——保持原子性)。
+- **Q2：StampedLock 的 tryOptimisticRead?**
+  - 答：返回非零戳(无锁);validate(stamp) 校验——期间有写则校验失败→升级读锁;乐观读是"无锁的读"。
+- **Q3：锁的公平性对性能的影响?**
+  - 答：公平锁吞吐低于非公平(上下文切换多,并发基础 23 题)——非公平是默认(吞吐优先),公平按"饥饿风险"决定是否开启。
 
 ## 总结点
 

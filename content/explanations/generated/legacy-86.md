@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:事务是 AOP 代理实现的
+### 第二步扩展① 机制:事务是 AOP 代理实现的
 
-@Transactional 的生效=TransactionInterceptor 拦截(调用必须经过代理)——自调用 this.pay() 不经过代理(拦截器不在调用链上)→事务开关没执行;new 出来的对象没有经过容器的 BPP→无代理→注解是摆设——"注解本身永远没错,错在调用路径"(spring-advanced 6 题)。
+- @Transactional 的生效=TransactionInterceptor 拦截(调用必须经过代理)——自调用 this.pay() 不经过代理(拦截器不在调用链上)→事务开关没执行。
+- new 出来的对象没有经过容器的 BPP→无代理→注解是摆设——"注解本身永远没错,错在调用路径"(spring-advanced 6 题)。
 
-### 反例:事务失效的两种事故
+### 第二步扩展② 反例:事务失效的两种事故
 
-事故一:同类内调用@Transactional 方法——事务不生效(自调用绕过代理,spring-advanced 1 题实测=0);修复=拆 bean/ObjectProvider/self-injection/AopContext。事故二:catch 后不标 rollback——内层 catch 异常不传播→外层不知道该回滚→部分提交(脏数据);修复=catch 后 setRollbackOnly 或重新 throw。
+- 事故一:同类内调用@Transactional 方法——事务不生效(自调用绕过代理,spring-advanced 1 题实测=0)。
+- 修复=拆 bean/ObjectProvider/self-injection/AopContext。
+- 事故二:catch 后不标 rollback——内层 catch 异常不传播→外层不知道该回滚→部分提交(脏数据)。
+- 修复=catch 后 setRollbackOnly 或重新 throw。
 
-### 取舍:事务边界的设计
+### 第二步扩展③ 取舍:事务边界的设计
 
-事务方法薄(只做 DB 操作)+业务逻辑下沉(无注解的内部方法)+远程调用移出事务(第 39 题事务长度)——事务边界的设计=缩小事务范围(短事务,连接占用少,锁持有短,banking 7 题锁序)。事务不是"加个注解"就完了,是"边界设计"的一部分。
+- 事务方法薄(只做 DB 操作)+业务逻辑下沉(无注解的内部方法)+远程调用移出事务(第 39 题事务长度)——事务边界的设计=缩小事务范围(短事务,连接占用少,锁持有短,banking 7 题锁序)。
+- 事务不是"加个注解"就完了,是"边界设计"的一部分。
 
 ## 案例
 
-### 验证:事务失效的走查核对
+### 第三步发散·验证与推演 验证:事务失效的走查核对
 
-验证:spring-advanced 1 题实测(自调用事务生效=0,代理调用=1)+28 题(PostConstruct 捕获=裸类)+6 题(排查入口 this.getClass().getName());验证:每个失效场景的断言可程序化(事务标志=TransactionSynchronizationManager.isActualTransactionActive)。
+- 验证:spring-advanced 1 题实测(自调用事务生效=0,代理调用=1)+28 题(PostConstruct 捕获=裸类)+6 题(排查入口 this.getClass().getName())。
+- 验证:每个失效场景的断言可程序化(事务标志=TransactionSynchronizationManager.isActualTransactionActive)。
 
-### 追问链:失效三刀
+### 第三步发散·追问扩展 追问链:失效三刀
 
-一刀:"@Transactional 加在类上?"——类级对全部 public 方法生效;方法级覆盖类级;接口上的注解在 CGLIB 模式不生效(代理不是接口实现)——注解放实现类。二刀:"Spring 6 对非 public 的 warn?"——启动日志有 warn(非 public 方法的事务注解被忽略)——很多团队日志级别看不到 warn;静态检查(ArchUnit)更可靠。三刀:"事务管理器选错?"——事务"正常开关"但管的是另一个数据源——最难排查的形态(多数据源必须显式绑定 TransactionManager,spring-advanced 7 题)。
+- **Q1：@Transactional 加在类上?**
+  - 答：类级对全部 public 方法生效;方法级覆盖类级;接口上的注解在 CGLIB 模式不生效(代理不是接口实现)——注解放实现类。
+- **Q2：Spring 6 对非 public 的 warn?**
+  - 答：启动日志有 warn(非 public 方法的事务注解被忽略)——很多团队日志级别看不到 warn;静态检查(ArchUnit)更可靠。
+- **Q3：事务管理器选错?**
+  - 答：事务"正常开关"但管的是另一个数据源——最难排查的形态(多数据源必须显式绑定 TransactionManager,spring-advanced 7 题)。
 
 ## 总结点
 

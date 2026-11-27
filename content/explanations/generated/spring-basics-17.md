@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
@@ -19,27 +19,38 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:Filter 与 Interceptor 的时序
+### 第二步扩展① 机制:Filter 与 Interceptor 的时序
 
-Filter 在 DispatcherServlet 之前(Servlet 层);Interceptor 在 DispatcherServlet 内部(MVC 层)——Filter 先执行。
+- Filter 在 DispatcherServlet 之前(Servlet 层)。
+- Interceptor 在 DispatcherServlet 内部(MVC 层)——Filter 先执行。
 
-### 反例:层级误选的后果
+### 第二步扩展② 反例:层级误选的后果
 
-需要 handler 信息的逻辑放 Filter(拿不到 HandlerMethod);纯 Servlet 层逻辑放 Interceptor(多一跳)——层级错选=功能缺失或性能损耗。
+- 需要 handler 信息的逻辑放 Filter(拿不到 HandlerMethod)。
+- 纯 Servlet 层逻辑放 Interceptor(多一跳)——层级错选=功能缺失或性能损耗。
 
-### 取舍:Filter 的读 body 禁忌
+### 第二步扩展③ 取舍:Filter 的读 body 禁忌
 
-Filter 读 body 后 Controller 读不到(流只能读一次)——需要读 body 用 ContentCachingRequestWrapper。
+- Filter 读 body 后 Controller 读不到(流只能读一次)——需要读 body 用 ContentCachingRequestWrapper。
 
 ## 案例
 
-### 验证:时序与边界的断言组
+### 第三步发散·验证与推演 验证:时序与边界的断言组
 
-验证:时序断言(Filter.pre→Interceptor.pre→Controller→Interceptor.post→Filter.post——日志顺序);handler 感知断言(Interceptor 拿到 HandlerMethod[方法信息];Filter 拿不到);异常传播断言(Interceptor.pre 异常→ControllerAdvice;Filter 异常→容器 error page)——三组固化 Filter/Interceptor 边界。
+- 验证:时序断言(Filter.pre→Interceptor.pre→Controller→Interceptor.post→Filter.post——日志顺序)。
+- handler 感知断言(Interceptor 拿到 HandlerMethod[方法信息]。
+- Filter 拿不到)。
+- 异常传播断言(Interceptor.pre 异常→ControllerAdvice。
+- Filter 异常→容器 error page)——三组固化 Filter/Interceptor 边界。
 
-### 追问链:Filter 三刀
+### 第三步发散·追问扩展 追问链:Filter 三刀
 
-一刀:"Filter 的顺序?"——@Order/FilterRegistrationBean.setOrder(数值越小越先)——安全 Filter 在业务 Filter 之前(认证先行);Spring Security 的 FilterChainProxy 是一个特殊的 Filter(内部再分链,第 17 题 spring-advanced)。二刀:"Interceptor 的执行范围?"——addPathPatterns/excludePathPatterns(路径匹配)——Interceptor 的注册可精确到路径(第 17 题 spring-advanced 多链)。三刀:"Filter 读完 body?"——Filter 读 body 后 Controller 读不到(流只能读一次,第 26 题 spring-advanced)——ContentCachingRequestWrapper 解决——Filter 设计的读取纪律。
+- **Q1：Filter 的顺序?**
+  - 答：@Order/FilterRegistrationBean.setOrder(数值越小越先)——安全 Filter 在业务 Filter 之前(认证先行);Spring Security 的 FilterChainProxy 是一个特殊的 Filter(内部再分链,第 17 题 spring-advanced)。
+- **Q2：Interceptor 的执行范围?**
+  - 答：addPathPatterns/excludePathPatterns(路径匹配)——Interceptor 的注册可精确到路径(第 17 题 spring-advanced 多链)。
+- **Q3：Filter 读完 body?**
+  - 答：Filter 读 body 后 Controller 读不到(流只能读一次,第 26 题 spring-advanced)——ContentCachingRequestWrapper 解决——Filter 设计的读取纪律。
 
 ## 总结点
 

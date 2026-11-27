@@ -43,8 +43,8 @@
       "category": "1.5 ⭐ Spring 基础",
       "file": "spring-basics.tsv",
       "references": [
-        "https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html",
-        "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html"
+        "https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html",
+        "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html"
       ]
     },
     {
@@ -74,7 +74,9 @@
         "https://arxiv.org/abs/2005.11401",
         "https://arxiv.org/abs/1706.03762",
         "https://arxiv.org/abs/2106.09685",
-        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/",
+        "https://arxiv.org/abs/2309.15217"
       ]
     },
     {
@@ -100,8 +102,8 @@
       "category": "2.3 ⭐ Spring 进阶",
       "file": "spring-advanced.tsv",
       "references": [
-        "https://docs.spring.io/spring-framework/reference/core/beans/factory-scopes.html",
-        "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html"
+        "https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html",
+        "https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html"
       ]
     },
     {
@@ -140,7 +142,9 @@
         "https://arxiv.org/abs/2005.11401",
         "https://arxiv.org/abs/1706.03762",
         "https://arxiv.org/abs/2106.09685",
-        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/",
+        "https://arxiv.org/abs/2309.15217"
       ]
     },
     {
@@ -191,7 +195,9 @@
         "https://arxiv.org/abs/2005.11401",
         "https://arxiv.org/abs/1706.03762",
         "https://arxiv.org/abs/2106.09685",
-        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/",
+        "https://arxiv.org/abs/2309.15217"
       ]
     },
     {

@@ -1,9 +1,9 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/invoke/VarHandle.html.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/invoke/VarHandle.html)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)
 
 </details>
@@ -21,27 +21,38 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：四档是"承诺强度"的阶梯
+### 第二步扩展① 机制：四档是"承诺强度"的阶梯
 
-plain 是便签（可能被缓存看不到），opaque 是广播（听得到最新版，不保证节目顺序），acquire/release 是挂号信（发布方之后的、接收方之前的都有序），volatile 是双向公证。类比选档：按"读者需要看到什么"倒推写方承诺，不上不下的浪费与不足都要避免。
+- plain 是便签（可能被缓存看不到），opaque 是广播（听得到最新版，不保证节目顺序），acquire/release 是挂号信（发布方之后的、接收方之前的都有序），volatile 是双向公证。
+- 类比选档：按"读者需要看到什么"倒推写方承诺，不上不下的浪费与不足都要避免。
 
-### 反例：三档误用的现场
+### 第二步扩展② 反例：三档误用的现场
 
-误用一：把 opaque 用在"先写数据再置就绪标志"的发布场景——标志可见了，数据写可能还不可见，需 release/acquire 或 volatile。误用二：全字段 volatile——把只有单线程访问的配置字段也加上全序，白白付出屏障成本。误用三：用 plain 存停止标志——经典可见性丢失（并发基础第 37 题）。
+- 误用一：把 opaque 用在"先写数据再置就绪标志"的发布场景——标志可见了，数据写可能还不可见，需 release/acquire 或 volatile。
+- 误用二：全字段 volatile——把只有单线程访问的配置字段也加上全序，白白付出屏障成本。
+- 误用三：用 plain 存停止标志——经典可见性丢失（并发基础第 37 题）。
 
-### 取舍：VarHandle 与 AtomicXxx 的分工
+### 第二步扩展③ 取舍：VarHandle 与 AtomicXxx 的分工
 
-VarHandle 把原子能力带给任意字段（不必把字段包装成 AtomicReference 对象），并提供五档渐变；AtomicXxx 是封装好的现成组件。字段是热点路径的一部分且需要档位控制——VarHandle；常规计数与引用替换——AtomicXxx 更简单。两者语义档位一一对应，混用时保持同一字段同一档位。
+- VarHandle 把原子能力带给任意字段（不必把字段包装成 AtomicReference 对象），并提供五档渐变。
+- AtomicXxx 是封装好的现成组件。
+- 字段是热点路径的一部分且需要档位控制——VarHandle。
+- 常规计数与引用替换——AtomicXxx 更简单。
+- 两者语义档位一一对应，混用时保持同一字段同一档位。
 
 ## 案例
 
-### 对照操作：同场景四档对照
+### 第三步发散·验证与推演 对照操作：同场景四档对照
 
-教学验证：发布场景（写 payload 再置 flag）分别用 opaque、release/acquire、volatile 实现，读线程校验 payload 可见性。预期：opaque 版本出现数据未就绪，release 版本正确且基准优于 volatile。实验可复跑（jcstress 更严谨），把选档表钉在实际行为上。
+- 教学验证：发布场景（写 payload 再置 flag）分别用 opaque、release/acquire、volatile 实现，读线程校验 payload 可见性。
+- 预期：opaque 版本出现数据未就绪，release 版本正确且基准优于 volatile。
+- 实验可复跑（jcstress 更严谨），把选档表钉在实际行为上。
 
-### 追问：access mode 与 memory ordering 是两个维度吗
+### 第三步发散·追问① 追问：access mode 与 memory ordering 是两个维度吗
 
-是。访问模式管"怎么改"（get/set/CAS/getAndAdd），内存序管"改了谁能看到、以什么顺序"——两者正交组合。面试里能把 getAndAdd（原子模式）与 setRelease（序模式）分开论述，就证明理解了 VarHandle 的二维设计，而不是把它当"更快的 volatile"。
+- 是。
+- 访问模式管"怎么改"（get/set/CAS/getAndAdd），内存序管"改了谁能看到、以什么顺序"——两者正交组合。
+- 面试里能把 getAndAdd（原子模式）与 setRelease（序模式）分开论述，就证明理解了 VarHandle 的二维设计，而不是把它当"更快的 volatile"。
 
 ## 总结点
 

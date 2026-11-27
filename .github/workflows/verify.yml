@@ -33,7 +33,7 @@ jobs:
       - run: npm ci && npm test && npm run format:check && npm run build && npm run test:knowledge-core
         working-directory: frontend
       - run: node frontend/node_modules/prettier/bin/prettier.cjs --plugin=./frontend/node_modules/prettier-plugin-java/dist/index.mjs --check "backend/src/**/*.java"
-      - run: node scripts/verify-contract.mjs && node scripts/sync-content-status.mjs --check && node scripts/validate-content.mjs && node scripts/validate-explanations.mjs
+      - run: node scripts/verify-contract.mjs && node scripts/sync-content-status.mjs --check && node scripts/validate-content.mjs && node scripts/validate-explanations.mjs && node scripts/check-three-step.mjs
       - run: docker compose --env-file .env.example config --quiet
       - run: node scripts/check-deployment-config.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

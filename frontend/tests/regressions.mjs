@@ -25,7 +25,7 @@ try {
         assert.ok(response.ok(), path + ': ' + response.status());
         return response.json();
       };
-      assert.equal((await get('/questions?tag=senior-v1&size=1')).total, 1050);
+      assert.equal((await get('/questions?tag=senior-v1&size=1')).total, 1062);
       const categories = await get('/categories');
       const category = categories.find(c => c.name.includes('专家'));
       const first = await get('/questions?category=' + category.id + '&size=15');

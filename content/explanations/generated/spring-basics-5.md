@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 - [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/docs/6.2.19/javadoc-api/)
@@ -20,27 +20,42 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:懒加载与预实例化的差异
+### 第二步扩展① 机制:懒加载与预实例化的差异
 
-BeanFactory 懒加载:definition 注册→首次 getBean 触发实例化(BeanPostProcessor/依赖注入/生命周期回调)——启动快但首次访问慢(且配置错误延迟暴露)。ApplicationContext 预实例化:refresh 时遍历所有 bean definition→逐个实例化→启动慢但配置错误启动期暴露( fail-fast)。真值示例:BeanFactory 的 definition:instance 阶段(definition 存在时无 instance)。
+- BeanFactory 懒加载:definition 注册→首次 getBean 触发实例化(BeanPostProcessor/依赖注入/生命周期回调)——启动快但首次访问慢(且配置错误延迟暴露)。
+- ApplicationContext 预实例化:refresh 时遍历所有 bean definition→逐个实例化→启动慢但配置错误启动期暴露( fail-fast)。
+- 真值示例:BeanFactory 的 definition:instance 阶段(definition 存在时无 instance)。
 
-### 反例:混用的两种代价
+### 第二步扩展② 反例:混用的两种代价
 
-代价一,BeanFactory 做业务容器:无 AOP 自动代理(BeanFactory 不自动应用 BeanPostProcessor——需手动注册)——@Transactional/@Autowired 失效(静默)。代价二,ApplicationContext 的启动开销:大型应用的预实例化(数千 bean 的启动时间)——懒加载优化(@Lazy/懒初始化,第 40 题)。两条的正解:业务用 ApplicationContext(功能完整);BeanFactory 理解为 ApplicationContext 的内核(教学与框架内部)。
+- 代价一,BeanFactory 做业务容器:无 AOP 自动代理(BeanFactory 不自动应用 BeanPostProcessor——需手动注册)——@Transactional/@Autowired 失效(静默)。
+- 代价二,ApplicationContext 的启动开销:大型应用的预实例化(数千 bean 的启动时间)——懒加载优化(@Lazy/懒初始化,第 40 题)。
+- 两条的正解:业务用 ApplicationContext(功能完整)。
+- BeanFactory 理解为 ApplicationContext 的内核(教学与框架内部)。
 
-### 取舍:预实例化与懒加载的平衡
+### 第二步扩展③ 取舍:预实例化与懒加载的平衡
 
-全预实例化:启动慢(但错误早暴露)+运行时快(无首次延迟)。全懒加载:启动快(但错误延迟到首次使用)+运行时首次慢。混合:singleton 预实例化(核心 bean)+@Lazy 标记非核心(第 40 题distributed 启动优化)——启动时间的优化手段。Spring Boot 的默认:预实例化(但支持 spring.main.lazy-initialization=true 全局懒加载)。
+- 全预实例化:启动慢(但错误早暴露)+运行时快(无首次延迟)。
+- 全懒加载:启动快(但错误延迟到首次使用)+运行时首次慢。
+- 混合:singleton 预实例化(核心 bean)+@Lazy 标记非核心(第 40 题distributed 启动优化)——启动时间的优化手段。
+- Spring Boot 的默认:预实例化(但支持 spring.main.lazy-initialization=true 全局懒加载)。
 
 ## 案例
 
-### 验证:BeanFactory 语义的断言组
+### 第三步发散·验证与推演 验证:BeanFactory 语义的断言组
 
-验证:真值断言(BeanPhasesExample 的 definition:instance——后端真值测试持续执行);预实例化断言(ApplicationContext refresh 后 getBean 零延迟);懒加载断言(BeanFactory 注册后 getBean 前无 instance)——三组固化两者的启动语义。
+- 验证:真值断言(BeanPhasesExample 的 definition:instance——后端真值测试持续执行)。
+- 预实例化断言(ApplicationContext refresh 后 getBean 零延迟)。
+- 懒加载断言(BeanFactory 注册后 getBean 前无 instance)——三组固化两者的启动语义。
 
-### 追问链:容器三刀
+### 第三步发散·追问扩展 追问链:容器三刀
 
-一刀:"ApplicationContext 的实现?"——AnnotationConfigApplicationContext(Java 配置)/ClassPathXmlApplicationContext(XML)/Spring Boot 的 SpringApplication.run(自动)——实现的演进(XML→Java→Boot 自动)。二刀:"容器的层次?"——ApplicationContext 包含 BeanFactory(getBeanFactory() 返回内核)——ApplicationContext 是门面(facade——增强功能委托内核)——门面模式(第 7 题distributed 防腐的容器版)。三刀:"容器的关闭?"——ctx.close()(销毁 singleton/调 @PreDestroy)——关闭顺序(依赖反向,第 38 题 spring-advanced)。
+- **Q1：ApplicationContext 的实现?**
+  - 答：AnnotationConfigApplicationContext(Java 配置)/ClassPathXmlApplicationContext(XML)/Spring Boot 的 SpringApplication.run(自动)——实现的演进(XML→Java→Boot 自动)。
+- **Q2：容器的层次?**
+  - 答：ApplicationContext 包含 BeanFactory(getBeanFactory() 返回内核)——ApplicationContext 是门面(facade——增强功能委托内核)——门面模式(第 7 题distributed 防腐的容器版)。
+- **Q3：容器的关闭?**
+  - 答：ctx.close()(销毁 singleton/调 @PreDestroy)——关闭顺序(依赖反向,第 38 题 spring-advanced)。
 
 ## 总结点
 

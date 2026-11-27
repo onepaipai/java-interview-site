@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CountDownLatch.html)
 
 </details>
 
@@ -20,27 +20,45 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:三工具的语义差异
+### 第二步扩展① 机制:三工具的语义差异
 
-CountDownLatch=倒计时门闩(等 N 件事完成);CyclicBarrier=集合点(N 个线程互相等);Semaphore=限流阀(N 个许可控制并发)——核心区别=谁是"等待的发起者":Latch=主任务等子任务;Barrier=线程互相等;Semaphore=限制进入数。
+- CountDownLatch=倒计时门闩(等 N 件事完成)。
+- CyclicBarrier=集合点(N 个线程互相等)。
+- Semaphore=限流阀(N 个许可控制并发)——核心区别=谁是"等待的发起者":Latch=主任务等子任务。
+- Barrier=线程互相等。
+- Semaphore=限制进入数。
 
-### 反例:并发工具的两种事故
+### 第二步扩展② 反例:并发工具的两种事故
 
-事故一:CountDownLatch 计数不匹配——countDown 次数<count→await 永远阻塞;修复=计数与任务数精确匹配(或 tryAwait 带超时)。事故二:Semaphore 泄漏——acquire 后异常路径未 release(许可泄漏→可用许可减少);修复=finally{release} 或 tryAcquire+finally 模式。
+- 事故一:CountDownLatch 计数不匹配——countDown 次数<count→await 永远阻塞。
+- 修复=计数与任务数精确匹配(或 tryAwait 带超时)。
+- 事故二:Semaphore 泄漏——acquire 后异常路径未 release(许可泄漏→可用许可减少)。
+- 修复=finally{release} 或 tryAcquire+finally 模式。
 
-### 取舍:CompletableFuture vs CountDownLatch
+### 第二步扩展③ 取舍:CompletableFuture vs CountDownLatch
 
-CompletableFuture:异步编排(thenCompose/thenCombine 链式)+异常处理(exceptionally)+回调非阻塞;CountDownLatch:简单等待(计数到零)+阻塞式——简单等待场景 Latch 够用;复杂编排(依赖链/异常传播)用 CompletableFuture(并发进阶 29 题结构化并发)。
+- CompletableFuture:异步编排(thenCompose/thenCombine 链式)+异常处理(exceptionally)+回调非阻塞。
+- CountDownLatch:简单等待(计数到零)+阻塞式——简单等待场景 Latch 够用。
+- 复杂编排(依赖链/异常传播)用 CompletableFuture(并发进阶 29 题结构化并发)。
 
 ## 案例
 
-### 验证:并发工具的走查核对
+### 第三步发散·验证与推演 验证:并发工具的走查核对
 
-验证:CountDownLatch 断言(N 个 countDown→await 放行);CyclicBarrier 断言(N 线程到齐→屏障打开→可重用);Semaphore 断言(N permits→acquire 获取/release 释放→超限阻塞);公平断言(Semaphore 公平模式 FIFO)。验证:三工具的行为断言可程序化(并发测试)。
+- 验证:CountDownLatch 断言(N 个 countDown→await 放行)。
+- CyclicBarrier 断言(N 线程到齐→屏障打开→可重用)。
+- Semaphore 断言(N permits→acquire 获取/release 释放→超限阻塞)。
+- 公平断言(Semaphore 公平模式 FIFO)。
+- 验证:三工具的行为断言可程序化(并发测试)。
 
-### 追问链:工具三刀
+### 第三步发散·追问扩展 追问链:工具三刀
 
-一刀:"Semaphore 的 acquire 与 tryAcquire?"——acquire 阻塞直到有许可;tryAcquire 立即返回(成功/失败)——限流场景用 tryAcquire(快速拒绝,不排队,第 126 题限流)。二刀:"CyclicBarrier 的回调?"——barrierAction 在屏障打开时执行(由最后到达的线程执行)——汇总/统计/日志的钩子;回调异常→barrier broken(所有等待者异常)。三刀:"Phaser?"——CyclicBarrier 的增强版(动态注册/多阶段)——比 CyclicBarrier 灵活但复杂度高;多数场景 CyclicBarrier 够用。
+- **Q1：Semaphore 的 acquire 与 tryAcquire?**
+  - 答：acquire 阻塞直到有许可;tryAcquire 立即返回(成功/失败)——限流场景用 tryAcquire(快速拒绝,不排队,第 126 题限流)。
+- **Q2：CyclicBarrier 的回调?**
+  - 答：barrierAction 在屏障打开时执行(由最后到达的线程执行)——汇总/统计/日志的钩子;回调异常→barrier broken(所有等待者异常)。
+- **Q3：Phaser?**
+  - 答：CyclicBarrier 的增强版(动态注册/多阶段)——比 CyclicBarrier 灵活但复杂度高;多数场景 CyclicBarrier 够用。
 
 ## 总结点
 

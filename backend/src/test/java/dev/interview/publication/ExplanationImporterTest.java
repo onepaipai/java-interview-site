@@ -327,7 +327,7 @@ class ExplanationImporterTest {
       root.resolve("explanations/manifest.json").toFile(),
       ExplanationImporter.Manifest.class
     );
-    assertEquals(1215, pack.count());
+    assertEquals(1227, pack.count());
     assertEquals(baselines.size(), pack.count());
     for (var item : pack.entries()) {
       assertEquals(titles.get(item.sourceKey()), item.title());
@@ -353,7 +353,7 @@ class ExplanationImporterTest {
       ExplanationImporter.validateSections(deep.replace("## 参考分析", "## 其他"))
     );
     assertThrows(IllegalArgumentException.class, () ->
-      ExplanationImporter.validateSections(deep.replace("### 数据库条件更新", "# 数据库条件更新"))
+      ExplanationImporter.validateSections(deep.replace("### 第二步扩展① 数据库条件更新", "# 数据库条件更新"))
     );
     assertThrows(IllegalArgumentException.class, () ->
       ExplanationImporter.validateSections(deep.replace("```sql", "~~~sql"))

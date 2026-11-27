@@ -57,7 +57,7 @@ try {
       for (const { module,question } of picks) {
         await page.goto(base + '/#/question/' + question.id);
         const deep = question.answer.includes('<!-- explanation:deep -->');
-        const headings = deep ? ['面试口述','机制与取舍','故障推演与追问','关键判断'] : ['参考回答', ...(question.answer.includes('## 参考分析') ? ['参考分析'] : []), '案例', '总结点'];
+        const headings = deep ? ['第一步 · 速记结论','第二步 · 逐点扩展','第三步 · 发散追问','关键口诀'] : ['参考回答', ...(question.answer.includes('## 参考分析') ? ['参考分析'] : []), '案例', '总结点'];
         await expect(page.locator('.reader .explanation-section')).toHaveCount(headings.length);
         const navLabels = await page.getByRole('navigation', { name: '主导航' }).locator('button').evaluateAll(buttons => buttons.map(button => {
           const range = document.createRange();

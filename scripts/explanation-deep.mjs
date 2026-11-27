@@ -30,8 +30,86 @@ export function validateDeepContent(value, key, title) {
 
 const numbered = items => items.map((text, i) => `${i + 1}. ${text}`).join('\n');
 const subsections = items => items.map(block => `### ${block.title}\n\n${block.body.trim()}`).join('\n\n');
+
+// 三步走呈现：正文按句子边界拆成独立列表行，避免整段堆叠；含代码块时原样保留。
+const stepPrefix = n => ['①', '②', '③', '④', '⑤', '⑥'][n] ?? String(n + 1);
+
+function splitToLines(body) {
+  if (/^\s*[-*]\s/m.test(body)) return body.trim();      // 已是列表（含手工三步走样板）保持原样
+  // 逐行处理：围栏内原样保留，围栏外按句子边界拆条；图片行原样保留
+  const out = [];
+  let fence = null;
+  for (const raw of body.split('\n')) {
+    const line = raw.trim();
+    // 围栏开关（``` 或 ~~~）
+    const marker = line.match(/^(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1][0];
+      else if (marker[1][0] === fence) fence = null;
+      out.push(raw);                                      // 围栏行原样
+      continue;
+    }
+    if (fence) { out.push(raw); continue; }               // 代码内容原样，不拆
+    if (!line) continue;
+    if (/^!\[[^\]]*\]\(/.test(line)) { out.push(line); continue; }
+    const parts = line.split(/(?<=[。；;])\s*/).map(s => s.trim()).filter(Boolean);
+    for (const p of parts) out.push('- ' + p.replace(/[；;，]$/, '。'));
+  }
+  return out.join('\n');
+}
+
+// 追问链处理：带问号的拆成问答对；"主题=解释"式拆成加粗要点，都不假造答案。
+function caseToQa(title, body) {
+  if (/```|~~~/.test(body) || /^\s*[-*]\s/m.test(body)) return splitToLines(body);
+  const segments = [...body.matchAll(/[一二三四五六]刀\s*[:：]\s*([\s\S]*?)(?=[一二三四五六]刀\s*[:：]|$)/g)];
+  if (segments.length < 2) return splitToLines(body);
+
+  // 全部是「"问题?"——答案」时，生成问答对
+  const qaLines = [];
+  let allQuoted = true;
+  segments.forEach((m, i) => {
+    const raw = m[1].trim();
+    const quoted = raw.match(/^[""「]([^""」?？]+[?？])[""」]\s*[-—]+\s*([\s\S]+)$/);
+    if (!quoted) { allQuoted = false; return; }
+    const q = quoted[1].trim(), a = quoted[2].trim().replace(/[。；]+$/, '');
+    qaLines.push(`- **Q${i + 1}：${q}**`);
+    qaLines.push(`  - 答：${a}。`);
+  });
+  if (allQuoted && qaLines.length >= 4) return qaLines.join('\n');
+
+  // 否则按「主题=解释」拆成加粗要点，每条独立成行
+  const pts = segments.map((m, i) => {
+    let text = m[1].trim().replace(/[。；]+$/, '');
+    const eq = text.indexOf('=');
+    if (eq > 0 && eq <= 24) {
+      const topic = text.slice(0, eq).trim();
+      const rest = text.slice(eq + 1).trim();
+      return `- **追问${stepPrefix(i)}·${topic}**：${rest}`;
+    }
+    return `- **追问${stepPrefix(i)}**：${text}`;
+  });
+  return pts.join('\n');
+}
+
+function threeStepSections(analysis, cases) {
+  const converted = analysis?.length && analysis[0].title.startsWith('第二步');
+  if (converted) return { analysis, cases }; // 已是三步走（手工样板），不再转换
+  const a = (analysis || []).map((b, i) => ({ title: `第二步扩展${stepPrefix(i)} ${b.title}`.slice(0, 65), body: splitToLines(b.body) }));
+  const c = (cases || []).map((b, i) => {
+    const body = caseToQa(b.title, b.body);
+    const isQa = /\*\*Q\d/.test(body);
+    const isPoint = /\*\*追问/.test(body);
+    const kind = isQa ? (i === 0 ? '问答对' : '追问扩展')
+      : isPoint ? '发散要点'
+      : (i === 0 ? '验证与推演' : '追问' + stepPrefix(i - 1));
+    return { title: `第三步发散·${kind} ${b.title}`.slice(0, 65), body };
+  });
+  return { analysis: a, cases: c };
+}
+
 export function renderDeepContent(value) {
-  return `## 参考回答\n\n${deepMarker}\n\n> 场景与约束：${value.scenario}\n\n${numbered(value.answer)}\n\n## 参考分析\n\n${subsections(value.analysis)}\n\n## 案例\n\n${subsections(value.case)}\n\n## 总结点\n\n${numbered(value.summary)}\n`;
+  const { analysis, cases } = threeStepSections(value.analysis, value.case);
+  return `## 参考回答\n\n${deepMarker}\n\n> 场景与约束：${value.scenario}\n\n${numbered(value.answer)}\n\n## 参考分析\n\n${subsections(analysis)}\n\n## 案例\n\n${subsections(cases)}\n\n## 总结点\n\n${numbered(value.summary)}\n`;
 }
 
 /** Same size, fence and terminal-summary guarantees as the compact publication format. */

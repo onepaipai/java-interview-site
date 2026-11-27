@@ -2,7 +2,7 @@
 // 证据基准:JDK 17.0.17 本机实测(F:\tmp-jl-exp);未实测写明"推演"。
 const pod = 'https://martinfowler.com/articles/patterns-of-distributed-systems/';
 const sre = 'https://sre.google/sre-book/addressing-cascading-failures/';
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const block = (title, body) => ({ title, body });
 const deep = (title, scenario, answer, analysis, cases, summary, references) => ({
   format: 'deep', title, scenario, answer, analysis, case: cases, summary, references,
@@ -947,12 +947,12 @@ export default {
     'Java 版本升级前应验证哪些兼容性？',
     '网银升级沙盘:JDK 17→21 升级——兼容性五面:语言与 API(移除/弃用的 API)、字节码与运行时(类文件版本/JIT 行为)、GC 与内存(默认 GC 行为变化,第 46 题)、依赖与工具链(框架/构建工具的版本支持)、序列化与安全(JEP 290 过滤器/安全管理器移除)。',
     [
-      '五面的验证清单:语言 API(jdeps 扫描)、字节码(类文件版本)、GC(默认参数变化——日志对比)、依赖(框架 JDK 支持)+序列化(过滤器/SecurityManager 移除)。',
+      '五面的验证清单:语言 API(jdeps 扫描)、字节码(类文件版本)、GC(默认参数变化——日志对比)、依赖(框架 JDK 支持)+序列化(过滤器/SecurityManager 禁用)。',
       '验证的三级:静态分析(jdeps/jdeprscan 的 API 使用扫描)、运行测试(全量回归+真值测试,第 49 题)、灰度对照(生产流量双版本对照——分布式 42 题框架)。',
       '与本仓库的衔接:本仓库已跑 JDK 17(spring 6.2.19)——升级 21 的回归集=本仓库的真值测试(SpringAdvancedExamplesTest)+90 后端测试+前端测试——回归集的完备性决定升级的可信度(第 49 题)。',
     ],
     [
-      block('机制:五面的具体验证', '面一,语言 API:jdeps --jdk-internals(内部 API 使用)+jdeprscan(deprecated 使用)——扫描清单逐项处理(替换/保留[配 --add-opens])。面二,运行时:类文件版本(61→65——编译目标与运行版本)、instrumentation(agent 的兼容)。面三,GC:默认 GC 的参数变化(G1 的默认值演进)+新 GC(分代 ZGC[21]的评估)+GC 日志的对比(暂停时间/吞吐)。面四,依赖:框架矩阵(Spring/MyBatis/Netty 的 JDK 支持表)+构建工具(maven-compiler-plugin 的 release 参数)。面五,序列化:JEP 290 过滤器的默认行为+SecurityManager 移除(17 deprecated,24 移除)——依赖 SecurityManager 的代码迁移。'),
+      block('机制:五面的具体验证', '面一,语言 API:jdeps --jdk-internals(内部 API 使用)+jdeprscan(deprecated 使用)——扫描清单逐项处理(替换/保留[配 --add-opens])。面二,运行时:类文件版本(61→65——编译目标与运行版本)、instrumentation(agent 的兼容)。面三,GC:默认 GC 的参数变化(G1 的默认值演进)+新 GC(分代 ZGC[21]的评估)+GC 日志的对比(暂停时间/吞吐)。面四,依赖:框架矩阵(Spring/MyBatis/Netty 的 JDK 支持表)+构建工具(maven-compiler-plugin 的 release 参数)。面五,序列化:JEP 290 过滤器的默认行为+SecurityManager 的安全检查在 JDK 17 标记弃用(JEP 411)、JDK 24 由 JEP 486 永久禁用(设置后不再生效)——依赖 SecurityManager 的代码迁移。'),
       block('反例:升级遗漏的三种事故', '事故一,内部 API 依赖:sun.misc.BASE64Encoder(JDK 内部)——升级后 NoClassDefFoundError——jdeps 前移发现。事故二,GC 行为漂移:默认堆参数/GC 触发阈值变化——内存行为漂移(第 46 题distributed 的升级兼容)。事故三,依赖不兼容:框架不支持新 JDK(字节码增强[ASM 版本]失败)——启动即崩(依赖矩阵先行)。三条的正解:五面清单+三级验证+灰度对照——升级的系统化。'),
       block('取舍:升级的策略与节奏', '策略:LTS 跳跃(17→21→25)+每 LTS 内小版本跟安全补丁——LTS 策略减少升级频率。节奏:升级先于"必须"(被动升级=紧急+风险;主动升级=从容)——升级的保鲜期(第 17 题 distributed)。回滚:旧版本制品保留(第 35 题)+回滚条件(第 46 题)+升级演练(第 46 题灾备演练)——升级是变更,走变更纪律。'),
     ],
@@ -961,6 +961,26 @@ export default {
       block('追问链:升级三刀', '一刀:"preview 特性?"——preview 特性(--enable-preview)的锁定(版本绑定——preview 在下一版变更)——preview 的生产禁用(除非接受版本锁定)。二刀:"依赖的先行?"——依赖的升级先行于 JDK(框架先支持新 JDK,再升 JDK)——顺序:依赖兼容性检查→依赖升级→JDK 升级——顺序反了=依赖崩(第 49 题回归集)。三刀:"升级的团队沟通?"——升级的影响面(行为变化/性能变化/依赖变化)进团队公告——升级的知识共享(第 38 题评审不垄断)——升级不是个人的事。'),
     ],
     ['五面验证:API/运行时/GC/依赖/序列化', '三级验证:静态/回归/灰度', 'LTS 策略+主动升级,不被动'], [sre],
+  ),
+
+  'java-language/51': deep(
+    'switch 模式匹配与传统的 instanceof 链有何不同？',
+    '网银报文沙盘:解析多种消息类型时，旧代码用 instanceof 链逐级判断并强转；团队升级到 JDK 21 后讨论改用 switch 模式匹配，需要说明空值、穷尽性与版本边界。',
+    [
+      '模式匹配把"类型判断 + 强转 + 取值"合成一条表达式或语句，减少样板代码；变量只在匹配成功的作用域内可用。',
+      'switch 模式匹配在 JDK 21 转正（JEP 441），可配合 record 解构与 guard 条件；null 必须用 case null 显式处理，否则会抛 NullPointerException。',
+      '穷尽性只在密封类型等已知类型集合下可被编译器静态保证；面对开放继承体系仍需 default 分支，不能说"switch 模式一定穷尽"。',
+    ],
+    [
+      block('机制:从判断强转到绑定变量', '传统写法先 if (obj instanceof Order o) 再使用 o，重复判断与强转；模式匹配在匹配成功时直接绑定变量。switch 进一步把多个类型分支集中到一个表达式，record 模式还能拆出组件。类比海关查验:旧写法是"看护照—确认国籍—再翻译"三步重复；模式匹配是一次查验后直接给对应通道的通行证——但无护照（null）的人仍要单独处理。'),
+      block('边界:null 与穷尽性是两个问题', 'switch 对 null 不自动放行:传统写法里没有分支命中时可能落到 else，而 switch 需要显式 case null（或先判空），否则运行时抛 NPE。穷尽性方面，sealed 类/接口限定了许可子类，编译器可检查所有分支；普通接口或父类可被任意新类实现，必须有 default 兜底。'),
+      block('取舍:可读性与版本约束', '模式匹配减少强转和临时变量，适合多类型分派；复杂 guard 条件和过多分支仍会损可读性，必要时保留策略表或 Visitor。版本上，项目基线 Java 17 不能编译 JDK 21 的 switch 模式；回答要给出版本前提和 null 处理策略。'),
+    ],
+    [
+      block('验证:分支覆盖的推演', '教学验证（JDK 21+）:构造 Order、Refund、未知类型与 null 四类输入，断言前三类进入对应分支、null 按 case null 处理；再新增一个未覆盖的 sealed 子类，观察编译是否报错。该验证为设计口径，本项目 Java 17 基线未运行该实验。'),
+      block('追问:instanceof 模式还常用吗', '常用。单个类型判断用 instanceof 模式更简单，只需要提取一个组件时也不会引入多余的分支语法；多类型分派或需要一次性解构 record 的多个组件时，switch 模式更集中。两者不是替代关系，按分支数量和是否需要解构选择，混合使用也很正常。'),
+    ],
+    ['匹配即绑定，少写强转', 'null 显式处理，穷尽靠 sealed', 'JDK 21 转正，17 不能用'], ['https://openjdk.org/jeps/441', 'https://openjdk.org/jeps/409'],
   ),
 
 };

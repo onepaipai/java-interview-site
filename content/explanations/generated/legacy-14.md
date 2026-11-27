@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html)
 
 </details>
 
@@ -19,27 +20,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:CHM 为什么读不需要加锁
+### 第二步扩展① 机制:CHM 为什么读不需要加锁
 
-Node.val 与 Node.next 都是 volatile——读线程看到最新值;数组引用 volatile 保证扩容后可见。写侧:空桶 CAS 放入,非空 synchronized 锁桶头(锁的是链表头 Node,不是数组槽)——不同桶互不影响,并发度接近桶数。
+- Node.val 与 Node.next 都是 volatile——读线程看到最新值。
+- 数组引用 volatile 保证扩容后可见。
+- 写侧:空桶 CAS 放入,非空 synchronized 锁桶头(锁的是链表头 Node,不是数组槽)——不同桶互不影响,并发度接近桶数。
 
-### 反例:并发容器的两种事故
+### 第二步扩展② 反例:并发容器的两种事故
 
-事故一:HashMap 多线程 put——数据丢失或(JDK7)扩容死循环;修复=CHM。事故二:Collections.synchronizedMap 当高性能用——所有操作一把互斥锁(与 Hashtable 同级);高并发必须 CHM。事故三:CHM 复合操作不原子——先 get 再 put 的检查-操作仍有竞态,用 putIfAbsent/computeIfAbsent。
+- 事故一:HashMap 多线程 put——数据丢失或(JDK7)扩容死循环。
+- 修复=CHM。
+- 事故二:Collections.synchronizedMap 当高性能用——所有操作一把互斥锁(与 Hashtable 同级)。
+- 高并发必须 CHM。
+- 事故三:CHM 复合操作不原子——先 get 再 put 的检查-操作仍有竞态,用 putIfAbsent/computeIfAbsent。
 
-### 取舍:同步容器的演进逻辑
+### 第二步扩展③ 取舍:同步容器的演进逻辑
 
-Hashtable(全表锁)→synchronizedMap(包装,同粒度)→分段锁(JDK7 CHM)→桶级锁+CAS(JDK8 CHM)——锁粒度逐代细化;选型:单线程 HashMap,并发 CHM,排序并发 ConcurrentSkipListMap(无并发 TreeMap)。
+- Hashtable(全表锁)→synchronizedMap(包装,同粒度)→分段锁(JDK7 CHM)→桶级锁+CAS(JDK8 CHM)——锁粒度逐代细化。
+- 选型:单线程 HashMap,并发 CHM,排序并发 ConcurrentSkipListMap(无并发 TreeMap)。
 
 ## 案例
 
-### 验证:三者并发的实测走查
+### 第三步发散·验证与推演 验证:三者并发的实测走查
 
-验证:并发压力断言(8 线程×10 万 put:HashMap 丢数据/CHM 无丢失);并发度断言(CHM 不同桶并行,单桶串行——计时对照);null 断言(HashMap 可 null,CHM 抛 NPE);复合操作断言(putIfAbsent 幂等 vs get+put 竞态)——集合模块 C 系列并发实验可复用。预期:CHM 无丢失且吞吐显著高于 Hashtable。
+- 验证:并发压力断言(8 线程×10 万 put:HashMap 丢数据/CHM 无丢失)。
+- 并发度断言(CHM 不同桶并行,单桶串行——计时对照)。
+- null 断言(HashMap 可 null,CHM 抛 NPE)。
+- 复合操作断言(putIfAbsent 幂等 vs get+put 竞态)——集合模块 C 系列并发实验可复用。
+- 预期:CHM 无丢失且吞吐显著高于 Hashtable。
 
-### 追问链:CHM 三刀
+### 第三步发散·发散要点 追问链:CHM 三刀
 
-一刀:size 弱一致=CounterCell 分片+sumCount 无全局锁(返回瞬时近似值)。二刀:迭代器弱一致=创建时不抛 CME(fail-fast 反面),可能读到旧值。三刀:computeIfAbsent 死锁风险=同桶嵌套 compute(JDK9 修复递归更新抛 IllegalStateException)——嵌套计算换普通 put。
+- **追问①·size 弱一致**：CounterCell 分片+sumCount 无全局锁(返回瞬时近似值)
+- **追问②·迭代器弱一致**：创建时不抛 CME(fail-fast 反面),可能读到旧值
+- **追问③·computeIfAbsent 死锁风险**：同桶嵌套 compute(JDK9 修复递归更新抛 IllegalStateException)——嵌套计算换普通 put
 
 ## 总结点
 

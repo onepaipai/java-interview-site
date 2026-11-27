@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html)
 
@@ -19,27 +19,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:modCount 为什么不能被迭代器删绕过
+### 第二步扩展① 机制:modCount 为什么不能被迭代器删绕过
 
-iterator.remove 先调 list 的删除(改 modCount)再把 expectedModCount=modCount(同步)——所以迭代器自己的删除不触发校验失败;而 list.remove 绕过迭代器只改 modCount——期望值与实际值脱节。类比:只有持票人能改票面座位号,别人改了票就作废(检测到外部改动)。
+- iterator.remove 先调 list 的删除(改 modCount)再把 expectedModCount=modCount(同步)——所以迭代器自己的删除不触发校验失败。
+- 而 list.remove 绕过迭代器只改 modCount——期望值与实际值脱节。
+- 类比:只有持票人能改票面座位号,别人改了票就作废(检测到外部改动)。
 
-### 反例:删除的两种事故
+### 第二步扩展② 反例:删除的两种事故
 
-事故一:for-each 删第一个命中后继续遍历——CME 在下一次 next 抛出(有时滞后到 hasNext 才抛,给人偶然不抛的假象);修复=removeIf。事故二:依赖 fail-fast 保证正确性——modCount 校验无同步保证,并发下可能漏检(Javadoc 明示 fail-fast 不可依赖);真正的并发安全靠并发容器或锁。
+- 事故一:for-each 删第一个命中后继续遍历——CME 在下一次 next 抛出(有时滞后到 hasNext 才抛,给人偶然不抛的假象)。
+- 修复=removeIf。
+- 事故二:依赖 fail-fast 保证正确性——modCount 校验无同步保证,并发下可能漏检(Javadoc 明示 fail-fast 不可依赖)。
+- 真正的并发安全靠并发容器或锁。
 
-### 取舍:三法的适用边界
+### 第二步扩展③ 取舍:三法的适用边界
 
-单线程+条件删:removeIf(首选,代码短);需要删除时做额外动作:iterator.remove;并发读写并存:CopyOnWriteArrayList(读多写少)或加锁(写多)——并发容器遍历的是快照/弱一致,不是 fail-fast。
+- 单线程+条件删:removeIf(首选,代码短)。
+- 需要删除时做额外动作:iterator.remove。
+- 并发读写并存:CopyOnWriteArrayList(读多写少)或加锁(写多)——并发容器遍历的是快照/弱一致,不是 fail-fast。
 
 ## 案例
 
-### 验证:fail-fast 的实测走查
+### 第三步发散·验证与推演 验证:fail-fast 的实测走查
 
-验证:CME 断言(for-each 中 remove→CME,且 hasNext 偶发不抛的滞后现象);iterator.remove 断言(删除顺利+modCount 同步);removeIf 断言(等价于迭代器删);CopyOnWriteArrayList 断言(遍历中并发写不抛 CME,读到旧快照)——四组固化删除语义,本机可复跑。预期:fail-fast 抛出时机与 modCount 校验点一致。
+- 验证:CME 断言(for-each 中 remove→CME,且 hasNext 偶发不抛的滞后现象)。
+- iterator.remove 断言(删除顺利+modCount 同步)。
+- removeIf 断言(等价于迭代器删)。
+- CopyOnWriteArrayList 断言(遍历中并发写不抛 CME,读到旧快照)——四组固化删除语义,本机可复跑。
+- 预期:fail-fast 抛出时机与 modCount 校验点一致。
 
-### 追问链:fail 三刀
+### 第三步发散·发散要点 追问链:fail 三刀
 
-一刀:fail-safe 对比=CopyOnWrite/COW 迭代快照不抛 CME(代价:内存复制+弱一致)。二刀:modCount 也用于 subList 视图校验(原集合结构性修改→视图操作抛 CME)。三刀:Map 遍历删=entrySet removeIf(CHM 用 entry 迭代器 remove 或 values removeIf——弱一致)。
+- **追问①·fail-safe 对比**：CopyOnWrite/COW 迭代快照不抛 CME(代价:内存复制+弱一致)
+- **追问②**：modCount 也用于 subList 视图校验(原集合结构性修改→视图操作抛 CME)
+- **追问③·Map 遍历删**：entrySet removeIf(CHM 用 entry 迭代器 remove 或 values removeIf——弱一致)
 
 ## 总结点
 

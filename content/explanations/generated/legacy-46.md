@@ -1,11 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/delete.html)
-- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/truncate-table.html)
-- [MySQL 8.4 参考 · 3](https://dev.mysql.com/doc/refman/8.4/en/implicit-commit.html)
+- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/)
+- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html)
 
 </details>
 
@@ -21,27 +20,43 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
 ## 参考分析
 
-### 机制:为什么 truncate 快且不可回滚
+### 第二步扩展① 机制:为什么 truncate 快且不可回滚
 
-delete 按行维护 undo(每行可逆)——代价是日志量与锁;truncate 直接重置表空间(页级别操作,无逐行 undo)——没有“回到中间态”的路径=不可回滚;DDL 隐式提交(事务里执行 delete 后 truncate,前半段也被提交——第 42 题事故同源)。
+- delete 按行维护 undo(每行可逆)——代价是日志量与锁。
+- truncate 直接重置表空间(页级别操作,无逐行 undo)——没有“回到中间态”的路径=不可回滚。
+- DDL 隐式提交(事务里执行 delete 后 truncate,前半段也被提交——第 42 题事故同源)。
 
-### 反例:三种删除的事故
+### 第二步扩展② 反例:三种删除的事故
 
-事故一:生产手滑 truncate 大业务表——不可回滚只能 PITR 恢复(第 151 题备份演练);修复=高危 SQL 工单+权限隔离(drop/truncate 只 DBA)。事故二:大表 delete 清理历史——一次删 5000 万行→长事务+undo 膨胀+主从延迟;修复=分批删除(小事务+间隔,第 137 题分批同源)。事故三(加分):delete 后磁盘没降——空间碎片未回收;修复=optimize table(锁表代价)或 pt-online-schema-change。
+- 事故一:生产手滑 truncate 大业务表——不可回滚只能 PITR 恢复(第 151 题备份演练)。
+- 修复=高危 SQL 工单+权限隔离(drop/truncate 只 DBA)。
+- 事故二:大表 delete 清理历史——一次删 5000 万行→长事务+undo 膨胀+主从延迟。
+- 修复=分批删除(小事务+间隔,第 137 题分批同源)。
+- 事故三(加分):delete 后磁盘没降——空间碎片未回收。
+- 修复=optimize table(锁表代价)或 pt-online-schema-change。
 
-### 取舍:选择决策树
+### 第二步扩展③ 取舍:选择决策树
 
-删结构=drop;清全表(临时表/日志表)=truncate;条件删除=delete(分批);高频清空场景(日志表)→按时间分表(整表 drop 分区,免 delete)——分区表或按月建表是“删大表”的工程解。
+- 删结构=drop。
+- 清全表(临时表/日志表)=truncate。
+- 条件删除=delete(分批)。
+- 高频清空场景(日志表)→按时间分表(整表 drop 分区,免 delete)——分区表或按月建表是“删大表”的工程解。
 
 ## 案例
 
-### 验证:三种删除的实测走查
+### 第三步发散·验证与推演 验证:三种删除的实测走查
 
-验证:回滚断言(delete 后 rollback→数据回;truncate 后 rollback→数据仍空——对照立现);自增断言(delete 保留,truncate 复位);速度对照(百万行 truncate 秒级 vs delete 分钟级);隐式提交断言(事务中 delete+truncate→delete 部分已提交不可回滚)——四组固化差异,数据库模块实验可复跑。
+- 验证:回滚断言(delete 后 rollback→数据回。
+- truncate 后 rollback→数据仍空——对照立现)。
+- 自增断言(delete 保留,truncate 复位)。
+- 速度对照(百万行 truncate 秒级 vs delete 分钟级)。
+- 隐式提交断言(事务中 delete+truncate→delete 部分已提交不可回滚)——四组固化差异,数据库模块实验可复跑。
 
-### 追问链:删除三刀
+### 第三步发散·发散要点 追问链:删除三刀
 
-一刀:软删除=逻辑删除标志位(deleted_at)——审计友好但查询全要带条件+唯一约束变复杂(唯一索引+软删冲突)。二刀:闪回=binlog/undo 恢复误删(delete 可用闪回工具,truncate/drop 只能备份)。三刀:归档=历史数据迁移归档库(生产库瘦身)——比删除更常用(可追溯)。
+- **追问①·软删除**：逻辑删除标志位(deleted_at)——审计友好但查询全要带条件+唯一约束变复杂(唯一索引+软删冲突)
+- **追问②·闪回**：binlog/undo 恢复误删(delete 可用闪回工具,truncate/drop 只能备份)
+- **追问③·归档**：历史数据迁移归档库(生产库瘦身)——比删除更常用(可追溯)
 
 ## 总结点
 

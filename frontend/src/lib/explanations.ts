@@ -22,10 +22,10 @@ export function formatExplanation(html: string, deep = false): string {
   result.className = 'explanation-content';
   if (deep) result.classList.add('explanation-deep');
   const labels: Record<string, string> = {
-    answer: '面试口述',
-    analysis: '机制与取舍',
-    case: '故障推演与追问',
-    summary: '关键判断',
+    answer: '第一步 · 速记结论',
+    analysis: '第二步 · 逐点扩展',
+    case: '第三步 · 发散追问',
+    summary: '关键口诀',
   };
   let body: HTMLDivElement | undefined;
   for (const node of Array.from(source.childNodes)) {

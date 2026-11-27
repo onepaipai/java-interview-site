@@ -1,7 +1,7 @@
 // Algorithms 1-50 · v2 深度标准(2026-11-14)
 // 手写算法题:结构/复杂度/边界/并发安全四线;证据锚点=集合 C 系列实验(扩容/树化/LRU)+规范推演明示。
 const juc = 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html';
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const block = (title, body) => ({ title, body });
 const deep = (title, scenario, answer, analysis, cases, summary, references) => ({
   format: 'deep', title, scenario, answer, analysis, case: cases, summary, references,

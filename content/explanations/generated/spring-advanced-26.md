@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
@@ -19,27 +19,44 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:流的单次消费与包装层
+### 第二步扩展① 机制:流的单次消费与包装层
 
-getInputStream() 是 ServletInputStream,读到底后再次读取为空——Filter 在 DispatcherServlet 之前,先读即占坑。Spring 的 ContentCachingRequestWrapper 是"边读边留副本"(写缓存),并不支持"先读再回放":Controller 仍读原始流,副本在请求结束后可查——适合日志审计,不适合"Filter 先校验再放行"。真正可回放需要自定义 wrapper(读取时缓冲全部字节,后续 getInputStream 返回 ByteArrayInputStream)或 Servlet 6 的 HttpExchange? 工程上更常见的是网关层签名+应用层透传上下文。
+- getInputStream() 是 ServletInputStream,读到底后再次读取为空——Filter 在 DispatcherServlet 之前,先读即占坑。
+- Spring 的 ContentCachingRequestWrapper 是"边读边留副本"(写缓存),并不支持"先读再回放":Controller 仍读原始流,副本在请求结束后可查——适合日志审计,不适合"Filter 先校验再放行"。
+- 真正可回放需要自定义 wrapper(读取时缓冲全部字节,后续 getInputStream 返回 ByteArrayInputStream)或 Servlet 6 的 HttpExchange? 工程上更常见的是网关层签名+应用层透传上下文。
 
-### 推演:三层方案的取舍(附真实上下文锚点)
+### 第二步扩展② 推演:三层方案的取舍(附真实上下文锚点)
 
-方案一,网关签名:签名校验在 API 网关(统一密钥管理、防重放),应用信任网关注入的签名结果头(注意第 22 题的信任边界:网关注入才可信)——应用过滤器不碰 body。方案二,应用内缓存包装:自定义 RepeatableRequestWrapper,注意 body 大小上限(超过直接拒绝缓存,走流式)。方案三,审计旁路:审计不校验签名,只异步记副本(ContentCachingRequestWrapper),校验留给业务层。锚点:过滤器在安全链中的位置(第 17 题)决定其可见性——上下文行为实测(Q19 alice:anonymous)证明链上组件的执行环境差异。验证:行为为规范推演,包装器方案可单测复现。
+- 方案一,网关签名:签名校验在 API 网关(统一密钥管理、防重放),应用信任网关注入的签名结果头(注意第 22 题的信任边界:网关注入才可信)——应用过滤器不碰 body。
+- 方案二,应用内缓存包装:自定义 RepeatableRequestWrapper,注意 body 大小上限(超过直接拒绝缓存,走流式)。
+- 方案三,审计旁路:审计不校验签名,只异步记副本(ContentCachingRequestWrapper),校验留给业务层。
+- 锚点:过滤器在安全链中的位置(第 17 题)决定其可见性——上下文行为实测(Q19 alice:anonymous)证明链上组件的执行环境差异。
+- 验证:行为为规范推演,包装器方案可单测复现。
 
-### 取舍:审计与校验的分层
+### 第二步扩展③ 取舍:审计与校验的分层
 
-校验类(签名/防重放):网关层最优(统一、集中、防绕过);必须在应用层做时,用可回放包装+大小上限。审计类:旁路记录,不阻塞主流程(失败不影响请求),副本异步落库。流式与大 body:超过阈值(如 10MB)禁用缓冲,改分块哈希(chunked signature)。评审问句:这个过滤器为什么要读 body?——答案如果是"校验",先问网关;如果是"审计",用旁路副本。
+- 校验类(签名/防重放):网关层最优(统一、集中、防绕过)。
+- 必须在应用层做时,用可回放包装+大小上限。
+- 审计类:旁路记录,不阻塞主流程(失败不影响请求),副本异步落库。
+- 流式与大 body:超过阈值(如 10MB)禁用缓冲,改分块哈希(chunked signature)。
+- 评审问句:这个过滤器为什么要读 body?——答案如果是"校验",先问网关。
+- 如果是"审计",用旁路副本。
 
 ## 案例
 
-### 验证:集成测试断言"过滤器读 body 后 Controller 
+### 第三步发散·验证与推演 验证:集成测试断言"过滤器读 body 后 Controller 
 
-验证:集成测试断言"过滤器读 body 后 Controller 正常解析"(包装器方案)或"网关签名头缺失被拒"(网关方案);大 body 超上限用例与流式上传例外用例单独覆盖。
+- 验证:集成测试断言"过滤器读 body 后 Controller 正常解析"(包装器方案)或"网关签名头缺失被拒"(网关方案)。
+- 大 body 超上限用例与流式上传例外用例单独覆盖。
 
-### 追问链:请求体三刀
+### 第三步发散·追问扩展 追问链:请求体三刀
 
-一刀:"multipart 文件上传怎么审计?"——ContentCachingRequestWrapper 对 multipart 的行为不同(缓存的是原始字节),文件内容审计走存储层(保存后读文件)而不是请求体。二刀:"网关签名防重放怎么做?"——签名带时间戳+nonce,网关查 nonce 去重表(Redis,TTL=时间窗)——防重放是网关职责,应用层再查一次是纵深。三刀:"怎么测过滤器与 Controller 的读取冲突?"——集成测试:过滤器读 body 后请求正常解析的断言;回归覆盖签名过滤器改动。
+- **Q1：multipart 文件上传怎么审计?**
+  - 答：ContentCachingRequestWrapper 对 multipart 的行为不同(缓存的是原始字节),文件内容审计走存储层(保存后读文件)而不是请求体。
+- **Q2：网关签名防重放怎么做?**
+  - 答：签名带时间戳+nonce,网关查 nonce 去重表(Redis,TTL=时间窗)——防重放是网关职责,应用层再查一次是纵深。
+- **Q3：怎么测过滤器与 Controller 的读取冲突?**
+  - 答：集成测试:过滤器读 body 后请求正常解析的断言;回归覆盖签名过滤器改动。
 
 ## 总结点
 

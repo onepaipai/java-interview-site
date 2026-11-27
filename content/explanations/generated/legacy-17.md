@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TreeMap.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedHashMap.html)
 
 </details>
 
@@ -19,27 +20,39 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:两种结构的代价差在哪
+### 第二步扩展① 机制:两种结构的代价差在哪
 
-TreeMap 每次插入要在红黑树中旋转着色(O(log n)),换来全局有序;LinkedHashMap 在 HashMap 的 O(1) 上只多做链表指针维护(每个条目多两个指针)——代价近零,换来遍历顺序稳定。类比:TreeMap 是随时保持书架按字母排好,LinkedHashMap 是书按放进来的顺序串成一条绳。
+- TreeMap 每次插入要在红黑树中旋转着色(O(log n)),换来全局有序。
+- LinkedHashMap 在 HashMap 的 O(1) 上只多做链表指针维护(每个条目多两个指针)——代价近零,换来遍历顺序稳定。
+- 类比:TreeMap 是随时保持书架按字母排好,LinkedHashMap 是书按放进来的顺序串成一条绳。
 
-### 反例:有序容器的两种事故
+### 第二步扩展② 反例:有序容器的两种事故
 
-事故一:TreeMap 的 key compareTo 与 equals 不一致——compare 认为相等但 equals 不等→put 覆盖丢失数据;修复=比较字段与相等字段一致。事故二:LinkedHashMap 并发使用——非线程安全(同 HashMap);LRU 缓存并发用 Caffeine(W-TinyLFU,legacy/111 取舍)。
+- 事故一:TreeMap 的 key compareTo 与 equals 不一致——compare 认为相等但 equals 不等→put 覆盖丢失数据。
+- 修复=比较字段与相等字段一致。
+- 事故二:LinkedHashMap 并发使用——非线程安全(同 HashMap)。
+- LRU 缓存并发用 Caffeine(W-TinyLFU,legacy/111 取舍)。
 
-### 边界:accessOrder 的隐性行为
+### 第二步扩展③ 边界:accessOrder 的隐性行为
 
-accessOrder=true 时 get 也会改链表结构(移到尾部)——遍历中 get 同一 key 会影响遍历序;removeEldestEntry 在 put 后回调(删链头 eldest)——淘汰逻辑只看容量,要 TTL 需手写(legacy/111 取舍)。
+- accessOrder=true 时 get 也会改链表结构(移到尾部)——遍历中 get 同一 key 会影响遍历序。
+- removeEldestEntry 在 put 后回调(删链头 eldest)——淘汰逻辑只看容量,要 TTL 需手写(legacy/111 取舍)。
 
 ## 案例
 
-### 验证:有序性的实测走查
+### 第三步发散·验证与推演 验证:有序性的实测走查
 
-验证:TreeMap 断言(乱序 put→keySet 迭代有序;floorKey/ceilingKey 边界);LinkedHashMap 断言(插入序遍历=put 顺序;accessOrder=true 时 get A 后 A 移尾——legacy/111 反射读链表同源);compare-equals 不一致断言(put 覆盖丢数据复现)——三组固化有序语义,本机可复跑。
+- 验证:TreeMap 断言(乱序 put→keySet 迭代有序。
+- floorKey/ceilingKey 边界)。
+- LinkedHashMap 断言(插入序遍历=put 顺序。
+- accessOrder=true 时 get A 后 A 移尾——legacy/111 反射读链表同源)。
+- compare-equals 不一致断言(put 覆盖丢数据复现)——三组固化有序语义,本机可复跑。
 
-### 追问链:有序三刀
+### 第三步发散·发散要点 追问链:有序三刀
 
-一刀:NavigableMap 接口=TreeMap 的范围查询全集(descendingMap/navigableKeySet)。二刀:ConcurrentSkipListMap=跳表(概率平衡,平均 O(log n)),替代并发场景红黑树(旋转难并发)。三刀:LinkedHashMap 与 LRU 的关系=accessOrder+removeEldestEntry 五行实现(legacy/111),手写版的定制空间=TTL/分段/权重。
+- **追问①·NavigableMap 接口**：TreeMap 的范围查询全集(descendingMap/navigableKeySet)
+- **追问②·ConcurrentSkipListMap**：跳表(概率平衡,平均 O(log n)),替代并发场景红黑树(旋转难并发)
+- **追问③·LinkedHashMap 与 LRU 的关系**：accessOrder+removeEldestEntry 五行实现(legacy/111),手写版的定制空间=TTL/分段/权重
 
 ## 总结点
 

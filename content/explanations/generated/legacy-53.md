@@ -3,9 +3,8 @@
 
 教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Google SRE · 1](https://sre.google/sre-book/table-of-contents/)
-- [Raft 论文 · 2](https://raft.github.io/raft.pdf)
-- [HTTP 语义规范 · 3](https://www.rfc-editor.org/rfc/rfc9110.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [OWASP 提示注入风险 · 2](https://genai.owasp.org/)
 
 </details>
 
@@ -21,27 +20,38 @@
 
 ## 参考分析
 
-### 机制:GET 幂等的工程含义
+### 第二步扩展① 机制:GET 幂等的工程含义
 
-GET 幂等=可安全重试/缓存/收藏;POST 非幂等=需要幂等键保护(防止重复提交);RESTful 设计:GET 查询/PUT 幂等更新/DELETE 幂等删除/POST 非幂等创建——动词的幂等性决定客户端重试策略(第 119 题)。
+- GET 幂等=可安全重试/缓存/收藏。
+- POST 非幂等=需要幂等键保护(防止重复提交)。
+- RESTful 设计:GET 查询/PUT 幂等更新/DELETE 幂等删除/POST 非幂等创建——动词的幂等性决定客户端重试策略(第 119 题)。
 
-### 反例:状态码误用两种事故
+### 第二步扩展② 反例:状态码误用两种事故
 
-事故一:所有错误返回 200+错误码——前端无法用 HTTP 状态码判断;修复=HTTP 状态码+业务错误码双层。事故二:POST 用于查询——绕过 GET 缓存/日志;修复=查询用 GET(语义正确)。
+- 事故一:所有错误返回 200+错误码——前端无法用 HTTP 状态码判断。
+- 修复=HTTP 状态码+业务错误码双层。
+- 事故二:POST 用于查询——绕过 GET 缓存/日志。
+- 修复=查询用 GET(语义正确)。
 
-### 取舍:GET 长度限制与 POST 上传
+### 第二步扩展③ 取舍:GET 长度限制与 POST 上传
 
-GET URL 限制(浏览器 2KB);POST body 限制(multipart max-file-size,第 44 题)——复杂查询条件用 POST body 规避长度限制(但失去缓存)。
+- GET URL 限制(浏览器 2KB)。
+- POST body 限制(multipart max-file-size,第 44 题)——复杂查询条件用 POST body 规避长度限制(但失去缓存)。
 
 ## 案例
 
-### 验证:状态码的走查核对
+### 第三步发散·验证与推演 验证:状态码的走查核对
 
-验证:状态码断言(200/201/204/301/302/304/400/401/403/404/429/500 各自行为);GET 幂等断言(多次结果一致);POST 非幂等断言(多次创建多条);缓存断言(GET 可缓存/POST 不缓存)——四组固化 HTTP 语义(第 12 题)。
+- 验证:状态码断言(200/201/204/301/302/304/400/401/403/404/429/500 各自行为)。
+- GET 幂等断言(多次结果一致)。
+- POST 非幂等断言(多次创建多条)。
+- 缓存断言(GET 可缓存/POST 不缓存)——四组固化 HTTP 语义(第 12 题)。
 
-### 追问链:HTTP 三刀
+### 第三步发散·发散要点 追问链:HTTP 三刀
 
-一刀:HTTP/2 对 GET/POST 的影响=多路复用(传输层优化,语义不变)。二刀:PUT vs POST=PUT 幂等(完整替换)/POST 非幂等(创建)——RESTful 语义。三刀:HTTP 状态码自定义=不可(IANA 标准);业务错误码在 body 中自定义(双层配合)。
+- **追问①·HTTP/2 对 GET/POST 的影响**：多路复用(传输层优化,语义不变)
+- **追问②·PUT vs POST**：PUT 幂等(完整替换)/POST 非幂等(创建)——RESTful 语义
+- **追问③·HTTP 状态码自定义**：不可(IANA 标准);业务错误码在 body 中自定义(双层配合)
 
 ## 总结点
 

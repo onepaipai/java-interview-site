@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ThreadLocal.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ThreadLocal.html)
 
 </details>
 
@@ -19,27 +20,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:为什么 key 弱 value 强
+### 第二步扩展① 机制:为什么 key 弱 value 强
 
-key 弱引用的目的=ThreadLocal 实例外部无引用时可回收(key 自动置 null,防止 ThreadLocal 泄漏);但 value 无对应机制(无法自动判“不再使用”)——value 生命周期=线程生命周期;设计权衡:若 value 也弱,业务用一半就被 GC(不可接受)——所以防泄漏责任在使用者(remove)。
+- key 弱引用的目的=ThreadLocal 实例外部无引用时可回收(key 自动置 null,防止 ThreadLocal 泄漏)。
+- 但 value 无对应机制(无法自动判“不再使用”)——value 生命周期=线程生命周期。
+- 设计权衡:若 value 也弱,业务用一半就被 GC(不可接受)——所以防泄漏责任在使用者(remove)。
 
-### 反例:ThreadLocal 的两种事故
+### 第二步扩展② 反例:ThreadLocal 的两种事故
 
-事故一:线程池+不 remove——用户 A 的上下文残留到用户 B 的请求(数据串号!)+内存缓涨;修复=拦截器 finally remove(必须)。事故二:父子线程传递缺失——主线程 set 后线程池任务 get 为 null(InheritableThreadLocal 只在创建时继承,池线程不新建;跨池传递用 TransmittableThreadLocal)。
+- 事故一:线程池+不 remove——用户 A 的上下文残留到用户 B 的请求(数据串号!)+内存缓涨。
+- 修复=拦截器 finally remove(必须)。
+- 事故二:父子线程传递缺失——主线程 set 后线程池任务 get 为 null(InheritableThreadLocal 只在创建时继承,池线程不新建。
+- 跨池传递用 TransmittableThreadLocal)。
 
-### 取舍:ThreadLocal vs 显式传参
+### 第二步扩展③ 取舍:ThreadLocal vs 显式传参
 
-ThreadLocal:免改方法签名(横切上下文)但隐式(难追踪/忘清理);显式传参:清晰(每个方法签名可见)但侵入所有层——上下文横切多处(日志 traceId/租户/用户)用 ThreadLocal+强规约(必须 remove);仅两三层传递用参数(简单直接)。
+- ThreadLocal:免改方法签名(横切上下文)但隐式(难追踪/忘清理)。
+- 显式传参:清晰(每个方法签名可见)但侵入所有层——上下文横切多处(日志 traceId/租户/用户)用 ThreadLocal+强规约(必须 remove)。
+- 仅两三层传递用参数(简单直接)。
 
 ## 案例
 
-### 验证:泄漏链的实测走查
+### 第三步发散·验证与推演 验证:泄漏链的实测走查
 
-验证:泄漏断言(线程池 50 线程循环 set 不 remove→堆中 value 实例持续增长不回收;finally remove 后回收);串号断言(任务 A set 后不清理,任务 B 读到 A 的值——复现上下文污染);弱 key 断言(置空 ThreadLocal 引用+System.gc→key=null,value 仍在——反射读 Thread.threadLocals)——三组固化泄漏语义,本机可复跑。预期:remove 是唯一可靠防线。
+- 验证:泄漏断言(线程池 50 线程循环 set 不 remove→堆中 value 实例持续增长不回收。
+- finally remove 后回收)。
+- 串号断言(任务 A set 后不清理,任务 B 读到 A 的值——复现上下文污染)。
+- 弱 key 断言(置空 ThreadLocal 引用+System.gc→key=null,value 仍在——反射读 Thread.threadLocals)——三组固化泄漏语义,本机可复跑。
+- 预期:remove 是唯一可靠防线。
 
-### 追问链:ThreadLocal 三刀
+### 第三步发散·发散要点 追问链:ThreadLocal 三刀
 
-一刀:哈希机制=魔数 0x61c88647 斐波那契散列(2 的幂容量下均匀分布,开放寻址而非链表)。二刀:InheritableThreadLocal=子线程创建时复制父值(池线程失效——复用不新建);TTL 库=任务提交时捕获+执行时恢复(线程池可用)。三刀:Spring 场景=RequestContextHolder 本质 ThreadLocal+拦截器清理(spring 是 remove 纪律的样板,第 89 题)。
+- **追问①·哈希机制**：魔数 0x61c88647 斐波那契散列(2 的幂容量下均匀分布,开放寻址而非链表)
+- **追问②·InheritableThreadLocal**：子线程创建时复制父值(池线程失效——复用不新建);TTL 库=任务提交时捕获+执行时恢复(线程池可用)
+- **追问③·Spring 场景**：RequestContextHolder 本质 ThreadLocal+拦截器清理(spring 是 remove 纪律的样板,第 89 题)
 
 ## 总结点
 

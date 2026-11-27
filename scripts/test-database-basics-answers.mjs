@@ -11,8 +11,10 @@ const { questions } = await loadQuestionContents();
 const assignments = await json('content/explanations/assignments.json');
 const manifest = await json('content/explanations/manifest.json');
 const status = await json('content/explanations/review-status.json');
-assert.deepEqual(status.modules.find(item => item.module === 'database-basics'), {
-  module: 'database-basics', total: 49, questionSpecific: 49, sampleSpecific: 0, sharedTopic: 0,
+const dbStatus = status.modules.find(item => item.module === 'database-basics');
+const dbRows = (await readFile(new URL('content/senior/database-basics.tsv', root), 'utf8')).trim().split(/\r?\n/).length;
+assert.deepEqual(dbStatus, {
+  module: 'database-basics', total: dbRows, questionSpecific: dbRows, sampleSpecific: 0, sharedTopic: 0,
 });
 assert.equal(Object.keys(answers).length, 49);
 assert.equal(Object.values(answers).filter(value => value.format === 'deep').length, 49);

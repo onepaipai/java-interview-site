@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html)
 
 </details>
 
@@ -19,27 +20,41 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:start 做了什么
+### 第二步扩展① 机制:start 做了什么
 
-start()→JVM 调用 OS 创建内核线程(分配栈)→新线程调度执行 run();run() 只是对象方法调用——线程体内跑的是 run 的字节码,谁调 run 谁执行。start 后线程进入 RUNNABLE(第 18 题状态机);isAlive() 判断是否已 start 未终止。
+- start()→JVM 调用 OS 创建内核线程(分配栈)→新线程调度执行 run()。
+- run() 只是对象方法调用——线程体内跑的是 run 的字节码,谁调 run 谁执行。
+- start 后线程进入 RUNNABLE(第 18 题状态机)。
+- isAlive() 判断是否已 start 未终止。
 
-### 反例:创建方式的两种事故
+### 第二步扩展② 反例:创建方式的两种事故
 
-事故一:高并发下 new Thread——每次建线程(1MB 栈+内核开销),流量峰值线程爆炸 OOM;修复=线程池(第 24 题 Executors 陷阱)。事故二:future.get() 无超时——任务挂死调用方永久阻塞;修复=get(timeout,unit)+超时策略(降级/取消)。
+- 事故一:高并发下 new Thread——每次建线程(1MB 栈+内核开销),流量峰值线程爆炸 OOM。
+- 修复=线程池(第 24 题 Executors 陷阱)。
+- 事故二:future.get() 无超时——任务挂死调用方永久阻塞。
+- 修复=get(timeout,unit)+超时策略(降级/取消)。
 
-### 取舍:Runnable vs Callable
+### 第二步扩展③ 取舍:Runnable vs Callable
 
-Runnable:无返回值,异常只能内部消化(线程池场景被吞,UncaughtExceptionHandler 兜底);Callable:返回值+受检异常可抛(FutureTask 捕获后 get 时重抛)——需要结果/异常感知用 Callable;CompletableFuture 更现代(组合/回调,不用阻塞 get)。
+- Runnable:无返回值,异常只能内部消化(线程池场景被吞,UncaughtExceptionHandler 兜底)。
+- Callable:返回值+受检异常可抛(FutureTask 捕获后 get 时重抛)——需要结果/异常感知用 Callable。
+- CompletableFuture 更现代(组合/回调,不用阻塞 get)。
 
 ## 案例
 
-### 验证:start/run 的实测走查
+### 第三步发散·验证与推演 验证:start/run 的实测走查
 
-验证:线程名断言(new Thread(task, 'worker') start 后打印 currentThread().getName()=worker;直接调 run() 打印的是 main——一字之差立现);重复 start 断言(抛 IllegalThreadStateException);Callable 断言(Future.get 拿到返回值+异常重抛);线程池提交断言(池线程名 pool-N-thread-M)——四组固化创建语义,本机可复跑。
+- 验证:线程名断言(new Thread(task, 'worker') start 后打印 currentThread().getName()=worker。
+- 直接调 run() 打印的是 main——一字之差立现)。
+- 重复 start 断言(抛 IllegalThreadStateException)。
+- Callable 断言(Future.get 拿到返回值+异常重抛)。
+- 线程池提交断言(池线程名 pool-N-thread-M)——四组固化创建语义,本机可复跑。
 
-### 追问链:创建三刀
+### 第三步发散·发散要点 追问链:创建三刀
 
-一刀:Thread 与 Runnable 的解耦=任务对象化(可复用/可排队/可取消)——线程池只认任务不认线程。二刀:Future.get 的阻塞陷阱=无超时永久挂;CompletableFuture.orTimeout(JDK9+)。三刀:虚拟线程(JDK21)=Thread.ofVirtual,百万级轻量线程——阻塞挂起零内核切换,IO 密集场景替代池化。
+- **追问①·Thread 与 Runnable 的解耦**：任务对象化(可复用/可排队/可取消)——线程池只认任务不认线程
+- **追问②·Future.get 的阻塞陷阱**：无超时永久挂;CompletableFuture.orTimeout(JDK9+)
+- **追问③·虚拟线程(JDK21)**：Thread.ofVirtual,百万级轻量线程——阻塞挂起零内核切换,IO 密集场景替代池化
 
 ## 总结点
 

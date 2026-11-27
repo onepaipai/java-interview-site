@@ -1,6 +1,6 @@
 // Java 17 / java.util.concurrent。教学场景统一声明,未实测的推演写"预期"。
 // 与 review-answers 中已有的 13 道并发进阶深入题互补,键不重叠。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const jls17 = 'https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html';
 const juc = api('java/util/concurrent/package-summary');
 const aqs = api('java/util/concurrent/locks/AbstractQueuedSynchronizer.html');
@@ -330,11 +330,11 @@ export default {
     [
       '内存放大：每个虚拟线程携带自己的 ThreadLocalMap；平台线程数百个、map 常驻可控，虚拟线程动辄百万——十几个 ThreadLocal 条目乘以百万线程就是可观的常驻内存，且多数条目在虚拟线程生命周期里根本没用过。',
       '清理失效：平台线程池靠"线程复用前 remove"治理泄漏；虚拟线程一次性用完即弃，泄漏变成另一种形态——载体线程不变、堆内存随线程对象整体回收，但海量短命 ThreadLocalMap 制造分配与回收压力。',
-      '继承与传递：InheritableThreadLocal 在虚拟线程上语义进一步扭曲（见并发基础第 12 题的复制时机问题），上下文传递的正确方向是 ScopedValue 与结构化并发的共享变量（JEP 446 一系）。',
+      '继承与传递：InheritableThreadLocal 在虚拟线程上语义进一步扭曲（见并发基础第 12 题的复制时机问题），上下文传递的正确方向是 ScopedValue（JDK 21–24 预览，JDK 25 由 JEP 506 转正）与结构化并发的共享变量。',
     ],
     [
       block('机制：ThreadLocal 的成本模型在线程数上翻倍', 'ThreadLocal 的代价 = 每线程一份 map + 每条目维护成本。平台线程模型下线程是稀缺资源，代价天然有界；虚拟线程把线程变成"几乎免费"的资源，ThreadLocal 成了唯一不免费的部分——多数线程根本不读某些值，却都要建表。类比给每间钟点房配一套完整的酒店行政办公桌：房间越多，桌子的总成本越失控。'),
-      block('边界：版本事实与迁移路径', 'Java 17 没有虚拟线程（JEP 425 预览在 19、转正在 21），本题为升级预研口径。迁移前先做两件事：审计 ThreadLocal 的真实使用（哪些是请求上下文、哪些是缓存复用）；把请求上下文迁往显式传参或 ScopedValue（JDK 21+），缓存类改并发容器。ThreadLocal 不是禁区，是要"少而准"。'),
+      block('边界：版本事实与迁移路径', 'Java 17 没有虚拟线程（JEP 425 预览在 19、转正在 21），本题为升级预研口径。迁移前先做两件事：审计 ThreadLocal 的真实使用（哪些是请求上下文、哪些是缓存复用）；把请求上下文迁往显式传参或 ScopedValue（JDK 21–24 预览、JDK 25 转正），缓存类改并发容器。ThreadLocal 不是禁区，是要"少而准"。'),
       block('取舍：ScopedValue 替代 ThreadLocal 的边界', 'ScopedValue 的值与作用域绑定、不可变、随作用域自动消失——没有清理责任、没有泄漏路径，代价是要求值不可变且作用域结构化。ThreadLocal 仍适合"跨多层调用传递的可变组件"（如事务资源句柄），但这类场景本身就该优先考虑显式参数化。升级虚拟线程前完成这轮改造，比上线后救火便宜得多。'),
       block('底座：ThreadLocalMap 的弱引用键与经典泄漏链', 'ThreadLocalMap.Entry 继承 WeakReference<ThreadLocal<?>>：键（ThreadLocal 实例）是弱引用，值是强引用。经典泄漏链（平台线程池）：Thread → ThreadLocalMap → Entry(key=null) → value——ThreadLocal 实例被回收后键变 null，但 value 沿强引用链无法回收。设计意图：键弱引用让 map 能探测过期条目（expungeStaleEntry 在后续 set/get/remove 时顺手清理 null 键条目）；值强引用是局限（map 无法知道业务何时不再需要它）。治理：池化线程必须在任务边界 remove，别依赖被动清理。虚拟线程一次性回收掩盖了泄漏，却把成本转成规模风险（见机制块）——同一结构，两种失效形态。'),
     ],
@@ -342,7 +342,7 @@ export default {
       block('对照操作：内存放大的量化预估', '教学推演（JDK 21 环境验证口径）：百万虚拟线程 × 每个 12 个 ThreadLocal 条目 × 每条目约 40 字节起，仅 map 结构即数百 MB 常驻；对照平台线程 200 个时同项不足 1MB。在 21 上用 JFR 对比改造前后的分配速率与驻留，Java 17 阶段以估算与审计为主。'),
       block('追问：为什么说虚拟线程让 ThreadLocal "更便宜也更危险"', '更便宜：虚拟线程的一次性生命周期让"忘记 remove"不再泄漏（线程整体回收）；更危险：海量线程让"每线程一份"的内存模型被无限放大，且 Inherits 复制语义在共享载体上更难推理。代价从"泄漏风险"迁移到"规模风险"，治理动作完全不同。'),
     ],
-    ['百万线程配百万张桌', '池化清理失效，规模成新风险', '上下文走 ScopedValue，缓存走容器'], ['https://openjdk.org/jeps/425', 'https://openjdk.org/jeps/446'],
+    ['百万线程配百万张桌', '池化清理失效，规模成新风险', '上下文走 ScopedValue，缓存走容器'], ['https://openjdk.org/jeps/425', 'https://openjdk.org/jeps/506'],
   ),
   'concurrency-advanced/29': deep(
     '结构化并发思想如何改善任务生命周期管理？',
@@ -706,4 +706,43 @@ export default {
     ],
     ['时间线挂证据，环环可验证', '反事实检验因果，不归罪个人', '防复发分三层，各有验收'], [jls17, juc],
   ),
+  'concurrency-advanced/51': deep(
+    'ScopedValue 为什么能替代一部分 ThreadLocal 场景？',
+    '网银升级沙盘:服务计划从 JDK 17 迁到 JDK 25，请求链路用 ThreadLocal 传递用户上下文；需要说明 ScopedValue 的绑定方式、适用边界与版本状态。',
+    [
+      'ScopedValue 把值与作用域绑定:在 where 指定的动态作用域内可读，退出自动消失——不需要 remove，也没有线程池复用导致的串号。',
+      '它要求值不可变、生命周期结构化，适合请求身份、租户、追踪上下文这类"一次绑定、向下传递"的数据；可变缓存和跨异步边界的资源句柄仍用显式参数或并发容器。',
+      '版本边界要讲清:JDK 21–24 为预览，JDK 25 由 JEP 506 转正；项目仍是 Java 17 时只能作为升级预研，不能写出可编译的生产代码。',
+    ],
+    [
+      block('机制:作用域绑定替代线程绑定', 'ThreadLocal 把值挂在线程上，值随线程复用到下一个任务；ScopedValue 把值挂在一次 where 调用的动态作用域上，只有在该作用域及其被调用的代码里可读，退出即不可见。类比工牌:ThreadLocal 像把工牌留在座位上，下一位客人会看到；ScopedValue 像入场时佩戴、离场时自然失效的临时通行证——人还在，权限随场次结束而消失。结构化并发让子任务继承同一作用域，因此不必手动复制上下文。'),
+      block('边界:不可变与可重入', 'ScopedValue 的值应是不可变对象；需要"换值"时用嵌套 where 覆盖，内层退出后自动恢复外层值。它不是全局可变容器，不支持像 ThreadLocal.set 那样在任意深层方法里改写。重复绑定和where 的嵌套顺序要显式设计，避免把"当前值来自哪一层"变成隐式约定。JDK 25 的 orElse 不再接受 null，空值语义要显式表达。'),
+      block('取舍:迁移成本与收益', '迁移收益是消除清理责任、降低线程池串号风险、与虚拟线程和结构化并发配合更自然。成本是调用链要接受结构化作用域，已有的拦截器式 set/remove 框架需要改造。对仍然运行 Java 17 的服务，优先做上下文审计和显式传参；把 ScopedValue 列入升级后的迁移项，而不是为了新 API 提前引入多套上下文机制。'),
+    ],
+    [
+      block('验证:作用域边界的推演', '教学验证（升级到 JDK 25 后执行）:在 where 作用域内读取用户 ID 断言正确；作用域外读取断言不存在或走 orElse 默认；嵌套 where 验证内层退出后恢复外层值。再放入结构化并发子任务，断言子任务能看到父作用域的值。以上为验证设计，本项目基线 Java 17 未运行该 JDK 25 实验。'),
+      block('追问:结构化并发还是预览吗', 'JDK 25 的结构化并发（JEP 505）仍是第五次预览，与已转正的 ScopedValue 不同；回答时要把"API 转正"和"仍预览"分开说。若要求稳定 API，就不要把预览接口当成不可变的长期契约；升级评估要记录使用的 JDK 版本与预览开关。'),
+    ],
+    ['线程绑定易串号，作用域绑定自动收', '不可变向下传，可变仍显式', 'JDK 25 转正，JDK 21 到 24 预览'], ['https://openjdk.org/jeps/506', 'https://openjdk.org/jeps/487', 'https://openjdk.org/jeps/505'],
+  ),
+  'concurrency-advanced/52': deep(
+    '虚拟线程 pinning 的版本边界怎样说才准确？',
+    '网银压测沙盘:JDK 21 上大量虚拟线程在 synchronized 块内阻塞，JFR 出现 VirtualThreadPinned 事件；团队准备升级到 JDK 24，需要判断哪些固定问题被解决、哪些仍需验证。',
+    [
+      '虚拟线程阻塞时通常从载体线程卸载，让载体去跑别的任务；pinning 指某些路径无法卸载，阻塞会占住载体线程，削弱虚拟线程的扩展性。',
+      'JDK 21 中在 synchronized 块内阻塞会固定载体；JEP 491 在 JDK 24 改变了 synchronized 监视器的实现，使这类阻塞不再固定载体。',
+      'native method 与 foreign function 等路径仍可能固定载体，且具体行为以目标 JDK 文档和 JFR 事件为准；不能把"JDK 24 修了 pinning"说成所有固定场景都消失。',
+    ],
+    [
+      block('机制:卸载与固定是两件事', '虚拟线程把任务提交给少量载体线程；遇到可卸载的阻塞点时，运行时把虚拟线程移走，载体继续执行其他任务。pinning 是"该卸载却不能卸载":虚拟线程被钉在载体上，载体数量有限，大量被钉住的虚拟线程会把载体耗尽。类比出租车站:乘客下车办事可先把车让给下一位（卸载）；若乘客把车门反锁坐在车里等（固定），车就被占住。JEP 491 改的是 synchronized 这把"反锁"的实现。'),
+      block('边界:JEP 491 没覆盖什么', 'JEP 491 的交付版本是 JDK 24，针对 synchronized 监视器中阻塞导致的固定；native method、foreign function 以及个别早期版本内部路径仍可能固定载体。诊断不能靠猜:在目标 JDK 用 JFR 订阅 jdk.VirtualThreadPinned，观察事件频率与调用栈，再决定是否改造同步块或升级。'),
+      block('取舍:改造同步还是升级运行时', '如果热点路径长期在 synchronized 内做阻塞 I/O，优先缩短同步块或用合适的并发结构；升级到 JDK 24 可以降低这类固定，但升级本身要跑回归和灰度。回答时给出版本、事件证据和改造动作，不要只背"虚拟线程不会被固定"或"synchronized 一定不能用"。'),
+    ],
+    [
+      block('验证:JFR 对照的实验设计', '教学验证:在目标 JDK 起一组虚拟线程，在 synchronized 块内执行短阻塞，录制 JFR 并统计 VirtualThreadPinned；把阻塞移出同步块后再录一次，预期事件显著减少。JDK 21 与 JDK 24 各跑一轮，验证 JEP 491 的版本差异。这是实验设计，不代表本项目已在 21/24 双版本实跑。'),
+      block('追问:如何向面试官证明你懂边界', '先说机制（阻塞能否从载体卸载），再说版本（21、24、JEP 491），最后说证据（JFR 事件与调用栈）。再补一句"native/foreign 路径仍需验证"，就能把"背结论"和"会排查"区分开。'),
+    ],
+    ['能卸载才扩展，钉住就占载体', 'JDK 24 修同步，native 仍未清零', 'JFR 看事件，不靠猜'], ['https://openjdk.org/jeps/491', 'https://openjdk.org/jeps/444'],
+  ),
+
 };

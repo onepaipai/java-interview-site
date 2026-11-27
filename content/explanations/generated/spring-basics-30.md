@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
@@ -19,27 +19,37 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:条件评估与静默缺失
+### 第二步扩展① 机制:条件评估与静默缺失
 
-条件评估 Conditional 注解的条件在容器 refresh 时评估不满足则 bean 不注册静默无错误无警告。事故调用方依赖该 bean 启动期 NoSuchBeanDefinitionException 如果能追踪到或运行期 NPE 如果延迟使用。防御 ApplicationContextRunner 测试条件矩阵加启动验证依赖的 bean 存在性检查加条件文档化。
+- 条件评估 Conditional 注解的条件在容器 refresh 时评估不满足则 bean 不注册静默无错误无警告。
+- 事故调用方依赖该 bean 启动期 NoSuchBeanDefinitionException 如果能追踪到或运行期 NPE 如果延迟使用。
+- 防御 ApplicationContextRunner 测试条件矩阵加启动验证依赖的 bean 存在性检查加条件文档化。
 
-### 反例:条件静默缺失的两种事故
+### 第二步扩展② 反例:条件静默缺失的两种事故
 
-事故一属性拼错 ConditionalOnProperty name feature.enabled 但配置写了 feature.enable 少个 d 条件永不匹配 bean 缺失调用方 NPE。事故二环境差异 dev 有 Profile dev 的 mock bean prod 没有prod 环境缺失调用方 NPE。两条的正解启动验证依赖存在性加条件文档化加环境矩阵测试。
+- 事故一属性拼错 ConditionalOnProperty name feature.enabled 但配置写了 feature.enable 少个 d 条件永不匹配 bean 缺失调用方 NPE。
+- 事故二环境差异 dev 有 Profile dev 的 mock bean prod 没有prod 环境缺失调用方 NPE。
+- 两条的正解启动验证依赖存在性加条件文档化加环境矩阵测试。
 
-### 取舍:matchIfMissing 的语义
+### 第二步扩展③ 取舍:matchIfMissing 的语义
 
-matchIfMissing true 属性缺失时条件匹配 bean 创建适合默认启用的功能。matchIfMissing false 属性缺失时条件不匹配 bean 不创建适合默认禁用的功能安全相关。判定安全相关的功能默认禁用 matchIfMissing false 功能开关默认启用 matchIfMissing true。
+- matchIfMissing true 属性缺失时条件匹配 bean 创建适合默认启用的功能。
+- matchIfMissing false 属性缺失时条件不匹配 bean 不创建适合默认禁用的功能安全相关。
+- 判定安全相关的功能默认禁用 matchIfMissing false 功能开关默认启用 matchIfMissing true。
 
 ## 案例
 
-### 验证:条件装配的断言组
+### 第三步发散·验证与推演 验证:条件装配的断言组
 
-验证:启动验证断言条件 bean 缺失时启动失败 fail-fast;环境矩阵断言 dev test prod 各环境的 bean 存在性矩阵 ApplicationContextRunner;配置断言 ConditionalOnProperty 的属性在环境配置中存在——三组固化条件装配的防御。
+- 验证:启动验证断言条件 bean 缺失时启动失败 fail-fast。
+- 环境矩阵断言 dev test prod 各环境的 bean 存在性矩阵 ApplicationContextRunner。
+- 配置断言 ConditionalOnProperty 的属性在环境配置中存在——三组固化条件装配的防御。
 
-### 追问链:条件装配三刀
+### 第三步发散·追问① 追问链:条件装配三刀
 
-一刀 ConditionalOnProperty 的 matchIfMissing 属性缺失时默认匹配 true 或不匹配。二刀 自定义条件 Condition 接口复杂条件多属性组合的自定义。三刀 条件的可测试 ApplicationContextRunner 测试条件矩阵。
+- 一刀 ConditionalOnProperty 的 matchIfMissing 属性缺失时默认匹配 true 或不匹配。
+- 二刀 自定义条件 Condition 接口复杂条件多属性组合的自定义。
+- 三刀 条件的可测试 ApplicationContextRunner 测试条件矩阵。
 
 ## 总结点
 

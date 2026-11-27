@@ -1,9 +1,9 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
 
 </details>
@@ -20,27 +20,42 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:CPU 高的"消耗模型"
+### 第二步扩展① 机制:CPU 高的"消耗模型"
 
-CPU=用户态+内核态:用户态高=业务代码在计算(死循环/序列化);内核态高=系统调用密集(IO/锁/内存分配)——用户态与内核态的比例缩小排查范围(用户态→应用层,内核态→IO/锁/GC)。
+- CPU=用户态+内核态:用户态高=业务代码在计算(死循环/序列化)。
+- 内核态高=系统调用密集(IO/锁/内存分配)——用户态与内核态的比例缩小排查范围(用户态→应用层,内核态→IO/锁/GC)。
 
-### 反例:CPU 排查的两种事故
+### 第二步扩展② 反例:CPU 排查的两种事故
 
-事故一:jstack 一次采样定位——线程可能在采样间隙切换了(非热点线程被抓到);修复=多次采样取交集(3 次以上,栈顶一致的线程=真热点)。事故二:CPU 高就重启——重启后 CPU 正常(内存也清了)→根因未定位(下次复发);修复=先采集证据(jstack/火焰图/JFR)再重启。
+- 事故一:jstack 一次采样定位——线程可能在采样间隙切换了(非热点线程被抓到)。
+- 修复=多次采样取交集(3 次以上,栈顶一致的线程=真热点)。
+- 事故二:CPU 高就重启——重启后 CPU 正常(内存也清了)→根因未定位(下次复发)。
+- 修复=先采集证据(jstack/火焰图/JFR)再重启。
 
-### 取舍:CPU 排查的工具选择
+### 第二步扩展③ 取舍:CPU 排查的工具选择
 
-jstack:轻量(线程快照)但单次(可能错过);Arthas:在线无侵入(trace/watch/profiler);Async-profiler:火焰图(采样精确,需要安装);JFR:持续 profiling(低开销,事后回看)——按"问题的偶发性"选工具(偶发用 JFR,持续用 Arthas)。
+- jstack:轻量(线程快照)但单次(可能错过)。
+- Arthas:在线无侵入(trace/watch/profiler)。
+- Async-profiler:火焰图(采样精确,需要安装)。
+- JFR:持续 profiling(低开销,事后回看)——按"问题的偶发性"选工具(偶发用 JFR,持续用 Arthas)。
 
 ## 案例
 
-### 验证:CPU 排查的走查核对
+### 第三步发散·验证与推演 验证:CPU 排查的走查核对
 
-验证:注入 CPU 高(死循环/正则回溯/GC 风暴)→五步排查走查(top→top -Hp→printf→jstack→分析)——每步的输出可验证(top 确认进程/jstack 确认线程栈);火焰图对照(热点函数占比);GC 线程 CPU 高的区分(jstack 中 GC 线程名含 GC)。验证:排查流程的效率=从告警到定位的时长(演练计时)。
+- 验证:注入 CPU 高(死循环/正则回溯/GC 风暴)→五步排查走查(top→top -Hp→printf→jstack→分析)——每步的输出可验证(top 确认进程/jstack 确认线程栈)。
+- 火焰图对照(热点函数占比)。
+- GC 线程 CPU 高的区分(jstack 中 GC 线程名含 GC)。
+- 验证:排查流程的效率=从告警到定位的时长(演练计时)。
 
-### 追问链:CPU 三刀
+### 第三步发散·追问扩展 追问链:CPU 三刀
 
-一刀:"CPU 高与 Load 高的区别?"——CPU=实际计算;Load=等待队列长度(含 IO 等待)——Load 高 CPU 低=IO 瓶颈(不是 CPU 问题,第 81 题 JVM 的 CPU/Load 区分)。二刀:"容器 CPU throttling?"——容器 CPU limit 被 cgroup 限制(throttling 指标单独看)——CPU limit 内的 CPU 高=正常(限流≠故障,第 81 题 JVM 容器)。三刀:"CPU 高的自动化处理?"——确定性故障(死循环)→自动化摘实例+取证;非确定性(偶发慢)→告警人工排查——自动化按确定性分级(第 145 题止损动作分级)。
+- **Q1：CPU 高与 Load 高的区别?**
+  - 答：CPU=实际计算;Load=等待队列长度(含 IO 等待)——Load 高 CPU 低=IO 瓶颈(不是 CPU 问题,第 81 题 JVM 的 CPU/Load 区分)。
+- **Q2：容器 CPU throttling?**
+  - 答：容器 CPU limit 被 cgroup 限制(throttling 指标单独看)——CPU limit 内的 CPU 高=正常(限流≠故障,第 81 题 JVM 容器)。
+- **Q3：CPU 高的自动化处理?**
+  - 答：确定性故障(死循环)→自动化摘实例+取证;非确定性(偶发慢)→告警人工排查——自动化按确定性分级(第 145 题止损动作分级)。
 
 ## 总结点
 

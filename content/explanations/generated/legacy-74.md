@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/manage/introduction.html)
 
 </details>
 
@@ -20,27 +20,41 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:双亲委派的"安全性"
+### 第二步扩展① 机制:双亲委派的"安全性"
 
-双亲委派的核心=防止核心类被篡改:自定义 java.lang.String→委托到 Bootstrap→Bootstrap 已加载 String→返回核心类(自定义的不会被加载)——保证核心类唯一性。类加载器也是命名空间:不同加载器加载的同一个类文件=不同的 Class 对象(第 37 题 JVM 类泄漏)。
+- 双亲委派的核心=防止核心类被篡改:自定义 java.lang.String→委托到 Bootstrap→Bootstrap 已加载 String→返回核心类(自定义的不会被加载)——保证核心类唯一性。
+- 类加载器也是命名空间:不同加载器加载的同一个类文件=不同的 Class 对象(第 37 题 JVM 类泄漏)。
 
-### 反例:类加载的两种事故
+### 第二步扩展② 反例:类加载的两种事故
 
-事故一:NoClassDefFoundError vs ClassNotFoundException——前者=编译时存在运行时缺失(依赖版本变更);后者=运行时动态加载失败;排查=类路径审计+依赖树分析。事故二:同类不同加载器——热部署环境下同一类被两个加载器加载→instanceof false→ClassCastException(第 37 题 JVM);修复=确保类只由一个加载器加载或共享父加载器。
+- 事故一:NoClassDefFoundError vs ClassNotFoundException——前者=编译时存在运行时缺失(依赖版本变更)。
+- 后者=运行时动态加载失败。
+- 排查=类路径审计+依赖树分析。
+- 事故二:同类不同加载器——热部署环境下同一类被两个加载器加载→instanceof false→ClassCastException(第 37 题 JVM)。
+- 修复=确保类只由一个加载器加载或共享父加载器。
 
-### 取舍:自定义加载器的场景
+### 第二步扩展③ 取舍:自定义加载器的场景
 
-热部署(不重启更新类——每个版本独立加载器)、隔离(插件系统——插件间类隔离)、加密(自定义类文件格式解密后加载)——自定义加载器的成本=双亲委派的复杂性(需要处理委托/缓存/类冲突),不是"随便覆写 findClass"。
+- 热部署(不重启更新类——每个版本独立加载器)、隔离(插件系统——插件间类隔离)、加密(自定义类文件格式解密后加载)——自定义加载器的成本=双亲委派的复杂性(需要处理委托/缓存/类冲突),不是"随便覆写 findClass"。
 
 ## 案例
 
-### 验证:类加载的走查核对
+### 第三步发散·验证与推演 验证:类加载的走查核对
 
-验证:双亲委派断言(String 的 classLoader=null→Bootstrap 加载);打破断言(Thread.contextClassLoader 加载 SPI 实现);初始化顺序断言(静态变量→静态块→构造器);类卸载断言(加载器被 GC→其加载的类卸载,第 37 题 JVM 代理类卸载)。验证:类加载的断言可程序化(Class.forName/getResourceAsStream)。
+- 验证:双亲委派断言(String 的 classLoader=null→Bootstrap 加载)。
+- 打破断言(Thread.contextClassLoader 加载 SPI 实现)。
+- 初始化顺序断言(静态变量→静态块→构造器)。
+- 类卸载断言(加载器被 GC→其加载的类卸载,第 37 题 JVM 代理类卸载)。
+- 验证:类加载的断言可程序化(Class.forName/getResourceAsStream)。
 
-### 追问链:类加载三刀
+### 第三步发散·追问扩展 追问链:类加载三刀
 
-一刀:"类的初始化顺序?"——父类静态→子类静态→父类构造→子类构造;静态变量赋值+静态块按源码顺序执行。二刀:"类加载器的层次?"——Bootstrap(核心)→Platform(扩展)→Application(classpath)→自定义——每层可以访问自己+父层的类,不能访问子层的。三刀:"Metaspace 泄漏与类加载器?"——类加载器被泄漏→其加载的所有类无法卸载→Metaspace 增长(第 37 题 JVM;CGLIB 代理类泄漏的场景)。
+- **Q1：类的初始化顺序?**
+  - 答：父类静态→子类静态→父类构造→子类构造;静态变量赋值+静态块按源码顺序执行。
+- **Q2：类加载器的层次?**
+  - 答：Bootstrap(核心)→Platform(扩展)→Application(classpath)→自定义——每层可以访问自己+父层的类,不能访问子层的。
+- **Q3：Metaspace 泄漏与类加载器?**
+  - 答：类加载器被泄漏→其加载的所有类无法卸载→Metaspace 增长(第 37 题 JVM;CGLIB 代理类泄漏的场景)。
 
 ## 总结点
 

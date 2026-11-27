@@ -56,7 +56,7 @@ try {
       for (const { key, value, question } of picks) {
         await page.goto(base + '/#/question/' + question.id);
         const deep = value.format === 'deep';
-        const headings = deep ? ['面试口述', '机制与取舍', '故障推演与追问', '关键判断']
+        const headings = deep ? ['第一步 · 速记结论', '第二步 · 逐点扩展', '第三步 · 发散追问', '关键口诀']
           : ['参考回答', ...(value.analysis ? ['参考分析'] : []), '案例', '总结点'];
         await expect(page.locator('.reader .explanation-content h2')).toHaveText(headings);
         await expect(page.locator('.reader .explanation-summary')).toContainText(value.summary[0]);

@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.State.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/index.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.State.html)
 
 </details>
 
@@ -19,27 +20,42 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:BLOCKED 与 WAITING 的分界
+### 第二步扩展① 机制:BLOCKED 与 WAITING 的分界
 
-BLOCKED=synchronized 竞争锁(锁释放自动唤醒,OS 层重量级锁挂起);WAITING=主动进入(wait/join/park),必须被 notify/notifyAll/unpark/目标线程结束唤醒——被动等锁与主动等待的分界;第 20 题展开 wait/notify 语义。
+- BLOCKED=synchronized 竞争锁(锁释放自动唤醒,OS 层重量级锁挂起)。
+- WAITING=主动进入(wait/join/park),必须被 notify/notifyAll/unpark/目标线程结束唤醒——被动等锁与主动等待的分界。
+- 第 20 题展开 wait/notify 语义。
 
-### 反例:状态误判的两种事故
+### 第二步扩展② 反例:状态误判的两种事故
 
-事故一:把 RUNNABLE 等同于正在跑 CPU——网络 IO 阻塞时线程也是 RUNNABLE(Java 视角),CPU 利用率却低;诊断要看 OS 层线程状态(top -H/jstack)。事故二:线程池任务卡死但状态 WAITING——jstack 看栈顶(park 在 LockSupport→查锁;wait→查 notify 配对)。
+- 事故一:把 RUNNABLE 等同于正在跑 CPU——网络 IO 阻塞时线程也是 RUNNABLE(Java 视角),CPU 利用率却低。
+- 诊断要看 OS 层线程状态(top -H/jstack)。
+- 事故二:线程池任务卡死但状态 WAITING——jstack 看栈顶(park 在 LockSupport→查锁。
+- wait→查 notify 配对)。
 
-### 取舍:线程的创建成本与虚拟线程
+### 第二步扩展③ 取舍:线程的创建成本与虚拟线程
 
-线程创建成本高(默认 1MB 栈预留+内核调度体)——数量受内存与上下文切换约束(JDK17 实测 2 万线程建完 2s,并发基础 11 题);海量并发任务→线程池复用(第 23 题)或虚拟线程(JDK21,挂起零内核切换)。
+- 线程创建成本高(默认 1MB 栈预留+内核调度体)——数量受内存与上下文切换约束(JDK17 实测 2 万线程建完 2s,并发基础 11 题)。
+- 海量并发任务→线程池复用(第 23 题)或虚拟线程(JDK21,挂起零内核切换)。
 
 ## 案例
 
-### 验证:线程状态的实测走查
+### 第三步发散·验证与推演 验证:线程状态的实测走查
 
-验证:状态断言(未 start→NEW;start 后 run 中→RUNNABLE;synchronized 竞争→BLOCKED;wait→WAITING;sleep(100)→TIMED_WAITING;run 返回→TERMINATED——六态全覆盖,线程状态实验已在并发模块验证可复跑);jstack 断言(池中空闲 worker=WAITING park)。预期:六态断言与 Thread.State 枚举一一对应。
+- 验证:状态断言(未 start→NEW。
+- start 后 run 中→RUNNABLE。
+- synchronized 竞争→BLOCKED。
+- wait→WAITING。
+- sleep(100)→TIMED_WAITING。
+- run 返回→TERMINATED——六态全覆盖,线程状态实验已在并发模块验证可复跑)。
+- jstack 断言(池中空闲 worker=WAITING park)。
+- 预期:六态断言与 Thread.State 枚举一一对应。
 
-### 追问链:线程三刀
+### 第三步发散·发散要点 追问链:线程三刀
 
-一刀:守护线程=setDaemon(true),JVM 退出不等守护线程——GC/清理类后台任务用,业务别用(随时被杀)。二刀:线程优先级=仅提示(1-10,OS 可忽略),别依赖优先级做正确性。三刀:Thread.yield=建议让步不保证——正确性绝不能建立在 yield/priority 上。
+- **追问①·守护线程**：setDaemon(true),JVM 退出不等守护线程——GC/清理类后台任务用,业务别用(随时被杀)
+- **追问②·线程优先级**：仅提示(1-10,OS 可忽略),别依赖优先级做正确性
+- **追问③·Thread.yield**：建议让步不保证——正确性绝不能建立在 yield/priority 上
 
 ## 总结点
 

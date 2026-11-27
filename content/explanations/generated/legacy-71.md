@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Google SRE · 2](https://sre.google/sre-book/service-level-objectives/)
 
 </details>
 
@@ -20,27 +20,41 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:死锁的成因=加锁顺序不一致
+### 第二步扩展① 机制:死锁的成因=加锁顺序不一致
 
-转账场景:事务 1 先锁 A 后锁 B,事务 2 先锁 B 后锁 A→两事务互相等待;修复=所有事务按相同顺序加锁(按 ID 排序)——顺序一致则不可能成环(数学证明:有向图无环)。数据库死锁=InnoDB wait-for 图检测自动回滚一方(兜底不是设计,banking 7 题锁序)。
+- 转账场景:事务 1 先锁 A 后锁 B,事务 2 先锁 B 后锁 A→两事务互相等待。
+- 修复=所有事务按相同顺序加锁(按 ID 排序)——顺序一致则不可能成环(数学证明:有向图无环)。
+- 数据库死锁=InnoDB wait-for 图检测自动回滚一方(兜底不是设计,banking 7 题锁序)。
 
-### 反例:死锁排查的两种事故
+### 第二步扩展② 反例:死锁排查的两种事故
 
-事故一:看到 BLOCKED 就报死锁——可能只是长事务阻塞(非死锁,可自行解除);修复=看 jstack 是否有"Found one Java-level deadlock"段。事故二:死锁后盲目重启——重启清空所有事务(排队任务丢失,第 9 题);修复=先止血(重启)后根因(锁序审计)。
+- 事故一:看到 BLOCKED 就报死锁——可能只是长事务阻塞(非死锁,可自行解除)。
+- 修复=看 jstack 是否有"Found one Java-level deadlock"段。
+- 事故二:死锁后盲目重启——重启清空所有事务(排队任务丢失,第 9 题)。
+- 修复=先止血(重启)后根因(锁序审计)。
 
-### 取舍:锁顺序 vs tryLock 的选择
+### 第二步扩展③ 取舍:锁顺序 vs tryLock 的选择
 
-固定顺序:零运行时开销,默认选择(维护顺序规则);tryLock:灵活(不阻塞)但引入重试循环与退避策略;一把大锁(全局锁):消灭死锁但并发归零(低频管理操作);数据库死锁:InnoDB 自动检测+回滚+应用重试(banking 7 题)。
+- 固定顺序:零运行时开销,默认选择(维护顺序规则)。
+- tryLock:灵活(不阻塞)但引入重试循环与退避策略。
+- 一把大锁(全局锁):消灭死锁但并发归零(低频管理操作)。
+- 数据库死锁:InnoDB 自动检测+回滚+应用重试(banking 7 题)。
 
 ## 案例
 
-### 验证:死锁的走查核对
+### 第三步发散·验证与推演 验证:死锁的走查核对
 
-验证:死锁复现(两个线程 transfer(A,B) 与 transfer(B,A) 各 sleep 10ms→jstack 报死锁);修复验证(lockInOrder 排序后同脚本零死锁);Arthas 验证(thread --state BLOCKED 过滤+thread -b 定位);数据库死锁(InnoDB 死锁日志的等待环解读,banking 7 题锁序)。验证:复现与修复的断言可程序化(并发测试+死锁检测)。
+- 验证:死锁复现(两个线程 transfer(A,B) 与 transfer(B,A) 各 sleep 10ms→jstack 报死锁)。
+- 修复验证(lockInOrder 排序后同脚本零死锁)。
+- Arthas 验证(thread --state BLOCKED 过滤+thread -b 定位)。
+- 数据库死锁(InnoDB 死锁日志的等待环解读,banking 7 题锁序)。
+- 验证:复现与修复的断言可程序化(并发测试+死锁检测)。
 
-### 追问链:死锁三刀
+### 第三步发散·发散要点 追问链:死锁三刀
 
-一刀:"活锁与死锁的区别?"——死锁=停着不动(CPU 空闲);活锁=忙着让路(CPU 满转,重试-回滚循环,并发基础 33 题)——活锁靠随机退避打破对称(并发基础 33 题)。二刀:"数据库死锁与 JVM 死锁的排查?"——JVM:jstack/Arthas;DB:SHOW ENGINE INNODB STATUS(LATEST DETECTED DEADLOCK 段,第 101 题数据库死锁)——两套体系按锁层次分别查。三刀:"锁顺序的"序"用什么定?"——稳定且全局一致的字段(数据库主键/唯一 ID);任何随时间变化的序(哈希遍历/列表下标)不同时刻不同顺序=等于没定(banking 7 题锁序)。
+- **追问①·"活锁与死锁的区别?"——死锁**：停着不动(CPU 空闲);活锁=忙着让路(CPU 满转,重试-回滚循环,并发基础 33 题)——活锁靠随机退避打破对称(并发基础 33 题)
+- **追问②**："数据库死锁与 JVM 死锁的排查?"——JVM:jstack/Arthas;DB:SHOW ENGINE INNODB STATUS(LATEST DETECTED DEADLOCK 段,第 101 题数据库死锁)——两套体系按锁层次分别查
+- **追问③**："锁顺序的"序"用什么定?"——稳定且全局一致的字段(数据库主键/唯一 ID);任何随时间变化的序(哈希遍历/列表下标)不同时刻不同顺序=等于没定(banking 7 题锁序)
 
 ## 总结点
 

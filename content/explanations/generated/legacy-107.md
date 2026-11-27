@@ -3,9 +3,8 @@
 
 教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Redis 官方文档 · 1](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
-- [Redis 官方文档 · 2](https://redis.io/docs/latest/develop/reference/eviction/)
-- [Kafka 4.1 设计 · 3](https://kafka.apache.org/41/design/design/)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [OWASP 提示注入风险 · 2](https://genai.owasp.org/)
 
 </details>
 
@@ -22,27 +21,44 @@
 
 ## 参考分析
 
-### 机制:RDB 的 fork 与 COW
+### 第二步扩展① 机制:RDB 的 fork 与 COW
 
-bgsave 时 fork 子进程(共享父进程内存页——写时复制 COW);父进程修改数据→COW 复制修改的页(子进程看到的是快照);fork 的耗时=页表复制(内存越大越慢,100GB≈秒级)——大实例的 fork 是 RDB 的主要风险(主线程暂停)。
+- bgsave 时 fork 子进程(共享父进程内存页——写时复制 COW)。
+- 父进程修改数据→COW 复制修改的页(子进程看到的是快照)。
+- fork 的耗时=页表复制(内存越大越慢,100GB≈秒级)——大实例的 fork 是 RDB 的主要风险(主线程暂停)。
 
-### 反例:持久化的两种事故
+### 第二步扩展② 反例:持久化的两种事故
 
-事故一:AOF everysec 丢 1 秒——金融场景不可接受(交易数据);修复=always(每命令 fsync,性能降 10 倍)或 Redis 只做缓存+DB 做主存储(数据不丢)。事故二:混合持久化未开启——AOF 文件巨大(重写慢)+恢复慢(逐命令重放);修复=开启混合(RDB 头+AOF 尾)。
+- 事故一:AOF everysec 丢 1 秒——金融场景不可接受(交易数据)。
+- 修复=always(每命令 fsync,性能降 10 倍)或 Redis 只做缓存+DB 做主存储(数据不丢)。
+- 事故二:混合持久化未开启——AOF 文件巨大(重写慢)+恢复慢(逐命令重放)。
+- 修复=开启混合(RDB 头+AOF 尾)。
 
-### 取舍:持久化策略的选择
+### 第二步扩展③ 取舍:持久化策略的选择
 
-纯缓存(可丢失):RDB 或不持久化(重启从 DB 加载);持久存储(Redis 当主存):AOF always+主从+哨兵(数据安全);混合(缓存+部分持久):混合持久化+everysec——按"Redis 中数据的可丢失程度"选持久化策略(第 104 题Redis 的角色)。
+- 纯缓存(可丢失):RDB 或不持久化(重启从 DB 加载)。
+- 持久存储(Redis 当主存):AOF always+主从+哨兵(数据安全)。
+- 混合(缓存+部分持久):混合持久化+everysec——按"Redis 中数据的可丢失程度"选持久化策略(第 104 题Redis 的角色)。
 
 ## 案例
 
-### 验证:持久化的走查核对
+### 第三步发散·验证与推演 验证:持久化的走查核对
 
-验证:RDB 断言(bgsave→dump.rdb 生成→重启后数据恢复);AOF 断言(appendonly yes→命令追加→重启重放);混合断言(AOF 文件头=RDB 格式→恢复速度快);过期断言(TTL 到期→惰性/定期删除);淘汰断言(maxmemory→allkeys-lru→LRU key 被逐出)。验证:持久化与过期的断言可程序化(Redis CLI+配置)。
+- 验证:RDB 断言(bgsave→dump.rdb 生成→重启后数据恢复)。
+- AOF 断言(appendonly yes→命令追加→重启重放)。
+- 混合断言(AOF 文件头=RDB 格式→恢复速度快)。
+- 过期断言(TTL 到期→惰性/定期删除)。
+- 淘汰断言(maxmemory→allkeys-lru→LRU key 被逐出)。
+- 验证:持久化与过期的断言可程序化(Redis CLI+配置)。
 
-### 追问链:持久化三刀
+### 第三步发散·追问扩展 追问链:持久化三刀
 
-一刀:"AOF 重写的触发?"——auto-aof-rewrite-percentage(100%,文件翻倍时)+auto-aof-rewrite-min-size(64MB 最小值)——重写时 fork(同 RDB 的 COW);重写期间新命令写新旧两个 AOF 缓冲。二刀:"Redis 集群的持久化?"——每个节点独立持久化(RDB/AOF)——节点故障=该节点数据可能丢失(从节点接管,但异步复制可能丢);持久化策略按"节点角色"调整(主节点 AOF everysec,从节点可 RDB)。三刀:"主从+哨兵+持久化的组合?"——哨兵(自动故障转移)+主从(数据冗余)+持久化(重启恢复)——三层高可用:哨兵管切换、主从管冗余、持久化管恢复(第 141 题高可用)。
+- **Q1：AOF 重写的触发?**
+  - 答：auto-aof-rewrite-percentage(100%,文件翻倍时)+auto-aof-rewrite-min-size(64MB 最小值)——重写时 fork(同 RDB 的 COW);重写期间新命令写新旧两个 AOF 缓冲。
+- **Q2：Redis 集群的持久化?**
+  - 答：每个节点独立持久化(RDB/AOF)——节点故障=该节点数据可能丢失(从节点接管,但异步复制可能丢);持久化策略按"节点角色"调整(主节点 AOF everysec,从节点可 RDB)。
+- **Q3：主从+哨兵+持久化的组合?**
+  - 答：哨兵(自动故障转移)+主从(数据冗余)+持久化(重启恢复)——三层高可用:哨兵管切换、主从管冗余、持久化管恢复(第 141 题高可用)。
 
 ## 总结点
 

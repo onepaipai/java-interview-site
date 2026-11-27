@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
@@ -19,27 +19,39 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:Mock 的覆盖边界与事务测试
+### 第二步扩展① 机制:Mock 的覆盖边界与事务测试
 
-Mock 的覆盖边界:Mock 掉 Repository 验证 Service 编排逻辑调了 save、参数对——但事务回滚规则、传播行为、隔离级别全部不覆盖(事务是数据库行为)。事务测试方案:@Transactional 测试自动回滚掩盖提交行为,TestTransaction 编程式提交回滚显式控制,Testcontainers 真库。Mock 与真库分工:Mock 测编排,真库测事务,两层互补。
+- Mock 的覆盖边界:Mock 掉 Repository 验证 Service 编排逻辑调了 save、参数对——但事务回滚规则、传播行为、隔离级别全部不覆盖(事务是数据库行为)。
+- 事务测试方案:@Transactional 测试自动回滚掩盖提交行为,TestTransaction 编程式提交回滚显式控制,Testcontainers 真库。
+- Mock 与真库分工:Mock 测编排,真库测事务,两层互补。
 
-### 反例:自动回滚的三类盲区
+### 第二步扩展② 反例:自动回滚的三类盲区
 
-@Transactional 测试的自动回滚掩盖提交行为——afterCommit 回调不触发(事务未真提交)、REQUIRES_NEW 内层是假提交、readOnly 提示不生效,三类盲区让它验证不了提交路径。TestTransaction 编程式控制:提交/回滚显式,弥补自动回滚盲区。Testcontainers 真库完整覆盖但成本高——三层按风险分配。
+- @Transactional 测试的自动回滚掩盖提交行为——afterCommit 回调不触发(事务未真提交)、REQUIRES_NEW 内层是假提交、readOnly 提示不生效,三类盲区让它验证不了提交路径。
+- TestTransaction 编程式控制:提交/回滚显式,弥补自动回滚盲区。
+- Testcontainers 真库完整覆盖但成本高——三层按风险分配。
 
-### 取舍:事务测试的分层
+### 第二步扩展③ 取舍:事务测试的分层
 
-Mock 测编排(Service 调了哪些方法);真库测事务(回滚、传播、隔离);端到端测集成(全链路)。分层分工:Mock 密集、真库稀疏、端到端关键路径——按风险分配。度量:事务缺陷必须由真库用例拦截,Mock 全绿但缺真库覆盖即测试债,进改进清单跟踪。
+- Mock 测编排(Service 调了哪些方法)。
+- 真库测事务(回滚、传播、隔离)。
+- 端到端测集成(全链路)。
+- 分层分工:Mock 密集、真库稀疏、端到端关键路径——按风险分配。
+- 度量:事务缺陷必须由真库用例拦截,Mock 全绿但缺真库覆盖即测试债,进改进清单跟踪。
 
 ## 案例
 
-### 验证:事务测试的断言组
+### 第三步发散·验证与推演 验证:事务测试的断言组
 
-验证:Mock 盲区断言(Mock 掉 Repository 的测试不含事务行为审查);真库断言(Testcontainers 跑回滚传播用例);对照断言(Mock 全绿但真库发现回滚缺失——Mock 的局限实证)——三组固化事务测试纪律。
+- 验证:Mock 盲区断言(Mock 掉 Repository 的测试不含事务行为审查)。
+- 真库断言(Testcontainers 跑回滚传播用例)。
+- 对照断言(Mock 全绿但真库发现回滚缺失——Mock 的局限实证)——三组固化事务测试纪律。
 
-### 追问链:事务测试三刀
+### 第三步发散·发散要点 追问链:事务测试三刀
 
-一刀:@Transactional 测试的盲区清单——afterCommit 不触发、REQUIRES_NEW 真提交缺失、readOnly 不生效,三类盲区。二刀:TestTransaction 编程式控制——提交/回滚显式,弥补自动回滚盲区。三刀:事务测试的分层——Mock 测编排、真库测事务、端到端测集成,三层分工。
+- **追问①**：@Transactional 测试的盲区清单——afterCommit 不触发、REQUIRES_NEW 真提交缺失、readOnly 不生效,三类盲区
+- **追问②**：TestTransaction 编程式控制——提交/回滚显式,弥补自动回滚盲区
+- **追问③**：事务测试的分层——Mock 测编排、真库测事务、端到端测集成,三层分工
 
 ## 总结点
 

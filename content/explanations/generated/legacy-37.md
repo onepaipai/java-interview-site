@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/classpath-scanning.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Google SRE · 2](https://sre.google/sre-book/service-level-objectives/)
 
 </details>
 
@@ -19,27 +20,36 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:语义注解的工程价值
+### 第二步扩展① 机制:语义注解的工程价值
 
-语义化=架构约束的可执行化:Reviewer 看到数据访问逻辑写在 @Service 就能拦截(分层越界);工具可按注解统计分层(ArchUnit 规则:Repository 只被 Service 依赖)——注解不是编译器强制,但提供了静态检查的锚点。
+- 语义化=架构约束的可执行化:Reviewer 看到数据访问逻辑写在 @Service 就能拦截(分层越界)。
+- 工具可按注解统计分层(ArchUnit 规则:Repository 只被 Service 依赖)——注解不是编译器强制,但提供了静态检查的锚点。
 
-### 反例:分层注解的两种事故
+### 第二步扩展② 反例:分层注解的两种事故
 
-事故一:数据访问写在 Service 不用 Repository——丢失异常转换(MySQL 异常直穿上层,错误处理按厂商异常硬编码);修复=DAO 层 @Repository。事故二:业务逻辑写在 Controller——路由层膨胀(单类千行,复用为零);修复=Controller 只做参数装配+调 Service(薄控制器)。
+- 事故一:数据访问写在 Service 不用 Repository——丢失异常转换(MySQL 异常直穿上层,错误处理按厂商异常硬编码)。
+- 修复=DAO 层 @Repository。
+- 事故二:业务逻辑写在 Controller——路由层膨胀(单类千行,复用为零)。
+- 修复=Controller 只做参数装配+调 Service(薄控制器)。
 
-### 边界:什么时候用 @Component
+### 第二步扩展③ 边界:什么时候用 @Component
 
-不属于任何层的通用组件(工具 Bean/配置类/事件监听)用 @Component;三层的用语义注解(即使行为相同)——语义注解是给人和工具看的,编译器不在乎,架构在乎。
+- 不属于任何层的通用组件(工具 Bean/配置类/事件监听)用 @Component。
+- 三层的用语义注解(即使行为相同)——语义注解是给人和工具看的,编译器不在乎,架构在乎。
 
 ## 案例
 
-### 验证:分层注解的实测走查
+### 第三步发散·验证与推演 验证:分层注解的实测走查
 
-验证:注册断言(四注解都注册成功——getBean 可取);异常转换断言(@Repository 的 DAO 抛出 DataAccessException 子类,而非厂商异常——翻译对照);路由断言(@RestController 方法返回对象→JSON,纯 @Controller 返回视图名——响应对照)——三组固化语义行为,Spring 模块测试可复跑。
+- 验证:注册断言(四注解都注册成功——getBean 可取)。
+- 异常转换断言(@Repository 的 DAO 抛出 DataAccessException 子类,而非厂商异常——翻译对照)。
+- 路由断言(@RestController 方法返回对象→JSON,纯 @Controller 返回视图名——响应对照)——三组固化语义行为,Spring 模块测试可复跑。
 
-### 追问链:分层三刀
+### 第三步发散·发散要点 追问链:分层三刀
 
-一刀:薄控制器纪律=参数校验(@Valid)/转换 DTO/调服务/返回——不做业务(第 138 题 reliability 分层同源)。二刀:@Bean vs @Component=第三方类(改不了源码)用 @Bean 显式注册。三刀:扫描边界=跨包用 @ComponentScan(basePackages) 或 starter 自动配置(第 39 题)。
+- **追问①·薄控制器纪律**：参数校验(@Valid)/转换 DTO/调服务/返回——不做业务(第 138 题 reliability 分层同源)
+- **追问②·@Bean vs @Component**：第三方类(改不了源码)用 @Bean 显式注册
+- **追问③·扫描边界**：跨包用 @ComponentScan(basePackages) 或 starter 自动配置(第 39 题)
 
 ## 总结点
 

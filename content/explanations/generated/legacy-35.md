@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/aop/proxying.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/core/aop.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Google SRE · 2](https://sre.google/sre-book/service-level-objectives/)
 
 </details>
 
@@ -20,27 +20,41 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:代理为什么拦不到自调用
+### 第二步扩展① 机制:代理为什么拦不到自调用
 
-AOP 代理是包在目标外的对象——this.method() 走的是目标对象自身(未经代理),切面不生效;@Transactional 自调用失效是经典事故(第 90 题);修复=AopContext.currentProxy() 或拆类或自注入;这也是字段注入难测的同一根因(容器增强都发生在代理上)。
+- AOP 代理是包在目标外的对象——this.method() 走的是目标对象自身(未经代理),切面不生效。
+- @Transactional 自调用失效是经典事故(第 90 题)。
+- 修复=AopContext.currentProxy() 或拆类或自注入。
+- 这也是字段注入难测的同一根因(容器增强都发生在代理上)。
 
-### 反例:切面的两种事故
+### 第二步扩展② 反例:切面的两种事故
 
-事故一:切点表达式过宽(execution(* com..*.*(..)))——非业务方法也被代理(反射/getter 全被套上,性能+日志噪音);修复=精确到注解或包+方法语义。事故二:切面里抛异常吞业务——通知异常传播会覆盖业务异常;修复=切面内部 try-catch(监控类切面绝不抛,事务切面除外)。
+- 事故一:切点表达式过宽(execution(* com..*.*(..)))——非业务方法也被代理(反射/getter 全被套上,性能+日志噪音)。
+- 修复=精确到注解或包+方法语义。
+- 事故二:切面里抛异常吞业务——通知异常传播会覆盖业务异常。
+- 修复=切面内部 try-catch(监控类切面绝不抛,事务切面除外)。
 
-### 取舍:Spring AOP vs AspectJ
+### 第二步扩展③ 取舍:Spring AOP vs AspectJ
 
-Spring AOP=方法级+运行时代理(覆盖 95% 场景,无编译期依赖);AspectJ=字段/构造器切点+编译期织入(无代理开销,功能全但构建链复杂);选型:方法级横切用 Spring AOP,需要字段级/性能敏感/非 Spring 环境用 AspectJ。
+- Spring AOP=方法级+运行时代理(覆盖 95% 场景,无编译期依赖)。
+- AspectJ=字段/构造器切点+编译期织入(无代理开销,功能全但构建链复杂)。
+- 选型:方法级横切用 Spring AOP,需要字段级/性能敏感/非 Spring 环境用 AspectJ。
 
 ## 案例
 
-### 验证:切面的实测走查
+### 第三步发散·验证与推演 验证:切面的实测走查
 
-验证:织入断言(切面计数器:一次调用=一次通知;自调用断言(this 调用不触发,代理调用触发——失效复现+修复对照);异常传播断言(AfterThrowing 拿到业务异常,切面抛异常覆盖验证);代理类型断言(有接口 JDK 代理/无接口 CGLIB——instanceof 检查)——Spring 模块 AOP 实验可复用。预期:五种通知顺序与自调用失效均可复现。
+- 验证:织入断言(切面计数器:一次调用=一次通知。
+- 自调用断言(this 调用不触发,代理调用触发——失效复现+修复对照)。
+- 异常传播断言(AfterThrowing 拿到业务异常,切面抛异常覆盖验证)。
+- 代理类型断言(有接口 JDK 代理/无接口 CGLIB——instanceof 检查)——Spring 模块 AOP 实验可复用。
+- 预期:五种通知顺序与自调用失效均可复现。
 
-### 追问链:AOP 三刀
+### 第三步发散·发散要点 追问链:AOP 三刀
 
-一刀:@Transactional 失效场景族=自调用/final/private/非 public/异常被吞/传播配置错(第 90 题事务详解)。二刀:通知顺序=Around 前→Before→目标→AfterReturning→After→Around 后(异常走 AfterThrowing);同切面多通知用 @Order。三刀:代理与 BeanPostProcessor=AnnotationAwareAspectJAutoProxyCreator 在初始化后创建代理(第 33 题 BPP 同源)。
+- **追问①·@Transactional 失效场景族**：自调用/final/private/非 public/异常被吞/传播配置错(第 90 题事务详解)
+- **追问②·通知顺序**：Around 前→Before→目标→AfterReturning→After→Around 后(异常走 AfterThrowing);同切面多通知用 @Order
+- **追问③·代理与 BeanPostProcessor**：AnnotationAwareAspectJAutoProxyCreator 在初始化后创建代理(第 33 题 BPP 同源)
 
 ## 总结点
 

@@ -1,6 +1,6 @@
 // MySQL 8.4 / InnoDB。教学场景统一声明,未实测的推演写"预期"。
 // 与 deep-answers(24)、review-answers(26–31) 已有的 7 道互补,键不重叠。
-const doc = n => 'https://dev.mysql.com/doc/refman/8.4/en/' + n + '.html';
+const doc = n => 'https://dev.mysql.com/doc/refman/8.4/en/' + (n.endsWith('.html') ? n : n + '.html');
 const block = (title, body) => ({ title, body });
 const deep = (title, scenario, answer, analysis, cases, summary, references) => ({
   format: 'deep', title, scenario, answer, analysis, case: cases, summary, references,
@@ -81,7 +81,7 @@ export default {
       block('对照操作：直方图前后的计划对照', '教学验证：对 status 建直方图前后，分别 EXPLAIN 查询"已完成"与"异常单"。预期：建图前两查询同计划（可能都错）；建图后热点值选全扫/冷值走索引，实际行数与估算收敛。实验可复跑，直方图的价值立现。'),
       block('追问：为什么"按值分策"不违背索引设计一致性', '索引设计服务于访问路径集合，值分布是访问路径的属性之一——热点值与冷值本来就是两条路径。工程上体现为：一个索引发扬冷值查询，热点值由分区/汇总/覆盖结构承接，而非一个索引讨好所有值。'),
     ],
-    ['九成同值，索引退位', '直方图把分布交给优化器', '热点走结构，冷值走索引'], [doc('histogram-optimization.html'), doc('mysql-indexes.html')],
+    ['九成同值，索引退位', '直方图把分布交给优化器', '热点走结构，冷值走索引'], [doc('optimizer-statistics.html'), doc('mysql-indexes.html')],
   ),
   'database-advanced/5': deep(
     '如何治理超宽索引带来的写放大？',
@@ -329,7 +329,7 @@ export default {
       block('对照操作：MDL 链的复现与守护', '教学验证：开启长事务后发起 ALTER，再开第三个会话做普通 SELECT。预期：SELECT 因 MDL 跟随 DDL 排队，三条链在 metadata_locks 可见；提交长事务后链解开。把 lock_wait_timeout 与"DDL 前查长事务"写进操作流程，实验可复跑。'),
       block('追问：为什么说"低峰执行 DDL"只对了一半', '低峰解决资源消耗（第二点），但 MDL 链在任何时段都可能被一个偶发长事务触发（第一点）——低峰只是降低概率。完整的守护是：DDL 前检查 information_schema.innodb_trx、设置 lock_wait_timeout、用 gh-ost 类工具的锁续期机制兜底。概率措施与机制措施分开列。'),
     ],
-    ['MDL 是闸门，长事务是钉子', 'DDL 前查长事务，设超时快失败', '先核支持矩阵，再选算法'], [doc('innodb-online-ddl.html'), doc('metadata-locks.html')],
+    ['MDL 是闸门，长事务是钉子', 'DDL 前查长事务，设超时快失败', '先核支持矩阵，再选算法'], [doc('innodb-online-ddl.html'), doc('metadata-locking.html')],
   ),
   'database-advanced/18': deep(
     '如何安全增加非空字段？',
@@ -481,7 +481,7 @@ export default {
       block('对照操作：回填竞态的复现与版本修复', '教学验证：写事务注入暂停构造"提交前回源"窗口，统计缓存与库不一致时长。预期：无版本协议的不一致持续到下次写；带版本比较（CDC 携带自增版本）后旧回填在删除到达时被拒、不一致窗口收敛到 TTL 内。实验可复跑。'),
       block('追问：为什么不用"删除失败重试"解决', '重试解决"删除没送达"，不解决"删除送达但被旧值覆盖"——竞态的方向性问题重试无能为力。把重试与版本比较放在一起看：重试管可靠性（必达），版本管因果性（必对）——两者是正交的两个维度，混为一谈的方案会漏掉回填竞态。'),
     ],
-    ['账本与价签隔着传单员', '删除带版本，旧传单作废', 'TTL 兜底，漏删必自愈'], [doc('replication.html'), doc('binlog-log.html')],
+    ['账本与价签隔着传单员', '删除带版本，旧传单作废', 'TTL 兜底，漏删必自愈'], [doc('replication.html'), doc('binary-log.html')],
   ),
   'database-advanced/33': deep(
     '读写分离如何提供可解释的一致性级别？',
@@ -557,7 +557,7 @@ export default {
       block('对照操作：binlog 逆向找回的演练', '教学验证（演练库）：DELETE 1000 行后，用 binlog 找出 DELETE 的 ROW 事件、反转成 INSERT 回插。预期：1000 行全部找回、其他写入无影响、全程生产库只承受 1000 次小插入。把演练脚本固化为"误删恢复 SOP"的第一路径。'),
       block('追问：为什么 ROW 格式让误删恢复可行', 'ROW 格式的 binlog 记录"被删行的完整前镜像"——DELETE 事件自带还原所需的全字段；STATEMENT 格式只有语句，被删行的值需要从更早的 binlog 重放推算。这也是第 23 题"RC 要求 ROW 格式"之外的第二个 ROW 格式理由：它同时是数据恢复的基础设施。'),
     ],
-    ['先止血定界，再选手术范围', 'binlog 逆向优于整库覆盖', '评估时间不是拖延，是防二次事故'], [doc('point-in-time-recovery.html'), doc('binlog-log.html')],
+    ['先止血定界，再选手术范围', 'binlog 逆向优于整库覆盖', '评估时间不是拖延，是防二次事故'], [doc('point-in-time-recovery.html'), doc('binary-log.html')],
   ),
   'database-advanced/37': deep(
     '如何治理数据库连接数突增？',
@@ -595,7 +595,7 @@ export default {
       block('对照操作：digest 表的消耗定位', '教学验证：注入一条 JSON_EXTRACT 高频语句，对比 events_statements_summary_by_digest 的 SUM_TIMER_WAIT 与 SUM_ROWS_EXAMINED。预期：该语句 TIME 占比第一而 ROWS 占比极低——CPU 型指纹。修复生成列后占比回落。实验可复跑。'),
       block('追问：海量值 IN 列表为什么吃 CPU', '数千个值的 IN 列表在优化与匹配阶段的比较成本线性于值数，且语句解析缓存失效（每次值集不同都算新语句）。治理：拆批、临时表 JOIN、或改写为范围条件——本质是让解析与比较的规模可控。'),
     ],
-    ['先分 IO 型与 CPU 型两种浪费', 'digest 表按时间与行数双维度排', '计算下移，SQL 瘦身'], [doc('performance-schema-statement-summary-tables.html'), doc('statement-explain-information.html')],
+    ['先分 IO 型与 CPU 型两种浪费', 'digest 表按时间与行数双维度排', '计算下移，SQL 瘦身'], [doc('performance-schema-statement-summary-tables.html'), doc('explain-output.html')],
   ),
   'database-advanced/39': deep(
     'I/O 饱和时增加 Buffer Pool 是否总有帮助？',
@@ -671,7 +671,7 @@ export default {
       block('对照操作：中间失败的两种结局对照', '教学验证：订单库与库存库分别以"双注解"与"outbox 消息"实现下单扣库存，注入库存库故障。预期：双注解版订单建成库存未扣（不一致持久存在）；outbox 版订单与事件同事务落库，故障恢复后库存被消息驱动扣减，最终一致。实验可复跑。'),
       block('追问：为什么说"路径三（2PC）"在互联网业务里少见', '2PC 的 prepare 阶段锁住资源等待协调者决议——参与者故障时资源阻塞（阻塞协议），吞吐与可用性代价在大并发下不可接受；且 XA 在故障恢复、超时处理上的运维复杂度高。绝大多数业务的一致性需求落在"最终一致 + 补偿/消息"，强一致需求用业务设计（预扣额度）规避分布式事务。'),
     ],
-    ['注解只管一个连接的原子', '跨库一致性 = 本地原子 + 投递 + 幂等', '补偿、消息、2PC，三问选路径'], [doc('innodb-commit.html'), doc('mysql-indexes.html')],
+    ['注解只管一个连接的原子', '跨库一致性 = 本地原子 + 投递 + 幂等', '补偿、消息、2PC，三问选路径'], [doc('innodb-transaction-model.html'), doc('mysql-indexes.html')],
   ),
   'database-advanced/43': deep(
     '如何设计数据库层面的审计与权限最小化？',

@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html)
 
 </details>
 
@@ -20,27 +20,35 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：先问长辈，避免"辈分错乱"
+### 第二步扩展① 机制：先问长辈，避免"辈分错乱"
 
-类比家族企业：任何新业务先问最高管理层"这个岗位有人吗"，有人就不另招——防止业务部门私自雇一个假"董事长"。Java 9 后的链是 App → Platform → Bootstrap；安全拦截（如定义 java.* 包的 SecurityException）再加一层硬约束，双保险。
+- 类比家族企业：任何新业务先问最高管理层"这个岗位有人吗"，有人就不另招——防止业务部门私自雇一个假"董事长"。
+- Java 9 后的链是 App → Platform → Bootstrap。
+- 安全拦截（如定义 java.* 包的 SecurityException）再加一层硬约束，双保险。
 
-### 边界：委派不等于"谁先加载谁说了算"
+### 第二步扩展② 边界：委派不等于"谁先加载谁说了算"
 
-委派解决"请求顺序"，不解决"加载器数量"：两个互不为父子的加载器各自加载同名类，会得到两个独立类型（见第 20 题）。因此隔离容器（Tomcat 每应用一加载器）天然产生同名类并存——这是特性不是缺陷，问题只出在跨加载器传递对象时。
+- 委派解决"请求顺序"，不解决"加载器数量"：两个互不为父子的加载器各自加载同名类，会得到两个独立类型（见第 20 题）。
+- 因此隔离容器（Tomcat 每应用一加载器）天然产生同名类并存——这是特性不是缺陷，问题只出在跨加载器传递对象时。
 
-### 取舍：什么时候应该破坏委派
+### 第二步扩展③ 取舍：什么时候应该破坏委派
 
-当"父加载器加载的服务要回调子加载器的实现"时只能反向委派（JDBC 驱动、JNDI）；当应用需要互相隔离与独立重载时必须子优先（Web 容器）。破坏是能力不是罪，前提是明白放弃了哪层保护：核心类仍受 SecurityException 与平台加载器保护，业务类则按你的隔离设计来。
+- 当"父加载器加载的服务要回调子加载器的实现"时只能反向委派（JDBC 驱动、JNDI）。
+- 当应用需要互相隔离与独立重载时必须子优先（Web 容器）。
+- 破坏是能力不是罪，前提是明白放弃了哪层保护：核心类仍受 SecurityException 与平台加载器保护，业务类则按你的隔离设计来。
 
 ## 案例
 
-### 对照操作：伪造核心类被拦截
+### 第三步发散·验证与推演 对照操作：伪造核心类被拦截
 
-教学验证：在自己包里定义 `java.lang.String`（或定义 `java.lang` 包的类）并加载。预期：抛 SecurityException（Prohibited package name）或加载到的仍是 Bootstrap 的 String（instanceof 校验通过）。再用 `Class.forName` 打印三个加载器加载链，实验可复跑。
+- 教学验证：在自己包里定义 `java.lang.String`（或定义 `java.lang` 包的类）并加载。
+- 预期：抛 SecurityException（Prohibited package name）或加载到的仍是 Bootstrap 的 String（instanceof 校验通过）。
+- 再用 `Class.forName` 打印三个加载器加载链，实验可复跑。
 
-### 追问：Platform 加载器与扩展机制的变化
+### 第三步发散·追问① 追问：Platform 加载器与扩展机制的变化
 
-Java 9 移除扩展类加载器，改为 Platform 加载器承载不再随核心分发的平台库（如部分 java.* 模块的实现依赖）。讨论双亲委派时用 Java 17 的三层链表述，不要再画"Ext 加载器"——术语过时是面试里的常见减分项。
+- Java 9 移除扩展类加载器，改为 Platform 加载器承载不再随核心分发的平台库（如部分 java.* 模块的实现依赖）。
+- 讨论双亲委派时用 Java 17 的三层链表述，不要再画"Ext 加载器"——术语过时是面试里的常见减分项。
 
 ## 总结点
 

@@ -4209,61 +4209,61 @@
     "key": "ai-advanced/2",
     "title": "Recall@K 与 MRR 适合观察什么差异？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/3",
     "title": "怎样构造检索评测中的困难负样本？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/4",
     "title": "BM25 与向量检索怎样融合比较稳健？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/5",
     "title": "何时应该采用查询改写或多路查询？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/6",
     "title": "HyDE 类方法可能带来哪些偏差？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/7",
     "title": "父子分块如何平衡召回精度与上下文完整性？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/8",
     "title": "表格和代码文档为何不宜按固定字符数盲切？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/9",
     "title": "文档解析中的脚注、页眉和重复段落应如何治理？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/10",
     "title": "如何处理同一知识点的多个有效版本？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/11",
     "title": "Embedding 模型升级怎样避免新旧向量混用？",
     "topic": "embedding-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/12",
@@ -4275,7 +4275,7 @@
     "key": "ai-advanced/13",
     "title": "ANN 检索的召回与延迟怎样权衡？",
     "topic": "embedding-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/14",
@@ -4287,121 +4287,121 @@
     "key": "ai-advanced/15",
     "title": "向量量化为何可能损害特定领域的召回？",
     "topic": "embedding-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/16",
     "title": "权限过滤与近似索引怎样配合？",
     "topic": "embedding-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/17",
     "title": "如何让删除和权限撤销及时反映到检索结果？",
     "topic": "index-lifecycle",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/18",
     "title": "增量索引为什么需要内容指纹与稳定来源键？",
     "topic": "index-lifecycle",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/19",
     "title": "索引更新事务失败怎样避免暴露半份文档？",
     "topic": "index-lifecycle",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/20",
     "title": "检索缓存如何跟随索引版本失效？",
     "topic": "index-lifecycle",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/21",
     "title": "如何减少每次查询都全量分词的开销？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/22",
     "title": "重排模型超时应怎样降级？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/23",
     "title": "向量接口失败是否应该让整个问答失败？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/24",
     "title": "怎样评估答案是否忠实于检索内容？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/25",
     "title": "如何防止模型把检索片段当作系统指令？",
     "topic": "hybrid-retrieval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/26",
     "title": "长上下文中的证据排序应该考虑什么？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/27",
     "title": "如何让引用能定位到原文而不是只有文档名？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/28",
     "title": "如何处理模型引用了不存在的片段编号？",
     "topic": "chunk-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/29",
     "title": "LoRA 训练数据怎样避免把评测答案泄漏进去？",
     "topic": "finetune-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/30",
     "title": "微调改善格式却降低通用能力时如何分析？",
     "topic": "finetune-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/31",
     "title": "为什么微调不是更新每天变化业务知识的首选？",
     "topic": "finetune-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/32",
     "title": "如何选择模型上下文压缩与摘要方案？",
     "topic": "inference",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/33",
     "title": "KV Cache 为什么影响推理并发与内存？",
     "topic": "inference",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/34",
     "title": "批处理推理怎样兼顾吞吐与尾延迟？",
     "topic": "inference",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/35",
@@ -4413,91 +4413,91 @@
     "key": "ai-advanced/36",
     "title": "推测解码的收益为什么依赖任务和模型组合？",
     "topic": "inference",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/37",
     "title": "工具调用参数校验应分为哪些层？",
     "topic": "agent-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/38",
     "title": "Agent 如何避免重复执行已成功的工具动作？",
     "topic": "agent-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/39",
     "title": "多工具 Agent 如何处理一个步骤成功后另一步失败？",
     "topic": "agent-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/40",
     "title": "怎样为 Agent 设计沙箱和最小权限？",
     "topic": "agent-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/41",
     "title": "多 Agent 方案为何可能比单 Agent 更差？",
     "topic": "agent-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/42",
     "title": "如何发现评测中的模型裁判偏差？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/43",
     "title": "如何建立面向业务的红队测试集？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/44",
     "title": "为什么 AI 日志不能默认保存完整提示和对话？",
     "topic": "ai-gateway-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/45",
     "title": "如何设计模型网关的公平配额？",
     "topic": "ai-gateway-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/46",
     "title": "如何建立模型故障的可解释降级链？",
     "topic": "ai-gateway-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/47",
     "title": "模型回答质量突然下降怎样定位？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/48",
     "title": "离线效果好而线上失败多时应检查什么？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/49",
     "title": "怎样设计 AI 实验的上线与回滚标准？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-advanced/50",
     "title": "资深开发应如何解释 RAG 方案的适用边界？",
     "topic": "rag-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "banking/1",
@@ -5703,31 +5703,31 @@
     "key": "ai-production/1",
     "title": "企业知识助手上线前怎样确定最小可用范围？",
     "topic": "ai-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/2",
     "title": "知识文档导入链路应该包含哪些治理步骤？",
     "topic": "ai-ingestion",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/3",
     "title": "扫描 PDF 和普通文本在入库时有何不同？",
     "topic": "ai-ingestion",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/4",
     "title": "如何让业务人员发现知识库中的错误资料？",
     "topic": "ai-ingestion",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/5",
     "title": "知识删除为什么必须考虑所有副本？",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/6",
@@ -5739,187 +5739,187 @@
     "key": "ai-production/7",
     "title": "企业权限继承如何映射到知识片段？",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/8",
     "title": "如何解释 AI 功能的资料发送范围？",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/9",
     "title": "模型服务商切换需要验证哪些兼容行为？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/10",
     "title": "如何设计可轮换的模型连接配置？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/11",
     "title": "模型网关怎样隔离聊天与向量任务？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/12",
     "title": "为什么索引构建需要分批和可恢复进度？",
     "topic": "ai-build-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/13",
     "title": "构建向量期间题目被编辑怎样避免索引污染？",
     "topic": "ai-build-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/14",
     "title": "模型或向量接口暂时故障时如何保持可用？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/15",
     "title": "如何为 AI 请求设计账号和全局并发限制？",
     "topic": "ai-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/16",
     "title": "浏览器超时后如何避免服务端继续无限生成？",
     "topic": "ai-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/17",
     "title": "流式 AI 页面如何处理断线和重复内容？",
     "topic": "ai-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/18",
     "title": "AI 回答怎样进入正式题库才可控？",
     "topic": "ai-editorial",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/19",
     "title": "如何把 AI 生成来源和人工编辑历史分开？",
     "topic": "ai-editorial",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/20",
     "title": "如何防止模型自我生成内容污染后续 RAG？",
     "topic": "ai-build-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/21",
     "title": "AI 日志应该如何兼顾排障与隐私？",
     "topic": "ai-history-cost",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/22",
     "title": "如何估算每天的 AI 预算？",
     "topic": "ai-history-cost",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/23",
     "title": "多轮对话历史怎样设置保留策略？",
     "topic": "ai-history-cost",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/24",
     "title": "缓存 AI 结果时如何避免权限变化后泄漏？",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/25",
     "title": "如何给企业术语和缩写建立检索支持？",
     "topic": "ai-ingestion",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/26",
     "title": "评测集如何覆盖资料缺失与过期资料？",
     "topic": "ai-review",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/27",
     "title": "怎样在线收集有用的 AI 反馈？",
     "topic": "ai-review",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/28",
     "title": "如何设计高风险回答的人工复核？",
     "topic": "ai-review",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/29",
     "title": "让模型查询数据库时应限制哪些能力？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/30",
     "title": "AI 工具涉及修改数据时如何设置边界？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/31",
     "title": "客服 Agent 怎样避免擅自承诺退款或补偿？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/32",
     "title": "如何给 Agent 的外部网络访问设限？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/33",
     "title": "文档中的隐藏指令如何在上线前测试？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/34",
     "title": "如何设计 Agent 的任务状态机？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/35",
     "title": "多步工具调用失败怎样恢复到可解释状态？",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/36",
     "title": "如何限制 AI 功能对主业务数据库的影响？",
     "topic": "ai-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/37",
     "title": "嵌入式向量存储何时需要迁移到专门系统？",
     "topic": "ai-build-index",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/38",
@@ -5931,67 +5931,67 @@
     "key": "ai-production/39",
     "title": "AI 上线灰度应该怎样按用户和任务划分？",
     "topic": "ai-editorial",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/40",
     "title": "模型升级后参考答案风格变化怎样治理？",
     "topic": "ai-editorial",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/41",
     "title": "如何处理供应商返回空回答或异常结构？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/42",
     "title": "AI 系统健康检查应该检测到什么程度？",
     "topic": "ai-provider",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/43",
     "title": "如何设计 AI 功能的紧急关闭开关？",
     "topic": "ai-stop-reproduce",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/44",
     "title": "如何确保 AI 问答不会突破现有账号权限？",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/45",
     "title": "如何解释本地模型与远程服务的成本取舍？",
     "topic": "ai-stop-reproduce",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/46",
     "title": "如何为 AI 事故提供可复现证据？",
     "topic": "ai-stop-reproduce",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/47",
     "title": "如何让产品文案准确描述 AI 能力边界？",
     "topic": "ai-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/48",
     "title": "怎样判断一个 AI 试点值得继续投入？",
     "topic": "ai-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/49",
     "title": "AI 落地方案应该交付哪些运维材料？",
     "topic": "ai-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "ai-production/50",
@@ -6303,67 +6303,67 @@
     "key": "legacy/1",
     "title": "基本类型与包装类区别？Integer 缓存范围（-128\\~127）与装箱的坑",
     "topic": "boxing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/2",
     "title": "== 与 equals 区别？重写 equals 为什么必须重写 hashCode",
     "topic": "value-key",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/3",
     "title": "String / StringBuilder / StringBuffer 区别？String 为什么不可变",
     "topic": "strings",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/4",
     "title": "final、finally、finalize 区别",
     "topic": "exception",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/5",
     "title": "抽象类与接口区别？Java 8 接口的 default、static 方法",
     "topic": "composition",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/6",
     "title": "重载与重写区别",
     "topic": "dispatch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/7",
     "title": "异常体系：checked 与 unchecked？try-finally 中 return 的执行顺序",
     "topic": "exception",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/8",
     "title": "泛型的作用与类型擦除",
     "topic": "generics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/9",
     "title": "反射是什么？使用场景与性能代价",
     "topic": "reflection",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/10",
     "title": "深拷贝与浅拷贝",
     "topic": "immutable",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/11",
     "title": "Java 8：Lambda、Stream、Optional 的基本用法",
     "topic": "functional",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/12",
@@ -6453,43 +6453,43 @@
     "key": "legacy/26",
     "title": "JVM 内存区域有哪些？各存什么",
     "topic": "jvm-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/27",
     "title": "对象创建过程？对象在堆中的布局",
     "topic": "jvm-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/28",
     "title": "如何判断对象可回收？",
     "topic": "reachability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/29",
     "title": "四种引用类型与应用场景",
     "topic": "reachability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/30",
     "title": "常见 GC 算法",
     "topic": "gc-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/31",
     "title": "分代思想？Minor / Major / Full GC 区别",
     "topic": "gc-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/32",
     "title": "StackOverflowError 与堆 OOM 的区别和常见原因",
     "topic": "stack-overflow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/33",
@@ -6603,79 +6603,79 @@
     "key": "legacy/51",
     "title": "TCP 与 UDP 区别？三次握手、四次挥手，为什么是三次",
     "topic": "http-path",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/52",
     "title": "HTTP 与 HTTPS 区别？HTTPS 握手过程简述",
     "topic": "tls-http2",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/53",
     "title": "常见 HTTP 状态码？GET 与 POST 区别",
     "topic": "http-contract",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/54",
     "title": "Cookie 与 Session 区别？分布式 Session 方案",
     "topic": "browser-security",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/55",
     "title": "常见设计模式：单例（手写双重检查）、工厂、代理、观察者、策略",
     "topic": "legacy-patterns",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/56",
     "title": "Git：merge 与 rebase 区别？冲突如何处理",
     "topic": "legacy-git",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/57",
     "title": "什么是大模型？token 是什么",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/58",
     "title": "上下文窗口是什么？超出了怎么办",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/59",
     "title": "什么是幻觉？temperature 的作用",
     "topic": "llm-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/60",
     "title": "平时用哪些 AI 工具？如何验证它生成的代码",
     "topic": "ai-eval-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/61",
     "title": "HashMap 扩容过程？链表转红黑树的条件（链表长度≥8 且数组≥64）？JDK7 头插法死循环问题",
     "topic": "hash-map",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/62",
     "title": "ConcurrentHashMap：JDK7 分段锁与 JDK8 CAS + synchronized 的区别？size 如何统计",
     "topic": "concurrent-map",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/63",
     "title": "CAS 原理？ABA 问题与 AtomicStampedReference",
     "topic": "atomic-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/64",
@@ -6687,169 +6687,169 @@
     "key": "legacy/65",
     "title": "AQS 原理（state + CLH 队列）？ReentrantLock 与 synchronized 区别",
     "topic": "aqs",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/66",
     "title": "公平锁与非公平锁？读写锁、StampedLock 的适用场景",
     "topic": "lock-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/67",
     "title": "CountDownLatch、CyclicBarrier、Semaphore 区别与场景",
     "topic": "coordination",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/68",
     "title": "JMM、happens-before、指令重排；volatile 如何靠内存屏障保证可见性",
     "topic": "atomic-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/69",
     "title": "线程池参数如何设置？队列怎么选？如何监控与动态调整",
     "topic": "pool-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/70",
     "title": "CompletableFuture 的编排与异常处理",
     "topic": "async-lifecycle",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/71",
     "title": "死锁的四个条件？如何排查（jstack）与避免",
     "topic": "concurrency-eval",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/72",
     "title": "ThreadLocal 在线程池中的问题，如何避免",
     "topic": "threadlocal",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/73",
     "title": "G1 原理？Region、Young GC、Mixed GC、停顿预测；与 CMS 区别",
     "topic": "g1",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/74",
     "title": "类加载过程与双亲委派？如何打破",
     "topic": "classload",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/75",
     "title": "垃圾回收器如何选型？ZGC 有什么特点",
     "topic": "collector",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/76",
     "title": "常用 JVM 参数？堆大小怎么定",
     "topic": "native-memory",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/77",
     "title": "OOM 完整排查流程",
     "topic": "heap-leak",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/78",
     "title": "Full GC 频繁怎么排查",
     "topic": "g1",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/79",
     "title": "对象晋升老年代的条件？空间分配担保是什么",
     "topic": "g1",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/80",
     "title": "逃逸分析、标量替换、JIT 编译分别做了什么",
     "topic": "jit-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/81",
     "title": "CPU 飙高排查",
     "topic": "cpu-profile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/82",
     "title": "内存泄漏的典型场景",
     "topic": "heap-leak",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/83",
     "title": "Bean 完整生命周期？BeanPostProcessor 的作用",
     "topic": "bean-life",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/84",
     "title": "循环依赖如何解决？三级缓存分别存什么？为什么需要三级",
     "topic": "early-bean",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/85",
     "title": "事务传播行为",
     "topic": "propagation",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/86",
     "title": "事务失效的场景",
     "topic": "txn-proxy",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/87",
     "title": "JDK 动态代理与 CGLIB 区别？为什么自调用时 AOP 不生效",
     "topic": "txn-proxy",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/88",
     "title": "Spring Boot 自动装配原理",
     "topic": "auto-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/89",
     "title": "拦截器与过滤器的区别？执行顺序",
     "topic": "mvc",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/90",
     "title": "MyBatis 执行流程？一二级缓存？延迟加载",
     "topic": "legacy-mybatis",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/91",
     "title": "Spring 事件机制；@Async 原理与线程池配置",
     "topic": "async-event",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/92",
     "title": "如何自定义一个 starter",
     "topic": "auto-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/93",
@@ -6861,7 +6861,7 @@
     "key": "legacy/94",
     "title": "联合索引的最左前缀？覆盖索引？索引下推",
     "topic": "query-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/95",
@@ -6873,97 +6873,97 @@
     "key": "legacy/96",
     "title": "间隙锁、临键锁？幻读如何解决",
     "topic": "locks-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/97",
     "title": "redo log、undo log、binlog 各自作用？两阶段提交",
     "topic": "logs-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/98",
     "title": "慢 SQL 排查流程？explain 关键字段",
     "topic": "query-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/99",
     "title": "深分页如何优化",
     "topic": "pagination-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/100",
     "title": "主从复制原理？主从延迟的原因与处理 - 要点：binlog → relay log → 重放；延迟原因：大事务、从库压力大、单线程回放；处理：并行复制、拆大事务、关键读走主库",
     "topic": "replication-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/101",
     "title": "死锁如何产生、如何排查 - 要点：加锁顺序不一致；show engine innodb status 查看；统一加锁顺序、缩小事务范围、失败重试",
     "topic": "locks-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/102",
     "title": "大表 DDL、加索引如何不影响线上",
     "topic": "online-ddl",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/103",
     "title": "转账场景下事务隔离级别怎么选？SELECT ... FOR UPDATE 如何使用",
     "topic": "locks-advanced",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/104",
     "title": "Redis 数据类型与应用场景？为什么快",
     "topic": "legacy-redis-types",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/105",
     "title": "缓存穿透、击穿、雪崩的区别与解决",
     "topic": "cache-hot",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/106",
     "title": "缓存与数据库一致性方案",
     "topic": "cache-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/107",
     "title": "Redis 持久化 RDB 与 AOF？过期与淘汰策略",
     "topic": "redis-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/108",
     "title": "Redis 分布式锁：实现、过期时间、误删、Redisson 看门狗",
     "topic": "redis-lock",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/109",
     "title": "MQ 如何保证消息不丢失、不重复、有序",
     "topic": "message-ack",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/110",
     "title": "消息积压如何处理？Kafka 与 RocketMQ 区别",
     "topic": "kafka-order",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/111",
     "title": "手写 LRU（LinkedHashMap，或双向链表 + HashMap）",
     "topic": "algo-cache",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/112",
@@ -6975,223 +6975,223 @@
     "key": "legacy/113",
     "title": "链表反转、二叉树层序遍历、两数之和、滑动窗口、合并区间",
     "topic": "legacy-algorithms",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/114",
     "title": "SQL：窗口函数、行转列、连续登录天数、每组前 N 名",
     "topic": "algo-schedule-test",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/115",
     "title": "RAG 完整流程：切片、Embedding、向量检索、重排、生成",
     "topic": "rag-basics",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/116",
     "title": "Prompt 设计技巧：角色、示例、约束、思维链",
     "topic": "prompt",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/117",
     "title": "Function Calling 的原理与流程",
     "topic": "tools-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/118",
     "title": "Java 如何调用大模型？流式输出如何处理",
     "topic": "ai-runtime-basic",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/119",
     "title": "转账如何保证幂等？重复点击、超时重试、MQ 重复消费 - 要点：唯一业务流水号 + 唯一索引 / 去重表 + 状态机，重复请求返回首次结果",
     "topic": "bank-idempotent",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/120",
     "title": "分布式事务方案对比：2PC、TCC、Saga、本地消息表、最终一致性",
     "topic": "dist-transactions",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/121",
     "title": "扣款成功但入账失败，或超时状态未知，如何处理 - 要点：状态查询、冲正、补偿重试，最终以对账兜底",
     "topic": "bank-unknown",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/122",
     "title": "余额并发扣减：乐观锁、悲观锁、行锁；热点账户如何处理",
     "topic": "bank-ledger",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/123",
     "title": "对账系统设计：差异类型（长款、短款、金额不一致）、自动修复、人工流程",
     "topic": "bank-reconcile",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/124",
     "title": "交易流水号与分布式 ID 方案（雪花、号段、时钟回拨问题）",
     "topic": "bank-batch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/125",
     "title": "日终批处理：失败重跑、断点续跑、大数据量分片",
     "topic": "bank-batch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/126",
     "title": "限额与风控：规则引擎设计，实时风控与异步风控的区别",
     "topic": "bank-rule",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/127",
     "title": "资金安全：防重放（时间戳 + nonce）、防篡改（签名）、传输加密",
     "topic": "bank-security",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/128",
     "title": "敏感数据（卡号、证件、手机号）的加密存储与脱敏；密钥管理",
     "topic": "bank-security",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/129",
     "title": "认证体系：Token / Session、单点登录、短信验证码、U盾 / 动态令牌、多端互踢",
     "topic": "bank-security",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/130",
     "title": "审计日志设计与合规追溯",
     "topic": "bank-audit",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/131",
     "title": "对接外部系统（核心、银联、人行）的超时、降级、补偿",
     "topic": "bank-unknown",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/132",
     "title": "渠道与核心系统解耦：报文转换、协议适配",
     "topic": "bank-channel",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/133",
     "title": "CAP 与 BASE 理论，结合业务如何取舍",
     "topic": "dist-consistency",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/134",
     "title": "限流算法（固定窗口、滑动窗口、令牌桶、漏桶）；分布式限流怎么做",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/135",
     "title": "熔断、降级、隔离（Sentinel / Hystrix）的原理",
     "topic": "dist-flow",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/136",
     "title": "分库分表：拆分键选择、跨库查询、全局 ID、平滑迁移",
     "topic": "dist-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/137",
     "title": "读写分离与主从延迟引发的问题",
     "topic": "dist-migration",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/138",
     "title": "Redis 与 ZooKeeper 分布式锁对比",
     "topic": "dist-lock-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/139",
     "title": "注册中心、配置中心、网关选型",
     "topic": "dist-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/140",
     "title": "分布式链路追踪如何落地",
     "topic": "dist-observability",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/141",
     "title": "高可用设计：多活、容灾、故障演练",
     "topic": "backup-dr",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/142",
     "title": "热点 key、大 key 的处理",
     "topic": "dist-routing",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/143",
     "title": "接口突然变慢，如何分层定位（网关 → 应用 → 数据库 → 网络）",
     "topic": "incident-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/144",
     "title": "数据库连接池耗尽、线程池打满怎么办",
     "topic": "incident-resource",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/145",
     "title": "一次完整的事故复盘：发现、止血、根因、改进",
     "topic": "incident-process",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/146",
     "title": "发布：灰度、蓝绿、回滚；数据库变更如何保证兼容",
     "topic": "release",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/147",
     "title": "压测与容量评估；监控告警体系怎么搭",
     "topic": "capacity-drill",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/148",
     "title": "单体与微服务如何取舍？拆分原则？拆完后带来的问题",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/149",
     "title": "DDD 在项目里的实践",
     "topic": "domain-boundary",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/150",
@@ -7203,90 +7203,162 @@
     "key": "legacy/151",
     "title": "代码质量保障：评审、单测、静态扫描、技术债",
     "topic": "quality",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/152",
     "title": "大数据量导入导出（异步、分片、流式）",
     "topic": "data-lifecycle-arch",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/153",
     "title": "如何评估大模型应用效果？评测集怎么建",
     "topic": "ai-review",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/154",
     "title": "成本与延迟优化：缓存、模型选型、上下文压缩",
     "topic": "ai-history-cost",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/155",
     "title": "银行场景下的数据脱敏、合规与审计",
     "topic": "ai-access",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/156",
     "title": "模型输出不可控时的兜底：校验、人工复核、降级",
     "topic": "ai-review",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/157",
     "title": "Agent 的基本思路？工具调用的安全边界",
     "topic": "ai-execution",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/158",
     "title": "你认为 AI 适合银行哪些场景，不适合哪些",
     "topic": "ai-scope",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/159",
     "title": "设计手机银行转账系统：需求澄清、容量估算、核心流程、一致性、幂等、对账、风控、监控",
     "topic": "design-payment",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/160",
     "title": "设计统一支付网关",
     "topic": "design-payment",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/161",
     "title": "设计风控规则引擎",
     "topic": "design-config",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/162",
     "title": "设计理财产品抢购系统：热点库存、限流、异步下单、防超卖",
     "topic": "design-stock-id",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/163",
     "title": "通用追问：依赖挂了怎么办？数据量涨 10 倍怎么办？怎么灰度？怎么回滚？",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/164",
     "title": "对现有系统架构演进的评价与下一步方向；金融科技趋势（信创、云原生、AI）",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
   },
   {
     "key": "legacy/165",
     "title": "重做一遍项目，你会改什么",
     "topic": "design-capacity",
-    "contentSource": "topic"
+    "contentSource": "question"
+  },
+  {
+    "key": "java-language/51",
+    "title": "switch 模式匹配与传统的 instanceof 链有何不同？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "spring-basics/51",
+    "title": "Spring 6 的 RestClient 与 WebClient、RestTemplate 如何取舍？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "ai-basics/51",
+    "title": "多模态输入为什么不能只把图片转成文字再问模型？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "ai-basics/52",
+    "title": "上下文工程与提示词-tuning 的差别是什么？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "concurrency-advanced/51",
+    "title": "ScopedValue 为什么能替代一部分 ThreadLocal 场景？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "concurrency-advanced/52",
+    "title": "虚拟线程 pinning 的版本边界怎样说才准确？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "jvm-advanced/51",
+    "title": "分代 ZGC 默认启用后，Java 17 的 ZGC 结论还能照搬吗？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "spring-advanced/51",
+    "title": "声明式 HTTP Interface 相比手写 Feign 客户端解决什么问题？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "spring-advanced/52",
+    "title": "Spring AI 的 ChatClient 与直接调用模型 API 如何取舍？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "cache-messaging/51",
+    "title": "Kafka 4 的 KRaft 模式改变了哪些运维前提？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "ai-advanced/51",
+    "title": "MCP 工具接入为什么仍然需要权限边界与审计？",
+    "topic": "question-specific",
+    "contentSource": "question"
+  },
+  {
+    "key": "ai-production/51",
+    "title": "Agentic RAG 与普通 RAG 的工程边界在哪里？",
+    "topic": "question-specific",
+    "contentSource": "question"
   }
 ]

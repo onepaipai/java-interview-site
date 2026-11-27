@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,41 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:REQUIRES_NEW 的挂起模型
+### 第二步扩展① 机制:REQUIRES_NEW 的挂起模型
 
-挂起=把外层的 ConnectionHolder 从 ThreadLocal 解绑(连接仍被外层持有,不归还池)→从池取新连接给内层→内层独立提交/回滚→解绑内层→恢复外层(重新绑定)——挂起的代价=连接翻倍+外层锁持有时间被内层放大(spring-advanced 2 题的精确化)。
+- 挂起=把外层的 ConnectionHolder 从 ThreadLocal 解绑(连接仍被外层持有,不归还池)→从池取新连接给内层→内层独立提交/回滚→解绑内层→恢复外层(重新绑定)——挂起的代价=连接翻倍+外层锁持有时间被内层放大(spring-advanced 2 题的精确化)。
 
-### 反例:传播行为的两种事故
+### 第二步扩展② 反例:传播行为的两种事故
 
-事故一:REQUIRES_NEW 的连接互等死锁——外层锁了行 A,内层(REQUIRES_NEW)也要更新行 A→外层持锁等内层,内层等外层释放行 A→死锁(spring-advanced 2 题的"自己等自己");修复=内层不访问外层已锁定的行。事故二:rollback-only 异常——内层(REQUIRED)标记 rollback-only,外层提交时 UnexpectedRollbackException(内层吞了异常但标记了回滚);修复=内层异常要么传播要么 catch 后不标 rollback-only。
+- 事故一:REQUIRES_NEW 的连接互等死锁——外层锁了行 A,内层(REQUIRES_NEW)也要更新行 A→外层持锁等内层,内层等外层释放行 A→死锁(spring-advanced 2 题的"自己等自己")。
+- 修复=内层不访问外层已锁定的行。
+- 事故二:rollback-only 异常——内层(REQUIRED)标记 rollback-only,外层提交时 UnexpectedRollbackException(内层吞了异常但标记了回滚)。
+- 修复=内层异常要么传播要么 catch 后不标 rollback-only。
 
-### 取舍:传播行为的选型
+### 第二步扩展③ 取舍:传播行为的选型
 
-默认 REQUIRED(大多数场景);审计/通知→REQUIRES_NEW 或 AFTER_COMMIT 事件(第 91 题);批量导入部分回滚→NESTED(保存点);边界控制→MANDATORY/NEVER(强制约束);Spring Data Repository 的查询→SUPPORTS(可事务可不事务)。
+- 默认 REQUIRED(大多数场景)。
+- 审计/通知→REQUIRES_NEW 或 AFTER_COMMIT 事件(第 91 题)。
+- 批量导入部分回滚→NESTED(保存点)。
+- 边界控制→MANDATORY/NEVER(强制约束)。
+- Spring Data Repository 的查询→SUPPORTS(可事务可不事务)。
 
 ## 案例
 
-### 验证:传播行为的走查核对
+### 第三步发散·验证与推演 验证:传播行为的走查核对
 
-验证:spring-advanced 2 题实验(计数 DataSource:REQUIRED=1,REQUIRES_NEW=2)+3 题实验(NESTED 保存点:[1]:[2] 外层保住)+4 题实验(rollback-only:true:0 双行全回滚)——三组实测固化传播行为;第 19 题 spring-advanced 安全上下文(DelegatingSecurityContextCallable)。验证:传播行为断言可程序化(事务边界日志)。
+- 验证:spring-advanced 2 题实验(计数 DataSource:REQUIRED=1,REQUIRES_NEW=2)+3 题实验(NESTED 保存点:[1]:[2] 外层保住)+4 题实验(rollback-only:true:0 双行全回滚)——三组实测固化传播行为。
+- 第 19 题 spring-advanced 安全上下文(DelegatingSecurityContextCallable)。
+- 验证:传播行为断言可程序化(事务边界日志)。
 
-### 追问链:传播三刀
+### 第三步发散·追问扩展 追问链:传播三刀
 
-一刀:"REQUIRES_NEW 内层访问外层未提交数据?"——另一个连接看不到未提交数据(隔离级别)→读到旧值或锁等待——"看不到自己刚写的数"是 REQUIRES_NEW 的常见坑(spring-advanced 2 题)。二刀:"NESTED 与保存点?"——DataSourceTransactionManager 支持 JDBC 保存点;JPATransactionManager 不支持(用 REQUIRES_NEW 替代)——事务管理器的实现决定 NESTED 是否可用。三刀:"传播与代理?"——传播行为由 TransactionInterceptor 根据注解读取并传给 PlatformTransactionManager——自调用绕过代理(第 87 题)→传播行为也不生效。
+- **Q1：REQUIRES_NEW 内层访问外层未提交数据?**
+  - 答：另一个连接看不到未提交数据(隔离级别)→读到旧值或锁等待——"看不到自己刚写的数"是 REQUIRES_NEW 的常见坑(spring-advanced 2 题)。
+- **Q2：NESTED 与保存点?**
+  - 答：DataSourceTransactionManager 支持 JDBC 保存点;JPATransactionManager 不支持(用 REQUIRES_NEW 替代)——事务管理器的实现决定 NESTED 是否可用。
+- **Q3：传播与代理?**
+  - 答：传播行为由 TransactionInterceptor 根据注解读取并传给 PlatformTransactionManager——自调用绕过代理(第 87 题)→传播行为也不生效。
 
 ## 总结点
 

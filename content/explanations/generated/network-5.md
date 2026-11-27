@@ -20,31 +20,42 @@
 
 ## 参考分析
 
-### 机制:两条队列的生命周期
+### 第二步扩展① 机制:两条队列的生命周期
 
-SYN 到达→半连接队列(分配 cookie 或表项)→ACK 到达→校验通过移入全连接队列→accept() 取走。全连接队列打满的行为取决于 tcp_abort_on_overflow:关(默认)静默丢 ACK 客户端重传、开(1)回 RST——前者表现为"连接建立了但第一笔请求丢失重试",更难排查。
+- SYN 到达→半连接队列(分配 cookie 或表项)→ACK 到达→校验通过移入全连接队列→accept() 取走。
+- 全连接队列打满的行为取决于 tcp_abort_on_overflow:关(默认)静默丢 ACK 客户端重传、开(1)回 RST——前者表现为"连接建立了但第一笔请求丢失重试",更难排查。
 
-### 反例:只看一个队列的误判
+### 第二步扩展② 反例:只看一个队列的误判
 
-误判一:只看 CPU 与线程池——全连接打满时 CPU 空闲、线程池有空位,但 accept 线程阻塞在慢任务上没人取连接,加机器无效。误判二:把 syncookies 触发当攻击——偶发 SYN 突发触发 cookie 模式,性能下降被误报为 DDoS。两条的正解:两个队列分别监控(SYN_RCVD 计数/Recv-Q/溢出计数)。
+- 误判一:只看 CPU 与线程池——全连接打满时 CPU 空闲、线程池有空位,但 accept 线程阻塞在慢任务上没人取连接,加机器无效。
+- 误判二:把 syncookies 触发当攻击——偶发 SYN 突发触发 cookie 模式,性能下降被误报为 DDoS。
+- 两条的正解:两个队列分别监控(SYN_RCVD 计数/Recv-Q/溢出计数)。
 
-### 取舍:队列长度的权衡
+### 第二步扩展③ 取舍:队列长度的权衡
 
-backlog 调大:抗瞬时突发,但掩盖 accept 线程慢的问题且内存占用增;调小:快速暴露应用瓶颈但突发丢连接。经验:backlog 与 accept 线程吞吐匹配(突发峰值×平均 accept 延迟),同时监控溢出计数——队列是缓冲不是解药,accept 速度才是。
+- backlog 调大:抗瞬时突发,但掩盖 accept 线程慢的问题且内存占用增。
+- 调小:快速暴露应用瓶颈但突发丢连接。
+- 经验:backlog 与 accept 线程吞吐匹配(突发峰值×平均 accept 延迟),同时监控溢出计数——队列是缓冲不是解药,accept 速度才是。
 
-### 排查:队列观察的命令链
+### 第二步扩展④ 排查:队列观察的命令链
 
-三步链:一,ss -lnt 看 Listen 态的 Recv-Q/Send-Q——Recv-Q=已握手未 accept 的连接数(全连接队列水位),上限即 backlog;二,netstat -s 按关键字看累计溢出计数(listen queue overflow/SYN overflow,历史漏接的直接证据);三,sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog 看内核上限(应用 backlog 受 somaxconn 截断)——"现在多少/历史溢了多少/上限多少"三问分别对应三个命令,排查按序对照。
+- 三步链:一,ss -lnt 看 Listen 态的 Recv-Q/Send-Q——Recv-Q=已握手未 accept 的连接数(全连接队列水位),上限即 backlog。
+- 二,netstat -s 按关键字看累计溢出计数(listen queue overflow/SYN overflow,历史漏接的直接证据)。
+- 三,sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog 看内核上限(应用 backlog 受 somaxconn 截断)——"现在多少/历史溢了多少/上限多少"三问分别对应三个命令,排查按序对照。
 
 ## 案例
 
-### 验证:队列异常形态的推演核对
+### 第三步发散·验证与推演 验证:队列异常形态的推演核对
 
-推演:本机 N2 实验验证了连接状态机(TIME_WAIT=30/CLOSE_WAIT=1)与 netstat 观察路径;队列维度按 RFC 793 与内核行为推演——半连接打满丢 SYN 表现为 connect 超时(N3 的 2019ms 形态),全连接打满丢 ACK 表现为首请求 reset;验证:两种失败形态可由异常类型与 netstat 计数区分,处置方向不同成立。
+- 推演:本机 N2 实验验证了连接状态机(TIME_WAIT=30/CLOSE_WAIT=1)与 netstat 观察路径。
+- 队列维度按 RFC 793 与内核行为推演——半连接打满丢 SYN 表现为 connect 超时(N3 的 2019ms 形态),全连接打满丢 ACK 表现为首请求 reset。
+- 验证:两种失败形态可由异常类型与 netstat 计数区分,处置方向不同成立。
 
-### 追问链:队列三刀
+### 第三步发散·发散要点 追问链:队列三刀
 
-一刀:syncookies 的代价——无状态防洪水,但牺牲 TCP 选项(窗口缩放等),触发即降级,要监控触发率。二刀:accept 与 epoll 的关系——accept 也是事件,Reactor 模型里由事件循环统一调度,accept 慢同样拖垮 IO 线程(见 Q28)。三刀:容器化下的观察陷阱——宿主机 netstat 看到的是所有容器,namespace 隔离后要在容器内观察,且 backlog 参数随容器 net namespace 各自生效。
+- **追问①**：syncookies 的代价——无状态防洪水,但牺牲 TCP 选项(窗口缩放等),触发即降级,要监控触发率
+- **追问②**：accept 与 epoll 的关系——accept 也是事件,Reactor 模型里由事件循环统一调度,accept 慢同样拖垮 IO 线程(见 Q28)
+- **追问③**：容器化下的观察陷阱——宿主机 netstat 看到的是所有容器,namespace 隔离后要在容器内观察,且 backlog 参数随容器 net namespace 各自生效
 
 ## 总结点
 

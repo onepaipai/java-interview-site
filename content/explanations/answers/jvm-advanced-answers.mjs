@@ -1,7 +1,7 @@
 // JVM 进阶 50 题 · v2 深度标准(2026-11-07)· 50 题全量
 // 证据基准:JDK 17.0.17 HotSpot 本机实测(Windows x64,2026-11-07),实验程序与日志在 F:\tmp-jvma-exp。
 // 未实测的推演一律写明"推演";版本边界注明适用 JDK。口诀服从准确性:先有钩子,后有机制短语。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const jvms2 = 'https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html';
 const jvms5 = 'https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html';
 const gctun = 'https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html';
@@ -207,7 +207,7 @@ export default {
       block('实证:分配剖析的最小闭环', '命令与输出(Java 17.0.17):\n```\njava -XX:StartFlightRecording=duration=8s,filename=probe2.jfr,settings=profile ...\njfr summary probe2.jfr\n  jdk.ObjectAllocationSample  120\n```\n配合 -Xlog:gc* 反推速率:每次 young GC 的堆迁移量(如 25M->5M)与间隔可得 MB/s。验证:对本机负载,速率与每轮分配字节数线性吻合;生产操作时先取两份(发布前后)再对比归一化速率,避免流量误判。'),
       block('追问链:分配定位三刀', '一刀:"为什么不直接上堆转储?"——堆转储是瞬时快照且 STW 长秒级,分配热点是速率问题,采样剖析更贴合;快照留给泄漏排查。二刀:"采样偏置会不会误导?"——会,ObjectAllocationSample 偏向大对象,小而多的对象被欠采样;用 jmap -histo(全量)与 JFR(带栈)交叉,结论才稳。三刀:"速率多高算高?"——没有绝对阈值,与堆、回收器、SLO 相关;实用判据是"速率变化率"——单请求分配字节环比突增即值得立案,绝对值交给容量规划。'),
     ],
-    ['速率除以流量,归一才可比', 'JFR 采样看栈,直方图看面', '修日志改循环拆大对象,逐项验证'], [api('java/lang/instrument/package-summary'), jdksrc('share/prims/jvm.cpp')],
+    ['速率除以流量,归一才可比', 'JFR 采样看栈,直方图看面', '修日志改循环拆大对象,逐项验证'], [api('java/lang/instrument/package-summary'), jfrman],
   ),
 
   'jvm-advanced/11': deep(
@@ -408,12 +408,12 @@ export default {
     [
       '先量化再看因:开 -Xlog:safepoint+stats 看每行 sync 列,本机 17.0.17 上 6 次 Full GC 的 sync 全部不超过 67 微秒。',
       '旧结论要按版本讲:长计数循环卡安全点是老教材经典,实测 17.0.17 即使显式关掉 UseCountedLoopSafepoints 与 LoopStripMiningIter,sync 仍是微秒级,防护比旧结论强。',
-      '耗时长的嫌疑名单:JNI 调用中线程、大数组的类初始化(初始化锁)、阻塞 IO 返回前的线程——用线程栈快照与 JFR 逐项排除(JDK 17 无偏向锁,JEP 374 已在 15 移除,不在嫌疑之列)。',
+      '耗时长的嫌疑名单:JNI 调用中线程、大数组的类初始化(初始化锁)、阻塞 IO 返回前的线程——用线程栈快照与 JFR 逐项排除(JDK 17 默认无偏向锁,JEP 374 在 15 弃用并默认禁用（命令行仍可开启）,默认配置下不在嫌疑之列)。',
     ],
     [
       block('机制:安全点的进入协议与 sync 时间的含义', 'VM 操作(如 GC)发起时,请求方把全局轮询页置脏,各线程在轮询点(poll)自陷;sync 列统计从发起到全部线程停下的时间。谁在无 poll 的长代码里跑,谁就拖延全员。JDK 10 起 x86 上默认 UseCountedLoopSafepoints 加 LoopStripMiningIter=1000,给长计数循环加条带化 poll——这正是实测微秒级 sync 的原因。源码 safepoint.cpp 管理 VM 操作队列与超时(-XX:SafetyPointTimeoutMillis 相关告警)。'),
       block('反例:被推翻的"大循环卡 GC"教学', '本机实验(2e9/1e10 次计数循环,期间 6 次 System.gc):\n```\n默认参数:              Maximum sync time 67400 ns\n-XX:LoopStripMiningIter=0: 38600 ns\n-XX:-UseCountedLoopSafepoints -XX:LoopStripMiningIter=0: 58700 ns\n```\n三组全部微秒级,循环 100 亿次也拖不住 GC。若按旧结论去"修复长循环",方向就错了;17 上排查 sync 长要转向 JNI、锁撤销、阻塞恢复这些名单,而不是先怀疑循环。这也演示了口径:任何"经典结论"都要在当前 JDK 上复验。'),
-      block('取舍:排查的日志与工具组合', '第一步 -Xlog:safepoint+stats=info 常态化(开销低);sync 长时看该行 initial_running 与 threads 列,定位"谁没停";jstack 连拍看可疑线程栈(JDK 17 无偏向锁,JEP 374 在 15 移除——不存在撤销嫌疑项)。生产上把"Maximum sync time"纳入 GC 健康面板,阈值设毫秒级,超限再深查——常态微秒、异常毫秒,分界清晰。'),
+      block('取舍:排查的日志与工具组合', '第一步 -Xlog:safepoint+stats=info 常态化(开销低);sync 长时看该行 initial_running 与 threads 列,定位"谁没停";jstack 连拍看可疑线程栈(JDK 17 默认无偏向锁,JEP 374 在 15 弃用并默认禁用——默认配置下不存在撤销嫌疑项)。生产上把"Maximum sync time"纳入 GC 健康面板,阈值设毫秒级,超限再深查——常态微秒、异常毫秒,分界清晰。'),
     ],
     [
       block('实证:三组对照的完整数字', '命令与输出(Java 17.0.17,SafepointExp:后台线程跑巨型计数循环,主线程连续 6 次 System.gc):\n```\njava -Xlog:safepoint+stats=info SafepointExp\n  [0.364s] Maximum sync time 67400 ns\njava -XX:LoopStripMiningIter=0 ...\n  [1.137s] Maximum sync time 38600 ns\njava -XX:-UseCountedLoopSafepoints -XX:LoopStripMiningIter=0 ...\n  [2.311s] Maximum sync time 58700 ns\n```\n每行 G1CollectFull 的 sync 列 6.5-58.7 微秒。验证:三组差异在防护开关,结果同量级,证明 17 的防护不依赖单点开关;旧结论的适用版本上限由此划清。'),
@@ -744,7 +744,7 @@ export default {
       block('实证:代理类的生成与卸载对照', '命令与输出(Java 17.0.17):\n```\n保活:GC.class_histogram -> jdk.proxy1.$Proxy0..199 共 200 个类,Class 总实例 2958\n不保活:200 个 $Proxy 类从直方图消失\n```\n验证:两次直方图差量=200,代理类随保活集合生灭;推演到生产:组合空间收敛后类数量上界可控,注销链路让下线租户的类真正卸载(Metaspace 回落验证)。'),
       block('追问链:动态类三刀', '一刀:"哪些框架在悄悄生成类?"——Spring AOP(CGLIB/代理)、MyBatis mapper、脚本引擎(Groovy/JS)、JSON 库的反射加速器;每类都有自己的缓存 key 设计,review 时查"key 是否无界"。二刀:"类数量多少算多?"——无绝对值,看增速与卸载:常态服务类数量应在启动后趋稳(几千到几万),持续上升即动态生成失控;与租户/规则数对齐的增长才是健康。三刀:"和 Lambda 类一样吗?"——Lambda 用 LambdaMetafactory 生成隐藏类(17 起 hidden class,JEP 371),同样进元空间、同样按使用点画像缓存;排查方法相同,直方图差量是通用入口。'),
     ],
-    ['组合定上界,引用定生死', '类随加载器整族生灭', '租户下线要注销,元空间才回头'], [jep(371), jdksrc('java.base/share/classes/java/lang/reflect/Proxy.java')],
+    ['组合定上界,引用定生死', '类随加载器整族生灭', '租户下线要注销,元空间才回头'], [jep(371), jvms2],
   ),
   'jvm-advanced/39': deep(
     '如何避免诊断命令本身扩大事故？',
@@ -928,7 +928,7 @@ export default {
       '往下走漏斗:锁竞争与线程池饱和(等待事件)、下游慢(链路追踪超时分布)、宿主层(CPU 限流/steal/页回收)——每层有独立证据,别靠猜。',
     ],
     [
-      block('机制:卡顿归因的四层漏斗', '第一层 JVM 停顿:GC 暂停、安全点等待(safepoint 日志)、偏向锁撤销(17 已无偏置锁)、类加载与 JIT 队列——JFR 时间线可见。第二层应用并发:锁竞争(JavaMonitorEnter)、线程池排队(ThreadPark 频度与池水位)、连接池等待。第三层依赖与 IO:下游延迟、DNS/连接建立、磁盘 IO。第四层宿主:CPU 限流(throttled 统计)、CPU steal(虚拟化)、内存回收与 swap。漏斗顺序按"证据获取成本"排列,上层便宜先查。'),
+      block('机制:卡顿归因的四层漏斗', '第一层 JVM 停顿:GC 暂停、安全点等待(safepoint 日志)、偏向锁撤销(17 默认无偏置锁)、类加载与 JIT 队列——JFR 时间线可见。第二层应用并发:锁竞争(JavaMonitorEnter)、线程池排队(ThreadPark 频度与池水位)、连接池等待。第三层依赖与 IO:下游延迟、DNS/连接建立、磁盘 IO。第四层宿主:CPU 限流(throttled 统计)、CPU steal(虚拟化)、内存回收与 swap。漏斗顺序按"证据获取成本"排列,上层便宜先查。'),
       block('反例:被"GC 正常"带偏的两小时', '接入层卡顿,值班反复看 GC 日志两小时(确实干净)。真正原因:某配置热更触发的全量类加载持锁,请求线程排队在类加载锁上——JFR 的 JavaMonitorEnter 事件 10 分钟就能定位。教训:GC 干洁只是排除了一层,卡顿的证据面还有四层;JFR 常开(第 22 题)时,10 分钟与 2 小时的差别就是有没有时间线。'),
       block('取舍:排查的记录与升级规则', '规则:每层查完记录"证据与结论"再下一层(安全点日志、JFR 摘要、链路追踪、宿主指标四份材料);两层无果升级二线(带齐材料),避免单人反复横跳。常态化:JFR default 常开、safepoint 日志常开、宿主 throttled 指标进监控——三层证据提前就位,卡顿案变成对齐时间戳的功课。'),
     ],
@@ -975,6 +975,26 @@ export default {
       block('追问链:报告三刀', '一刀:"生产报告和实验报告差在哪?"——生产报告多两项:业务口径(真实流量下的分位与错误率)与成本口径(容器配额、机器数);实验数据只支撑机制归因,生产决策要业务数字。二刀:"多重收益怎么排序?"——按业务指标改善幅度乘置信度排序,机制上未归因的收益降权;报告结论区不超过三条,长尾进附录。三刀:"怎么防止报告造假?"——命令可复跑加原始日志归档加抽查复现;数据造假的成本应高于收益,工具化采集(脚本直接生成报告附原始文件)是治理手段。'),
     ],
     ['命令可复跑,数字有出处', '收益要指认,存疑要标注', '事前定标准,事后只判定'], [jfrman, jcmdman, g1tun],
+  ),
+
+  'jvm-advanced/51': deep(
+    '分代 ZGC 默认启用后，Java 17 的 ZGC 结论还能照搬吗？',
+    '容量规划沙盘:团队在 JDK 17 上测得 ZGC 的分配停顿与 CPU 曲线，准备升级 JDK 23+；需要判断分代 ZGC 成为默认模式后哪些结论失效。',
+    [
+      'JDK 17 的 ZGC 是单代实现，每次并发周期按全堆存活集工作；JDK 21 的 JEP 439 引入分代 ZGC，JDK 23 的 JEP 474 让它成为默认模式，JDK 24 的 JEP 490 才移除单代模式。',
+      '分代后按对象存活特征分别回收，短命对象的处理成本下降；JDK 17 上"ZGC 不分代、周期随存活集增大"的瓶颈描述不能直接套用到新版本。',
+      '升级评估要重测:默认堆布局、并发线程 CPU、分配停顿与长尾延迟都变化；报告须标注 JDK 版本和是否显式指定分代模式。',
+    ],
+    [
+      block('机制:分代改变了哪条成本曲线', '单代 ZGC 用染色指针和读屏障做并发标记搬迁，暂停不随堆大小线性增长，但每个周期要处理全堆存活对象；常驻存活集大时周期长、CPU 开销明显。分代 ZGC 把对象按年龄分开，年轻对象更快回收，长命对象少被反复扫描，降低分配停顿并改善吞吐。类比仓库盘点:全仓盘点每次都要走遍所有货架（单代）；把高频周转区单独盘点，剩下慢慢盘（分代）—— zones 变了，成本模型也变。'),
+      block('边界:版本链不要压缩成一句话', 'JDK 17 单代；21 通过 JEP 439 提供分代 ZGC（需开关）；23 通过 JEP 474 把分代设为默认；24 通过 JEP 490 移除单代模式。把"ZGC 不分代"当作永恒结论是版本错误；把"JDK 21 起默认分代"也记错——默认是 JDK 23，单代彻底消失是 JDK 24。回答时把这条版本链说清楚。'),
+      block('取舍:评估迁移的操作面', '先固定负载与堆大小，再在 17 与 23+ 上分别用同一套 GC 日志指标对比:分配停顿、并发周期时长、CPU 占用、p99。若结论用于生产，还要按目标应用的存活率和分配速率重测；教学模型不能替代压测。'),
+    ],
+    [
+      block('验证:升级对照的断言组', '教学验证:同一压测脚本分别在 JDK 17（单代 ZGC）与 JDK 23+（默认分代 ZGC）运行，记录 allocation stall 次数、并发周期时长和 CPU 曲线；预期高频短命负载下分代模式的分配停顿下降。该对照是验证设计，本项目基线 Java 17 未执行该双版本实验。'),
+      block('追问:JDK 21 要不要显式开启', 'JDK 21 可用 -XX:+UseGenerationalZGC 开启分代；JDK 23 起默认就是分代，JDK 24 起单代模式不再可用。讨论参数前先问目标版本，避免把 21 的开关写法套到 24。'),
+    ],
+    ['17 单代，21 可选，23 默认分代', '短命快回收，成本曲线重画', '升级重测 GC 日志，不搬旧结论'], ['https://openjdk.org/jeps/439', 'https://openjdk.org/jeps/474', 'https://openjdk.org/jeps/490'],
   ),
 
 };

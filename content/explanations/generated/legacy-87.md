@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,43 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:代理的两层对象
+### 第二步扩展① 机制:代理的两层对象
 
-Spring 容器返回的是代理对象(内部持有 target 引用)——外部调用=经过代理(拦截器先执行再调 target);自调用=在 target 内部直接调 this.method()(this=target,不经代理)——两层对象(代理+目标)是理解自调用失效的关键;AopContext.currentProxy()(exposeProxy=true)可获取代理引用解决。
+- Spring 容器返回的是代理对象(内部持有 target 引用)——外部调用=经过代理(拦截器先执行再调 target)。
+- 自调用=在 target 内部直接调 this.method()(this=target,不经代理)——两层对象(代理+目标)是理解自调用失效的关键。
+- AopContext.currentProxy()(exposeProxy=true)可获取代理引用解决。
 
-### 反例:代理的两种事故
+### 第二步扩展② 反例:代理的两种事故
 
-事故一:@Transactional 方法自调用——事务失效(spring-advanced 1 题实测:生效=0);修复=拆 bean/注入自身代理/AopContext.currentProxy/TransactionTemplate。事故二:CGLIB 代理读字段——代理对象的字段全 null(字段在 target);修复=经 target 读字段(不在代理上读)。
+- 事故一:@Transactional 方法自调用——事务失效(spring-advanced 1 题实测:生效=0)。
+- 修复=拆 bean/注入自身代理/AopContext.currentProxy/TransactionTemplate。
+- 事故二:CGLIB 代理读字段——代理对象的字段全 null(字段在 target)。
+- 修复=经 target 读字段(不在代理上读)。
 
-### 取舍:代理方式的选型
+### 第二步扩展③ 取舍:代理方式的选型
 
-JDK 代理:有接口+性能略优(反射调用);CGLIB:无接口或 proxyTargetClass=true(统一代理方式)+final 方法失效;Boot 默认 CGLIB(spring.aop.proxy-target-class=true)——统一代理方式避免"有接口和没接口的行为差异"(第 10 题 spring-basics)。
+- JDK 代理:有接口+性能略优(反射调用)。
+- CGLIB:无接口或 proxyTargetClass=true(统一代理方式)+final 方法失效。
+- Boot 默认 CGLIB(spring.aop.proxy-target-class=true)——统一代理方式避免"有接口和没接口的行为差异"(第 10 题 spring-basics)。
 
 ## 案例
 
-### 验证:代理的走查核对
+### 第三步发散·验证与推演 验证:代理的走查核对
 
-验证:spring-basics 9 题真值(ProxyBoundaryExample:proxy.run() intercepted=1,target.run() intercepted=0,累计 1:2);spring-advanced 1 题(自调用事务生效=0,代理调用=1);spring-advanced 19 题(代理字段全 null,经 target 读正确);类名断言(getClass 含 CGLIB/$Proxy)。验证:代理的断言可程序化(真值测试持续执行)。
+- 验证:spring-basics 9 题真值(ProxyBoundaryExample:proxy.run() intercepted=1,target.run() intercepted=0,累计 1:2)。
+- spring-advanced 1 题(自调用事务生效=0,代理调用=1)。
+- spring-advanced 19 题(代理字段全 null,经 target 读正确)。
+- 类名断言(getClass 含 CGLIB/$Proxy)。
+- 验证:代理的断言可程序化(真值测试持续执行)。
 
-### 追问链:代理三刀
+### 第三步发散·追问扩展 追问链:代理三刀
 
-一刀:"CGLIB 的 final 方法?"——CGLIB 无法覆写 final 方法→@Transactional 标在 final 方法→事务失效(静默,无报错);修复=final 方法不加事务注解或去掉 final(spring-basics 10 题)。二刀:"Spring 的代理创建时机?"——AbstractAutoProxyCreator 在初始化后(postProcessAfterInitialization)包裹;循环引用时 getEarlyBeanReference 提前创建(第 8 题 spring-basics 三级缓存)。三刀:"代理与序列化?"——CGLIB 代理不可序列化(含合成字段)——返回 DTO 而非代理实体(spring-basics 10 题)。
+- **Q1：CGLIB 的 final 方法?**
+  - 答：CGLIB 无法覆写 final 方法→@Transactional 标在 final 方法→事务失效(静默,无报错);修复=final 方法不加事务注解或去掉 final(spring-basics 10 题)。
+- **Q2：Spring 的代理创建时机?**
+  - 答：AbstractAutoProxyCreator 在初始化后(postProcessAfterInitialization)包裹;循环引用时 getEarlyBeanReference 提前创建(第 8 题 spring-basics 三级缓存)。
+- **Q3：代理与序列化?**
+  - 答：CGLIB 代理不可序列化(含合成字段)——返回 DTO 而非代理实体(spring-basics 10 题)。
 
 ## 总结点
 

@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 GC 指南 · 2](https://docs.oracle.com/en/java/javase/17/gctuning/collectors.html)
 
 </details>
 
@@ -20,27 +20,38 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:栈与堆的物理位置
+### 第二步扩展① 机制:栈与堆的物理位置
 
-栈=线程私有(每线程独立,大小 -Xss);堆=线程共享(全局,大小 -Xmx);栈总量=线程数×栈大小(第 11 题实测:4000/20000 线程均 2s 建完——保留≠提交)。
+- 栈=线程私有(每线程独立,大小 -Xss)。
+- 堆=线程共享(全局,大小 -Xmx)。
+- 栈总量=线程数×栈大小(第 11 题实测:4000/20000 线程均 2s 建完——保留≠提交)。
 
-### 反例:OOM 混淆的两种事故
+### 第二步扩展② 反例:OOM 混淆的两种事故
 
-事故一:SOE 误判为堆 OOM——看到 OutOfMemoryError 就调 -Xmx(实际是递归);修复=看错误子类型。事故二:线程 OOM 误调 -Xmx——unable to create native thread(线程栈空间不足)调堆无效;修复=区分 OOM 子类型。
+- 事故一:SOE 误判为堆 OOM——看到 OutOfMemoryError 就调 -Xmx(实际是递归)。
+- 修复=看错误子类型。
+- 事故二:线程 OOM 误调 -Xmx——unable to create native thread(线程栈空间不足)调堆无效。
+- 修复=区分 OOM 子类型。
 
-### 取舍:-Xss 的设置
+### 第二步扩展③ 取舍:-Xss 的设置
 
-大=递归深但总线程少(内存=线程数×栈大小);小=可创建更多线程但递归受限——默认 512K-1M 足够绝大多数场景;深递归业务→改迭代或增大 -Xss,同时监控线程总量。
+- 大=递归深但总线程少(内存=线程数×栈大小)。
+- 小=可创建更多线程但递归受限——默认 512K-1M 足够绝大多数场景。
+- 深递归业务→改迭代或增大 -Xss,同时监控线程总量。
 
 ## 案例
 
-### 验证:两种 OOM 的走查核对
+### 第三步发散·验证与推演 验证:两种 OOM 的走查核对
 
-验证:SOE 复现(无限递归→stack trace 重复帧);Heap OOM 复现(无限 new→OOM: heap space,heap dump);线程 OOM 复现(大量线程→OOM: native thread)——三种 OOM 形态与排查路径完全不同(第 32 题 JVM)。
+- 验证:SOE 复现(无限递归→stack trace 重复帧)。
+- Heap OOM 复现(无限 new→OOM: heap space,heap dump)。
+- 线程 OOM 复现(大量线程→OOM: native thread)——三种 OOM 形态与排查路径完全不同(第 32 题 JVM)。
 
-### 追问链:OOM 三刀
+### 第三步发散·发散要点 追问链:OOM 三刀
 
-一刀:OOM 子类型=heap/Metaspace/native thread/direct buffer——各走不同排查路径。二刀:-Xss 默认=512K-1M(Linux x64 1MB);大部分方法栈帧<1KB。三刀:SOE 可 catch(Throwable 子类)但栈已满,再调方法可能再 SOE——catch SOE 通常无意义(修代码)。
+- **追问①·OOM 子类型**：heap/Metaspace/native thread/direct buffer——各走不同排查路径
+- **追问②·-Xss 默认**：512K-1M(Linux x64 1MB);大部分方法栈帧<1KB
+- **追问③**：SOE 可 catch(Throwable 子类)但栈已满,再调方法可能再 SOE——catch SOE 通常无意义(修代码)
 
 ## 总结点
 

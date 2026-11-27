@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/ObjectInputStream.html)
 
@@ -19,27 +19,43 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:gadget 链与过滤器
+### 第二步扩展① 机制:gadget 链与过滤器
 
-gadget 链:类路径上的一组类(其 readObject/readResolve/等回调可被串成任意代码执行)——攻击者无需目标代码漏洞,组合 JDK/库的类即可(ObjectInputStream 的反序列化=调用 readObject=潜在代码执行)。过滤器:ObjectInputFilter(白名单类模式/深度限制/引用数限制)——JEP 290(9)的缓解;配置的粒度(全局/流级)与维护成本(新增类要更新白名单)。
+- gadget 链:类路径上的一组类(其 readObject/readResolve/等回调可被串成任意代码执行)——攻击者无需目标代码漏洞,组合 JDK/库的类即可(ObjectInputStream 的反序列化=调用 readObject=潜在代码执行)。
+- 过滤器:ObjectInputFilter(白名单类模式/深度限制/引用数限制)——JEP 290(9)的缓解。
+- 配置的粒度(全局/流级)与维护成本(新增类要更新白名单)。
 
-### 反例:序列化的三种事故
+### 第二步扩展② 反例:序列化的三种事故
 
-事故一,回调接口收序列化:渠道回调收 Java 序列化流(历史遗留)——反序列化 RCE(经典攻击)。事故二,缓存序列化:Redis 存 Java 序列化对象(JdkSerializer)——缓存数据被篡改(攻击面进缓存)。事故三,gadget 依赖:引入带 gadget 的库(commons-collections 旧版)——攻击面扩大(供应链,第 33 题)。三条的正解:不可信输入换数据格式+过滤兜底+依赖治理。
+- 事故一,回调接口收序列化:渠道回调收 Java 序列化流(历史遗留)——反序列化 RCE(经典攻击)。
+- 事故二,缓存序列化:Redis 存 Java 序列化对象(JdkSerializer)——缓存数据被篡改(攻击面进缓存)。
+- 事故三,gadget 依赖:引入带 gadget 的库(commons-collections 旧版)——攻击面扩大(供应链,第 33 题)。
+- 三条的正解:不可信输入换数据格式+过滤兜底+依赖治理。
 
-### 取舍:序列化的替代与迁移
+### 第二步扩展③ 取舍:序列化的替代与迁移
 
-替代:JSON(Jackson——校验+schema)+proto(二进制+schema 强制)——数据格式的选择(第 14 题)。迁移路径:内部序列化协议的双格式过渡(新格式并存+旧格式 deprecated,第 41 题);过滤器先行(立即缓解)+格式迁移(根治)。序列化的遗留价值:内部 RPC 的性能(Java 原生)与复杂对象图——遗留兼容的短期合理性+长期迁移的必然性。
+- 替代:JSON(Jackson——校验+schema)+proto(二进制+schema 强制)——数据格式的选择(第 14 题)。
+- 迁移路径:内部序列化协议的双格式过渡(新格式并存+旧格式 deprecated,第 41 题)。
+- 过滤器先行(立即缓解)+格式迁移(根治)。
+- 序列化的遗留价值:内部 RPC 的性能(Java 原生)与复杂对象图——遗留兼容的短期合理性+长期迁移的必然性。
 
 ## 案例
 
-### 验证:防御的断言组
+### 第三步发散·验证与推演 验证:防御的断言组
 
-验证:过滤器断言(非白名单类的反序列化被拒——ObjectInputFilter 实测);gadget 演练断言(ysoserial 类 payload 被过滤器拦截——攻击面验证);扫描断言(代码中 ObjectInputStream 的使用清单——全部标注可信边界)——三组让序列化防御可验证;ObjectInputStream 的引入审批(第 33 题供应链纪律)
+- 验证:过滤器断言(非白名单类的反序列化被拒——ObjectInputFilter 实测)。
+- gadget 演练断言(ysoserial 类 payload 被过滤器拦截——攻击面验证)。
+- 扫描断言(代码中 ObjectInputStream 的使用清单——全部标注可信边界)——三组让序列化防御可验证。
+- ObjectInputStream 的引入审批(第 33 题供应链纪律)
 
-### 追问链:序列化安全三刀
+### 第三步发散·追问扩展 追问链:序列化安全三刀
 
-一刀:"record 的序列化?"——record 反序列化走构造器(校验不可绕过,spring-advanced 9 题)——record 是序列化安全的结构改善。二刀:"Kryo/其他库?"——Kryo/Hessian 同有反序列化风险(各自的类注册机制缓解)——任何"反序列化执行代码"的格式都有攻击面——数据格式(JSON/proto)无执行语义是根本解。三刀:"序列化的密钥?"——序列化流的加密(传输保护)不影响反序列化漏洞(解密后仍执行)——加密≠安全(混淆了传输保护与输入安全)。
+- **Q1：record 的序列化?**
+  - 答：record 反序列化走构造器(校验不可绕过,spring-advanced 9 题)——record 是序列化安全的结构改善。
+- **Q2：Kryo/其他库?**
+  - 答：Kryo/Hessian 同有反序列化风险(各自的类注册机制缓解)——任何"反序列化执行代码"的格式都有攻击面——数据格式(JSON/proto)无执行语义是根本解。
+- **Q3：序列化的密钥?**
+  - 答：序列化流的加密(传输保护)不影响反序列化漏洞(解密后仍执行)——加密≠安全(混淆了传输保护与输入安全)。
 
 ## 总结点
 

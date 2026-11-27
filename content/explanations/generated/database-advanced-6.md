@@ -3,8 +3,8 @@
 
 MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
-- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/mysql-indexes.html.html)
-- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/explain-output.html.html)
+- [MySQL 8.4 参考 · 1](https://dev.mysql.com/doc/refman/8.4/en/mysql-indexes.html)
+- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/explain-output.html)
 
 </details>
 
@@ -20,27 +20,36 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
 ## 参考分析
 
-### 机制：三个成本项发生在流水线的不同工位
+### 第二步扩展① 机制：三个成本项发生在流水线的不同工位
 
-定位（索引树走多少层）→ 过滤（ICP 在引擎层省掉回表）→ 回表（取整行的随机 IO）→ 排序（filesort 的内存/磁盘成本）。类比快递分拣：分拣中心预筛（ICP）、按地址装车（排序）、到楼栋才开箱取件（回表）——每个工位的浪费叠加成总延迟，优化要按工位逐个看。
+- 定位（索引树走多少层）→ 过滤（ICP 在引擎层省掉回表）→ 回表（取整行的随机 IO）→ 排序（filesort 的内存/磁盘成本）。
+- 类比快递分拣：分拣中心预筛（ICP）、按地址装车（排序）、到楼栋才开箱取件（回表）——每个工位的浪费叠加成总延迟，优化要按工位逐个看。
 
-### 反例：覆盖优先把排序弄丢的现场
+### 第二步扩展② 反例：覆盖优先把排序弄丢的现场
 
-为覆盖 SELECT 列把 status 加到 (user_id, status, created_at) 前段，查询 WHERE user_id=? ORDER BY created_at：EXPLAIN 显示 Using index 但出现 filesort——status 插在中间破坏了 created_at 的连续有序。修正：调整为 (user_id, created_at, status)，排序恢复、覆盖保留。
+- 为覆盖 SELECT 列把 status 加到 (user_id, status, created_at) 前段，查询 WHERE user_id=? ORDER BY created_at：EXPLAIN 显示 Using index 但出现 filesort——status 插在中间破坏了 created_at 的连续有序。
+- 修正：调整为 (user_id, created_at, status)，排序恢复、覆盖保留。
 
-### 取舍：filesort 并非总是要消灭
+### 第二步扩展③ 取舍：filesort 并非总是要消灭
 
-当过滤后只剩几十行时，filesort 的内存排序成本远低于为此再建一个索引的写放大。决策表的核心是量级：定位行数 × 排序成本 vs 新索引的写成本。小结果集接受 filesort，大结果集才动索引。
+- 当过滤后只剩几十行时，filesort 的内存排序成本远低于为此再建一个索引的写放大。
+- 决策表的核心是量级：定位行数 × 排序成本 vs 新索引的写成本。
+- 小结果集接受 filesort，大结果集才动索引。
 
 ## 案例
 
-### 对照操作：同一查询的四种计划对照
+### 第三步发散·验证与推演 对照操作：同一查询的四种计划对照
 
-教学验证：调整索引顺序产生四种 EXPLAIN 组合（ICP+filesort、ICP 无 filesort、覆盖+filesort、覆盖无 filesort），记录 actual rows 与耗时。预期：最优组合随"过滤后行数"变化——数据摆出来，决策表就有了实证。实验可复跑。
+- 教学验证：调整索引顺序产生四种 EXPLAIN 组合（ICP+filesort、ICP 无 filesort、覆盖+filesort、覆盖无 filesort），记录 actual rows 与耗时。
+- 预期：最优组合随"过滤后行数"变化——数据摆出来，决策表就有了实证。
+- 实验可复跑。
 
-### 追问：ICP 到底省了什么
+### 第三步发散·追问① 追问：ICP 到底省了什么
 
-没有 ICP 时，索引只定位到 user_id 前缀，status 条件要回表后在服务器层判断——每条候选都回表；ICP 把 status 判断推到引擎层，先筛再回表。省的是"回表次数 × 随机 IO"，在复合索引的非前缀列上生效。理解工位才能解释为什么有时加了列索引反而显著变快。
+- 没有 ICP 时，索引只定位到 user_id 前缀，status 条件要回表后在服务器层判断——每条候选都回表。
+- ICP 把 status 判断推到引擎层，先筛再回表。
+- 省的是"回表次数 × 随机 IO"，在复合索引的非前缀列上生效。
+- 理解工位才能解释为什么有时加了列索引反而显著变快。
 
 ## 总结点
 

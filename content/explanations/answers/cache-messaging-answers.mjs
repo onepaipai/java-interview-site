@@ -84,7 +84,7 @@ export default {
       block('对照操作：三级识别的开销对照', '教学验证：同一热键环境分别用 --hotkeys、短时 monitor 采样、客户端 QPS 统计定位。预期：三者都能找到目标 key，开销（Redis CPU 增量）差异显著——hotkeys 零增量、monitor 数十个百分点。开销表写进运维手册，实验可复跑。'),
       block('追问：为什么客户端统计有时比 Redis 端更准', 'Redis 端看到的是"到达的命令"，客户端统计能关联到"哪个业务场景发起"——归因到业务代码才能治本（加缓存、改逻辑）。端上工具定位"哪个 key 热"，客户端定位"为什么热、从哪来"——两级配合，先端上后客户端。'),
     ],
-    ['分片先定位，键级再下钻', '扫描工具的 开销要小于问题', '拆分散负载，聚合管读侧'], [redisEvict, 'https://redis.io/docs/latest/operate/rs/clustering/'],
+    ['分片先定位，键级再下钻', '扫描工具的 开销要小于问题', '拆分散负载，聚合管读侧'], [redisEvict, 'https://redis.io/docs/latest/develop/use/keyspace/'],
   ),
   'cache-messaging/7': deep(
     'Redis 大键为什么影响延迟和运维？',
@@ -256,7 +256,7 @@ export default {
       block('对照操作：两种删除的现场区分', '教学验证：设置 TTL 的 key 到期后 EXISTS 为 0（过期删除）；打满内存后未设 TTL 的 key 消失（内存淘汰，allkeys-lru）。用 `INFO memory` 的 evicted_keys 计数区分两者——计数增长说明在内存淘汰，业务要警觉。实验可复跑。'),
       block('追问：为什么过期删除要用"惰性+定期"组合而不是纯定时', '纯定时需要为每个 key 维护精确定时器（百万级 key 的定时器开销巨大）；惰性（访问时检查）漏掉"再也没被访问的 key"，定期抽样补漏——组合以极低成本逼近全量及时清除。这个"成本与及时性折中"的设计思想，在第 5 题 TTL 抖动、第 3 题逻辑过期中反复出现。'),
     ],
-    ['保质期到点下架，货架满逼下架', 'evicted_keys 增长即警觉', '策略选择=选择失败方式'], [redisEvict, 'https://redis.io/docs/latest/develop/reference/expiration/'],
+    ['保质期到点下架，货架满逼下架', 'evicted_keys 增长即警觉', '策略选择=选择失败方式'], [redisEvict, 'https://redis.io/docs/latest/commands/expire/'],
   ),
   'cache-messaging/16': deep(
     '如何选择 Redis 淘汰策略？',
@@ -275,7 +275,7 @@ export default {
       block('对照操作：混用与拆分的淘汰对照', '教学验证：混用实例内存打满观察锁与计数器被逐（allkeys-lru）；拆出 noeviction 实例后打满时写失败告警而非锁丢失。两场景的故障形态对照可复跑——"丢什么"由策略决定，这决定了你收到的是哪种告警。'),
       block('追问：为什么 noeviction 的"写失败"反而可接受', '锁与计数器的写失败是显式失败：应用立刻知道（报错）并可重试或降级；静默丢失（被逐）是隐式失败：互斥失效、配额重置都无从察觉。显式失败优于隐式失败——这是关键数据不进可逐出实例的根本理由，与"宁可写失败也不静默丢"的第 48 题降级原则同构。'),
     ],
-    ['可丢进 LRU，不可丢进 noeviction', '混用实例的策略是单优先级', '拆实例是根治，监控 evicted_keys'], [redisEvict, 'https://redis.io/docs/latest/operate/rs/databases/configure/eviction-policy/'],
+    ['可丢进 LRU，不可丢进 noeviction', '混用实例的策略是单优先级', '拆实例是根治，监控 evicted_keys'], [redisEvict, 'https://redis.io/docs/latest/develop/reference/eviction/'],
   ),
   'cache-messaging/17': deep(
     'AOF 与 RDB 应怎样配合恢复目标？',
@@ -294,7 +294,7 @@ export default {
       block('对照操作：三种配置的丢失与恢复对照', '教学验证：同一写入负载下分别用 RDB-only、AOF everysec、混合持久化，kill -9 后恢复并统计丢失量与恢复耗时。预期：RDB 丢一个间隔、AOF 丢 ≤1 秒但恢复慢、混合版丢失同 AOF 且恢复接近 RDB。数字对照可复跑。'),
       block('追问：为什么"缓存实例"可以只开 RDB 甚至关闭持久化', '缓存数据可从数据库重建（第 3 题的回源），丢失的代价是"短暂的回源风暴"（配合第 3 题击穿治理可消化）；持久化开销（fork、磁盘 IO）纯属浪费。持久化配置跟着"数据可否重建"走——Redis 当主存（锁、计数）才需要 AOF 级别的完整性。'),
     ],
-    ['RDB 快照丢间隔，AOF 记账保完整', '混合文件：头快照尾日志', '可重建的缓存，持久化从简'], [redisEvict, 'https://redis.io/docs/latest/operate/management/persistence/'],
+    ['RDB 快照丢间隔，AOF 记账保完整', '混合文件：头快照尾日志', '可重建的缓存，持久化从简'], [redisEvict, 'https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/'],
   ),
   'cache-messaging/18': deep(
     'Redis Cluster 的槽与业务键如何关联？',
@@ -313,7 +313,7 @@ export default {
       block('对照操作：CROSSSLOT 与 hash tag 的对照', '教学验证：MSET key1 key2（跨槽报错）→ 改 {tag}key1 {tag}key2（成功）。再用 Lua 跨槽脚本验证失败、同槽成功。实验可复跑，把"槽边界=原子边界"变成亲手触发的错误。'),
       block('追问：为什么"每实例一个 slot 范围"比"客户端按业务分片"好', '客户端分片的映射在应用代码里（扩缩容要改代码重分片）；Cluster 的槽映射在数据层且支持在线迁移（扩容只搬槽不动代码）。业务无感的弹性是槽机制的核心价值——hash tag 与 MULTI-key 约束是为了原子性付出的最小代价。'),
     ],
-    ['槽是原子的物理边界', 'hash tag 粒度到原子操作组', '大粒度 tag 制造热点分片'], ['https://redis.io/docs/latest/develop/operate/oss_cluster/', 'https://redis.io/docs/latest/operate/legacy/cluster-spec/'],
+    ['槽是原子的物理边界', 'hash tag 粒度到原子操作组', '大粒度 tag 制造热点分片'], ['https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/', 'https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/'],
   ),
   'cache-messaging/19': deep(
     '缓存序列化协议升级如何兼容旧值？',
@@ -428,7 +428,7 @@ export default {
       block('对照操作：双写不一致的两种修复对照', '教学验证：注入"消息发送后本地事务失败"与"本地事务提交后进程崩溃"两个故障。预期：直接发送版分别出现空消息与丢消息；事务消息版回查后正确提交/回滚；outbox 版事件与业务同存亡。故障矩阵覆盖两个方向，实验可复跑。'),
       block('追问：为什么"本地事务成功后同步重试发送"不是完整方案', '同步重试能覆盖"进程存活期间的发送失败"，覆盖不了"提交后进程崩溃"——重试逻辑随进程消失。outbox/事务消息的本质是把"待发送"持久化到事务内，让任意后续进程都能接手——持久化是跨进程续传的前提。'),
     ],
-    ['半消息预占，回查定生死', 'outbox 先变数据，后变消息', '两者同本质：本地原子+可重试确认'], ['https://rocketmq.apache.org/docs/transactionExample/', kafkaDocs],
+    ['半消息预占，回查定生死', 'outbox 先变数据，后变消息', '两者同本质：本地原子+可重试确认'], ['https://rocketmq.apache.org/docs/', kafkaDocs],
   ),
   'cache-messaging/25': deep(
     'Kafka 分区内有序为什么不等于全局有序？',
@@ -675,7 +675,7 @@ export default {
       block('对照操作：停机与时钟回拨的注入验证', '教学验证：延迟取消订单任务，注入——进程重启（预期 broker 级不丢、内存级丢失）、时钟回拨 10 分钟（预期时钟依赖版提前取消，状态机版不受影响）。两组注入覆盖两大风险，实验可复跑。'),
       block('追问：为什么"created_at + 30 分钟"的扫表天然抗时钟回拨', '扫表判断的是"当前时间 − created_at ≥ 30 分钟"——created_at 是已持久化的历史值，时钟回拨 10 分钟只是让本轮扫描少匹配 10 分钟内的记录，下一轮补上；不会错误取消"还不该取消"的订单。绝对到期时刻（expire_at = now + 30min 存库）则会被回拨直接命中——存储"起点+时长"优于存储"终点"。'),
     ],
-    ['延迟状态谁保管，谁就负责可靠性', '扫表存起点加时长，天然抗回拨', '内存队列只加速，不保管'], ['https://rocketmq.apache.org/docs/delaymessage/', kafkaDocs],
+    ['延迟状态谁保管，谁就负责可靠性', '扫表存起点加时长，天然抗回拨', '内存队列只加速，不保管'], ['https://rocketmq.apache.org/docs/', kafkaDocs],
   ),
   'cache-messaging/39': deep(
     '如何实现消息追踪而不制造高基数监控？',
@@ -905,5 +905,25 @@ export default {
     ],
     ['层层深入的 why，不是组件列表', '归因个人不修复机制', '治理动作分层有验收'], [redisEvict, kafkaDocs],
   ),
+  'cache-messaging/51': deep(
+    'Kafka 4 的 KRaft 模式改变了哪些运维前提？',
+    '消息平台沙盘:团队从依赖 ZooKeeper 的旧集群迁到 Kafka 4，需要说明元数据管理变化对部署、控制器故障和监控的影响。',
+    [
+      'KRaft 用 Kafka 自身的 Raft 日志复制元数据，取代外部 ZooKeeper；Kafka 4 已不再支持 ZooKeeper 模式，部署拓扑从"Broker + ZooKeeper"变为"Broker/Controller 角色"。',
+      '元数据一致性从两套系统边界收敛到 Kafka 内部；控制器是多数派选举，部署时要保证投票节点数与故障域分布。',
+      '迁移不是改一个开关:版本兼容、角色规划、控制器仲裁、监控指标和客户端配置都要核对官方升级路径，教学推演不能冒充生产演练。',
+    ],
+    [
+      block('机制:元数据从外部搬到内部', '旧模式把分区、ISR、配置等元数据放 ZooKeeper，Broker 与 ZooKeeper 之间的一致性是两套系统的协作问题。KRaft 把元数据写成 Kafka 内部的复制日志，Controller 负责写入，其他节点跟随。类比办公室:以前档案室单独租（ZooKeeper），现在档案柜搬进办公楼并配了值班主管（Controller）——少了一次跨机构协调，但主管请假要有接班规则。'),
+      block('边界:控制器与法定人数', 'KRaft 依赖多数派:控制器故障后由投票节点选出新控制器，节点数应为奇数并跨故障域分布。把控制器和 Broker 全放同一可用区，等于把"多数派"押在同一个故障域上。迁移时还要看客户端与协议版本兼容，不能假设旧监控面板指标原样可用。'),
+      block('取舍:收益与迁移成本', '收益是减少一套外部依赖、简化部署与故障面；成本是角色规划、滚动升级顺序、元数据备份与恢复演练都要重做。评估回答要包含"为什么改、改了什么、如何验证"，而不是只背"Kafka 4 去掉 ZooKeeper"。'),
+    ],
+    [
+      block('验证:迁移清单的推演', '教学验证:在隔离环境按官方升级路径部署 KRaft 集群，模拟控制器宕机，观察新控制器选举耗时与生产/消费是否恢复；记录元数据备份与恢复步骤。该流程是验证设计，不代表本项目已执行 Kafka 4 迁移演练。'),
+      block('追问:ZooKeeper 知识还用学吗', 'Kafka 4 不再需要 ZooKeeper，但分布式一致性、法定人数、选举与脑裂防护的思想仍然适用；历史系统也可能仍在旧模式，迁移期间还会同时面对两套组件。回答应区分"框架依赖"与"底层原理"：前者随版本变化，后者是排查分布式故障的基本功。'),
+    ],
+    ['KRaft 把元数据收回 Kafka', '控制器多数派，故障域要分散', '迁移按官方路径，演练不算背结论'], ['https://kafka.apache.org/documentation/', 'https://kafka.apache.org/41/design/design/'],
+  ),
+
 };
 

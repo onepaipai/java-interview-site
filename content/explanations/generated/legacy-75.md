@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/collectors.html)
+- [原始研究论文 · 2](https://arxiv.org/abs/1603.09320)
 
 </details>
 
@@ -20,27 +20,39 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:ZGC 的染色指针与并发整理
+### 第二步扩展① 机制:ZGC 的染色指针与并发整理
 
-ZGC 用 64 位指针的高位存元数据(Marked0/Marked1/Remapped/Finalizable)——读屏障检查指针颜色,过期则在读时修正(自愈);并发整理不暂停应用(代价=读屏障内联+堆余量,第 7 题 jvm-advanced 实测:暂停亚毫秒但堆满时 Allocation Stall 59ms)。
+- ZGC 用 64 位指针的高位存元数据(Marked0/Marked1/Remapped/Finalizable)——读屏障检查指针颜色,过期则在读时修正(自愈)。
+- 并发整理不暂停应用(代价=读屏障内联+堆余量,第 7 题 jvm-advanced 实测:暂停亚毫秒但堆满时 Allocation Stall 59ms)。
 
-### 反例:GC 选型的两种事故
+### 第二步扩展② 反例:GC 选型的两种事故
 
-事故一:ZGC 用在小堆(256MB)——ZGC 的堆余量要求+读屏障开销在小堆上得不偿失(G1 更合适);修复=按堆大小+暂停要求选型。事故二:JDK 17 上期望分代 ZGC——JDK 17 的 ZGC 不分代(每次周期扫全堆);分代 ZGC 是 JDK 21 的 JEP 439——版本边界要先核对(第 7 题 jvm-advanced)。
+- 事故一:ZGC 用在小堆(256MB)——ZGC 的堆余量要求+读屏障开销在小堆上得不偿失(G1 更合适)。
+- 修复=按堆大小+暂停要求选型。
+- 事故二:JDK 17 上期望分代 ZGC——JDK 17 的 ZGC 不分代(每次周期扫全堆)。
+- 分代 ZGC 是 JDK 21 的 JEP 439——版本边界要先核对(第 7 题 jvm-advanced)。
 
-### 取舍:GC 选型的矩阵
+### 第二步扩展③ 取舍:GC 选型的矩阵
 
-堆大小(小/中/大/超大)×暂停要求(不敏感/<100ms/<10ms)×吞吐要求(高/中/低)——三维矩阵选回收器:Parallel(吞吐优,暂停差)/G1(平衡)/ZGC(暂停优,吞吐略损)——选型后用自己的负载实测(第 147 题压测),不按理论选。
+- 堆大小(小/中/大/超大)×暂停要求(不敏感/<100ms/<10ms)×吞吐要求(高/中/低)——三维矩阵选回收器:Parallel(吞吐优,暂停差)/G1(平衡)/ZGC(暂停优,吞吐略损)——选型后用自己的负载实测(第 147 题压测),不按理论选。
 
 ## 案例
 
-### 验证:GC 选型的走查核对
+### 第三步发散·验证与推演 验证:GC 选型的走查核对
 
-验证:本机对照实验(G1 vs ZGC 同负载:g1.log young 中位 2.948ms vs zgc.log Pause 0.005-0.017ms;ZGC Allocation Stall 59.822ms)——jvm-advanced 7/8 题的实测数据;选型决策=暂停分布+吞吐+内存三维对照(不是单指标)。验证:GC 对照的断言可程序化(GC 日志分析)。
+- 验证:本机对照实验(G1 vs ZGC 同负载:g1.log young 中位 2.948ms vs zgc.log Pause 0.005-0.017ms。
+- ZGC Allocation Stall 59.822ms)——jvm-advanced 7/8 题的实测数据。
+- 选型决策=暂停分布+吞吐+内存三维对照(不是单指标)。
+- 验证:GC 对照的断言可程序化(GC 日志分析)。
 
-### 追问链:GC 选型三刀
+### 第三步发散·追问扩展 追问链:GC 选型三刀
 
-一刀:"G1 到 ZGC 的迁移?"——参数变更(UseZGC)+行为差异(读屏障/不分代)+回归测试(同负载对照);第 8 题 jvm-advanced 的对照实验模板可复用。二刀:"Shenandoah 与 ZGC?"——两者都是并发整理(亚毫秒暂停);Shenandoah 用转发指针(Brooks pointer),ZGC 用染色指针;Shenandoah 由 Red Hat 维护,ZGC 由 Oracle——生态与支持的 JDK 版本不同。三刀:"GC 日志怎么读?"——-Xlog:gc*(G1)/-Xlog:gc(ZGC)→分析工具(GCEasy/GCViewer)——关键指标:暂停分布(P99/P999)/吞吐(GC 时间占比)/频率(每分钟次数)/特殊事件(Full/Exhausted/Stall)。
+- **Q1：G1 到 ZGC 的迁移?**
+  - 答：参数变更(UseZGC)+行为差异(读屏障/不分代)+回归测试(同负载对照);第 8 题 jvm-advanced 的对照实验模板可复用。
+- **Q2：Shenandoah 与 ZGC?**
+  - 答：两者都是并发整理(亚毫秒暂停);Shenandoah 用转发指针(Brooks pointer),ZGC 用染色指针;Shenandoah 由 Red Hat 维护,ZGC 由 Oracle——生态与支持的 JDK 版本不同。
+- **Q3：GC 日志怎么读?**
+  - 答：Xlog:gc*(G1)/-Xlog:gc(ZGC)→分析工具(GCEasy/GCViewer)——关键指标:暂停分布(P99/P999)/吞吐(GC 时间占比)/频率(每分钟次数)/特殊事件(Full/Exhausted/Stall)。
 
 ## 总结点
 

@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/invoke/MethodHandles.html)
 
@@ -19,27 +19,42 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:Lookup 与访问权限
+### 第二步扩展① 机制:Lookup 与访问权限
 
-Lookup:MethodHandles.Lookup(工厂——权限=查找方的访问能力)——privateLookupIn(模块系统的跨模块私有访问——需目标模块 opens,第 26 题反射的模块化限制);Lookup 的能力降级(dropLookupMode)——权限的最小化原则(第 33 题)。invokeExact:签名严格匹配(不匹配 WrongMethodTypeException)——类型安全的强制;invoke(通用——asType 自适应,性能略降)。
+- Lookup:MethodHandles.Lookup(工厂——权限=查找方的访问能力)——privateLookupIn(模块系统的跨模块私有访问——需目标模块 opens,第 26 题反射的模块化限制)。
+- Lookup 的能力降级(dropLookupMode)——权限的最小化原则(第 33 题)。
+- invokeExact:签名严格匹配(不匹配 WrongMethodTypeException)——类型安全的强制。
+- invoke(通用——asType 自适应,性能略降)。
 
-### 反例:选型的两种错位
+### 第二步扩展② 反例:选型的两种错位
 
-错位一,热路径用反射:高频调用的框架反射(第 26 题事故)——MH/生成类替代(性能 10 倍)。错位二,MH 的灵活性误用:需要"运行期按字符串发现方法"(反射的合法场景)用 MH(MH 需要预知签名——发现能力弱于反射)——灵活性与性能的反比关系(MH 中间态)。两条的正解:调用频率(热→MH/生成)+访问需求(私有→反射[或 opens+MH])+发现需求(运行期字符串发现→反射)。
+- 错位一,热路径用反射:高频调用的框架反射(第 26 题事故)——MH/生成类替代(性能 10 倍)。
+- 错位二,MH 的灵活性误用:需要"运行期按字符串发现方法"(反射的合法场景)用 MH(MH 需要预知签名——发现能力弱于反射)——灵活性与性能的反比关系(MH 中间态)。
+- 两条的正解:调用频率(热→MH/生成)+访问需求(私有→反射[或 opens+MH])+发现需求(运行期字符串发现→反射)。
 
-### 取舍:MH 的工程成本
+### 第二步扩展③ 取舍:MH 的工程成本
 
-成本:API 学习曲线(MethodType/Lookup/适配)、调试的复杂度(句柄链的栈)、JDK 版本的 API 演进(VarHandle[字段]/MH 的 Java 9+ 语义)。收益:性能(接近直接调用)+类型安全(签名验证)+VarHandle(字段的原子操作[volatile/CAS 的现代形态——替代 Unsafe])。VarHandle 的独立价值:字段的 volatile/CAS 操作(Unsafe 的安全替代——并发工具的实现底座,第 19 题 AtomicLong 的底层)。
+- 成本:API 学习曲线(MethodType/Lookup/适配)、调试的复杂度(句柄链的栈)、JDK 版本的 API 演进(VarHandle[字段]/MH 的 Java 9+ 语义)。
+- 收益:性能(接近直接调用)+类型安全(签名验证)+VarHandle(字段的原子操作[volatile/CAS 的现代形态——替代 Unsafe])。
+- VarHandle 的独立价值:字段的 volatile/CAS 操作(Unsafe 的安全替代——并发工具的实现底座,第 19 题 AtomicLong 的底层)。
 
 ## 案例
 
-### 验证:选型的断言组
+### 第三步发散·验证与推演 验证:选型的断言组
 
-验证:性能断言(直接/反射/MH/Lambda 的调用耗时对照——本机微基准,第 50 题distributed 纪律);类型安全断言(MH 的签名不匹配异常——invokeExact 的严格性实证);访问断言(privateLookupIn 的模块权限行为)——三组固化选型阶梯;MH 与反射的选择树进框架设计指南。
+- 验证:性能断言(直接/反射/MH/Lambda 的调用耗时对照——本机微基准,第 50 题distributed 纪律)。
+- 类型安全断言(MH 的签名不匹配异常——invokeExact 的严格性实证)。
+- 访问断言(privateLookupIn 的模块权限行为)——三组固化选型阶梯。
+- MH 与反射的选择树进框架设计指南。
 
-### 追问链:MH 三刀
+### 第三步发散·追问扩展 追问链:MH 三刀
 
-一刀:"VarHandle 与 Unsafe?"——VarHandle(Java 9+,字段的内存语义操作[volatile/getAndSet/CAS])——替代 Unsafe(安全+可维护);Unsafe 的残留(高性能场景的绕过——deprecated 趋势,第 44 题)。二刀:"LambdaMetafactory 的场景?"——动态接口实现(每次生成的开销 vs 预生成缓存,第 18 题lambda 机制)——生成类的高性能与不可 introspect(调试图难)。三刀:"invokeExact 的严格?"——签名不匹配即异常(无自动适配)——invokeExact 的严格性=性能的前提(类型在编译期确定);invoke(适配)的代价(每次 asType)。
+- **Q1：VarHandle 与 Unsafe?**
+  - 答：VarHandle(Java 9+,字段的内存语义操作[volatile/getAndSet/CAS])——替代 Unsafe(安全+可维护);Unsafe 的残留(高性能场景的绕过——deprecated 趋势,第 44 题)。
+- **Q2：LambdaMetafactory 的场景?**
+  - 答：动态接口实现(每次生成的开销 vs 预生成缓存,第 18 题lambda 机制)——生成类的高性能与不可 introspect(调试图难)。
+- **Q3：invokeExact 的严格?**
+  - 答：签名不匹配即异常(无自动适配)——invokeExact 的严格性=性能的前提(类型在编译期确定);invoke(适配)的代价(每次 asType)。
 
 ## 总结点
 

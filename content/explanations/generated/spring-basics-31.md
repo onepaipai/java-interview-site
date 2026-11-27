@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/)
 
@@ -19,27 +19,41 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:类型化绑定的防护层
+### 第二步扩展① 机制:类型化绑定的防护层
 
-防护一类型转换字符串到目标类型类型不匹配启动失败;防护二审校 JSR 303 注解 NotBlank Min;防护三元数据 IDE 补全。三层防护类型错误启动暴露校验错误启动暴露 IDE 补全减少 typo。
+- 防护一类型转换字符串到目标类型类型不匹配启动失败。
+- 防护二审校 JSR 303 注解 NotBlank Min。
+- 防护三元数据 IDE 补全。
+- 三层防护类型错误启动暴露校验错误启动暴露 IDE 补全减少 typo。
 
-### 反例:@Value 的两种事故
+### 第二步扩展② 反例:@Value 的两种事故
 
-事故一 typo 的 key 拼写错误运行时 null 静默。事故二类型错误注入 String 转 int 时 NumberFormatException 运行时。两条的正解类型化绑定加校验错误在启动期暴露。
+- 事故一 typo 的 key 拼写错误运行时 null 静默。
+- 事故二类型错误注入 String 转 int 时 NumberFormatException 运行时。
+- 两条的正解类型化绑定加校验错误在启动期暴露。
 
-### 取舍:不可变配置
+### 第二步扩展③ 取舍:不可变配置
 
-ConstructorBinding record 构造器绑定不可变配置构造后不变;可变配置 Setter 有并发风险运行中修改。不可变配置的线程安全免费。落地:@ConfigurationProperties 配合 record 与 @Validated,非法配置启动期即失败。
+- ConstructorBinding record 构造器绑定不可变配置构造后不变。
+- 可变配置 Setter 有并发风险运行中修改。
+- 不可变配置的线程安全免费。
+- 落地:@ConfigurationProperties 配合 record 与 @Validated,非法配置启动期即失败。
 
 ## 案例
 
-### 验证:类型化绑定的断言组
+### 第三步发散·验证与推演 验证:类型化绑定的断言组
 
-验证:类型断言(端口属性非数字启动失败);元数据断言(IDE 配置补全);校验断言(NotBlank 的配置缺失启动失败)——三组固化类型化绑定。验证结论:断言失败即配置管理缺陷。对照:绑定失败在启动期报出具体属性路径,比 @Value 的运行时解析失败早一个阶段暴露。
+- 验证:类型断言(端口属性非数字启动失败)。
+- 元数据断言(IDE 配置补全)。
+- 校验断言(NotBlank 的配置缺失启动失败)——三组固化类型化绑定。
+- 验证结论:断言失败即配置管理缺陷。
+- 对照:绑定失败在启动期报出具体属性路径,比 @Value 的运行时解析失败早一个阶段暴露。
 
-### 追问链:配置三刀
+### 第三步发散·发散要点 追问链:配置三刀
 
-一刀:不可变配置 ConstructorBinding record 构造器绑定不可变配置类的线程安全。二刀:配置的层级默认值配置文件环境变量命令行优先级覆盖。三刀:配置的热更 RefreshScope 热刷新销毁重建。
+- **追问①**：不可变配置 ConstructorBinding record 构造器绑定不可变配置类的线程安全
+- **追问②**：配置的层级默认值配置文件环境变量命令行优先级覆盖
+- **追问③**：配置的热更 RefreshScope 热刷新销毁重建
 
 ## 总结点
 

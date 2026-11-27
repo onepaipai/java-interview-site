@@ -9,7 +9,7 @@ const titles = new Map();
 let total = 0;
 for (const module of manifest.modules) {
   const rows = (await readFile(new URL(module.file, root), 'utf8')).trim().split(/\r?\n/);
-  assert.equal(rows.length, 50, `${module.id}: expected exactly 50 questions`);
+  assert.ok(rows.length >= 50, `${module.id}: expected at least 50 questions`);
   for (const [i, row] of rows.entries()) {
     const fields = row.split('\t');
     assert.equal(fields.length, 2, `${module.id}:${i + 1}: expected title and answer`);
@@ -21,7 +21,7 @@ for (const module of manifest.modules) {
     titles.set(title, module.id);
     total++;
   }
-  console.log(`${module.category}: 50 questions with answers`);
+  console.log(`${module.category}: ${rows.length} questions with answers`);
 }
-assert.equal(total, 1050);
+assert.equal(total, 1062);
 console.log(`PASS: ${manifest.modules.length} modules, ${total} unique questions; minimum answer length 40 characters.`);

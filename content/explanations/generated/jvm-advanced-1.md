@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-first-g1-tuning.html)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html)
@@ -22,33 +22,46 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:尾延迟预算如何分解到 GC
+### 第二步扩展① 机制:尾延迟预算如何分解到 GC
 
-把 P999 目标 50ms 拆开:网络与业务逻辑占大头,GC 的 STW 暂停只是其中一项,还有并发周期抢走的应用吞吐、安全点同步等待、以及 GC 后紧接的缓存冷启动。调优前先从链路追踪确认"抖动窗口"与 GC 日志时间戳是否重合,这一步决定后面是调 GC 还是调代码。日志层面用 -Xlog:gc* 输出每次暂停,配 P999 的分布做对齐。
+- 把 P999 目标 50ms 拆开:网络与业务逻辑占大头,GC 的 STW 暂停只是其中一项,还有并发周期抢走的应用吞吐、安全点同步等待、以及 GC 后紧接的缓存冷启动。
+- 调优前先从链路追踪确认"抖动窗口"与 GC 日志时间戳是否重合,这一步决定后面是调 GC 还是调代码。
+- 日志层面用 -Xlog:gc* 输出每次暂停,配 P999 的分布做对齐。
 
-### 反例:只看 GC 时间占比会漏掉真正的元凶
+### 第二步扩展② 反例:只看 GC 时间占比会漏掉真正的元凶
 
-实测里 G1 的 young 暂停中位仅 2.948ms、最大 32.202ms(256MB 堆,单线程压测),GC 时间占比不到 5%,按"占比思维"完全可以不调;但 ZGC 对照组在堆被填满时出现 Allocation Stall (main) 59.822ms——一次 60ms 的应用侧停顿,任何"GC 时间占比"指标都不统计它。尾延迟调优必须把分配速率、堆余量、暂停分布、应用侧停顿(如 Allocation Stall)放在一起看,而不是只看 GC 花了多少时间。
+- 实测里 G1 的 young 暂停中位仅 2.948ms、最大 32.202ms(256MB 堆,单线程压测),GC 时间占比不到 5%,按"占比思维"完全可以不调。
+- 但 ZGC 对照组在堆被填满时出现 Allocation Stall (main) 59.822ms——一次 60ms 的应用侧停顿,任何"GC 时间占比"指标都不统计它。
+- 尾延迟调优必须把分配速率、堆余量、暂停分布、应用侧停顿(如 Allocation Stall)放在一起看,而不是只看 GC 花了多少时间。
 
-### 取舍:参数面越窄,回滚越容易
+### 第二步扩展③ 取舍:参数面越窄,回滚越容易
 
-每一轮只动一个参数(如 MaxGCPauseMillis、InitiatingHeapOccupancyPercent、堆大小三者绝不同批改动),并在变更单里写死回滚条件:例如"P999 连续 10 分钟超预算即回滚"。参数越多,归因越难;实测中同一个负载换 -Xlog 粒度都会影响日志干扰程度,更不要说同时改五个参数。
+- 每一轮只动一个参数(如 MaxGCPauseMillis、InitiatingHeapOccupancyPercent、堆大小三者绝不同批改动),并在变更单里写死回滚条件:例如"P999 连续 10 分钟超预算即回滚"。
+- 参数越多,归因越难。
+- 实测中同一个负载换 -Xlog 粒度都会影响日志干扰程度,更不要说同时改五个参数。
 
 ## 案例
 
-### 实证:一次可复现的基线采集
+### 第三步发散·验证与推演 实证:一次可复现的基线采集
 
-在本机 JDK 17.0.17 用同一负载跑 G1:-Xms512m -Xmx512m -XX:MaxGCPauseMillis=5 -Xlog:gc*:file=pause.log。命令与关键输出如下,程序含 60 轮高频分配,以 OOM 收尾(净增长设计),数据取自 OOM 前。验证方式:重跑同命令应得到同量级分布。
+- 在本机 JDK 17.0.17 用同一负载跑 G1:-Xms512m -Xmx512m -XX:MaxGCPauseMillis=5 -Xlog:gc*:file=pause.log。
+- 命令与关键输出如下,程序含 60 轮高频分配,以 OOM 收尾(净增长设计),数据取自 OOM 前。
+- 验证方式:重跑同命令应得到同量级分布。
 ```
 GC(30) Pause Full (G1 Compaction Pause) 511M->407M(512M) 80.755ms
 GC(0)  Pause Young (Normal) (G1 Evacuation Pause) 25M->5M(512M) 2.404ms
 GC(4)  Pause Young (Normal) (G1 Evacuation Pause) 50M->50M(512M) 6.211ms
 ```
-结果:目标 5ms,young 实测 2.4 至 6.2ms 波动,且出现 80.755ms 的 Full——预算与实际的差距即为后续调参的靶子。
+- 结果:目标 5ms,young 实测 2.4 至 6.2ms 波动,且出现 80.755ms 的 Full——预算与实际的差距即为后续调参的靶子。
 
-### 追问链:面试官沿尾延迟调优的三刀
+### 第三步发散·追问扩展 追问链:面试官沿尾延迟调优的三刀
 
-一刀:"5ms 目标设了为什么还超?"——答:MaxGCPauseMillis 是目标不是承诺,G1 按它规划 young 区数量,但存活集大小与 Humongous 不受它控制,实测同参数下 young 在 2.4 至 6.2ms 波动。二刀:"那直接换 ZGC 是不是就稳了?"——答:换 ZGC 把暂停降到 0.005 至 0.017ms,但实测同一负载出现过 59.822ms 的 Allocation Stall,堆余量不足时应用照样停,换回收器不等于免调优。三刀:"线上没有 GC 日志时怎么定位?"——答:开 JFR 常态采集(实测 profile 档 8 秒能拿到 120 条 ObjectAllocationSample),事后从时间戳对齐 P999 抖动窗口,再回放取证。
+- **Q1：5ms 目标设了为什么还超?**
+  - 答：答:MaxGCPauseMillis 是目标不是承诺,G1 按它规划 young 区数量,但存活集大小与 Humongous 不受它控制,实测同参数下 young 在 2.4 至 6.2ms 波动。
+- **Q2：那直接换 ZGC 是不是就稳了?**
+  - 答：答:换 ZGC 把暂停降到 0.005 至 0.017ms,但实测同一负载出现过 59.822ms 的 Allocation Stall,堆余量不足时应用照样停,换回收器不等于免调优。
+- **Q3：线上没有 GC 日志时怎么定位?**
+  - 答：答:开 JFR 常态采集(实测 profile 档 8 秒能拿到 120 条 ObjectAllocationSample),事后从时间戳对齐 P999 抖动窗口,再回放取证。
 
 ## 总结点
 

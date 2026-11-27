@@ -1,6 +1,6 @@
 // Java 17 / java.util.concurrent。教学场景统一声明,未实测的推演写"预期"。
 // 口诀服从准确性:先有钩子,后有机制短语。每题独立成文,不回退共享主题正文。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const jls17 = 'https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html';
 const juc = api('java/util/concurrent/package-summary');
 const block = (title, body) => ({ title, body });
@@ -13,18 +13,41 @@ export default {
     'volatile 能解决哪些可见性问题，不能解决什么？',
     'Java 17 教学场景：配置线程把含开关与限额的配置对象整体替换，多个工作线程循环读取 volatile 引用并做计数累加。观察可见性何时生效，复合计数与多字段读取还有哪些风险。本场景为设计推演，未运行基准。',
     [
-      'volatile 保证一个线程的写在下一次读中被看到：读写之间建立 happens-before，读到的一定是已发布的最新值，不会用寄存器里的旧副本。',
-      '它不保证复合操作原子性：count++ 是读、加、写三步，两个线程交错仍会丢更新，需要 AtomicLong 或加锁。',
-      '多个 volatile 字段之间也没有原子性：两次读可能拿到不同版本。要一致快照，就把字段收进一个不可变对象，整体替换 volatile 引用。',
+      '【重点一·能解决】可见性：一个线程写 volatile，另一个读同一变量，读到的一定是最新值，不会用寄存器旧副本。',
+      '【重点二·不能】原子性：count++ 是读、加、写三步，交错仍丢更新，要用原子类或加锁。',
+      '【重点三·多字段】无整体一致：两次读可能跨版本，要一致快照就把字段收进不可变对象，整体替换 volatile 引用。',
     ],
     [
-      block('机制：写与读配对建立顺序，而不是"实时同步"', 'JLS 第 17.4 节把可见性定义为 happens-before 顺序：对 volatile 变量的写与后续对它的读同步，读线程能看到该写及它之前未被重排的全部写入。可以类比成公告栏换纸：管理员把一整页新告示贴上去（一次写），路过的人要么看到旧纸、要么看到完整新纸，不会看到半页。但每个人仍要自己凑近看一次（主动读），公告栏不会推送，也不管纸上写的账目算得对不对。'),
-      block('边界：不锁、不阻塞、不管复合操作', 'volatile 不提供互斥，临界区里多个步骤依然可以交错；它也不让线程等待。因此可见性只解决"看到旧值"，不解决"读改写被插队"。另一个常被忽略的点是 long 和 double 的非 volatile 读写理论上是两次 32 位写（JLS 17.7），volatile 化后才是整体读写；在 64 位主流 JVM 上即便不加 volatile 通常也表现为整体写，但这属于实现细节，跨平台代码不能依赖。'),
-      block('取舍：快照发布模式的适用与代价', '读多写少的配置、路由表、限额参数适合"不可变对象 + volatile 引用整体替换"：读者无锁、写者构造完整新对象后一次发布。代价是每次修改都新建对象，字段很多或更新极频繁时不如加锁或 AtomicReference 的 CAS 更新。把多个 volatile 字段当作"各自独立的通知通道"来用是允许的，前提是业务不要求它们在同一时刻互相一致。'),
+      block('第二步扩展① 可见性——为什么成立', `- 保证：volatile 写与后续读之间建立 happens-before，读到的一定是最新值，且该写之前的其他写入也一并可见。
+- 附带：它禁止相关指令重排序越过这道屏障。
+- 边界：是"读时看到最新"，不是"写时主动推送"。
+- 类比：公告栏贴新通知，只有主动去看的人知道。`),
+      block('第二步扩展② 非原子——为什么丢更新', `- 拆解：count++ = 读 → 加 → 写，volatile 只保证每步读到最新，不保证三步不被打断。
+- 交错：两线程同读到 0，各自加 1 写回，结果仍是 1。
+- 修复：用 AtomicLong 或加锁，给 volatile 无效。
+- 边界：long/double 的 volatile 读写保证整体；非 volatile 的 64 位读写理论上是两次 32 位写，属实现细节不可依赖。`),
+      block('第二步扩展③ 多字段——如何拿到一致快照', `- 问题：读 A 与读 B 之间 B 被改，得到"A 新 + B 旧"。
+- 做法：字段收进不可变对象，单个 volatile 引用整块替换。
+- 效果：读方一次拿到完整一版，像整体换一页公告。
+- 代价：每次更新都新建对象，字段多、更新频繁时不如加锁或 CAS。`),
     ],
     [
-      block('对照操作：丢更新用 AtomicInteger 才消除', '教学验证定义 volatile int count，两个线程各执行 1000 次 count++，join 后统计；再改用 AtomicInteger.incrementAndGet 重复同一实验。预期 volatile 版本结果小于 2000 且每次运行不同（丢更新），原子版本恒等于 2000。此实验代码简单，可在任意 Java 17 环境复跑；不同硬件上 volatile 版本的差值会不同，不能把某次差值当作固定损耗。'),
-      block('追问：停止标志为何能生效，阻塞 IO 为何不响应', '运行线程每轮循环读一次 volatile boolean running，写线程置 false 后它会在下一轮退出，这靠的就是写读同步；若把标志改成普通 boolean，JIT 可能把它提升进寄存器导致循环不退出。边界要讲清：线程若正阻塞在 socket 读或 Object.wait 上，改标志不会唤醒它，需要中断或关闭流，可见性不等于唤醒能力。'),
+      block('第三步发散·问答对', `- **Q1：volatile 能替代锁吗？**
+  - 答：不能。锁 = 互斥 + 可见性；volatile = 可见性 + 禁重排，没有互斥。
+  - 复合操作、"检查再执行"仍要用锁或原子类。
+- **Q2：volatile 写会立刻刷主存吗？**
+  - 答：规范只承诺 happens-before 的可见效果，不规定刷主存时机。
+  - 底层靠缓存一致性实现是细节，别拿它替代规范推理。
+- **Q3：停止标志为何 volatile 就生效？阻塞时呢？**
+  - 答：while(!stopped) 每轮读 volatile，置 true 后能退出循环。
+  - 阻塞在 sleep/wait/IO 时不会被唤醒，要用 interrupt()，可见性不等于唤醒能力。
+- **Q4：DCL 单例为何必须 volatile？**
+  - 答：new = 分配 → 初始化 → 赋引用，重排可能让引用先指向半构造对象。
+  - volatile 禁止该重排，保证安全发布。
+- 验证：两线程各加 1000 次 count++ 可见丢更新，改用 AtomicInteger 后恒为 2000；此为可复跑教学验证，非本机实测。`),
+      block('追问：可见性与唤醒的分工', `- 可见性负责"读到最新值"，唤醒负责"从阻塞中醒来"，机制不同。
+- volatile 写读负责前者，interrupt()/notify()/关闭流负责后者。
+- 停止标志改成普通 boolean，JIT 可能提升进寄存器导致循环不退出，这是可见性问题。`),
     ],
     ['可见不原子，快照整体换', '复合操作交给原子类或锁', '公告栏不推送，主动读才可见'], [jls17, juc],
   ),
@@ -211,7 +234,7 @@ export default {
     [
       block('机制：口袋跟着线程走，不跟着任务走', '每个 Thread 身上挂着一张 ThreadLocalMap，键是 ThreadLocal 实例（弱引用），值是你放的对象（强引用）。类比更衣室编号柜：柜子属于场馆（线程），不是属于每位客人（任务）；客人走时不取走物品，柜子就一直占着。键的弱引用只保证 ThreadLocal 对象本身可被回收，被回收后条目变 stale，只有等后续 set/get 触发清理才可能腾出位置，值在此之前仍被强引用着。'),
       block('故障推演：串号比 OOM 更早出现', '请求 A 在拦截器把用户上下文 set 进 ThreadLocal，处理完不再清理。请求 B 复用同一线程，鉴权代码读到 A 的身份——越权或脏数据。若对象是大图缓存，多个线程各持一份时才逐渐逼近 OOM；而串号在第二次请求就会发生，且难以稳定复现（取决于线程分配）。两类故障的同一根因都是"任务结束没清场"。'),
-      block('取舍：让清理发生在结构里而不是靠自觉', '用 try/finally 包裹 remove 是最低要求；更可靠的是把 set/remove 收敛到框架唯一入口（拦截器、任务装饰器），任务代码只读不写。传递型场景优先考虑显式参数或结构化并发的作用域值（JDK 21 预览的 ScopedValue，Java 17 不适用），它随作用域结束自动失效。TransmittableThreadLocal 解决的是传递而非清理，两者不要混为一谈。'),
+      block('取舍：让清理发生在结构里而不是靠自觉', '用 try/finally 包裹 remove 是最低要求；更可靠的是把 set/remove 收敛到框架唯一入口（拦截器、任务装饰器），任务代码只读不写。传递型场景优先考虑显式参数或作用域值（ScopedValue：JDK 21–24 预览、JDK 25 由 JEP 506 转正，Java 17 不适用），它随作用域结束自动失效。TransmittableThreadLocal 解决的是传递而非清理，两者不要混为一谈。'),
     ],
     [
       block('对照操作：读旧值与内存驻留的验证', '教学验证：固定 2 线程池循环执行任务，任务 set 一个大 byte 数组后不 remove，下一个任务先 get 并断言为 null。预期断言间歇性失败（复用线程时读到旧值），堆转储中数组随线程存活；补上 finally remove 后断言恒过。实验代码可复跑，串号概率取决于线程复用顺序，多次运行必有命中。'),
@@ -434,10 +457,10 @@ export default {
     [
       'ReentrantLock 提供 tryLock 立即或限时获取（synchronized 会无限期阻塞）、可中断获取 lockInterruptibly、公平模式与多个 Condition 精准唤醒。',
       '它还支持重入计数与 HoldCount 查询，配合显式 lock/unlock 把锁的边界写得更清楚，代价是必须 finally 解锁、代码更啰嗦。',
-      'synchronized 在 Java 6 之后经偏向锁、轻量级锁等优化（JDK 15 移除偏向锁后默认从无锁直接到轻量级），多数场景性能相当；选择依据是"需要哪些控制能力"，不是"哪个更快"。',
+      'synchronized 在 Java 6 之后经偏向锁、轻量级锁等优化（JEP 374 在 JDK 15 弃用并默认禁用偏向锁后，默认从无锁直接到轻量级），多数场景性能相当；选择依据是"需要哪些控制能力"，不是"哪个更快"。',
     ],
     [
-      block('机制：同一互斥语义，不同的控制面板', '两者都是可重入互斥锁，但底层实现不同：synchronized 走 JVM 内置 ObjectMonitor（C++ 实现，monitor enter/exit 字节码），ReentrantLock 基于 AQS（Java 层 CLH 变体队列）。锁升级方面，synchronized 经历偏向锁（JDK 15 移除）→轻量级锁（CAS 自旋+Lock Record）→重量级锁（ObjectMonitor，park/unpark），升级不可逆；ReentrantLock 无升级链，直接走 AQS 的 CAS+CLH 队列。ReentrantLock 像手动挡：tryLock 是"先看看能不能停进去"，lockInterruptibly 是"排队时可以接电话（响应中断）"，公平模式是"严格取号"，Condition 是"按业务分多条等待队列"。synchronized 是自动挡：简洁、不易漏解锁（作用域结束自动释放），但没有这些面板。'),
+      block('机制：同一互斥语义，不同的控制面板', '两者都是可重入互斥锁，但底层实现不同：synchronized 走 JVM 内置 ObjectMonitor（C++ 实现，monitor enter/exit 字节码），ReentrantLock 基于 AQS（Java 层 CLH 变体队列）。锁升级方面，synchronized 经历偏向锁（JDK 15 弃用并默认禁用，命令行仍可开启）→轻量级锁（CAS 自旋+Lock Record）→重量级锁（ObjectMonitor，park/unpark），升级不可逆；ReentrantLock 无升级链，直接走 AQS 的 CAS+CLH 队列。ReentrantLock 像手动挡：tryLock 是"先看看能不能停进去"，lockInterruptibly 是"排队时可以接电话（响应中断）"，公平模式是"严格取号"，Condition 是"按业务分多条等待队列"。synchronized 是自动挡：简洁、不易漏解锁（作用域结束自动释放），但没有这些面板。'),
       block('反例：把 tryLock 当万能优化', '为"避免死锁"给所有路径加 tryLock 失败重试，可能把偶发竞争放大成活锁：双方反复抢、反复退、谁也进不去。正确用法是冲突 rare 且重试有退避；或按固定顺序取多把锁从根上避免死锁。另一个误用是 tryLock 成功后忘记 unlock（没有 finally），锁永久泄漏——显式锁的自由伴随纪律。'),
       block('取舍：默认 synchronized，特殊需求升级', '简单互斥、临界区短、无需超时——synchronized，语法保证解锁。需要以下任一才换 ReentrantLock：限时获取、可中断等待、公平排队、多 Condition、锁诊断（getQueuedThreads 等）。读写锁是另一个维度：读多写少且临界区较长时 ReadWriteLock 或 StampedLock 提升读并行，但复杂度与误用面也随之增加（见第 25 题）。'),
     ],

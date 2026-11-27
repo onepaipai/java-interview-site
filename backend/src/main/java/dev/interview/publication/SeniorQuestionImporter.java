@@ -58,8 +58,8 @@ public class SeniorQuestionImporter {
         .stream()
         .filter(l -> !l.isBlank())
         .toList();
-      if (lines.size() != 50) throw new IllegalArgumentException(
-        module.id() + " 必须恰好包含 50 道题"
+      if (lines.size() < 50) throw new IllegalArgumentException(
+        module.id() + " 至少需要 50 道题"
       );
       var titles = new HashSet<String>();
       for (int i = 0; i < lines.size(); i++) {

@@ -1,9 +1,9 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [github.com · 1](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/HashMap.java)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/HashMap.html)
 
 </details>
 
@@ -19,27 +19,40 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:扰动函数为什么高低位异或
+### 第二步扩展① 机制:扰动函数为什么高低位异或
 
-hashCode 低 bits 相同的 key 常见(如自增 id 低位变化)——只取低 bits 碰撞率高;高 16 位异或进低 16 位=高位信息参与索引(代价一条指令)——散列更均匀,树化与扩容概率下降。
+- hashCode 低 bits 相同的 key 常见(如自增 id 低位变化)——只取低 bits 碰撞率高。
+- 高 16 位异或进低 16 位=高位信息参与索引(代价一条指令)——散列更均匀,树化与扩容概率下降。
 
-### 反例:HashMap 的三种事故
+### 第二步扩展② 反例:HashMap 的三种事故
 
-事故一:可变对象做 key——put 后修改字段→hashCode 变→get 找不到(条目成孤儿);修复=key 不可变(String/Integer)。事故二:多线程 put——JDK7 头插扩容成环(死循环 CPU 100%),JDK8 尾插不环但数据丢失;修复=ConcurrentHashMap(第 14 题)。事故三:容量设 100——tableSizeFor 取整 128,阈值 96,存 97 个就扩容;预估容量应按 expectedSize/0.75+1 设置。
+- 事故一:可变对象做 key——put 后修改字段→hashCode 变→get 找不到(条目成孤儿)。
+- 修复=key 不可变(String/Integer)。
+- 事故二:多线程 put——JDK7 头插扩容成环(死循环 CPU 100%),JDK8 尾插不环但数据丢失。
+- 修复=ConcurrentHashMap(第 14 题)。
+- 事故三:容量设 100——tableSizeFor 取整 128,阈值 96,存 97 个就扩容。
+- 预估容量应按 expectedSize/0.75+1 设置。
 
-### 边界:树化的两个阈值
+### 第二步扩展③ 边界:树化的两个阈值
 
-TREEIFY_THRESHOLD=8(泊松分布下单桶 8 个概率亿分之一,树化是兜底而非常规);MIN_TREEIFY_CAPACITY=64(容量小优先扩容而不是树化)——树化要同时满足链长与容量两个条件。
+- TREEIFY_THRESHOLD=8(泊松分布下单桶 8 个概率亿分之一,树化是兜底而非常规)。
+- MIN_TREEIFY_CAPACITY=64(容量小优先扩容而不是树化)——树化要同时满足链长与容量两个条件。
 
 ## 案例
 
-### 验证:树化与扩容的实测走查
+### 第三步发散·验证与推演 验证:树化与扩容的实测走查
 
-验证:集合模块 C1 实验——16 桶放入 30 个同桶键,反射读 table 观察链表→红黑树轨迹;扩容断言(存 13 个→容量 16→32,阈值 12 触发);(n-1)&hash 等价 hash%n 断言(万级随机 key 对照);扰动断言(关闭扰动构造对照散列分布)。预期:树化轨迹与阈值 8/64 一致。
+- 验证:集合模块 C1 实验——16 桶放入 30 个同桶键,反射读 table 观察链表→红黑树轨迹。
+- 扩容断言(存 13 个→容量 16→32,阈值 12 触发)。
+- (n-1)&hash 等价 hash%n 断言(万级随机 key 对照)。
+- 扰动断言(关闭扰动构造对照散列分布)。
+- 预期:树化轨迹与阈值 8/64 一致。
 
-### 追问链:HashMap 三刀
+### 第三步发散·发散要点 追问链:HashMap 三刀
 
-一刀:resize 拆分=JDK8 高低位两条链(e.hash&oldCap==0 低位链/非 0 高位链)——免重算 hash。二刀:负载因子 0.75=时间(碰撞)与空间(利用率)的经验折中。三刀:1.7 vs 1.8=头插(并发成环)vs 尾插+树化+高低位拆分——并发安全交给 CHM(第 14 题)。
+- **追问①·resize 拆分**：JDK8 高低位两条链(e.hash&oldCap==0 低位链/非 0 高位链)——免重算 hash
+- **追问②·负载因子 0.75**：时间(碰撞)与空间(利用率)的经验折中
+- **追问③·1.7 vs 1.8**：头插(并发成环)vs 尾插+树化+高低位拆分——并发安全交给 CHM(第 14 题)
 
 ## 总结点
 

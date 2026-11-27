@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 GC 指南 · 2](https://docs.oracle.com/en/java/javase/17/gctuning/collectors.html)
 
 </details>
 
@@ -20,27 +20,38 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:线程私有与共享的生命周期
+### 第二步扩展① 机制:线程私有与共享的生命周期
 
-线程私有随线程创建销毁(栈帧随方法进出);共享区域随 JVM 存活(堆 GC 管理,元空间按类加载卸载)。类比办公楼:工位按员工分配回收,会议室按需预订,档案室按项目存档。
+- 线程私有随线程创建销毁(栈帧随方法进出)。
+- 共享区域随 JVM 存活(堆 GC 管理,元空间按类加载卸载)。
+- 类比办公楼:工位按员工分配回收,会议室按需预订,档案室按项目存档。
 
-### 边界:三种 OOM 的事故
+### 第二步扩展② 边界:三种 OOM 的事故
 
-SOE:递归无终止→栈满(看栈顶定位);元空间 OOM:CGLIB 代理持续生成不卸载(排查类加载器泄漏);堆 OOM:内存泄漏或大对象(dump 分析 dominator tree)。每种 OOM 的区域决定排查路径。
+- SOE:递归无终止→栈满(看栈顶定位)。
+- 元空间 OOM:CGLIB 代理持续生成不卸载(排查类加载器泄漏)。
+- 堆 OOM:内存泄漏或大对象(dump 分析 dominator tree)。
+- 每种 OOM 的区域决定排查路径。
 
-### 取舍:堆大小与区域比例
+### 第二步扩展③ 取舍:堆大小与区域比例
 
--Xms=-Xmx(生产相等避免扩容)+-XX:NewRatio+SurvivorRatio+-XX:MetaspaceSize——依据=负载画像(对象大小/存活率/分配速率)与压测校准,不是默认值。
+- -Xms=-Xmx(生产相等避免扩容)+-XX:NewRatio+SurvivorRatio+-XX:MetaspaceSize——依据=负载画像(对象大小/存活率/分配速率)与压测校准,不是默认值。
 
 ## 案例
 
-### 验证:内存区域的实测走查
+### 第三步发散·验证与推演 验证:内存区域的实测走查
 
-验证:-Xlog:gc+heap=info 查看堆布局;NMT 查看各区域 committed;OOM 各形态可构造复现(堆 OOM=无限 new/栈 SOE=无限递归/元空间=循环生成代理);NMT 三种口径互不相等(第 19 题 jvm-advanced 实测)。预期:实测与理论分区对应。
+- 验证:-Xlog:gc+heap=info 查看堆布局。
+- NMT 查看各区域 committed。
+- OOM 各形态可构造复现(堆 OOM=无限 new/栈 SOE=无限递归/元空间=循环生成代理)。
+- NMT 三种口径互不相等(第 19 题 jvm-advanced 实测)。
+- 预期:实测与理论分区对应。
 
-### 追问链:内存三刀
+### 第三步发散·发散要点 追问链:内存三刀
 
-一刀:堆外内存=DirectByteBuffer(NMT 监控,Cleaner 兜底,第 33 题)。二刀:元空间 vs 永久代=本地内存 vs 堆内(JDK 8 移除永久代);字符串常量池 JDK 7 起在堆。三刀:栈帧=局部变量表+操作栈+动态链接+返回地址;-Xss 设栈大小(第 11 题线程栈实测 4000/20000 线程)。
+- **追问①·堆外内存**：DirectByteBuffer(NMT 监控,Cleaner 兜底,第 33 题)
+- **追问②·元空间 vs 永久代**：本地内存 vs 堆内(JDK 8 移除永久代);字符串常量池 JDK 7 起在堆
+- **追问③·栈帧**：局部变量表+操作栈+动态链接+返回地址;-Xss 设栈大小(第 11 题线程栈实测 4000/20000 线程)
 
 ## 总结点
 

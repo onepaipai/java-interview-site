@@ -3,7 +3,8 @@
 
 MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
-- [github.com · 1](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [MySQL 8.4 参考 · 2](https://dev.mysql.com/doc/refman/8.4/en/)
 
 </details>
 
@@ -19,27 +20,44 @@ MySQL 8.4 / InnoDB；演示库不替代目标数据库的锁与恢复验证。
 
 ## 参考分析
 
-### 机制:借出-归还契约为什么容易被破坏
+### 第二步扩展① 机制:借出-归还契约为什么容易被破坏
 
-连接的生命周期跨越业务代码(借出→SQL→归还)——归还责任在业务代码手上(框架托管后弱化,但手动连接/绕过框架的路径仍裸奔);异常路径是重灾区:try 块抛异常时 return 到池的语句被跳过——finally/try-with-resources 是唯一可靠归还(第 25 题 ThreadLocal finally remove 同构:资源借还都靠 finally 纪律);泄漏检测的本质=借出时打点+超时打栈,把「不还」显性化。
+- 连接的生命周期跨越业务代码(借出→SQL→归还)——归还责任在业务代码手上(框架托管后弱化,但手动连接/绕过框架的路径仍裸奔)。
+- 异常路径是重灾区:try 块抛异常时 return 到池的语句被跳过——finally/try-with-resources 是唯一可靠归还(第 25 题 ThreadLocal finally remove 同构:资源借还都靠 finally 纪律)。
+- 泄漏检测的本质=借出时打点+超时打栈,把「不还」显性化。
 
-### 反例:泄漏的三种事故
+### 第二步扩展② 反例:泄漏的三种事故
 
-事故一:异常路径漏 close——try 内 return 前抛异常,close 在 return 后(顺序错);try-with-resources 修复;事故二:事务模板外自取连接(多数据源场景)——事务不绑定,连接与事务都漏;统一数据源访问层;事故三:DB 侧 kill(超时连接被 DBA/防火墙掐)——应用不知道,继续用死连接报通讯异常;maxLifetime+testWhileIdle 保活。
+- 事故一:异常路径漏 close——try 内 return 前抛异常,close 在 return 后(顺序错)。
+- try-with-resources 修复。
+- 事故二:事务模板外自取连接(多数据源场景)——事务不绑定,连接与事务都漏。
+- 统一数据源访问层。
+- 事故三:DB 侧 kill(超时连接被 DBA/防火墙掐)——应用不知道,继续用死连接报通讯异常。
+- maxLifetime+testWhileIdle 保活。
 
-### 取舍:泄漏检测阈值与池大小
+### 第二步扩展③ 取舍:泄漏检测阈值与池大小
 
-leakDetection 设 60s(长事务豁免名单另管)——太短误报(报表),太长漏报;池大小=DB 容量÷应用实例数(每实例 10-20 足够,第 152 题舱壁预算);泄漏不可 100% 预防,监控+快速定位(栈打点)让修复以小时计——「会漏但要能快速抓」是工程态度。
+- leakDetection 设 60s(长事务豁免名单另管)——太短误报(报表),太长漏报。
+- 池大小=DB 容量÷应用实例数(每实例 10-20 足够,第 152 题舱壁预算)。
+- 泄漏不可 100% 预防,监控+快速定位(栈打点)让修复以小时计——「会漏但要能快速抓」是工程态度。
 
 ## 案例
 
-### 验证:泄漏断言组(本机可复跑)
+### 第三步发散·验证与推演 验证:泄漏断言组(本机可复跑)
 
-验证:泄漏复现断言(异常路径借出不还→活跃数爬升→获取超时;leakDetection 打出持有栈——定位到行);伪泄漏区分断言(慢事务持有时长分布 vs 泄漏的趋向无穷);归还断言(try-with-resources 异常路径仍归还——修复对照);maxLifetime 断言(连接到期重建,防 DB 静默断连);对账断言(池活跃数 vs DB processlist 数一致)。预期:泄漏-检测-修复闭环。
+- 验证:泄漏复现断言(异常路径借出不还→活跃数爬升→获取超时。
+- leakDetection 打出持有栈——定位到行)。
+- 伪泄漏区分断言(慢事务持有时长分布 vs 泄漏的趋向无穷)。
+- 归还断言(try-with-resources 异常路径仍归还——修复对照)。
+- maxLifetime 断言(连接到期重建,防 DB 静默断连)。
+- 对账断言(池活跃数 vs DB processlist 数一致)。
+- 预期:泄漏-检测-修复闭环。
 
-### 追问链:池泄漏三刀
+### 第三步发散·发散要点 追问链:池泄漏三刀
 
-一刀:与 ThreadLocal 泄漏的同构——借出资源+finally 归还纪律(第 25 题),框架托管减少裸奔;二刀:池与事务的绑定——Spring 事务的连接绑定与释放(@Transactional 的连接生命周期,第 89 题),泄漏常发生在「脱离模板」的路径;三刀:池参数族——maxLifetime/idleTimeout/minimumIdle 与连接有效性的探测开销(第 30 题超时参数族),池调优是系统工程不是单参数。
+- **追问①**：与 ThreadLocal 泄漏的同构——借出资源+finally 归还纪律(第 25 题),框架托管减少裸奔;
+- **追问②**：池与事务的绑定——Spring 事务的连接绑定与释放(@Transactional 的连接生命周期,第 89 题),泄漏常发生在「脱离模板」的路径;
+- **追问③**：池参数族——maxLifetime/idleTimeout/minimumIdle 与连接有效性的探测开销(第 30 题超时参数族),池调优是系统工程不是单参数
 
 ## 总结点
 

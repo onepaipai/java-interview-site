@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [github.com · 1](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/ArrayList.java)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ArrayList.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/LinkedList.html)
 
 </details>
 
@@ -19,27 +20,39 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:1.5 倍的取舍
+### 第二步扩展① 机制:1.5 倍的取舍
 
-1.5 倍=扩容频率与内存浪费的折中:翻倍(2 倍)浪费上限大,线性(每次+1)扩容 O(n) 次数多;1.5 倍下扩容次数 O(log n) 且旧数组可复用部分空间(1.5 倍扩出来的新数组与旧数组重叠,HotSpot 可就地收缩)。实测:扩容 10 次≈容量 40 倍增长。
+- 1.5 倍=扩容频率与内存浪费的折中:翻倍(2 倍)浪费上限大,线性(每次+1)扩容 O(n) 次数多。
+- 1.5 倍下扩容次数 O(log n) 且旧数组可复用部分空间(1.5 倍扩出来的新数组与旧数组重叠,HotSpot 可就地收缩)。
+- 实测:扩容 10 次≈容量 40 倍增长。
 
-### 反例:List 误用的两种事故
+### 第二步扩展② 反例:List 误用的两种事故
 
-事故一:LinkedList 做随机访问——循环 get(i) 每次 O(n)→总 O(n²)(百万数据秒级变分钟级);修复=ArrayList 或迭代器。事故二:不预估容量——10 万次 add 触发约 24 次扩容(每次全量复制);修复=new ArrayList<>(expectedSize)。
+- 事故一:LinkedList 做随机访问——循环 get(i) 每次 O(n)→总 O(n²)(百万数据秒级变分钟级)。
+- 修复=ArrayList 或迭代器。
+- 事故二:不预估容量——10 万次 add 触发约 24 次扩容(每次全量复制)。
+- 修复=new ArrayList<>(expectedSize)。
 
-### 边界:remove 与 fail-fast
+### 第二步扩展③ 边界:remove 与 fail-fast
 
-ArrayList.remove 按索引 O(n)(移动后续元素);遍历中 remove 抛 ConcurrentModificationException(fail-fast,第 16 题);LinkedList 遍历删除用 iterator.remove O(1)。
+- ArrayList.remove 按索引 O(n)(移动后续元素)。
+- 遍历中 remove 抛 ConcurrentModificationException(fail-fast,第 16 题)。
+- LinkedList 遍历删除用 iterator.remove O(1)。
 
 ## 案例
 
-### 验证:扩容的实测走查
+### 第三步发散·验证与推演 验证:扩容的实测走查
 
-验证:反射读 elementData.length——add 第 11 个元素时 10→15,16 个时 15→22(1.5 倍链);System.arraycopy 复制断言(旧数组内容不变);随机访问耗时对照(ArrayList get(百万级)毫秒 vs LinkedList 秒级)——集合模块 C 系列实验可复用。预期:1.5 倍链与源码 grow() 一致。
+- 验证:反射读 elementData.length——add 第 11 个元素时 10→15,16 个时 15→22(1.5 倍链)。
+- System.arraycopy 复制断言(旧数组内容不变)。
+- 随机访问耗时对照(ArrayList get(百万级)毫秒 vs LinkedList 秒级)——集合模块 C 系列实验可复用。
+- 预期:1.5 倍链与源码 grow() 一致。
 
-### 追问链:List 三刀
+### 第三步发散·发散要点 追问链:List 三刀
 
-一刀:ArrayDeque vs LinkedList=数组环形缓冲 vs 链表——双端队列首选 ArrayDeque(缓存友好+无节点开销)。二刀:CopyOnWriteArrayList=写时复制(读无锁,写贵)——读多写少(并发基础)。三刀:subList 视图= backed by 原数组(改原数组影响视图,序列化风险)。
+- **追问①·ArrayDeque vs LinkedList**：数组环形缓冲 vs 链表——双端队列首选 ArrayDeque(缓存友好+无节点开销)
+- **追问②·CopyOnWriteArrayList**：写时复制(读无锁,写贵)——读多写少(并发基础)
+- **追问③·subList 视图**：backed by 原数组(改原数组影响视图,序列化风险)
 
 ## 总结点
 

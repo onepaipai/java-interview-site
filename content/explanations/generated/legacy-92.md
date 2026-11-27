@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Spring Framework 6.2 参考 · 1](https://docs.spring.io/spring-framework/reference/6.2/core/beans/factory-scopes.html)
-- [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/6.2/data-access/transaction/declarative/annotations.html)
+- [Google SRE · 1](https://sre.google/sre-book/service-level-objectives/)
+- [事件溯源设计说明 · 2](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
 </details>
 
@@ -20,27 +20,43 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:starter 的"封装即复用"
+### 第二步扩展① 机制:starter 的"封装即复用"
 
-starter=把"依赖+配置+自动装配"打包为可复用单元:使用者引入 starter+配置属性即可(无需理解内部实现);starter 的价值=消除"每个项目重复配置"的劳动(约定优于配置的实践)。类比工具箱:starter=工具箱(打开即用),内部工具(autoconfigure)自动组装。
+- starter=把"依赖+配置+自动装配"打包为可复用单元:使用者引入 starter+配置属性即可(无需理解内部实现)。
+- starter 的价值=消除"每个项目重复配置"的劳动(约定优于配置的实践)。
+- 类比工具箱:starter=工具箱(打开即用),内部工具(autoconfigure)自动组装。
 
-### 反例:starter 的两种事故
+### 第二步扩展② 反例:starter 的两种事故
 
-事故一:starter 缺条件注解——无条件注册 bean(与其他 starter 冲突或覆盖用户配置);修复=@ConditionalOnMissingBean(用户优先)+@ConditionalOnClass(依赖存在才装配)。事故二:starter 的属性无默认值——使用者必须配置所有属性才能启动;修复=@ConfigurationProperties 的默认值(合理默认,减少配置负担)。
+- 事故一:starter 缺条件注解——无条件注册 bean(与其他 starter 冲突或覆盖用户配置)。
+- 修复=@ConditionalOnMissingBean(用户优先)+@ConditionalOnClass(依赖存在才装配)。
+- 事故二:starter 的属性无默认值——使用者必须配置所有属性才能启动。
+- 修复=@ConfigurationProperties 的默认值(合理默认,减少配置负担)。
 
-### 取舍:starter 的内部复杂度
+### 第二步扩展③ 取舍:starter 的内部复杂度
 
-简单的 starter(一个配置类+一个 bean):够用就好;复杂的 starter(多个配置类+条件组合+生命周期管理):按需求递增——starter 的复杂度=使用者"少配置"与开发者"多实现"的交换;starter 的文档(README:配置项/条件/示例)是使用者的第一入口。
+- 简单的 starter(一个配置类+一个 bean):够用就好。
+- 复杂的 starter(多个配置类+条件组合+生命周期管理):按需求递增——starter 的复杂度=使用者"少配置"与开发者"多实现"的交换。
+- starter 的文档(README:配置项/条件/示例)是使用者的第一入口。
 
 ## 案例
 
-### 验证:starter 的走查核对
+### 第三步发散·验证与推演 验证:starter 的走查核对
 
-验证:引入 starter 断言(bean 自动注册——actuator/beans 可查);条件断言(缺依赖→不装配+条件评估报告说明);属性绑定断言(配置项正确绑定到 @ConfigurationProperties);用户优先断言(用户自定义 bean→starter 不覆盖)。验证:starter 的断言可程序化(Spring Boot 测试:ApplicationContextRunner 模拟不同条件)。
+- 验证:引入 starter 断言(bean 自动注册——actuator/beans 可查)。
+- 条件断言(缺依赖→不装配+条件评估报告说明)。
+- 属性绑定断言(配置项正确绑定到 @ConfigurationProperties)。
+- 用户优先断言(用户自定义 bean→starter 不覆盖)。
+- 验证:starter 的断言可程序化(Spring Boot 测试:ApplicationContextRunner 模拟不同条件)。
 
-### 追问链:starter 三刀
+### 第三步发散·追问扩展 追问链:starter 三刀
 
-一刀:"autoconfigure 与 starter 分开?"——autoconfigure(代码)与 starter(依赖聚合)分两个模块——使用者引 starter(包含 autoconfigure+依赖);开发者只依赖 autoconfigure(测试)。二刀:"starter 的版本管理?"——starter 与 autoconfigure 版本独立(自动配置变更→autoconfigure 版本升;依赖变更→starter 版本升)——版本解耦。三刀:"starter 的测试?"——ApplicationContextRunner(模拟不同条件:有/无依赖/有/无用户 bean/不同属性值)——starter 的自动化测试(Spring Boot 官方测试工具)。
+- **Q1：autoconfigure 与 starter 分开?**
+  - 答：autoconfigure(代码)与 starter(依赖聚合)分两个模块——使用者引 starter(包含 autoconfigure+依赖);开发者只依赖 autoconfigure(测试)。
+- **Q2：starter 的版本管理?**
+  - 答：starter 与 autoconfigure 版本独立(自动配置变更→autoconfigure 版本升;依赖变更→starter 版本升)——版本解耦。
+- **Q3：starter 的测试?**
+  - 答：ApplicationContextRunner(模拟不同条件:有/无依赖/有/无用户 bean/不同属性值)——starter 的自动化测试(Spring Boot 官方测试工具)。
 
 ## 总结点
 

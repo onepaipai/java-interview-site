@@ -1,9 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/package-summary.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/array/ArrayBlockingQueue.html)
 
 </details>
 
@@ -19,27 +20,43 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:关闭为什么必须是协议而非标志位
+### 第二步扩展① 机制:关闭为什么必须是协议而非标志位
 
-.closed=true 只对「下一次检查」生效——正在 await 的消费者不会自己醒;关闭动作必须:①置标志②signalAll 全部等待者③生产者侧立即拒绝。三步缺一就是「关了但有人永远等」或「关闭后还能塞任务」;毒丸方案(塞一个特殊对象,消费者见到即退)是协议的变体——但它要求「毒丸前任务全部入队完成」,多生产者时毒丸数量要等于消费者数。
+- .closed=true 只对「下一次检查」生效——正在 await 的消费者不会自己醒。
+- 关闭动作必须:①置标志②signalAll 全部等待者③生产者侧立即拒绝。
+- 三步缺一就是「关了但有人永远等」或「关闭后还能塞任务」。
+- 毒丸方案(塞一个特殊对象,消费者见到即退)是协议的变体——但它要求「毒丸前任务全部入队完成」,多生产者时毒丸数量要等于消费者数。
 
-### 反例:关闭处理的四种事故
+### 第二步扩展② 反例:关闭处理的四种事故
 
-事故一:close 只置标志不唤醒——消费者永久 WAITING,进程退不干净;事故二:notify 而非 notifyAll——唤醒的是另一个消费者,空队列+关闭态的消费者还睡着;事故三:关闭后 put 不拒绝——任务进了「已关闭」队列永远没人消费(静默丢失);事故四:排空前中断——shutdownNow 直接 interrupt,任务做一半,资金类操作产生悬置状态(第 143 题 banking 悬置同源)。
+- 事故一:close 只置标志不唤醒——消费者永久 WAITING,进程退不干净。
+- 事故二:notify 而非 notifyAll——唤醒的是另一个消费者,空队列+关闭态的消费者还睡着。
+- 事故三:关闭后 put 不拒绝——任务进了「已关闭」队列永远没人消费(静默丢失)。
+- 事故四:排空前中断——shutdownNow 直接 interrupt,任务做一半,资金类操作产生悬置状态(第 143 题 banking 悬置同源)。
 
-### 取舍:温和关闭与立即关闭的适用
+### 第二步扩展③ 取舍:温和关闭与立即关闭的适用
 
-出账/转账类:温和关闭(排空+超时兜底——超过 deadline 强制中断并落盘现场);日志上报类:立即关闭(丢得起);判断依据=任务可重放性:可重放(Kafka 消费)中断随意,不可重放(资金)必须先排空+现场保全;超时兜底必须有——「排空完再退」在毒任务上等于永不退出。
+- 出账/转账类:温和关闭(排空+超时兜底——超过 deadline 强制中断并落盘现场)。
+- 日志上报类:立即关闭(丢得起)。
+- 判断依据=任务可重放性:可重放(Kafka 消费)中断随意,不可重放(资金)必须先排空+现场保全。
+- 超时兜底必须有——「排空完再退」在毒任务上等于永不退出。
 
 ## 案例
 
-### 验证:关闭语义断言组(本机可复跑)
+### 第三步发散·验证与推演 验证:关闭语义断言组(本机可复跑)
 
-验证:排空断言(10 任务入队后 shutdown——消费者处理完 10 个才退出,一个不丢);拒绝断言(shutdown 后 put 抛异常/false);唤醒断言(3 个消费者都在 await,close 后 1 秒内全部退出——signalAll 生效);中断断言(shutdownNow 返回未处理清单且消费者被中断退出);毒任务对照(塞一个 sleep 10s 任务,温和关闭 3s 超时强制退出)。预期:五组断言构成完整关闭契约。
+- 验证:排空断言(10 任务入队后 shutdown——消费者处理完 10 个才退出,一个不丢)。
+- 拒绝断言(shutdown 后 put 抛异常/false)。
+- 唤醒断言(3 个消费者都在 await,close 后 1 秒内全部退出——signalAll 生效)。
+- 中断断言(shutdownNow 返回未处理清单且消费者被中断退出)。
+- 毒任务对照(塞一个 sleep 10s 任务,温和关闭 3s 超时强制退出)。
+- 预期:五组断言构成完整关闭契约。
 
-### 追问链:关闭三刀
+### 第三步发散·发散要点 追问链:关闭三刀
 
-一刀:毒丸 vs 标志位——毒丸无侵入但多生产者要发 N 个;标志位要 signalAll;BlockingQueue 用户只能选毒丸或中断。二刀:优雅停机与进程信号——SIGTERM→JVM shutdown hook→close+join(deadline)→exit,启动脚本给足 SIGKILL 宽限(第 76 题 JVM 同源)。三刀:与线程池的关系——池的 shutdown=温和/shutdownNow=立即+返回队列剩余,自己手写队列时对齐这套语义,调用方迁移零成本。
+- **追问①**：毒丸 vs 标志位——毒丸无侵入但多生产者要发 N 个;标志位要 signalAll;BlockingQueue 用户只能选毒丸或中断
+- **追问②**：优雅停机与进程信号——SIGTERM→JVM shutdown hook→close+join(deadline)→exit,启动脚本给足 SIGKILL 宽限(第 76 题 JVM 同源)
+- **追问③·与线程池的关系——池的 shutdown**：温和/shutdownNow=立即+返回队列剩余,自己手写队列时对齐这套语义,调用方迁移零成本
 
 ## 总结点
 

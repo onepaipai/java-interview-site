@@ -1,7 +1,7 @@
 // Java 17 / HotSpot。教学场景统一声明,未实测的推演写"预期"。
 // 口诀服从准确性:先有钩子,后有机制短语。每题独立成文,不回退共享主题正文。
 // 参考资料基准:JVMS 第 2/5 章、Java 17 GC 调优指南、相关 JEP。
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const jvms2 = 'https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html';
 const jvms5 = 'https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html';
 const gctun = 'https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html';

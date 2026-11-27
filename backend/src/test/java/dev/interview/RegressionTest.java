@@ -521,9 +521,9 @@ class RegressionTest {
         "SELECT q.title,q.answer FROM questions q JOIN question_tags qt ON qt.question_id=q.id JOIN tags t ON t.id=qt.tag_id JOIN categories c ON c.id=q.category_id WHERE t.name='senior-v1' AND c.name=?",
         module.category()
       );
-      assertEquals(50, rows.size(), module.id());
+      assertTrue(rows.size() >= 50, module.id() + " 至少需要 50 道题");
       assertEquals(
-        50,
+        rows.size(),
         rows
           .stream()
           .map(r -> r.get("title"))

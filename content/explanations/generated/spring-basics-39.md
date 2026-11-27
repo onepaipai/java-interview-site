@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
 - [Google SRE · 1](https://sre.google/sre-book/addressing-cascading-failures/)
 - [Spring Framework 6.2 参考 · 2](https://docs.spring.io/spring-framework/reference/)
@@ -20,27 +20,37 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:三种探针的信息分级
+### 第二步扩展① 机制:三种探针的信息分级
 
-Liveness:进程是否活着(重启信号——最简信息,不暴露内部)。Readiness:是否可接流量(依赖状态——DB/Redis/MQ 连通性)。Detail:组件级健康(各依赖的详细状态——管理端点权限保护)。三层的信息量递增,暴露面递减——按权限分级暴露(第 44 题 distributed)。
+- Liveness:进程是否活着(重启信号——最简信息,不暴露内部)。
+- Readiness:是否可接流量(依赖状态——DB/Redis/MQ 连通性)。
+- Detail:组件级健康(各依赖的详细状态——管理端点权限保护)。
+- 三层的信息量递增,暴露面递减——按权限分级暴露(第 44 题 distributed)。
 
-### 反例:Detail 全量暴露的信息泄露
+### 第二步扩展② 反例:Detail 全量暴露的信息泄露
 
-沙盘:/actuator/health 返回完整组件详情(DB 连接串/Redis 地址)——攻击者获取内部拓扑(第 44 题 distributed)。修复:show-details=when-authorized(认证后才显示详情)+管理端口隔离(management.server.port 独立)。
+- 沙盘:/actuator/health 返回完整组件详情(DB 连接串/Redis 地址)——攻击者获取内部拓扑(第 44 题 distributed)。
+- 修复:show-details=when-authorized(认证后才显示详情)+管理端口隔离(management.server.port 独立)。
 
-### 取舍:健康检查的性能
+### 第二步扩展③ 取舍:健康检查的性能
 
-健康检查自身不能成为瓶颈:DB 检查用轻查询(SELECT 1)、Redis 用 ping、MQ 用连接状态——禁重查询(全表扫描/聚合)。超时:健康检查带超时(3 秒)——超时视为 DOWN(不挂死探针)。频率:K8s 每 10 秒探一次——健康检查的缓存(避免每次真实查询)。
+- 健康检查自身不能成为瓶颈:DB 检查用轻查询(SELECT 1)、Redis 用 ping、MQ 用连接状态——禁重查询(全表扫描/聚合)。
+- 超时:健康检查带超时(3 秒)——超时视为 DOWN(不挂死探针)。
+- 频率:K8s 每 10 秒探一次——健康检查的缓存(避免每次真实查询)。
 
 ## 案例
 
-### 验证:健康检查的断言组
+### 第三步发散·验证与推演 验证:健康检查的断言组
 
-验证:分层断言(liveness 与 readiness 的端点分离 K8s 配置);组件级断言(DB Redis MQ 各自的状态 CompositeHealthContributor);安全断言(detail 端点需认证)——三组固化健康检查的暴露纪律。
+- 验证:分层断言(liveness 与 readiness 的端点分离 K8s 配置)。
+- 组件级断言(DB Redis MQ 各自的状态 CompositeHealthContributor)。
+- 安全断言(detail 端点需认证)——三组固化健康检查的暴露纪律。
 
-### 追问链:Actuator 三刀
+### 第三步发散·发散要点 追问链:Actuator 三刀
 
-一刀:Actuator 的安全 management 端点的暴露加端口隔离管理端口与业务端口分离加认证管理端的认证。二刀:健康检查的依赖 HealthIndicator 查 DB 轻查询 Redis ping MQ 连接状态健康检查自身不能成为性能瓶颈轻查询加超时。三刀:指标与健康的关系 Metrics Prometheus 的指标数据 vs Health 二值状态指标看趋势健康看当前互补不替代。
+- **追问①**：Actuator 的安全 management 端点的暴露加端口隔离管理端口与业务端口分离加认证管理端的认证
+- **追问②**：健康检查的依赖 HealthIndicator 查 DB 轻查询 Redis ping MQ 连接状态健康检查自身不能成为性能瓶颈轻查询加超时
+- **追问③**：指标与健康的关系 Metrics Prometheus 的指标数据 vs Health 二值状态指标看趋势健康看当前互补不替代
 
 ## 总结点
 

@@ -1,13 +1,13 @@
 {
-  "total": 1215,
-  "matched": 1215,
+  "total": 1227,
+  "matched": 1227,
   "topics": 249,
   "unmatched": [],
   "qualityReview": {
-    "questionSpecific": 1215,
+    "questionSpecific": 1227,
     "sampleSpecific": 0,
     "remainingTopicContent": 0,
-    "deepFormat": 1215,
-    "allQuestionsIndividuallyReviewed": true
+    "deepFormat": 1227,
+    "allQuestionsIndividuallyReviewed": false
   }
 }

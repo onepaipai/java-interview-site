@@ -15,7 +15,7 @@ try {
   Run-Check 'npm' @('ci');Run-Check 'npm' @('test');Run-Check 'npm' @('run','format:check');Run-Check 'npm' @('run','build');Run-Check 'npm' @('run','test:knowledge-core')
  } finally {Pop-Location}
  Run-Check 'node' @('frontend/node_modules/prettier/bin/prettier.cjs','--plugin=./frontend/node_modules/prettier-plugin-java/dist/index.mjs','--check','backend/src/**/*.java')
- foreach($script in @('check-deployment-config.mjs','verify-contract.mjs','sync-content-status.mjs','validate-content.mjs','validate-explanations.mjs','test-database-basics-answers.mjs','test-explanation-publication.mjs','test-deep-answers.mjs')){
+ foreach($script in @('check-deployment-config.mjs','verify-contract.mjs','sync-content-status.mjs','validate-content.mjs','validate-explanations.mjs','check-three-step.mjs','test-database-basics-answers.mjs','test-explanation-publication.mjs','test-deep-answers.mjs')){
   $arguments=@("scripts/$script");if($script -eq 'sync-content-status.mjs'){$arguments+='--check'};Run-Check 'node' $arguments
  }
  if(!$SkipMySql){Run-Check 'docker' @('compose','--env-file','.env.example','config','--quiet');& "$PSScriptRoot/test-mysql.ps1";if(!$?){throw 'MySQL gate failed'}}

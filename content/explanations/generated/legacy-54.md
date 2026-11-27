@@ -3,9 +3,8 @@
 
 教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Google SRE · 1](https://sre.google/sre-book/table-of-contents/)
-- [Raft 论文 · 2](https://raft.github.io/raft.pdf)
-- [HTTP 语义规范 · 3](https://www.rfc-editor.org/rfc/rfc9110.html)
+- [OWASP 提示注入风险 · 1](https://genai.owasp.org/)
+- [Google SRE · 2](https://sre.google/sre-book/service-level-objectives/)
 
 </details>
 
@@ -21,27 +20,37 @@
 
 ## 参考分析
 
-### 机制:Session 的本质=服务端状态存储
+### 第二步扩展① 机制:Session 的本质=服务端状态存储
 
-Cookie 是门票(SessionID),Session 是保险箱(数据在服务端);Cookie 被偷=SessionID 泄露(会话劫持)——Cookie 安全属性(HttpOnly/Secure/SameSite)是基础防线(第 23 题 CSRF)。
+- Cookie 是门票(SessionID),Session 是保险箱(数据在服务端)。
+- Cookie 被偷=SessionID 泄露(会话劫持)——Cookie 安全属性(HttpOnly/Secure/SameSite)是基础防线(第 23 题 CSRF)。
 
-### 反例:Session 管理的两种事故
+### 第二步扩展② 反例:Session 管理的两种事故
 
-事故一:分布式部署用本地 Session——LB 轮询到其他节点→Session 找不到→用户被踢出;修复=Spring Session Redis(集中存储)。事故二:Cookie 未设 HttpOnly——JS 可读 SessionID(XSS 窃取会话);修复=HttpOnly+Secure+SameSite。
+- 事故一:分布式部署用本地 Session——LB 轮询到其他节点→Session 找不到→用户被踢出。
+- 修复=Spring Session Redis(集中存储)。
+- 事故二:Cookie 未设 HttpOnly——JS 可读 SessionID(XSS 窃取会话)。
+- 修复=HttpOnly+Secure+SameSite。
 
-### 取舍:JWT vs Session 的选择
+### 第二步扩展③ 取舍:JWT vs Session 的选择
 
-JWT:无状态(不查存储)+跨域友好+撤销难(黑名单,第 22 题);Session:有状态(查存储)+撤销即时+分布式需集中存储——选择=撤销需求+部署架构+运维能力(第 22 题选择框架)。
+- JWT:无状态(不查存储)+跨域友好+撤销难(黑名单,第 22 题)。
+- Session:有状态(查存储)+撤销即时+分布式需集中存储——选择=撤销需求+部署架构+运维能力(第 22 题选择框架)。
 
 ## 案例
 
-### 验证:Cookie/Session 的走查核对
+### 第三步发散·验证与推演 验证:Cookie/Session 的走查核对
 
-验证:Cookie 属性断言(HttpOnly/Secure/SameSite);Session 共享断言(多实例 Redis Session 可用);互踢断言(新登录踢旧);Cookie 安全断言(XSS 场景 HttpOnly 防 JS 读)——四组固化会话管理(第 129 题认证体系)。
+- 验证:Cookie 属性断言(HttpOnly/Secure/SameSite)。
+- Session 共享断言(多实例 Redis Session 可用)。
+- 互踢断言(新登录踢旧)。
+- Cookie 安全断言(XSS 场景 HttpOnly 防 JS 读)——四组固化会话管理(第 129 题认证体系)。
 
-### 追问链:会话三刀
+### 第三步发散·发散要点 追问链:会话三刀
 
-一刀:Cookie SameSite=Strict/Lax/None(CSRF 浏览器层防御,第 23 题)。二刀:Session 超时=服务端 web.xml/配置+Cookie Max-Age(独立配置,第 129 题)。三刀:分布式 Session 一致性=Redis 集中存储(强一致)vs Session 复制(最终一致,第 24 题)。
+- **追问①·Cookie SameSite**：Strict/Lax/None(CSRF 浏览器层防御,第 23 题)
+- **追问②·Session 超时**：服务端 web.xml/配置+Cookie Max-Age(独立配置,第 129 题)
+- **追问③·分布式 Session 一致性**：Redis 集中存储(强一致)vs Session 复制(最终一致,第 24 题)
 
 ## 总结点
 

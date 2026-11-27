@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
 - [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jls/se17/html/index.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/package-summary.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html)
 
 </details>
 
@@ -20,27 +20,43 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:哈希容器为什么依赖 hashCode 契约
+### 第二步扩展① 机制:哈希容器为什么依赖 hashCode 契约
 
-HashMap 的查找流程:key.hashCode()→定位桶→桶内遍历用 equals 匹配——如果 hashCode 不一致,两个"equals 相等"的对象可能被分到不同桶,遍历时找不到(第 2 题 collections 的详细机制)。hashCode 是"定位",equals 是"确认"——定位对了确认才有效;定位错了永远找不到。
+- HashMap 的查找流程:key.hashCode()→定位桶→桶内遍历用 equals 匹配——如果 hashCode 不一致,两个"equals 相等"的对象可能被分到不同桶,遍历时找不到(第 2 题 collections 的详细机制)。
+- hashCode 是"定位",equals 是"确认"——定位对了确认才有效。
+- 定位错了永远找不到。
 
-### 反例:违反契约的两种事故
+### 第二步扩展② 反例:违反契约的两种事故
 
-事故一:只重写 equals 不重写 hashCode——HashSet.add(两个"相同"对象)→集合中出现两个元素(去重失败);修复=同时重写 hashCode(用 Objects.hash(关键字段))。事故二:hashCode 用可变字段——对象放入 HashMap 后修改了参与 hashCode 的字段→get 返回 null(对象还在但定位不到);修复=hashCode 用不可变字段或 key 用不可变对象(第 20 题 collections 值安全)。
+- 事故一:只重写 equals 不重写 hashCode——HashSet.add(两个"相同"对象)→集合中出现两个元素(去重失败)。
+- 修复=同时重写 hashCode(用 Objects.hash(关键字段))。
+- 事故二:hashCode 用可变字段——对象放入 HashMap 后修改了参与 hashCode 的字段→get 返回 null(对象还在但定位不到)。
+- 修复=hashCode 用不可变字段或 key 用不可变对象(第 20 题 collections 值安全)。
 
-### 取舍:手写 equals vs Lombok/Record
+### 第二步扩展③ 取舍:手写 equals vs Lombok/Record
 
-手写:完全可控但要覆盖所有规范(自反/对称/传递/null/class);Lombok @EqualsAndHashCode:自动生成(注意 callSuper 参数——继承时要调 super.equals);Record:自动生成(不可变+自动 equals/hashCode)——推荐 Record(第 1 题 java-language)或 Lombok(存量项目);手写仅在学习时用。
+- 手写:完全可控但要覆盖所有规范(自反/对称/传递/null/class)。
+- Lombok @EqualsAndHashCode:自动生成(注意 callSuper 参数——继承时要调 super.equals)。
+- Record:自动生成(不可变+自动 equals/hashCode)——推荐 Record(第 1 题 java-language)或 Lombok(存量项目)。
+- 手写仅在学习时用。
 
 ## 案例
 
-### 验证:equals/hashCode 契约的断言组
+### 第三步发散·验证与推演 验证:equals/hashCode 契约的断言组
 
-验证:equals 对称断言(a.equals(b)==b.equals(a));hashCode 一致断言(a.equals(b)→a.hashCode()==b.hashCode());HashSet 去重断言(两个 equals 相等的对象 add 后 size=1);HashMap get 断言(重写 hashCode 后 get 可找到)——四组固化契约(本机 C 系列实验:可变 key 的 get=null 事故)。
+- 验证:equals 对称断言(a.equals(b)==b.equals(a))。
+- hashCode 一致断言(a.equals(b)→a.hashCode()==b.hashCode())。
+- HashSet 去重断言(两个 equals 相等的对象 add 后 size=1)。
+- HashMap get 断言(重写 hashCode 后 get 可找到)——四组固化契约(本机 C 系列实验:可变 key 的 get=null 事故)。
 
-### 追问链:equals 三刀
+### 第三步发散·追问扩展 追问链:equals 三刀
 
-一刀:"equals 与 Comparable?"——equals 比"是不是同一值",compareTo 比"排序大小"——两者语义不同(Person 可以 equals 判断 ID 相同,compareTo 按 age 排序);compareTo 为 0 不要求 equals 为 true(但建议一致,TreeSet 用 compareTo 去重)。二刀:"instanceof vs getClass?"——instanceof 允许子类相等(父类.equals(子类)可能 true);getClass 严格类型匹配(不同类不相等)——Effective Java 推荐 getClass(严格),但某些框架(如 JPA 实体)用 instanceof(代理兼容)。三刀:"hashCode 的实现?"——Objects.hash(field1,field2,...)(自动处理 null 和数组)或手写(31*result+field.hashCode())——31 是奇素数(乘法溢出分布均匀),不可用 2 的幂(等价于位移,低位丢失)。
+- **Q1：equals 与 Comparable?**
+  - 答：equals 比"是不是同一值",compareTo 比"排序大小"——两者语义不同(Person 可以 equals 判断 ID 相同,compareTo 按 age 排序);compareTo 为 0 不要求 equals 为 true(但建议一致,TreeSet 用 compareTo 去重)。
+- **Q2：instanceof vs getClass?**
+  - 答：instanceof 允许子类相等(父类.equals(子类)可能 true);getClass 严格类型匹配(不同类不相等)——Effective Java 推荐 getClass(严格),但某些框架(如 JPA 实体)用 instanceof(代理兼容)。
+- **Q3：hashCode 的实现?**
+  - 答：Objects.hash(field1,field2,...)(自动处理 null 和数组)或手写(31*result+field.hashCode())——31 是奇素数(乘法溢出分布均匀),不可用 2 的幂(等价于位移,低位丢失)。
 
 ## 总结点
 

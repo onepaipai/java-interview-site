@@ -1,9 +1,9 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
+Spring Framework 6.2 / Boot 3；新 API 按正文标注版本，代理与回滚前提见正文。
 
-- [Google SRE · 1](https://sre.google/sre-book/addressing-cascading-failures/)
+- [OWASP 交易授权 · 1](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 
 </details>
 
@@ -19,27 +19,42 @@ Spring Framework 6.2 / Boot 3；代理与回滚前提见正文。
 
 ## 参考分析
 
-### 机制:会话固定的攻击链
+### 第二步扩展① 机制:会话固定的攻击链
 
-攻击链:攻击者先访问登录页获取空 Session ID→构造钓鱼链接携带该 JSESSIONID→受害者点击并用该 ID 登录→服务端把身份绑定到攻击者已知的 ID→攻击者用同一 ID 访问,冒充受害者。防御:Spring Security 的 SessionFixationProtectionStrategy 在认证成功后自动换 ID(changeSessionId);自定义认证流程(手写 filter)需手动处理。
+- 攻击链:攻击者先访问登录页获取空 Session ID→构造钓鱼链接携带该 JSESSIONID→受害者点击并用该 ID 登录→服务端把身份绑定到攻击者已知的 ID→攻击者用同一 ID 访问,冒充受害者。
+- 防御:Spring Security 的 SessionFixationProtectionStrategy 在认证成功后自动换 ID(changeSessionId)。
+- 自定义认证流程(手写 filter)需手动处理。
 
-### 反例:无会话固定防御的事故
+### 第二步扩展② 反例:无会话固定防御的事故
 
-沙盘:网银登录不换 Session ID;攻击者发钓鱼链接携带预取的 Session ID;受害者登录;攻击者用同一 ID 访问,执行资金操作。修复:启用 SessionFixationProtectionStrategy 自动换 ID;自定义认证流程需手动调用 changeSessionId 或重建 Session。
+- 沙盘:网银登录不换 Session ID。
+- 攻击者发钓鱼链接携带预取的 Session ID。
+- 受害者登录。
+- 攻击者用同一 ID 访问,执行资金操作。
+- 修复:启用 SessionFixationProtectionStrategy 自动换 ID。
+- 自定义认证流程需手动调用 changeSessionId 或重建 Session。
 
-### 取舍:会话固定防御的粒度
+### 第二步扩展③ 取舍:会话固定防御的粒度
 
-changeSessionId:保留 Session 数据(购物车等),只换 ID——体验好,默认推荐。invalidate+create:销毁旧 Session 全部重建——更安全但丢失匿名数据。选择:有匿名数据的先迁移再换 ID;无匿名数据直接 invalidate+create。
+- changeSessionId:保留 Session 数据(购物车等),只换 ID——体验好,默认推荐。
+- invalidate+create:销毁旧 Session 全部重建——更安全但丢失匿名数据。
+- 选择:有匿名数据的先迁移再换 ID。
+- 无匿名数据直接 invalidate+create。
 
 ## 案例
 
-### 验证:会话固定的断言组
+### 第三步发散·验证与推演 验证:会话固定的断言组
 
-验证:固定断言——登录前后 Session ID 相同(复现攻击面);防御断言——changeSessionId 后 ID 变化,旧 ID 不可用;Spring Security 断言——默认策略生效,认证后 ID 变化。三组固化会话固定防御。
+- 验证:固定断言——登录前后 Session ID 相同(复现攻击面)。
+- 防御断言——changeSessionId 后 ID 变化,旧 ID 不可用。
+- Spring Security 断言——默认策略生效,认证后 ID 变化。
+- 三组固化会话固定防御。
 
-### 追问链:会话固定三刀
+### 第三步发散·发散要点 追问链:会话固定三刀
 
-一刀:Token 类的会话固定——攻击者预取 refresh token;refresh token 的生成必须随机(CSPRNG)+绑定用户。二刀:匿名 Session——购物车等匿名数据在登录时迁移合并+换 ID。三刀:多设备会话——同一用户多设备登录产生多个独立 Session,会话固定的防御按 Session 独立。
+- **追问①**：Token 类的会话固定——攻击者预取 refresh token;refresh token 的生成必须随机(CSPRNG)+绑定用户
+- **追问②**：匿名 Session——购物车等匿名数据在登录时迁移合并+换 ID
+- **追问③**：多设备会话——同一用户多设备登录产生多个独立 Session,会话固定的防御按 Session 独立
 
 ## 总结点
 

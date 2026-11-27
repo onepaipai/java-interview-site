@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+教学设计场景；容量、一致性和恢复承诺需按实际约束验证。
 
-- [Java 17 规范与 API · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 规范与 API · 1](https://docs.oracle.com/javase/specs/jvms/se17/html/index.html)
+- [Java 17 GC 指南 · 2](https://docs.oracle.com/en/java/javase/17/gctuning/collectors.html)
 
 </details>
 
@@ -20,27 +20,42 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制:参数的"打印与验证"
+### 第二步扩展① 机制:参数的"打印与验证"
 
--XX:+PrintFlagsFinal(打印所有参数最终值——验证参数是否生效)/-XX:+PrintFlagsInitial(初始值)——参数的验证=PrintFlagsFinal 对照(确认 JML 参数被正确设置,而不是"以为设置了");jcmd VM.flags(运行时查看)——参数的审计=变更后 diff FlagsFinal(第 50 题升级排查的基础)。
+- -XX:+PrintFlagsFinal(打印所有参数最终值——验证参数是否生效)/-XX:+PrintFlagsInitial(初始值)——参数的验证=PrintFlagsFinal 对照(确认 JML 参数被正确设置,而不是"以为设置了")。
+- jcmd VM.flags(运行时查看)——参数的审计=变更后 diff FlagsFinal(第 50 题升级排查的基础)。
 
-### 反例:JVM 参数的两种事故
+### 第二步扩展② 反例:JVM 参数的两种事故
 
-事故一:-Xms≠-Xmx——堆动态扩缩容(扩容=暂停+抖动);修复=生产环境 Xms=Xmx(避免动态扩容)。事故二:参数堆积不加区分——从网上复制的"调优参数"盲用(与新 JDK 版本不兼容或已移除);修复=PrintFlagsFinal 验证+按 JDK 版本核对(第 50 题升级的三层排查)。
+- 事故一:-Xms≠-Xmx——堆动态扩缩容(扩容=暂停+抖动)。
+- 修复=生产环境 Xms=Xmx(避免动态扩容)。
+- 事故二:参数堆积不加区分——从网上复制的"调优参数"盲用(与新 JDK 版本不兼容或已移除)。
+- 修复=PrintFlagsFinal 验证+按 JDK 版本核对(第 50 题升级的三层排查)。
 
-### 取舍:参数的"默认优先"原则
+### 第二步扩展③ 取舍:参数的"默认优先"原则
 
-JDK 默认值经过大量测试(大多数场景够用)——不要盲目覆盖默认值(每个覆盖都引入维护成本);只调"有明确依据的参数"(压测发现瓶颈→针对性调整);参数变更=一次发布(走评测门禁,第 49 题)。
+- JDK 默认值经过大量测试(大多数场景够用)——不要盲目覆盖默认值(每个覆盖都引入维护成本)。
+- 只调"有明确依据的参数"(压测发现瓶颈→针对性调整)。
+- 参数变更=一次发布(走评测门禁,第 49 题)。
 
 ## 案例
 
-### 验证:JVM 参数的走查核对
+### 第三步发散·验证与推演 验证:JVM 参数的走查核对
 
-验证:PrintFlagsFinal 断言(参数生效——diff 变更前后的 FlagsFinal);堆大小断言(jcmd GC.heap_info 查看堆布局);OOM 转储断言(构造 OOM→HeapDumpPath 有 dump 文件);NMT 断言(NMT summary 的各区域能耗与理论一致,第 11 题 JVM 实测)。验证:参数验证的断言可程序化(jcmd 命令集)。
+- 验证:PrintFlagsFinal 断言(参数生效——diff 变更前后的 FlagsFinal)。
+- 堆大小断言(jcmd GC.heap_info 查看堆布局)。
+- OOM 转储断言(构造 OOM→HeapDumpPath 有 dump 文件)。
+- NMT 断言(NMT summary 的各区域能耗与理论一致,第 11 题 JVM 实测)。
+- 验证:参数验证的断言可程序化(jcmd 命令集)。
 
-### 追问链:参数三刀
+### 第三步发散·追问扩展 追问链:参数三刀
 
-一刀:"容器环境的 JVM 参数?"——容器内存限制(cgroup)与 JVM 堆的关系(JVM 感知容器内存,JDK 10+ UseContainerSupport)——堆+元空间+栈+堆外+Code Cache < 容器 limit(第 19 题 jvm-advanced 容器 OOMKilled)。二刀:"-XX:+UseCompressedOops 的条件?"——堆<32GB 时可用(>32GB 自动关闭,引用变 8 字节→内存跳涨)——堆从 31GB 调到 33GB 可用内存反而变少(压缩指针失效)。三刀:"参数的优先级?"——命令行>环境变量>配置文件>JVM 默认——冲突时高优先级覆盖;参数的来源要可追溯(第 10 题配置审计)。
+- **Q1：容器环境的 JVM 参数?**
+  - 答：容器内存限制(cgroup)与 JVM 堆的关系(JVM 感知容器内存,JDK 10+ UseContainerSupport)——堆+元空间+栈+堆外+Code Cache < 容器 limit(第 19 题 jvm-advanced 容器 OOMKilled)。
+- **Q2：-XX:+UseCompressedOops 的条件?**
+  - 答：堆<32GB 时可用(>32GB 自动关闭,引用变 8 字节→内存跳涨)——堆从 31GB 调到 33GB 可用内存反而变少(压缩指针失效)。
+- **Q3：参数的优先级?**
+  - 答：命令行>环境变量>配置文件>JVM 默认——冲突时高优先级覆盖;参数的来源要可追溯(第 10 题配置审计)。
 
 ## 总结点
 

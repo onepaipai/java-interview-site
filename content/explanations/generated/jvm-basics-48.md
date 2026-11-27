@@ -1,7 +1,7 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
 - [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/troubleshoot/environment-issues.html)
@@ -20,27 +20,39 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：内核 OOM kill 与 Java OOM 是两套裁判
+### 第二步扩展① 机制：内核 OOM kill 与 Java OOM 是两套裁判
 
-cgroup 超限由内核直接杀进程（无堆转储、无日志缓冲刷新）；Java OOM 由 JVM 抛错（有堆栈、可配转储、可配快速退出）。预算拆分的全部意义：让"第一次爆"发生在 Java 层、有证据可查，而不是内核无声处决。类比给家里各房间装分闸：跳的是房间闸，而不是总闸全楼黑。
+- cgroup 超限由内核直接杀进程（无堆转储、无日志缓冲刷新）。
+- Java OOM 由 JVM 抛错（有堆栈、可配转储、可配快速退出）。
+- 预算拆分的全部意义：让"第一次爆"发生在 Java 层、有证据可查，而不是内核无声处决。
+- 类比给家里各房间装分闸：跳的是房间闸，而不是总闸全楼黑。
 
-### 反例：85% 堆的内核处决
+### 第二步扩展② 反例：85% 堆的内核处决
 
-limit 2G、堆 1.7G：元空间 150M + CodeCache 100M + 50 线程×1M + 直接内存 200M，合计超限。高峰直接内存一涨，cgroup 先爆——dmesg 有一行 oom-kill，Java 日志干干净净。修正：堆降到 60%（1.2G）并显式设 MaxDirectMemorySize=256m，RSS 回到 limit 内，此后 OOM（若有）全部是 Java 层可诊断事件。
+- limit 2G、堆 1.7G：元空间 150M + CodeCache 100M + 50 线程×1M + 直接内存 200M，合计超限。
+- 高峰直接内存一涨，cgroup 先爆——dmesg 有一行 oom-kill，Java 日志干干净净。
+- 修正：堆降到 60%（1.2G）并显式设 MaxDirectMemorySize=256m，RSS 回到 limit 内，此后 OOM（若有）全部是 Java 层可诊断事件。
 
-### 取舍：百分比、绝对值与验证闭环
+### 第二步扩展③ 取舍：百分比、绝对值与验证闭环
 
-参数形式的选择：固定规格容器用绝对值（-Xmx1g 等）最可控；弹性规格用 MaxRAMPercentage。无论哪种，都要用 NMT/RSS 监控验证一周基线，再回头修预算表——预算是假设，监控是验收。本项目实践：65% 堆 + OOM 快速退出，审查建议降至 55–60%（见审查记录）。
+- 参数形式的选择：固定规格容器用绝对值（-Xmx1g 等）最可控。
+- 弹性规格用 MaxRAMPercentage。
+- 无论哪种，都要用 NMT/RSS 监控验证一周基线，再回头修预算表——预算是假设，监控是验收。
+- 本项目实践：65% 堆 + OOM 快速退出，审查建议降至 55–60%（见审查记录）。
 
 ## 案例
 
-### 对照操作：预算表逐项对账
+### 第三步发散·验证与推演 对照操作：预算表逐项对账
 
-教学验证：limit 2G 容器内按表逐项核对——jcmd GC.heap_info（堆）、VM.native_memory summary（本地内存分项）、线程数×Xss、NMT Internal（直接内存）。预期：分项合计 + 15–25% 余量 ≤ 2G；把表格贴进部署文档，参数变更必走对账。演练可离线完成。
+- 教学验证：limit 2G 容器内按表逐项核对——jcmd GC.heap_info（堆）、VM.native_memory summary（本地内存分项）、线程数×Xss、NMT Internal（直接内存）。
+- 预期：分项合计 + 15–25% 余量 ≤ 2G。
+- 把表格贴进部署文档，参数变更必走对账。
+- 演练可离线完成。
 
-### 追问：为什么不直接把 limit 调大省去拆分
+### 第三步发散·追问① 追问：为什么不直接把 limit 调大省去拆分
 
-调大 limit 推高成本且不改变"账单失控"的本质：下一次直接内存泄漏照样内核处决，只是更晚。拆分的价值是让每个资源项可观测、可独立设限（MaxDirectMemorySize、MaxMetaspaceSize、Xss），故障时第一时间知道"谁的账爆了"。
+- 调大 limit 推高成本且不改变"账单失控"的本质：下一次直接内存泄漏照样内核处决，只是更晚。
+- 拆分的价值是让每个资源项可观测、可独立设限（MaxDirectMemorySize、MaxMetaspaceSize、Xss），故障时第一时间知道"谁的账爆了"。
 
 ## 总结点
 

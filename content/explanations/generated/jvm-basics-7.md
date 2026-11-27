@@ -1,10 +1,10 @@
 <details class="explanation-references">
 <summary>适用范围与模块参考资料</summary>
 
-Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分。
+Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正文版本区分。
 
 - [Java 17 GC 指南 · 1](https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html)
-- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/management/MemoryMXBean.html.html)
+- [Java 17 规范与 API · 2](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/management/MemoryMXBean.html)
 
 </details>
 
@@ -20,27 +20,38 @@ Java 示例以 17 为基准；虚拟线程及历史实现按正文版本区分�
 
 ## 参考分析
 
-### 机制：Java 进程内存是一张分项清单
+### 第二步扩展① 机制：Java 进程内存是一张分项清单
 
-类比租同一块地的两座仓库：账面面积（Xmx）相同，但一家货码得满（堆实际触碰页多）、另一家还租了仓库周边的小间（元空间/CodeCache/直接内存），再加上货架管理台账（GC 辅助结构）厚薄不同，实付租金（RSS）自然不同。差值通常不在堆内，而在堆外四小件。
+- 类比租同一块地的两座仓库：账面面积（Xmx）相同，但一家货码得满（堆实际触碰页多）、另一家还租了仓库周边的小间（元空间/CodeCache/直接内存），再加上货架管理台账（GC 辅助结构）厚薄不同，实付租金（RSS）自然不同。
+- 差值通常不在堆内，而在堆外四小件。
 
-### 反例：三个常见的"隐形大户"
+### 第二步扩展② 反例：三个常见的"隐形大户"
 
-一是大量线程：每线程 Xss 常驻（1000 线程 × 1MB 就是 1G）；二是直接内存：Netty/压缩/加密缓冲常驻且不在堆转储里（见第 33 题）；三是透明大页或 CodeCache 膨胀。三者都不受 Xmx 约束，容器里最先顶穿 cgroup 上限的也往往是它们。
+- 一是大量线程：每线程 Xss 常驻（1000 线程 × 1MB 就是 1G）。
+- 二是直接内存：Netty/压缩/加密缓冲常驻且不在堆转储里（见第 33 题）。
+- 三是透明大页或 CodeCache 膨胀。
+- 三者都不受 Xmx 约束，容器里最先顶穿 cgroup 上限的也往往是它们。
 
-### 取舍：预算拆分而不是只调 Xmx
+### 第二步扩展③ 取舍：预算拆分而不是只调 Xmx
 
-容器内存预算应显式拆分：堆 + 元空间 + CodeCache + 线程栈合计 + 直接内存 + 余量 ≤ limit。项目实践里 MaxRAMPercentage 取 55–65 并配 ExitOnOutOfMemoryError；NMT 跑一周基线后再定各项上限（详见第 48 题）。
+- 容器内存预算应显式拆分：堆 + 元空间 + CodeCache + 线程栈合计 + 直接内存 + 余量 ≤ limit。
+- 项目实践里 MaxRAMPercentage 取 55–65 并配 ExitOnOutOfMemoryError。
+- NMT 跑一周基线后再定各项上限（详见第 48 题）。
 
 ## 案例
 
-### 对照操作：NMT 六类目的读法
+### 第三步发散·验证与推演 对照操作：NMT 六类目的读法
 
-教学验证：两服务同开 NMT summary，`jcmd PID VM.native_memory summary` 输出按 Java Heap/Class/Meta/Thread/Code/Internal 分类对比。预期：差异集中在 Thread（线程数）或 Internal（直接内存）类目，而不是 Java Heap。该读法可迁移到任何 RSS 疑难，一次学会反复用。
+- 教学验证：两服务同开 NMT summary，`jcmd PID VM.native_memory summary` 输出按 Java Heap/Class/Meta/Thread/Code/Internal 分类对比。
+- 预期：差异集中在 Thread（线程数）或 Internal（直接内存）类目，而不是 Java Heap。
+- 该读法可迁移到任何 RSS 疑难，一次学会反复用。
 
-### 追问：committed 和 RSS 为什么对不上
+### 第三步发散·追问① 追问：committed 和 RSS 为什么对不上
 
-committed 是 JVM 向操作系统"预约"的地址空间，RSS 是实际驻留的物理页。堆可以只提交不触碰（never touched pages 不占物理内存），GC 扫描过的页倾向于常驻。因此"committed 大、RSS 小"是常态；容器内存告警要盯 RSS 与 cgroup，而不是 Xmx。
+- committed 是 JVM 向操作系统"预约"的地址空间，RSS 是实际驻留的物理页。
+- 堆可以只提交不触碰（never touched pages 不占物理内存），GC 扫描过的页倾向于常驻。
+- 因此"committed 大、RSS 小"是常态。
+- 容器内存告警要盯 RSS 与 cgroup，而不是 Xmx。
 
 ## 总结点
 

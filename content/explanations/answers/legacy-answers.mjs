@@ -10,7 +10,7 @@ const hnsw = 'https://arxiv.org/abs/1603.09320';
 const lora = 'https://arxiv.org/abs/2106.09685';
 const judge = 'https://arxiv.org/abs/2306.05685';
 const elastic = 'https://www.elastic.co/guide/en/elasticsearch/reference/current/rrf.html';
-const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + n + '.html';
+const api = n => 'https://docs.oracle.com/en/java/javase/17/docs/api/java.base/' + (n.endsWith('.html') ? n : n + '.html');
 const mysql = 'https://dev.mysql.com/doc/refman/8.4/en/';
 const r = { index: mysql + 'multiple-column-indexes.html', explain: mysql + 'explain.html', convert: mysql + 'type-conversion.html', snapshot: mysql + 'innodb-consistent-read.html', isolation: mysql + 'innodb-transaction-isolation-levels.html', lock: mysql + 'innodb-locking.html', deadlock: mysql + 'innodb-deadlocks.html', redo: mysql + 'innodb-redo-log.html', undo: mysql + 'innodb-undo-logs.html', binlog: mysql + 'binary-log.html', create: mysql + 'create-index.html', commit: mysql + 'implicit-commit.html', ddl: mysql + 'innodb-online-ddl-operations.html', select: mysql + 'select.html', backup: mysql + 'backup-and-recovery.html', replication: mysql + 'replication.html' };
 const jls17 = 'https://docs.oracle.com/javase/specs/jls/se17/html/index.html';
@@ -1096,7 +1096,7 @@ export default {
     [
       'String 不可变:内部 char[]/byte[](JDK 9 Compact Strings,第 36 题 JVM)声明为 final,无修改方法——不可变的原因:安全性(密码/路径/类名不可被篡改)+哈希缓存(String 的 hashCode 缓存,首次计算后不重算)+线程安全(不可变天然线程安全)+字符串常量池(共享引用)。',
       'StringBuilder:可变字符序列,内部 char[]/byte[] 动态扩容(默认 16,不足×2+2)——append/insert/replace 原地修改(不创建新对象);非线程安全(单线程拼接首选,性能最好)。',
-      'StringBuffer:StringBuilder 的线程安全版(所有方法 synchronized)——并发安全但性能低于 StringBuilder(锁开销,并发基础 21 题偏向锁移除后的真实成本);实际场景中多线程拼接罕见(通常单线程内拼接后一次转 String),StringBuffer 使用率极低。',
+      'StringBuffer:StringBuilder 的线程安全版(所有方法 synchronized)——并发安全但性能低于 StringBuilder(锁开销,并发基础 21 题偏向锁默认禁用后的真实成本);实际场景中多线程拼接罕见(通常单线程内拼接后一次转 String),StringBuffer 使用率极低。',
     ],
     [
       block('机制:String 不可变的四层原因', '一,安全性:String 常用于文件路径/类名/网络地址——如果可变,恶意代码可修改路径指向其他文件;二,常量池:String Pool 依赖不可变(多个引用共享同一实例——修改会影响所有引用);三,hashCode 缓存:不可变才能缓存 hashCode(HashMap 的 key 优化);四,线程安全:不可变对象天然线程安全(无需同步)。'),
@@ -2144,16 +2144,16 @@ export default {
     [
       "大模型(LLM):基于 Transformer 的大规模预训练语言模型——参数量(十亿到万亿)+训练数据(海量文本)+能力(生成/理解/推理/对话);LLM 不是数据库(不能查询事实),是语言模型(基于训练分布生成文本——第 31 题知识归 RAG)。",
       "token:模型处理文本的最小单位——中文≈1-2 字/token,英文≈1 词/1-3 token;计费与上下文窗口都按 token 计(第 22 题预算);token 计数≠字符数(第 57 题 ai-production)。",
-      "上下文窗口:模型一次能处理的最大 token 数(GPT-4 128K/Claude 200K)——窗口内所有内容(系统提示+检索片段+对话历史+用户问题)共享窗口;超出→截断或压缩(第 32 题压缩方案)。",
+      "上下文窗口:模型一次能处理的最大 token 数(各型号差异大,以实际版本为准)——窗口内所有内容(系统提示+检索片段+对话历史+用户问题)共享窗口;超出→截断或压缩(第 32 题压缩方案)。",
     ],
     [
       block("机制:LLM 的知识来自训练分布", "LLM 的知识=训练数据的压缩表示(参数中的统计模式)——不是查询而是生成(基于上下文预测下一个 token);训练截止后的知识=不知道(幻觉风险)——RAG 解决(检索最新知识注入上下文,第 31 题职责分离)。"),
       block("反例:LLM 理解偏差的两种事故", "事故一:把 LLM 当搜索引擎——帮我查最新利率→用旧数据回答(过时);修复=RAG 注入最新数据。事故二:把 token 当字——中文与 token 不是 1:1;计费与窗口估算按 token 而不是字符数(第 22 题)。"),
-      block("取舍:模型选型的维度", "能力(通用/代码/数学)+窗口大小(4K/32K/128K/200K)+成本(输入/输出单价)+延迟(首 token/生成速度)+合规(数据出境/私有化,第 45 题)——模型选型=多维矩阵(第 35 题量化矩阵同构),用业务评测集实测(第 1 题)。"),
+      block("取舍:模型选型的维度", "能力(通用/代码/数学)+窗口大小(按型号实际规格核对)+成本(输入/输出单价)+延迟(首 token/生成速度)+合规(数据出境/私有化,第 45 题)——模型选型=多维矩阵(第 35 题量化矩阵同构),用业务评测集实测(第 1 题)。"),
     ],
     [
       block("验证:LLM 概念的走查核对", "验证:token 计数断言(中文/英文 token 数与字符数不同——tokenizer 实测);上下文窗口断言(超窗口→截断或报错);知识截止断言(训练后事件→不知道);幻觉断言(要求输出不存在的事实→可能编造)。验证:概念断言可程序化(调用 API 实测);Y1 成本模型的 token 计量可复用。"),
-      block("追问链:LLM 三刀", "一刀:temperature=0 确定性(结构化输出)>0 随机性(创意)——温度低→稳定。二刀:大模型 vs 小模型=能力强+成本高 vs 能力弱+成本低——路由(第 22 题)按复杂度分配。三刀:私有化部署 vs API=数据不出域 vs 能力强+成本线性(第 45 题混合路由)。"),
+      block("追问链:LLM 三刀", "一刀:temperature=0 贪心解码(消除采样随机但不保证完全一致,浮点/批处理/服务版本仍有影响,见 ai-basics 4 题)>0 随机性(创意)——温度低→更稳但强确定性要靠代码校验。二刀:大模型 vs 小模型=能力强+成本高 vs 能力弱+成本低——路由(第 22 题)按复杂度分配。三刀:私有化部署 vs API=数据不出域 vs 能力强+成本线性(第 45 题混合路由)。"),
     ],
     ["LLM=生成模型,不是搜索引擎", "token 计量≠字符数", "知识截止→RAG 补充最新知识"], [rag, paged],
   ),
@@ -2168,7 +2168,7 @@ export default {
     [
       block("机制:窗口与 KV Cache 的关系", "窗口大小决定 KV Cache 内存(第 33 题乘积:并发×上下文×层×头×维×2)——窗口越大→单请求 KV 越大→同显存并发越少——窗口=成本×质量×并发的三角(第 33 题容量)。"),
       block("反例:窗口管理的两种事故", "事故一:全量塞入——整个文档(50K)塞入→KV 巨大+注意力稀释(第 26 题位置效应);修复=RAG 检索相关片段(只送 2-5K)。事故二:截断丢关键证据——按 token 截断(不是按证据边界)→关键条款被截;修复=按证据块截断(第 8 题结构切分)。"),
-      block("取舍:窗口大小选型", "大窗口(128K/200K):装更多但成本高+注意力稀释;小窗口(4K/8K):精细检索+压缩——按任务需要的证据量选(大多数问答 8K 足够);窗口=成本×质量×并发三角(第 33 题)。"),
+      block("取舍:窗口大小选型", "大窗口:装更多证据但成本高+注意力稀释(中间位置利用率下降);小窗口:倒逼精细检索+压缩,成本可控但需多轮取证——按任务真正需要的证据量选,别把窗口数字当能力上限;窗口选择=成本×质量×并发三角(第 33 题),具体规格以目标模型文档为准。"),
     ],
     [
       block("验证:窗口管理的走查核对", "验证:窗口预算断言(四部分 token 总和≤窗口);超窗口断言(压缩或截断——不静默丢内容);RAG 断言(检索片段总 token<窗口 50%);压缩断言(压缩后忠实度不跌破阈值,第 32 题)。验证:token 计数可程序化(tokenizer API);窗口管理验收=答案质量(第 49 题)。"),
@@ -2178,22 +2178,22 @@ export default {
   ),
   "legacy/59": deep(
     "什么是幻觉？temperature 的作用",
-    "网银 AI 沙盘:模型自信输出不存在的内容(幻觉=概率生成的固有特性)——temperature 控制随机性(0=确定性,1=创造性);幻觉检测=RAG+忠实度评估(第 24 题)+人工复核(第 28 题)。",
+    "网银 AI 沙盘:模型自信输出不存在的内容(幻觉=概率生成的固有特性)——temperature 控制采样随机性(0=贪心解码消除采样随机,但不等于完全一致);幻觉检测=RAG+忠实度评估(第 24 题)+人工复核(第 28 题)。",
     [
       "幻觉的机制:LLM 基于训练分布生成文本——上下文不足或问题超出训练分布时,模型编造看似合理的答案(语言流畅但事实错误);幻觉不是 bug,是概率生成模型的固有特性(第 59 题 ai-production)。",
       "幻觉分类:事实幻觉(编造不存在的事实——虚构法条/日期)、忠实度幻觉(检索内容存在但答案不符——过度推断)、指令幻觉(编造引用编号,第 28 题)——每类的检测与防御不同(第 24 题)。",
-      "temperature:采样温度——0=贪心解码(确定性输出);<1=保守(倾向高概率 token);>1=多样(倾向低概率 token);温度影响幻觉概率(高温增加,低温减少但可能重复)——金融问答 temperature=0-0.3(确定性优先)。",
+      "temperature:采样温度——0=贪心解码(消除采样随机,不保证完全一致:浮点/批处理/服务版本仍有影响);<1=保守(倾向高概率 token);>1=多样(倾向低概率 token);温度影响幻觉概率(高温增加,低温减少但可能重复)——金融问答 temperature=0-0.3(稳定优先,确定性仍靠校验与固定版本)。",
     ],
     [
       block("机制:幻觉为什么流畅且自信", "LLM 训练目标=预测下一个 token(语言流畅),不是验证事实正确——幻觉文本的语言特征与正确文本相同(流畅/有逻辑/自信),区别只在事实层面——需要事实校验(检索比对)而非语言特征判断(第 24 题)。"),
       block("反例:幻觉的两种事故", "事故一:数字幻觉——利率/金额编造(金融资损级);修复=RAG+忠实度评估+数字人工复核(第 28 题)。事故二:引用幻觉——编造引用编号(第 28 题);修复=程序化校验(编号∈上下文清单)+引用定位(第 27 题)。"),
-      block("取舍:temperature 场景化设置", "结构化输出(JSON/代码):temperature=0(格式稳定);创意写作:0.7-1.0(多样性);金融问答:0-0.3(确定性优先)——temperature 的选择也是质量门禁参数(第 49 题:不同温度评测对照)。"),
+      block("取舍:temperature 场景化设置", "结构化输出(JSON/代码):temperature=0(格式较稳)+后端校验;创意写作:0.7-1.0(多样性);金融问答:0-0.3(稳定优先,不靠温度保证确定)——temperature 的选择也是质量门禁参数(第 49 题:不同温度评测对照)。"),
     ],
     [
       block("验证:幻觉与 temperature 的走查核对", "验证:幻觉检测断言(语料无答案的问题→模型可能编造→忠实度评估拦截);temperature 对照断言(同 prompt 不同温度的输出多样性);RAG 断言(检索注入后幻觉率下降);拒答断言(temperature=0+忠实约束→我不知道而非编造)。验证:幻觉率可程序化(忠实度评估+人工抽检);temperature 对照可复跑。"),
       block("追问链:幻觉三刀", "一刀:RAG 不能完全消除幻觉(检索到正确证据+模型仍可能过度推断——忠实度幻觉,第 24 题)。二刀:幻觉检测手段=断言级忠实度评估+人工抽检+一致性检验(多轮对比)——全自动检测有漏检。三刀:幻觉的业务影响分级=数字/日期/法规=高风险(资金/合规);描述性=低风险——影响决定防御强度(第 28 题复核触发器)。"),
     ],
-    ["幻觉=概率生成的固有特性", "temperature 0=确定性,高=多样", "RAG 减少知识缺失型,不消除推理型"], [rag, judge],
+    ["幻觉=概率生成的固有特性", "温度零消采样,不保完全一致", "RAG 减少知识缺失型,不消除推理型"], [rag, judge],
   ),
   "legacy/60": deep(
     "平时用哪些 AI 工具？如何验证它生成的代码",

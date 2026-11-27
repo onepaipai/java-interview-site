@@ -49,7 +49,7 @@ for (const module of seniorManifest.modules) {
 }
 
 for (const entry of oldManifest.entries) {
-  const source = await read('content/explanations/' + entry.file);
+  const source = await read('content/explanations/generated/' + path.basename(entry.file));
   let content = source;
   let references = (entry.references || []).map(normalize);
   const baseName = path.basename(entry.file);

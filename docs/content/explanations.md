@@ -119,9 +119,9 @@ senior-v1 最初为 1,050 道题及稳定来源键，后续按技术演进增补
 3. `node scripts/test-explanation-publication.mjs` 验证失败生成保留旧清单和不可变文件；`test-explanation-corrections.mjs` 等历史一次性验收脚本已退役(git 历史可恢复)。
 4. 正文中的 Java 示例由后端 `*ExamplesTest` 编译执行（舍入、二分、前缀和、背包和零钱案例等），另验证错误捕获片段编译失败。历史脚本 `verify-reviewed-examples.ps1` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/verify-reviewed-examples.ps1`)。
 5. 历史脚本 `prepare-review-examples.mjs` 已退役，从 git 历史取回(`git show bf8768a:scripts/prepare-review-examples.mjs`)后提取正文代码，再以 Java 17 执行 `backend/target/ReviewExamples20261020.java`；包含交接、丢更新、LRU、空值、顺序和可见性等 14 项验证。
-6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；执行证据由 `SpringCoreExamplesTest` 与审核台账承接(历史核对脚本已退役)。完整范围及限制见 [整改记录](../reports/content/SPRING-CORE-CONTENT-20261023.md)。
-7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；执行证据由 `SpringAdvancedExamplesTest` 与审核台账承接(历史核对脚本已退役)。范围和未验证部分见 [进阶整改记录](../reports/content/SPRING-ADVANCED-CONTENT-20261023.md)。
-8. 数据库基础模块现有 59 题均有独立正文，新增 53 道修订及 12 道深入格式。`DatabaseBasicsExamplesTest` 执行正文中 3 组 SQL 并记录 H2 结果，`node scripts/test-database-basics-answers.mjs` 核对证据。相同 SQL 接入显式隔离 MySQL 8.4 门禁，本机未运行该门禁，不以 H2 结果代替索引或锁验证；范围见 [数据库整改记录](../reports/content/DATABASE-BASICS-CONTENT-20261023.md)。
+6. Spring 基础模块现有 59 题均有独立正文，本轮将其中 54 题从主题正文改为逐题编写，新增 15 道深入格式。`SpringCoreExamplesTest` 编译运行正文中 3 段 Java 源码并验证事务回滚对照；执行证据由 `SpringCoreExamplesTest` 与审核台账承接(历史核对脚本已退役)。完整范围及限制见整改明细报告 `docs/reports/content/SPRING-CORE-CONTENT-20261023.md`（已移出仓库，`git show bf8768a:<路径>` 可取回）。
+7. Spring 进阶模块现有 60 题均有独立正文，新增 54 道题目级修订，其中 12 道深入格式。`SpringAdvancedExamplesTest` 执行正文中 3 段程序和 2 项真实事务事件对照；执行证据由 `SpringAdvancedExamplesTest` 与审核台账承接(历史核对脚本已退役)。范围和未验证部分见整改明细报告 `docs/reports/content/SPRING-ADVANCED-CONTENT-20261023.md`（已移出仓库，`git show bf8768a:<路径>` 可取回）。
+8. 数据库基础模块现有 59 题均有独立正文，新增 53 道修订及 12 道深入格式。`DatabaseBasicsExamplesTest` 执行正文中 3 组 SQL 并记录 H2 结果，`node scripts/test-database-basics-answers.mjs` 核对证据。相同 SQL 接入显式隔离 MySQL 8.4 门禁，本机未运行该门禁，不以 H2 结果代替索引或锁验证；范围见整改明细报告 `docs/reports/content/DATABASE-BASICS-CONTENT-20261023.md`（已移出仓库，`git show bf8768a:<路径>` 可取回）。
 
 ## 版本核对依据
 

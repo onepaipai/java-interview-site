@@ -133,6 +133,6 @@ python scripts/test-restore.py G:/Git/bin/bash.exe
 
 发布后对快照运行 `node scripts/sync-content-status.mjs --check` 核对内容状态与审核台账。历史脚本 `verify-explanation-upgrade.mjs`、`verify-review-fixes.mjs` 已退役，需要时从 git 历史取回(`git show bf8768a:scripts/<脚本名>`)。
 
-逐项结果见各模块整改记录（如 `docs/reports/content/SPRING-CORE-CONTENT-20261023.md`）。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围，历史报告已从仓库移除，需要时从 git 历史恢复。
+逐项结果见各模块整改记录（如 `docs/reports/content/SPRING-CORE-CONTENT-20261023.md`，已移出仓库，`git show bf8768a:<路径>` 可取回）。10 月 15 日的 37 项后端测试、9 项单元测试及恢复模拟记录属于当时验证范围，历史报告已从仓库移除，需要时从 git 历史恢复。
 
 以上不代表真实模型供应商、生产 MySQL 或远程部署已验收。

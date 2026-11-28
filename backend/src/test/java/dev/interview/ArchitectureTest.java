@@ -194,7 +194,7 @@ class ArchitectureTest {
     );
     index.snapshot();
     org.mockito.Mockito.clearInvocations(db);
-    questions.list(user, "OriginalMarker", category, "", "", "", false, false, false, 1, 15);
+    questions.list(user, "OriginalMarker", category, "", "", "", false, false, false, false, 1, 15);
     questions.location(id, category, "OriginalMarker", false, 15);
     long scans = org.mockito.Mockito.mockingDetails(db)
       .getInvocations()
@@ -225,7 +225,7 @@ class ArchitectureTest {
     assertEquals(
       1L,
       questions
-        .list(user, "OriginalMarker", category, "", "", "", false, false, false, 1, 15)
+        .list(user, "OriginalMarker", category, "", "", "", false, false, false, false, 1, 15)
         .get("total")
     );
     questions.save(
@@ -235,13 +235,13 @@ class ArchitectureTest {
     assertEquals(
       1L,
       questions
-        .list(user, "CommittedMarker", category, "", "", "", false, false, false, 1, 15)
+        .list(user, "CommittedMarker", category, "", "", "", false, false, false, false, 1, 15)
         .get("total")
     );
     assertEquals(
       0L,
       questions
-        .list(user, "OriginalMarker", category, "", "", "", false, false, false, 1, 15)
+        .list(user, "OriginalMarker", category, "", "", "", false, false, false, false, 1, 15)
         .get("total")
     );
   }

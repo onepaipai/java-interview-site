@@ -1,6 +1,7 @@
 package dev.interview.question;
 
 import jakarta.validation.constraints.*;
+import java.sql.Timestamp;
 import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,7 @@ public class LearningService {
   @Transactional
   public void progress(long user, long id, Progress input) {
     questions.question(id, user, false);
-    repository.progress(user, id, input);
+    repository.progress(user, id, input, new Timestamp(System.currentTimeMillis()));
   }
 
   public Map<String, Object> stats(long user) {

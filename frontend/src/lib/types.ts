@@ -48,6 +48,7 @@ export interface LearningSummary {
   total: number;
   mastered: number;
   weak: number;
+  due: number;
   categories: { name: string; total: number; mastered: number }[];
 }
 export interface Page<T> {
@@ -69,6 +70,7 @@ export interface QuestionSummary {
   tags: string[];
   mastery: string;
   favorite: boolean;
+  next_review: string | null;
 }
 export interface IdResponse {
   id: number;
@@ -91,6 +93,7 @@ export interface Question {
   mastery: string;
   favorite: boolean;
   note: string;
+  next_review: string | null;
   tags: string[];
 }
 export interface User {

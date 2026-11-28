@@ -43,6 +43,7 @@ public class QuestionController {
     @RequestParam(defaultValue = "") String tag,
     @RequestParam(defaultValue = "false") boolean favorite,
     @RequestParam(defaultValue = "false") boolean weak,
+    @RequestParam(defaultValue = "false") boolean due,
     @RequestParam(defaultValue = "false") boolean trash,
     @RequestParam(defaultValue = "1") int page,
     @RequestParam(defaultValue = "30") int size
@@ -64,6 +65,7 @@ public class QuestionController {
         tag,
         favorite,
         weak,
+        due,
         trash,
         page,
         size

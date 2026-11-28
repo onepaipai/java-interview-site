@@ -1497,6 +1497,15 @@
             }
           },
           {
+            "name": "due",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
             "name": "trash",
             "in": "query",
             "required": false,
@@ -8740,6 +8749,12 @@
           },
           "favorite": {
             "type": "boolean"
+          },
+          "next_review": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8754,7 +8769,8 @@
           "preview",
           "tags",
           "mastery",
-          "favorite"
+          "favorite",
+          "next_review"
         ],
         "additionalProperties": false
       },
@@ -8807,6 +8823,12 @@
           "review_count": {
             "type": "integer",
             "format": "int64"
+          },
+          "next_review": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8822,7 +8844,8 @@
           "mastery",
           "favorite",
           "note",
-          "review_count"
+          "review_count",
+          "next_review"
         ],
         "additionalProperties": false
       },

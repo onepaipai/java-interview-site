@@ -22,7 +22,8 @@ public final class QuestionDtos {
     String preview,
     List<String> tags,
     String mastery,
-    boolean favorite
+    boolean favorite,
+    @JsonProperty("next_review") String nextReview
   ) {
     public static Summary from(Map<String, Object> r) {
       return new Summary(
@@ -37,7 +38,8 @@ public final class QuestionDtos {
         string(r, "preview"),
         QuestionDtos.tags(r),
         string(r, "mastery"),
-        bool(r, "favorite")
+        bool(r, "favorite"),
+        timestamp(r, "next_review")
       );
     }
   }
@@ -55,7 +57,8 @@ public final class QuestionDtos {
     String mastery,
     boolean favorite,
     String note,
-    @JsonProperty("review_count") int reviewCount
+    @JsonProperty("review_count") int reviewCount,
+    @JsonProperty("next_review") String nextReview
   ) {
     public static Detail from(Map<String, Object> r) {
       return new Detail(
@@ -71,7 +74,8 @@ public final class QuestionDtos {
         string(r, "mastery"),
         bool(r, "favorite"),
         string(r, "note"),
-        (int) number(r, "review_count")
+        (int) number(r, "review_count"),
+        timestamp(r, "next_review")
       );
     }
   }
@@ -96,6 +100,15 @@ public final class QuestionDtos {
 
   private static boolean bool(Map<String, Object> r, String key) {
     return Boolean.TRUE.equals(r.get(key)) || (r.get(key) instanceof Number n && n.intValue() != 0);
+  }
+
+  /** 时间戳转 ISO-8601 字符串（浏览器可稳定解析）；NULL 保持 null 表示未排期。 */
+  private static String timestamp(Map<String, Object> r, String key) {
+    Object value = r.get(key);
+    if (value instanceof java.sql.Timestamp t) {
+      return t.toInstant().toString();
+    }
+    return null;
   }
 
   @SuppressWarnings("unchecked")

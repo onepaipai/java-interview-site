@@ -72,6 +72,10 @@ onBeforeUnmount(() => {
   statsController.abort();
   weakController.abort();
 });
+// 与后端排期同一口径：未排期（存量弱项）或排期时间已到即为今日到期
+function isDue(nextReview: string | null): boolean {
+  return !nextReview || new Date(nextReview).getTime() <= Date.now();
+}
 </script>
 <template>
   <section class="learning-home panel" aria-label="我的学习">
@@ -81,7 +85,7 @@ onBeforeUnmount(() => {
         <p class="muted">
           {{
             stats
-              ? `已掌握 ${stats.mastered} 题 · 待复习 ${stats.weak} 题`
+              ? `已掌握 ${stats.mastered} 题 · 今日到期 ${stats.due} 题 · 待复习 ${stats.weak} 题`
               : '自评后，会在这里整理需要复习的题目。'
           }}
         </p>
@@ -108,7 +112,10 @@ onBeforeUnmount(() => {
       <span class="muted">待复习 · 显示 {{ weak.length }} / {{ weakTotal }} 题</span>
       <button v-for="q in weak" :key="q.id" @click="emit('open', q.id)">
         <span>{{ plainContent(q.title) }}</span
-        ><small>{{ q.mastery === 'NO' ? '不会' : '模糊' }} →</small>
+        ><small
+          >{{ isDue(q.next_review) ? '今日到期 · ' : ''
+          }}{{ q.mastery === 'NO' ? '不会' : '模糊' }} →</small
+        >
       </button>
       <button class="primary" @click="emit('review')">开始复习全部 {{ weakTotal }} 题 →</button>
     </div>

@@ -459,6 +459,9 @@ const emit = defineEmits<{
           >
             {{ rating.label }}
           </button>
+          <span v-if="selected.next_review" class="muted">
+            下次复习：{{ new Date(selected.next_review).toLocaleDateString('zh-CN') }}
+          </span>
         </div>
       </section>
       <AiPanel

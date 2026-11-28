@@ -66,7 +66,7 @@ public class QuestionRepository {
 
   public Map<String, Object> question(long id, long user, boolean trash) {
     var rows = db.queryForList(
-      "SELECT q.*,COALESCE(c.archived_name,c.name) AS category,COALESCE(p.mastery,'NEW') AS mastery,COALESCE(p.favorite,FALSE) AS favorite,COALESCE(p.note,'') AS note,COALESCE(p.review_count,0) AS review_count FROM questions q JOIN categories c ON c.id=q.category_id LEFT JOIN progress p ON p.question_id=q.id AND p.user_id=? WHERE q.id=? AND q.deleted=?",
+      "SELECT q.*,COALESCE(c.archived_name,c.name) AS category,COALESCE(p.mastery,'NEW') AS mastery,COALESCE(p.favorite,FALSE) AS favorite,COALESCE(p.note,'') AS note,COALESCE(p.review_count,0) AS review_count,p.next_review FROM questions q JOIN categories c ON c.id=q.category_id LEFT JOIN progress p ON p.question_id=q.id AND p.user_id=? WHERE q.id=? AND q.deleted=?",
       user,
       id,
       trash
@@ -152,6 +152,7 @@ public class QuestionRepository {
     String tag,
     boolean favorite,
     boolean weak,
+    boolean due,
     boolean trash,
     int page,
     int size
@@ -181,15 +182,19 @@ public class QuestionRepository {
       args.add(tag);
     }
     if (favorite) where += " AND p.favorite=TRUE";
-    if (weak) where += " AND p.mastery IN ('NO','PARTIAL')";
+    if (weak || due) where += " AND p.mastery IN ('NO','PARTIAL')";
+    // 到期 = 弱项且未排期或排期时间已到；NULL 是存量弱项，视为立即到期
+    if (due) where += " AND (p.next_review IS NULL OR p.next_review<=CURRENT_TIMESTAMP)";
+    String order = " ORDER BY c.sort_order,c.id,q.sort_order,q.id";
+    if (weak || due) {
+      // 复习队列：未排期的最急在前，已排期的按到期时间升序
+      order =
+        " ORDER BY (p.next_review IS NULL) DESC,p.next_review,c.sort_order,c.id,q.sort_order,q.id";
+    }
     List<Long> ranked = null;
     var projection = searchIndex.snapshot();
     if (!search.isBlank()) ranked = QuestionSearchIndex.order(
-      db.queryForList(
-        "SELECT q.id" + where + " ORDER BY c.sort_order,c.id,q.sort_order,q.id",
-        Long.class,
-        args.toArray()
-      ),
+      db.queryForList("SELECT q.id" + where + order, Long.class, args.toArray()),
       projection,
       search
     );
@@ -222,9 +227,10 @@ public class QuestionRepository {
     args.add(size);
     args.add(pageIds == null ? (page - 1) * size : 0);
     var rows = db.queryForList(
-      "SELECT q.id,q.title,q.category_id,q.difficulty,q.sort_order,q.version,CHAR_LENGTH(q.answer)>0 AS answered,COALESCE(c.archived_name,c.name) AS category,COALESCE(p.mastery,'NEW') AS mastery,COALESCE(p.favorite,FALSE) AS favorite" +
+      "SELECT q.id,q.title,q.category_id,q.difficulty,q.sort_order,q.version,CHAR_LENGTH(q.answer)>0 AS answered,COALESCE(c.archived_name,c.name) AS category,COALESCE(p.mastery,'NEW') AS mastery,COALESCE(p.favorite,FALSE) AS favorite,p.next_review" +
         where +
-        " ORDER BY c.sort_order,c.id,q.sort_order,q.id LIMIT ? OFFSET ?",
+        order +
+        " LIMIT ? OFFSET ?",
       args.toArray()
     );
     if (pageIds != null) {

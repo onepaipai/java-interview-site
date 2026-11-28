@@ -32,8 +32,8 @@ const schemas = {
   KnowledgeStatus: object({ enabled: boolean, model: string(), embeddingConfigured: boolean, chunks: integer, vectors: integer, documents: integer }),
   User: object({ id: integer, username: string(), role: { enum: ['ADMIN', 'USER'] }, last_question: { type: ['integer', 'null'] } }),
   AccountSummary: object({ id: integer, username: string(), role: string(), created_at: string() }),
-  Summary: object({ id: integer, title: string(), category_id: integer, category: string(), difficulty: string(), sort_order: integer, version: integer, answered: boolean, preview: string(), tags: array(string()), mastery: string(), favorite: boolean }),
-  Detail: object({ id: integer, title: string(), category_id: integer, category: string(), difficulty: string(), answer: string(), sort_order: integer, version: integer, tags: array(string()), mastery: string(), favorite: boolean, note: string(), review_count: integer }),
+  Summary: object({ id: integer, title: string(), category_id: integer, category: string(), difficulty: string(), sort_order: integer, version: integer, answered: boolean, preview: string(), tags: array(string()), mastery: string(), favorite: boolean, next_review: { type: ['string', 'null'] } }),
+  Detail: object({ id: integer, title: string(), category_id: integer, category: string(), difficulty: string(), answer: string(), sort_order: integer, version: integer, tags: array(string()), mastery: string(), favorite: boolean, note: string(), review_count: integer, next_review: { type: ['string', 'null'] } }),
   Page: object({ items: array(ref('Summary')), total: integer, page: integer, size: integer }),
   Location: object({ page: integer, index: integer, total: integer }),
   Csrf: object({ token: string(), headerName: string() }),
@@ -125,7 +125,7 @@ export function contract() {
     if (['/api/health', '/api/csrf', '/api/test-environment'].includes(path)) operation.security = [];
     for (const status of [400, 401, 403, 404, 409, 413, 429, 502, 503, 504]) operation.responses[status] = { description: ({400:'Invalid input',401:'Authentication required',403:'Role or CSRF denied',404:'Not found',409:'Conflict',413:'Upload too large',429:'Quota or concurrency exhausted',502:'Invalid/upstream provider error',503:'Service unavailable',504:'Provider deadline exceeded'})[status], content: { 'application/json': { schema: ref('Error') } } };
     const parameters = [...path.matchAll(/\{([^}]+)\}/g)].map(([, name]) => ({ name, in: 'path', required: true, schema: name === 'id' ? integer : string() }));
-    if (path === '/api/questions') parameters.push(query('search', { ...string(3000), default: '' }), query('category', integer), ...['difficulty','mastery','tag'].map(name => query(name, string())), ...['favorite','weak','trash'].map(name => query(name, { ...boolean, default: false })), query('page', { type: 'integer', minimum: 1, maximum: 100000, default: 1 }), query('size', { type: 'integer', minimum: 1, maximum: 100, default: 30 }));
+    if (path === '/api/questions') parameters.push(query('search', { ...string(3000), default: '' }), query('category', integer), ...['difficulty','mastery','tag'].map(name => query(name, string())), ...['favorite','weak','due','trash'].map(name => query(name, { ...boolean, default: false })), query('page', { type: 'integer', minimum: 1, maximum: 100000, default: 1 }), query('size', { type: 'integer', minimum: 1, maximum: 100, default: 30 }));
     if (path.endsWith('/location')) parameters.push(query('search', string(3000)), query('category', integer), query('global', boolean), query('size', { type: 'integer', minimum: 1, maximum: 100, default: 30 }));
     if (path === '/api/ai/search') parameters.push(query('query', { ...string(3000), minLength: 1 }, true));
     if (path === '/api/admin/knowledge/source') parameters.push(query('key', { ...string(), pattern: '^(question|seed|upload):[1-9][0-9]*$' }, true));

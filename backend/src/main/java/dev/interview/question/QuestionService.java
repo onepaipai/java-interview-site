@@ -86,6 +86,7 @@ public class QuestionService {
     String tag,
     boolean favorite,
     boolean weak,
+    boolean due,
     boolean trash,
     int page,
     int size
@@ -99,6 +100,7 @@ public class QuestionService {
       tag,
       favorite,
       weak,
+      due,
       trash,
       page,
       size

@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import dev.interview.knowledge.KnowledgeService;
 import dev.interview.publication.SeniorQuestionImporter;
+import dev.interview.question.LearningService;
 import dev.interview.question.QuestionService;
 import dev.interview.shared.KnowledgeChanged;
 import dev.interview.shared.MarkdownImporter;
@@ -56,6 +57,9 @@ class RegressionTest {
   QuestionService questions;
 
   @Autowired
+  LearningService learning;
+
+  @Autowired
   KnowledgeService knowledge;
 
   @Autowired
@@ -101,7 +105,7 @@ class RegressionTest {
     try {
       List<Long> expected = List.of(exact, prefix, body);
       for (int page = 1; page <= 3; page++) {
-        var result = questions.list(0, term, category, "", "", "", false, false, false, page, 1);
+        var result = questions.list(0, term, category, "", "", "", false, false, false, false, page, 1);
         assertEquals(3L, ((Number) result.get("total")).longValue());
         var rows = (List<Map<String, Object>>) result.get("items");
         assertEquals(
@@ -119,7 +123,7 @@ class RegressionTest {
       assertTrue(
         (
           (List<?>) questions
-            .list(0, term, category, "", "", "", false, false, false, 4, 1)
+            .list(0, term, category, "", "", "", false, false, false, false, 4, 1)
             .get("items")
         ).isEmpty()
       );
@@ -337,6 +341,66 @@ class RegressionTest {
   }
 
   @Test
+  void reviewScheduleSchedulesThenExpiresWeakQuestions() throws Exception {
+    long category = questions.category("schedule_" + UUID.randomUUID());
+    String marker = "schedule_probe_" + UUID.randomUUID().toString().replace("-", "");
+    long id = questions.save(
+      null,
+      new QuestionService.Edit(marker, category, "高级", "排期参考回答", 0, List.of(), null)
+    );
+    long user = db.queryForObject("SELECT id FROM accounts WHERE username='admin'", Long.class);
+    int dueBefore = ((Number) learning.stats(user).get("due")).intValue();
+    int weakBefore = ((Number) learning.stats(user).get("weak")).intValue();
+    // PARTIAL 首次自评：次日到期，计入弱项与今日到期
+    learning.progress(user, id, new LearningService.Progress("PARTIAL", false, "", true));
+    var next = db.queryForObject(
+      "SELECT next_review FROM progress WHERE user_id=? AND question_id=?",
+      java.sql.Timestamp.class,
+      user,
+      id
+    );
+    assertNotNull(next);
+    assertTrue(
+      next.getTime() > System.currentTimeMillis() &&
+        next.getTime() <= System.currentTimeMillis() + 2L * 24 * 60 * 60 * 1000
+    );
+    // 刚自评的题排到明天：计入弱项，但不算今日到期
+    assertEquals(weakBefore + 1, ((Number) learning.stats(user).get("weak")).intValue());
+    assertEquals(dueBefore, ((Number) learning.stats(user).get("due")).intValue());
+    assertEquals(
+      0L,
+      ((Number)
+          questions
+            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+            .get("total"))
+        .longValue()
+    );
+    // 排期时间流逝后进入今日到期队列
+    db.update("UPDATE progress SET next_review=CURRENT_TIMESTAMP WHERE user_id=? AND question_id=?", user, id);
+    assertEquals(dueBefore + 1, ((Number) learning.stats(user).get("due")).intValue());
+    assertEquals(
+      1L,
+      ((Number)
+          questions
+            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+            .get("total"))
+        .longValue()
+    );
+    // 改 YES 后退出弱项与到期队列
+    learning.progress(user, id, new LearningService.Progress("YES", false, "", true));
+    assertEquals(dueBefore, ((Number) learning.stats(user).get("due")).intValue());
+    assertEquals(weakBefore, ((Number) learning.stats(user).get("weak")).intValue());
+    assertEquals(
+      0L,
+      ((Number)
+          questions
+            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+            .get("total"))
+        .longValue()
+    );
+  }
+
+  @Test
   void importedHistoricalAnswersDisappearAfterEditsAndDeletes() throws Exception {
     String marker = "historical_" + UUID.randomUUID().toString().replace("-", "");
     var parsed = parser.parse(
@@ -453,7 +517,7 @@ class RegressionTest {
   void pageTagsUseOneBatchAndStillMatchTheQuestionDetails() {
     long user = db.queryForObject("SELECT id FROM accounts WHERE username='admin'", Long.class);
     org.mockito.Mockito.clearInvocations(db);
-    var page = questions.list(user, "", null, "", "", "senior-v1", false, false, false, 1, 15);
+    var page = questions.list(user, "", null, "", "", "senior-v1", false, false, false, false, 1, 15);
     var batchCalls = org.mockito.Mockito.mockingDetails(db)
       .getInvocations()
       .stream()
@@ -482,6 +546,7 @@ class RegressionTest {
             "",
             "",
             "",
+            false,
             false,
             false,
             false,

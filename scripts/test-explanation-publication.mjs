@@ -18,7 +18,7 @@ await assert.rejects(publishExplanations(directory,'explanations-v2',[artifact('
 assert.equal(await readManifest(),previous,'Invalid generation replaced the live manifest');
 const second=await publishExplanations(directory,'explanations-v2',[artifact('second')]);
 assert.notEqual(second.entries[0].file,first.entries[0].file);
-assert.equal(await readFile(firstPath,'utf8'),'first','New revision modified old snapshot');
+await assert.rejects(stat(firstPath),{code:'ENOENT'},'Stale snapshot survived successful republication');
 await writeFile(path.join(directory,second.entries[0].file),'tampered');
 const current=await readManifest();
 await assert.rejects(publishExplanations(directory,'explanations-v2',[artifact('second')]));
@@ -26,4 +26,4 @@ assert.equal(await readManifest(),current,'Corrupt snapshot changed the manifest
 assert.match(referenceTitle('https://www.rfc-editor.org/rfc/rfc9293.html'),/TCP/);
 assert.doesNotMatch(referenceTitle('https://ocw.mit.edu/courses/6-006/'),/HTTP/);
 assert.throws(()=>validateExplanationMarkdown('## 参考回答\n## 参考分析\n## 案例\n## 总结点'));
-console.log('PASS: immutable content, atomic manifest publication, failed-build preservation, idempotency and accurate source labels.');
+console.log('PASS: immutable content, atomic manifest publication, failed-build preservation, idempotency, stale snapshot pruning and accurate source labels.');

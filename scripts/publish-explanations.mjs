@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, writeFile, rename, access } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile, rename, access, readdir, rm } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -35,5 +35,12 @@ export async function publishExplanations(directory, version, artifacts) {
   const temp=path.resolve(directory,`.manifest-${randomUUID()}.tmp`);
   await writeFile(temp,JSON.stringify(manifest,null,2),{encoding:'utf8',flag:'wx'});
   await rename(temp,path.resolve(directory,'manifest.json'));
+  // 发布成功后才清理快照：失败路径必须原样保留旧快照，供下一次发布做不可变校验。
+  for (const name of await readdir(publishedRoot)) {
+    if (name === path.basename(destination)) {
+      continue;
+    }
+    await rm(path.join(publishedRoot, name), { recursive: true, force: true });
+  }
   return manifest;
 }

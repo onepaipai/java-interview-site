@@ -1,10 +1,10 @@
 /* 深色主题：以 token 重映射为主，个别组件在此追加覆盖。由 html[data-theme='dark'] 启用。 */
 html[data-theme='dark'] {
-  --accent: #8f84ff;
-  --accent-hover: #a49bff;
-  --accent-soft: #2c2850;
-  --accent-muted: #9d94cf;
-  --accent-ring: #5b539a;
+  --accent: #818cf8;
+  --accent-hover: #a5b4fc;
+  --accent-soft: #262a52;
+  --accent-muted: #a5b4fc;
+  --accent-ring: #4c5296;
   --text: #d5dbe8;
   --muted: #9aa3b7;
   --border: #2c3546;

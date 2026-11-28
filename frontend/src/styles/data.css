@@ -248,7 +248,7 @@
   flex-shrink: 0;
   font-size: 11px;
   padding: 2px 7px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--surface-3);
   color: var(--muted);
 }

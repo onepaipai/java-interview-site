@@ -334,7 +334,7 @@
   margin: 14px 0;
   padding: 13px 15px;
   border: 1px dashed var(--border-strong);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--accent-soft);
 }
 .quiz-card .quiz-hint {

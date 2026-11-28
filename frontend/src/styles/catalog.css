@@ -61,10 +61,10 @@
   padding: 5px 10px;
 }
 .catalog-home .learning-home {
-  padding: 22px 24px;
+  padding: 18px 20px;
   border-color: var(--border);
   background: var(--surface);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: none;
   margin-bottom: 30px;
 }
@@ -201,7 +201,7 @@
   text-align: left;
   padding: 19px;
   min-height: 204px;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: none;
 }
 .catalog-home .module-card:hover {
@@ -281,7 +281,7 @@
 }
 .learning-path {
   padding: 23px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 .path-heading {
   display: flex;
@@ -402,7 +402,7 @@
 .reading-column .explanation-answer {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 22px;
   margin-bottom: 26px;
 }
@@ -412,7 +412,7 @@
 .reading-column .explanation-summary {
   background: var(--success-soft);
   border: 1px solid var(--success-border);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 20px 22px;
   margin-top: 16px;
 }

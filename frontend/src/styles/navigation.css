@@ -210,7 +210,7 @@
   max-height: 85dvh;
   height: 680px;
   border: 1px solid var(--border);
-  border-radius: 18px 18px 0 0;
+  border-radius: 12px 18px 0 0;
   padding: 0;
   background: white;
   box-shadow: 0 -10px 70px #26364e25;
@@ -262,7 +262,7 @@
   margin: 0 24px 13px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 10px 13px;
   color: var(--muted);
   flex-shrink: 0;
@@ -320,7 +320,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 13px 15px;
   min-height: 67px;
   background: white;
@@ -381,8 +381,8 @@
 .question-section {
   background: var(--accent-soft);
   border: 1px solid var(--accent-ring);
-  border-radius: 12px;
-  padding: 25px 29px;
+  border-radius: 10px;
+  padding: 18px 20px;
 }
 .question-section .reader-question {
   gap: 14px;
@@ -393,7 +393,7 @@
   background: var(--accent-soft);
   color: var(--accent);
   font-size: 15px;
-  border-radius: 9px;
+  border-radius: 8px;
   margin-top: 3px;
 }
 .question-section .eyebrow {
@@ -432,7 +432,7 @@
   margin-top: 19px;
   background: white;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 24px 29px;
 }
 .answer-section .answer-divider {
@@ -463,14 +463,14 @@
   background: var(--surface-2);
   border-radius: 8px;
   font-size: 14px;
-  padding: 35px 20px;
+  padding: 24px 20px;
 }
 .question-switch {
   margin-top: 21px;
 }
 .question-list.panel {
   border-color: var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 .question-list .list-heading {
   background: var(--surface-2);
@@ -601,7 +601,7 @@
     min-height: 45px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 9px;
+    border-radius: 8px;
     color: var(--muted);
     text-align: left;
     box-shadow: 0 2px 8px #23344c03;
@@ -631,7 +631,7 @@
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
-    border-radius: 18px 18px 0 0;
+    border-radius: 12px 18px 0 0;
   }
   .picker-heading {
     padding: 21px 21px 15px;
@@ -697,7 +697,7 @@
   }
   .question-section {
     padding: 20px 18px;
-    border-radius: 11px;
+    border-radius: 10px;
   }
   .question-section .reader-question {
     gap: 10px;
@@ -727,7 +727,7 @@
   .answer-section {
     margin-top: 15px;
     padding: 21px 18px;
-    border-radius: 11px;
+    border-radius: 10px;
   }
   .answer-section .answer-divider {
     padding-bottom: 14px;
@@ -808,7 +808,7 @@
   border: 1px solid var(--danger);
   background: var(--danger-soft);
   color: var(--danger);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 22px;
   text-align: center;
 }
@@ -847,7 +847,7 @@
   background: transparent;
   color: var(--muted);
   padding: 8px 4px;
-  border-radius: 9px;
+  border-radius: 8px;
 }
 .module-rail-mini button span {
   font-size: 11px;

@@ -1,9 +1,9 @@
 :root {
-  --accent: #5146cf;
-  --accent-hover: #4439b9;
-  --accent-soft: #efedf9;
-  --accent-muted: #6f658e;
-  --accent-ring: #b7afea;
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-soft: #eef2ff;
+  --accent-muted: #6366f1;
+  --accent-ring: #a5b4fc;
   --text: #263248;
   --muted: #657288;
   --border: #e1e5ec;
@@ -21,18 +21,18 @@
   --warn-soft: #fdf6e3;
   --inverse-surface: #202b40;
   --inverse-text: #d0d9e8;
-  --radius: 10px;
+  --radius: 8px;
   --radius-sm: 6px;
-  --radius-lg: 16px;
+  --radius-lg: 12px;
   --shadow-sm: 0 1px 2px rgba(38, 50, 72, 0.06);
   --shadow-md: 0 6px 20px rgba(38, 50, 72, 0.08);
   --space-xs: 6px;
   --space-sm: 10px;
   --space-md: 16px;
   --space-lg: 24px;
-  --control-h: 40px;
+  --control-h: 36px;
   --small: 13px;
-  --body: 16px;
+  --body: 14px;
   font-family: Inter, 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   color: var(--text);
   background: var(--background);
@@ -130,12 +130,12 @@ p {
   margin: 0;
 }
 h1 {
-  font-size: 28px;
+  font-size: 22px;
   letter-spacing: -0.6px;
   line-height: 1.45;
 }
 h2 {
-  font-size: 19px;
+  font-size: 17px;
   line-height: 1.5;
 }
 h3 {
@@ -218,7 +218,7 @@ header {
   white-space: nowrap;
   text-decoration: none;
   color: var(--text);
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 700;
   min-width: 170px;
 }
@@ -455,7 +455,7 @@ nav button.active {
   padding: 20px;
   text-align: left;
   min-height: 142px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: white;
 }
 .module-card:hover {
@@ -922,7 +922,7 @@ nav button.active {
 }
 .markdown-editor {
   border: 1px solid var(--border-strong);
-  border-radius: 9px;
+  border-radius: 8px;
   overflow: hidden;
   background: white;
 }
@@ -1164,7 +1164,7 @@ nav button.active {
   background: var(--success-soft);
   color: var(--success);
   border: 1px solid var(--success-border);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 12px 16px;
   font-size: 13px;
   z-index: 30;
@@ -1337,7 +1337,7 @@ dialog::backdrop {
   width: 440px;
   max-width: calc(100vw - 32px);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 27px;
   box-shadow: 0 20px 90px #1d294435;
 }
@@ -1388,7 +1388,7 @@ dialog::backdrop {
   place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 11px;
+  border-radius: 10px;
   background: var(--accent-soft);
   color: var(--accent);
 }
@@ -1415,7 +1415,7 @@ dialog::backdrop {
   width: 720px;
   max-width: calc(100vw - 32px);
   border: 1px solid var(--border);
-  border-radius: 13px;
+  border-radius: 10px;
   padding: 0;
   box-shadow: 0 20px 100px #20304730;
   margin-top: 12vh;
@@ -1595,12 +1595,12 @@ dialog::backdrop {
   background: var(--surface-2);
 }
 .login-card {
-  width: 410px;
+  width: 380px;
   max-width: 100%;
   background: var(--surface);
-  padding: 35px;
+  padding: 24px 28px;
   border: 1px solid var(--border);
-  border-radius: 13px;
+  border-radius: 10px;
   box-shadow: 0 15px 50px #23304706;
 }
 .login-card p {
@@ -2066,7 +2066,7 @@ dialog::backdrop {
   margin: 0 0 26px;
 }
 .module-manager-heading h1 {
-  font-size: 28px;
+  font-size: 22px;
   letter-spacing: -0.6px;
 }
 .module-manager-heading p {
@@ -2095,7 +2095,7 @@ dialog::backdrop {
   gap: 10px;
   background: white;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 9px 13px;
   max-width: 350px;
   flex: 1;
@@ -2128,7 +2128,7 @@ dialog::backdrop {
   gap: 4px;
   padding: 4px;
   background: var(--surface-3);
-  border-radius: 9px;
+  border-radius: 8px;
 }
 .module-manager-filter button {
   border: 0;
@@ -2170,7 +2170,7 @@ dialog::backdrop {
 }
 .managed-module-card {
   border: 1px solid #e3e7f0;
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
   background: var(--surface);
   box-shadow: 0 3px 15px #24304703;
@@ -2207,7 +2207,7 @@ dialog::backdrop {
   place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 11px;
+  border-radius: 10px;
   background: var(--accent-soft);
   color: var(--accent-muted);
 }
@@ -2292,7 +2292,7 @@ dialog::backdrop {
 .managed-module-add {
   background: var(--surface-2);
   border: 1px dashed #d9dbe8;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 30px;
   min-height: 222px;
   display: flex;
@@ -2352,7 +2352,7 @@ dialog::backdrop {
   background: var(--success-soft);
   color: var(--success);
   padding: 11px 15px;
-  border-radius: 9px;
+  border-radius: 8px;
   font-size: 12px;
   margin-bottom: 20px;
 }
@@ -2360,7 +2360,7 @@ dialog::backdrop {
   padding: 60px 24px;
   text-align: center;
   border: 1px dashed #dce1ec;
-  border-radius: 14px;
+  border-radius: 10px;
   color: var(--muted);
 }
 .managed-module-no-results > span {
@@ -2368,7 +2368,7 @@ dialog::backdrop {
   place-items: center;
   width: 63px;
   height: 63px;
-  border-radius: 18px;
+  border-radius: 12px;
   background: var(--surface-2);
   color: var(--accent-muted);
   margin-bottom: 20px;
@@ -2389,7 +2389,7 @@ dialog::backdrop {
   width: 440px;
   max-width: calc(100vw - 32px);
   border: 1px solid #e8e8f2;
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 28px 30px;
   box-shadow: 0 25px 100px #26234835;
   color: var(--text);
@@ -2409,7 +2409,7 @@ dialog::backdrop {
   place-items: center;
   width: 45px;
   height: 45px;
-  border-radius: 13px;
+  border-radius: 10px;
   background: var(--accent-soft);
   color: var(--muted);
 }
@@ -2575,7 +2575,7 @@ dialog::backdrop {
   .managed-module-icon {
     width: 31px;
     height: 31px;
-    border-radius: 9px;
+    border-radius: 8px;
   }
   .managed-module-icon svg {
     width: 18px;
@@ -2723,7 +2723,7 @@ dialog::backdrop {
   padding: 22px;
   min-height: 156px;
   border: 1px solid #e0e5ee;
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--surface);
   box-shadow: 0 2px 8px #28344d03;
   transition:
@@ -2741,7 +2741,7 @@ dialog::backdrop {
   width: 38px;
   height: 38px;
   margin: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--accent-soft);
   color: var(--accent);
 }
@@ -2808,7 +2808,7 @@ dialog::backdrop {
   .module-card-icon {
     width: 34px;
     height: 34px;
-    border-radius: 9px;
+    border-radius: 8px;
   }
   .module-card-icon svg {
     width: 19px;

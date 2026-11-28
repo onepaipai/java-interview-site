@@ -29,7 +29,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--surface-3);
   color: var(--text);
 }
@@ -89,7 +89,7 @@
   padding: 14px 11px;
   min-height: 72px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   text-decoration: none;
   color: var(--muted);
   transition: background 0.15s;
@@ -238,7 +238,7 @@
   display: grid;
   gap: 3px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: 0 8px 24px #27314e14;
 }
@@ -274,7 +274,7 @@
 .preview-diagram-dialog {
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 10px;
   width: min(520px, calc(100vw - 24px));
   max-height: calc(100dvh - 28px);
   background: var(--surface);
@@ -395,7 +395,7 @@
   .preview-brand-mark {
     width: 30px;
     height: 30px;
-    border-radius: 9px;
+    border-radius: 8px;
   }
   .preview-brand strong {
     font-size: 18px;

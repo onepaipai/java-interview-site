@@ -123,7 +123,13 @@ try {
         await expect(page.locator('.editor')).toHaveCount(0);
         await page.unrouteAll();await page.reload();await page.locator('.reader').waitFor();
       }
-      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      const overflow=await page.evaluate(()=>{
+        const vw=innerWidth;
+        if(document.documentElement.scrollWidth<=vw) return null;
+        const bad=[...document.querySelectorAll('*')].filter(el=>el.getBoundingClientRect().right>vw+1).slice(0,8).map(el=>el.tagName+'.'+String(el.className).slice(0,60)+' right='+Math.round(el.getBoundingClientRect().right)+' w='+Math.round(el.getBoundingClientRect().width));
+        return {vw,dw:document.documentElement.scrollWidth,bad};
+      });
+      assert.equal(overflow,null,'横向溢出: '+JSON.stringify(overflow));
       assert.deepEqual(errors,[]);
       await page.screenshot({path:'test-results/polish/'+name+'.png'});
       console.log(name+': keyboard search, late page response, rejected link, save freeze and upload cancellation PASS');

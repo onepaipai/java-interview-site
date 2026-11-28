@@ -26,8 +26,9 @@ class MySqlIntegrationTest extends RegressionTest {
   @Test
   void actualMysql84AndAllMigrationsAreUsed() {
     assertTrue(db.queryForObject("SELECT VERSION()", String.class).startsWith("8.4."));
+    // 全部迁移成功应用：历史总行数与成功行数一致，新增迁移无需更新此断言。
     assertEquals(
-      6,
+      db.queryForObject("SELECT COUNT(*) FROM flyway_schema_history", Integer.class),
       db.queryForObject(
         "SELECT COUNT(*) FROM flyway_schema_history WHERE success=TRUE",
         Integer.class

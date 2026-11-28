@@ -38,7 +38,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-local.ps1
 首次导入 165 道原始题和 21 个模块的高级题（基础每模块 50 道，后续按技术演进增补至共 897 道，合计 1,062 道题目），解析包 `explanations-v38` 共 1,227 道题目级正文。原始 `content/Java.md` 不改写。高级题包按稳定来源去重，解析升级保留人工修改及主动删除，旧包不能覆盖已记录的更高版本。数据库迁移目前为 V1–V8，升级前备份。
 
 <!-- content-status:start -->
-当前解析包为 `explanations-v38`，共 1227 道：1227 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 0 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](../content/explanations/review-ledger.json)。
+当前解析包为 `explanations-v38`，共 1227 道：1227 道题目级正文、0 道固定样例、0 道主题正文。独立正文不等于事实核验完成；审核台账中 50 道有完整事实审核证据，其余保持待审核。结构、案例执行、事实核验及人工合并分别记录在 [审核台账](../content/explanations/review-ledger.json)。
 <!-- content-status:end -->
 
 ## 日志维护

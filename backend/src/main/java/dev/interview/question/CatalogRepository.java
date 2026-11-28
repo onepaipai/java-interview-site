@@ -31,6 +31,23 @@ public class CatalogRepository {
     return !db.queryForList("SELECT id FROM categories WHERE name=?", Long.class, name).isEmpty();
   }
 
+  /** 重名检查排除自身，重命名仅改排序时不会误报。 */
+  public boolean nameTakenByOther(String name, long id) {
+    return !db
+      .queryForList("SELECT id FROM categories WHERE name=? AND id<>?", Long.class, name, id)
+      .isEmpty();
+  }
+
+  public boolean tagNameTaken(String name) {
+    return !db.queryForList("SELECT id FROM tags WHERE name=?", Long.class, name).isEmpty();
+  }
+
+  public boolean tagNameTakenByOther(String name, long id) {
+    return !db
+      .queryForList("SELECT id FROM tags WHERE name=? AND id<>?", Long.class, name, id)
+      .isEmpty();
+  }
+
   public String archivedName(long id) {
     return db.queryForObject(
       "SELECT archived_name FROM categories WHERE id=? AND deleted=TRUE",

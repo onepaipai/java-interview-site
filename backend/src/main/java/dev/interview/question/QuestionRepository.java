@@ -53,13 +53,10 @@ public class QuestionRepository {
     return Objects.requireNonNull(key.getKey()).longValue();
   }
 
-  public long answerLength(long id) {
-    var value = db.queryForObject(
-      "SELECT LENGTH(answer) FROM questions WHERE id=?",
-      Long.class,
-      id
-    );
-    return value == null ? 0 : value;
+  /** 不存在返回 null，由调用方决定 404 语义；answer 列 NOT NULL，长度只可能为查询不到时为空。 */
+  public Long answerLength(long id) {
+    var values = db.queryForList("SELECT LENGTH(answer) FROM questions WHERE id=?", Long.class, id);
+    return values.isEmpty() ? null : values.get(0);
   }
 
   public long category(String name) {

@@ -181,9 +181,12 @@ public class QuestionService {
   @Transactional
   public long save(Long id, Edit e) {
     validate(e);
-    long current = id == null ? 0 : repository.answerLength(id);
+    Long current = id == null ? null : repository.answerLength(id);
+    if (id != null && current == null) throw new ResponseStatusException(NOT_FOUND, "题目不存在");
     long projected =
-      index.answerCharacters() - current + (e.answer() == null ? 0 : e.answer().length());
+      index.answerCharacters() -
+      (current == null ? 0 : current) +
+      (e.answer() == null ? 0 : e.answer().length());
     if (projected > maxAnswerCharacters) throw new ResponseStatusException(
       PAYLOAD_TOO_LARGE,
       "题库内容总量已达上限，无法继续保存"

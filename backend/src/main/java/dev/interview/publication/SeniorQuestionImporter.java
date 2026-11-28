@@ -42,9 +42,12 @@ public class SeniorQuestionImporter {
   public int importAll(Path manifestPath) throws java.io.IOException {
     if (!Files.isRegularFile(manifestPath)) return 0;
     var manifest = json.readValue(manifestPath.toFile(), Manifest.class);
+    // 模块数量由清单数据决定，只要求非空；逐模块仍受文件内容校验与最少行数门约束。
     if (
-      !"senior-v1".equals(manifest.version()) || manifest.modules().size() != 21
-    ) throw new IllegalArgumentException("高级题包版本或模块数量不正确");
+      !"senior-v1".equals(manifest.version()) ||
+      manifest.modules() == null ||
+      manifest.modules().isEmpty()
+    ) throw new IllegalArgumentException("高级题包版本或模块清单无效");
     Path root = manifestPath.toAbsolutePath().normalize().getParent();
     var entries = new ArrayList<Entry>();
     var moduleIds = new HashSet<String>();
@@ -58,9 +61,7 @@ public class SeniorQuestionImporter {
         .stream()
         .filter(l -> !l.isBlank())
         .toList();
-      if (lines.size() < 50) throw new IllegalArgumentException(
-        module.id() + " 至少需要 50 道题"
-      );
+      if (lines.size() < 50) throw new IllegalArgumentException(module.id() + " 至少需要 50 道题");
       var titles = new HashSet<String>();
       for (int i = 0; i < lines.size(); i++) {
         String[] fields = lines.get(i).split("\t", -1);

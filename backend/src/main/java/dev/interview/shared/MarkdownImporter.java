@@ -128,7 +128,7 @@ public class MarkdownImporter {
       .stream()
       .filter(i -> i.answer().isBlank())
       .count();
-    warnings.add(empty + " 道题没有原始答案，导入后显示待补充");
+    if (empty > 0) warnings.add(empty + " 道题没有原始答案，导入后显示待补充");
     if (markdown.matches("(?s).*!\\[[^]]*]\\((?!https?://|/uploads/)[^)]+\\).*")) warnings.add(
       "存在相对路径图片，请上传图片后更新链接"
     );

@@ -58,8 +58,13 @@ public class CatalogService {
 
   @Transactional
   public void category(long id, String name, Integer order) {
+    String normalized = name(name, 200);
+    if (repository.nameTakenByOther(normalized, id)) throw new ResponseStatusException(
+      CONFLICT,
+      "模块名称已存在"
+    );
     if (
-      !repository.renameCategory(id, name(name, 200), order == null ? 0 : order)
+      !repository.renameCategory(id, normalized, order == null ? 0 : order)
     ) throw new ResponseStatusException(NOT_FOUND, "分类不存在");
   }
 
@@ -76,12 +81,22 @@ public class CatalogService {
 
   @Transactional
   public void tag(String name) {
-    repository.createTag(name(name, 80));
+    String normalized = name(name, 80);
+    if (repository.tagNameTaken(normalized)) throw new ResponseStatusException(
+      CONFLICT,
+      "标签已存在"
+    );
+    repository.createTag(normalized);
   }
 
   @Transactional
   public void tag(long id, String name) {
-    if (!repository.renameTag(id, name(name, 80))) throw new ResponseStatusException(
+    String normalized = name(name, 80);
+    if (repository.tagNameTakenByOther(normalized, id)) throw new ResponseStatusException(
+      CONFLICT,
+      "标签名称已存在"
+    );
+    if (!repository.renameTag(id, normalized)) throw new ResponseStatusException(
       NOT_FOUND,
       "标签不存在"
     );

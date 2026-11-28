@@ -353,7 +353,9 @@ class ExplanationImporterTest {
       ExplanationImporter.validateSections(deep.replace("## 参考分析", "## 其他"))
     );
     assertThrows(IllegalArgumentException.class, () ->
-      ExplanationImporter.validateSections(deep.replace("### 第二步扩展① 数据库条件更新", "# 数据库条件更新"))
+      ExplanationImporter.validateSections(
+        deep.replace("### 第二步扩展① 数据库条件更新", "# 数据库条件更新")
+      )
     );
     assertThrows(IllegalArgumentException.class, () ->
       ExplanationImporter.validateSections(deep.replace("```sql", "~~~sql"))

@@ -41,9 +41,7 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 
 ### 第三步发散·验证与推演 对照操作：伪造核心类被拦截
 
-- 教学验证：在自己包里定义 `java.lang.String`（或定义 `java.lang` 包的类）并加载。
-- 预期：抛 SecurityException（Prohibited package name）或加载到的仍是 Bootstrap 的 String（instanceof 校验通过）。
-- 再用 `Class.forName` 打印三个加载器加载链，实验可复跑。
+- 教学验证：在自己包里定义 `java.lang.String`（或定义 `java.lang` 包的类）并加载。预期：抛 SecurityException（Prohibited package name）或加载到的仍是 Bootstrap 的 String（instanceof 校验通过）。再用 `Class.forName` 打印三个加载器加载链，实验可复跑。
 
 ### 第三步发散·追问① 追问：Platform 加载器与扩展机制的变化
 

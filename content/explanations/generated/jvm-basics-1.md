@@ -45,10 +45,7 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 
 ### 第三步发散·验证与推演 对照操作：三区各自的观测命令
 
-- 教学验证：以 `-XX:MaxMetaspaceSize=64m` 启动，循环用 CGLIB 生成代理类。
-- 预期：堆直方图变化不大，`jcmd PID GC.class_stats` 可见类数上升，最终抛 OutOfMemoryError: Metaspace。
-- 同一负载改放在数组里撑堆，则报 Java heap space。
-- 两种 OOM 的错误信息区分了责任区，可复现。
+- 教学验证：以 `-XX:MaxMetaspaceSize=64m` 启动，循环用 CGLIB 生成代理类。预期：堆直方图变化不大，`jcmd PID GC.class_stats` 可见类数上升，最终抛 OutOfMemoryError: Metaspace；同一负载改放在数组里撑堆，则报 Java heap space。两种 OOM 的错误信息区分了责任区，可复现。
 
 ### 第三步发散·追问① 追问：Xss 调大有代价吗
 

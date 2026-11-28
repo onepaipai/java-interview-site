@@ -21,11 +21,7 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 
 ### 第二步扩展① 机制:record 的自动与手动边界
 
-- 自动:头组件的 final 字段+访问器+三件套——组件类型为 List 时,record 只保证"引用不变"。
-- 手动责任:List.copyOf(构造时)+紧凑构造器校验(负金额拒绝)+可达性(组件不泄露 this——构造期 this 逃逸=record 不变式被破坏)。
-- 紧凑构造器:`public Order { if (amount <= 0) throw ...。
-- items = List.copyOf(items)。
-- }`——校验与拷贝的集中点。
+- 自动:头组件的 final 字段+访问器+三件套——组件类型为 List 时,record 只保证"引用不变"。手动责任:List.copyOf(构造时)+紧凑构造器校验(负金额拒绝)+可达性(组件不泄露 this——构造期 this 逃逸=record 不变式被破坏)。紧凑构造器:`public Order { if (amount <= 0) throw ...; items = List.copyOf(items); }`——校验与拷贝的集中点。
 
 ### 第二步扩展② 反例:record 浅不可变的两种事故
 

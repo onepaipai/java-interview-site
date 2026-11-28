@@ -52,6 +52,8 @@ function splitToLines(body) {
     if (fence) { out.push(raw); continue; }               // 代码内容原样，不拆
     if (!line) continue;
     if (/^!\[[^\]]*\]\(/.test(line)) { out.push(line); continue; }
+    // 行内代码 span（`...`）内的分号不参与拆句：命中则整行保留为一条，避免代码被拆碎
+    if (/`[^`]*[。；;][^`]*`/.test(line)) { out.push('- ' + line); continue; }
     const parts = line.split(/(?<=[。；;])\s*/).map(s => s.trim()).filter(Boolean);
     for (const p of parts) out.push('- ' + p.replace(/[；;，]$/, '。'));
   }

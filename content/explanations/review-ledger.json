@@ -988,7 +988,7 @@
     {
       "sourceKey": "865a3d132b1f90e67e0d0a17c8909a310e1e1f52c5d365acff20b196fa67a794",
       "title": "record 是否自动保证深度不可变？",
-      "answerSha256": "ac75415e17dc4bfe473a42a87177d717962710ebf1a89bb418d04fce64afa5fa",
+      "answerSha256": "b150287f07a0b180ed709aabcd8834cd55ff0b96f6dfd4bf5e06043c4a011966",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -1081,6 +1081,21 @@
         },
         {
           "answerSha256": "a6f2ce24b9dbeee722f05e12bdab88f720dca764df7542ffd591be763d78ea96",
+          "title": "record 是否自动保证深度不可变？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "ac75415e17dc4bfe473a42a87177d717962710ebf1a89bb418d04fce64afa5fa",
           "title": "record 是否自动保证深度不可变？",
           "example": {
             "status": "pending",
@@ -18388,7 +18403,7 @@
     {
       "sourceKey": "a7ad5b1d64ce51d40e320606bc5eeb8bef7adbf379d72f793d80b816a198eeac",
       "title": "堆、线程栈和元空间的职责如何区分？",
-      "answerSha256": "505f457835f8d3e18130ca9591fb930a26bee3a7fb1ece34e7c7aa8091d78090",
+      "answerSha256": "3df2668b17948303be70afb2fe5bf30197370474da98511cbdf5b8233e1fbe22",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -18482,6 +18497,21 @@
         },
         {
           "answerSha256": "ded44b56fdc95c6ef6dd36b187c4f51068411690b9deb8dd90e7c76fd84a5bd7",
+          "title": "堆、线程栈和元空间的职责如何区分？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "505f457835f8d3e18130ca9591fb930a26bee3a7fb1ece34e7c7aa8091d78090",
           "title": "堆、线程栈和元空间的职责如何区分？",
           "example": {
             "status": "pending",
@@ -18851,7 +18881,7 @@
     {
       "sourceKey": "890fec10b676b19f905ca733e129b0316f3706f40052be163568cefc58e63ece",
       "title": "对象头中通常包含哪些信息？",
-      "answerSha256": "deaf65b707306df14e860f827eb510f147a2021aca664fd864c81e037e31b336",
+      "answerSha256": "1021e3e67e080621c2fc322d71e5953d6c791a7afdef516d9a5436d6339ef645",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -18930,6 +18960,21 @@
         },
         {
           "answerSha256": "ba6a09702c1f5e437e5406694c20884804f604c1820adefa7ddc407e89cf04e1",
+          "title": "对象头中通常包含哪些信息？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "deaf65b707306df14e860f827eb510f147a2021aca664fd864c81e037e31b336",
           "title": "对象头中通常包含哪些信息？",
           "example": {
             "status": "pending",
@@ -19217,7 +19262,7 @@
     {
       "sourceKey": "bb41f1a84753df142d0a99eac1cfe6dcc8f6c6233c65fcb3dd3da51e31243096",
       "title": "可达性分析为什么优于简单引用计数？",
-      "answerSha256": "6908c086e1de32d248eaf7a70865ecbb04328df192fe14bc22b58bd73f056a91",
+      "answerSha256": "ba44f4632aed67dbbcb581ef2b9bef7d0a613373f9f4d5439f8b5ea5f3c40dd2",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -19311,6 +19356,21 @@
         },
         {
           "answerSha256": "b4ac7144e61d1c5bb91b1480519a5ae01c50d94e1bad2c45ee8dcd90cde3ff48",
+          "title": "可达性分析为什么优于简单引用计数？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "6908c086e1de32d248eaf7a70865ecbb04328df192fe14bc22b58bd73f056a91",
           "title": "可达性分析为什么优于简单引用计数？",
           "example": {
             "status": "pending",
@@ -20321,7 +20381,7 @@
     {
       "sourceKey": "36e38934556a7216a3187b83e7af7b03aefdb4bd6c9bdcf9760747231bb92345",
       "title": "安全点为什么会影响暂停时长？",
-      "answerSha256": "4b9055caddd9a10d382f904b68ffec90e02ca1271e5c96f2c6bb161a0ed3c02a",
+      "answerSha256": "70413602ea6c2acac29cfcdcb121125923227ad175b07c69e8c9cbe337d338fa",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -20442,13 +20502,28 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "4b9055caddd9a10d382f904b68ffec90e02ca1271e5c96f2c6bb161a0ed3c02a",
+          "title": "安全点为什么会影响暂停时长？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
     {
       "sourceKey": "dbbbca339deceeb3e10e83bc43dc9c86ff7b45d1a0d2579e8323a86aeee75580",
       "title": "类加载的加载、链接和初始化分别做什么？",
-      "answerSha256": "9ffc250a12aed153740f2d9be875d987f16e41fcf448c0f900ccfa1215f1a8ea",
+      "answerSha256": "b462ace847703df2cce169f9f564942244fce661e1da3b4033bd17738355df3f",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -20568,13 +20643,28 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9ffc250a12aed153740f2d9be875d987f16e41fcf448c0f900ccfa1215f1a8ea",
+          "title": "类加载的加载、链接和初始化分别做什么？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
     {
       "sourceKey": "936785e766a6943fdc3c0c67be44eec431664480f289474228439fee3487ce17",
       "title": "双亲委派为什么有利于类型安全？",
-      "answerSha256": "95b752dbbac94aba87dc7a390048097dbbd32a32d2d15932cfe6274747bf3672",
+      "answerSha256": "073c2048088c1f3524c8e94f41a956b586098cccb0fd5835426481ad8a2378c4",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -20683,6 +20773,21 @@
         },
         {
           "answerSha256": "9fc54731678abc309563ce8ff8f2992c7a6d9cb3bb3250a26fd03c8f333bd0b8",
+          "title": "双亲委派为什么有利于类型安全？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "95b752dbbac94aba87dc7a390048097dbbd32a32d2d15932cfe6274747bf3672",
           "title": "双亲委派为什么有利于类型安全？",
           "example": {
             "status": "pending",
@@ -20940,7 +21045,7 @@
     {
       "sourceKey": "a7fb099ce09507332eb5d35d91663fc523723b9218c40cf84ab0ffb99f37c586",
       "title": "什么操作会触发类初始化？",
-      "answerSha256": "eb479da99da4f60f545a01f3029c2879f2cee6a8929753af8730549f08b09c7b",
+      "answerSha256": "6405f60685f7bbfe40eac9b50deb06f4973426c5c98de2fcaf84b0f42571c886",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -21033,6 +21138,21 @@
         },
         {
           "answerSha256": "fdea69fac6a50430bfcd00bdf9b0da585b63df5480d1fca6f73a89461bd52a50",
+          "title": "什么操作会触发类初始化？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "eb479da99da4f60f545a01f3029c2879f2cee6a8929753af8730549f08b09c7b",
           "title": "什么操作会触发类初始化？",
           "example": {
             "status": "pending",

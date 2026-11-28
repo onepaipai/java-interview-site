@@ -129,6 +129,7 @@ try {
         const bad=[...document.querySelectorAll('*')].filter(el=>el.getBoundingClientRect().right>vw+1).slice(0,8).map(el=>el.tagName+'.'+String(el.className).slice(0,60)+' right='+Math.round(el.getBoundingClientRect().right)+' w='+Math.round(el.getBoundingClientRect().width));
         return {vw,dw:document.documentElement.scrollWidth,bad};
       });
+      if(overflow) console.log('::error::横向溢出 '+name+' '+JSON.stringify(overflow));
       assert.equal(overflow,null,'横向溢出: '+JSON.stringify(overflow));
       assert.deepEqual(errors,[]);
       await page.screenshot({path:'test-results/polish/'+name+'.png'});

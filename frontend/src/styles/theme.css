@@ -273,7 +273,7 @@ nav button.active {
 .search-launcher kbd {
   font-size: 10px;
   font-family: inherit;
-  border: 1px solid #dce1e9;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   padding: 0 4px;
   color: var(--muted);
@@ -524,7 +524,7 @@ nav button.active {
   width: 100%;
   padding: 17px 21px;
   border: 0;
-  border-bottom: 1px solid #edf0f4;
+  border-bottom: 1px solid var(--border);
   border-radius: 0;
   text-align: left;
   background: white;
@@ -788,7 +788,7 @@ nav button.active {
   font-size: 21px;
   margin: 28px 0 15px;
   padding-bottom: 9px;
-  border-bottom: 1px solid #e7ebf1;
+  border-bottom: 1px solid var(--border);
 }
 .markdown h3 {
   font-size: 18px;
@@ -818,7 +818,7 @@ nav button.active {
   cursor: zoom-in;
 }
 .markdown blockquote {
-  border-left: 3px solid #aa9bd3;
+  border-left: 3px solid var(--accent-ring);
   background: var(--accent-soft);
   padding: 12px 17px;
   border-radius: 0 7px 7px 0;
@@ -921,7 +921,7 @@ nav button.active {
   font-size: 12px;
 }
 .markdown-editor {
-  border: 1px solid #dce2ec;
+  border: 1px solid var(--border-strong);
   border-radius: 9px;
   overflow: hidden;
   background: white;
@@ -967,7 +967,7 @@ nav button.active {
 .segmented button.active {
   background: var(--surface);
   color: var(--accent);
-  box-shadow: 0 1px 3px #2632480c;
+  box-shadow: var(--shadow-sm);
 }
 .md-toolbar {
   display: flex;
@@ -1163,7 +1163,7 @@ nav button.active {
   gap: 10px;
   background: var(--success-soft);
   color: var(--success);
-  border: 1px solid #cee4d6;
+  border: 1px solid var(--success-border);
   border-radius: 9px;
   padding: 12px 16px;
   font-size: 13px;
@@ -1193,7 +1193,7 @@ nav button.active {
 .loading-dot {
   width: 14px;
   height: 14px;
-  border: 2px solid #ddd9ed;
+  border: 2px solid var(--border-strong);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -1235,7 +1235,7 @@ footer {
   align-items: center;
   gap: 18px;
   padding: 15px 20px;
-  border-bottom: 1px solid #e8edf2;
+  border-bottom: 1px solid var(--border);
 }
 .account-list-label {
   background: var(--surface-2);
@@ -1597,7 +1597,7 @@ dialog::backdrop {
 .login-card {
   width: 410px;
   max-width: 100%;
-  background: white;
+  background: var(--surface);
   padding: 35px;
   border: 1px solid var(--border);
   border-radius: 13px;
@@ -2094,7 +2094,7 @@ dialog::backdrop {
   align-items: center;
   gap: 10px;
   background: white;
-  border: 1px solid #e4e7f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 9px 13px;
   max-width: 350px;

@@ -231,7 +231,7 @@
 .answer-mode-switch {
   display: inline-flex;
   padding: 3px;
-  border: 1px solid #e5e7ef;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-3);
 }
@@ -494,7 +494,7 @@
 .media-placeholder {
   display: block;
   padding: 12px;
-  border: 1px dashed #c4ccd8;
+  border: 1px dashed var(--border-strong);
   border-radius: 7px;
   color: var(--muted);
   font-size: 13px;

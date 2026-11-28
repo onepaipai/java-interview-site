@@ -63,7 +63,7 @@
 .catalog-home .learning-home {
   padding: 22px 24px;
   border-color: var(--border);
-  background: linear-gradient(110deg, #fff, #faf9ff);
+  background: var(--surface);
   border-radius: 12px;
   box-shadow: none;
   margin-bottom: 30px;
@@ -79,7 +79,7 @@
 .learning-empty {
   color: var(--muted);
   font-size: 13px;
-  border-top: 1px solid #ececf4;
+  border-top: 1px solid var(--border);
   padding-top: 13px;
   margin-top: 15px;
 }
@@ -95,7 +95,7 @@
   padding: 8px 0;
   font-size: 13px;
   border-radius: 0;
-  border-bottom: 1px solid #eeedf5;
+  border-bottom: 1px solid var(--border);
 }
 .catalog-home .review-questions button:hover {
   background: transparent;
@@ -379,7 +379,7 @@
   margin: 0;
   background: transparent;
   color: var(--muted);
-  border: 1px solid #e9ebf0;
+  border: 1px solid var(--border);
   padding: 1px 5px;
 }
 .question-level,
@@ -401,7 +401,7 @@
 }
 .reading-column .explanation-answer {
   background: var(--surface);
-  border: 1px solid #e3e5ef;
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 22px;
   margin-bottom: 26px;
@@ -411,7 +411,7 @@
 }
 .reading-column .explanation-summary {
   background: var(--success-soft);
-  border: 1px solid #deebe3;
+  border: 1px solid var(--success-border);
   border-radius: 9px;
   padding: 20px 22px;
   margin-top: 16px;

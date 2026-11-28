@@ -812,7 +812,7 @@
 }
 .knowledge-setup {
   margin-top: 22px;
-  border: 1px solid #e9ecf2;
+  border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--muted);
   font-size: 12px;
@@ -867,7 +867,7 @@
   max-height: calc(100dvh - 56px);
   padding: 0;
   margin: auto;
-  border: 1px solid #e1e5ed;
+  border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--muted);
   background: var(--surface);

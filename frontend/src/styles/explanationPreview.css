@@ -4,7 +4,7 @@
 }
 .preview-header {
   height: 68px;
-  border-bottom: 1px solid #e6e8f1;
+  border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
 .preview-header-inner {
@@ -31,7 +31,7 @@
   height: 34px;
   border-radius: 10px;
   background: var(--surface-3);
-  color: #fff;
+  color: var(--text);
 }
 .preview-brand strong {
   font-size: 20px;
@@ -129,7 +129,7 @@
 .preview-sidebar-toc {
   margin-top: 30px;
   padding-top: 25px;
-  border-top: 1px solid #e3e6ee;
+  border-top: 1px solid var(--border);
 }
 .preview-toc {
   display: grid;
@@ -189,7 +189,7 @@
 .preview-experience {
   color: var(--accent-muted);
   background: var(--accent-soft);
-  border: 1px solid #e6e1f7;
+  border: 1px solid var(--accent-ring);
   border-radius: 5px;
   padding: 2px 7px;
 }
@@ -213,7 +213,7 @@
 }
 .preview-question-meta > span {
   padding-right: 12px;
-  border-right: 1px solid #dcdfe9;
+  border-right: 1px solid var(--border);
 }
 .preview-references {
   position: relative;
@@ -273,7 +273,7 @@
 }
 .preview-diagram-dialog {
   padding: 0;
-  border: 1px solid #dee3ee;
+  border: 1px solid var(--border);
   border-radius: 14px;
   width: min(520px, calc(100vw - 24px));
   max-height: calc(100dvh - 28px);

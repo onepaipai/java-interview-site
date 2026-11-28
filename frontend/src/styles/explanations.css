@@ -60,7 +60,7 @@
 .explanation-deep .explanation-answer blockquote {
   margin: 0 0 20px;
   padding: 14px 18px;
-  border-left: 3px solid #a69bcf;
+  border-left: 3px solid var(--accent-ring);
   border-radius: 0 6px 6px 0;
   background: var(--accent-soft);
   color: var(--muted);

@@ -105,7 +105,20 @@ class RegressionTest {
     try {
       List<Long> expected = List.of(exact, prefix, body);
       for (int page = 1; page <= 3; page++) {
-        var result = questions.list(0, term, category, "", "", "", false, false, false, false, page, 1);
+        var result = questions.list(
+          0,
+          term,
+          category,
+          "",
+          "",
+          "",
+          false,
+          false,
+          false,
+          false,
+          page,
+          1
+        );
         assertEquals(3L, ((Number) result.get("total")).longValue());
         var rows = (List<Map<String, Object>>) result.get("items");
         assertEquals(
@@ -369,22 +382,26 @@ class RegressionTest {
     assertEquals(dueBefore, ((Number) learning.stats(user).get("due")).intValue());
     assertEquals(
       0L,
-      ((Number)
-          questions
-            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
-            .get("total"))
-        .longValue()
+      (
+        (Number) questions
+          .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+          .get("total")
+      ).longValue()
     );
     // 排期时间流逝后进入今日到期队列
-    db.update("UPDATE progress SET next_review=CURRENT_TIMESTAMP WHERE user_id=? AND question_id=?", user, id);
+    db.update(
+      "UPDATE progress SET next_review=CURRENT_TIMESTAMP WHERE user_id=? AND question_id=?",
+      user,
+      id
+    );
     assertEquals(dueBefore + 1, ((Number) learning.stats(user).get("due")).intValue());
     assertEquals(
       1L,
-      ((Number)
-          questions
-            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
-            .get("total"))
-        .longValue()
+      (
+        (Number) questions
+          .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+          .get("total")
+      ).longValue()
     );
     // 改 YES 后退出弱项与到期队列
     learning.progress(user, id, new LearningService.Progress("YES", false, "", true));
@@ -392,11 +409,11 @@ class RegressionTest {
     assertEquals(weakBefore, ((Number) learning.stats(user).get("weak")).intValue());
     assertEquals(
       0L,
-      ((Number)
-          questions
-            .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
-            .get("total"))
-        .longValue()
+      (
+        (Number) questions
+          .list(user, marker, null, "", "", "", false, false, true, false, 1, 30)
+          .get("total")
+      ).longValue()
     );
   }
 
@@ -517,7 +534,20 @@ class RegressionTest {
   void pageTagsUseOneBatchAndStillMatchTheQuestionDetails() {
     long user = db.queryForObject("SELECT id FROM accounts WHERE username='admin'", Long.class);
     org.mockito.Mockito.clearInvocations(db);
-    var page = questions.list(user, "", null, "", "", "senior-v1", false, false, false, false, 1, 15);
+    var page = questions.list(
+      user,
+      "",
+      null,
+      "",
+      "",
+      "senior-v1",
+      false,
+      false,
+      false,
+      false,
+      1,
+      15
+    );
     var batchCalls = org.mockito.Mockito.mockingDetails(db)
       .getInvocations()
       .stream()

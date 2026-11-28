@@ -18,6 +18,8 @@ const {
   fragmentCount,
   groups,
   index,
+  indexProgress,
+  stopIndex,
   library,
   libraryFilters,
   libraryKind,
@@ -466,18 +468,25 @@ const {
               </p>
               <button
                 class="knowledge-index-button"
-                :disabled="busy || !pendingVectors"
+                :disabled="busy || (!pendingVectors && operation !== 'index')"
                 @click="index"
               >
                 {{
                   operation === 'index'
-                    ? '正在构建…'
+                    ? indexProgress
+                      ? '正在构建… 已处理 ' +
+                        indexProgress.indexed.toLocaleString() +
+                        '，剩余 ' +
+                        indexProgress.remaining.toLocaleString()
+                      : '正在构建…'
                     : pendingVectors
-                      ? '构建一批索引'
+                      ? '构建向量索引'
                       : '索引已就绪'
                 }}</button
+              ><button v-if="operation === 'index'" class="knowledge-index-stop" @click="stopIndex">
+                停止</button
               ><small class="knowledge-service-footnote"
-                >每批最多 16 个片段，将使用已配置的向量模型。</small
+                >自动分批构建直到完成，每批 16 个片段；期间仍可使用关键词检索。</small
               ></template
             >
             <p v-else class="knowledge-service-copy">

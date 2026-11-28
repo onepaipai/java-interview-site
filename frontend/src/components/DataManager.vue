@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { api } from '../lib/api';
 import { confirmAction } from '../lib/confirm';
 import { trapDialogTab } from '../lib/dialog';
@@ -35,6 +35,11 @@ const statusLoading = ref(false);
 
 const reviews = ref<ReviewSummary | null>(null);
 const reviewFilter = ref<'all' | ReviewItem['status']>('all');
+const reviewPage = ref(1);
+const REVIEW_PAGE_SIZE = 20;
+const reviewPages = computed(() =>
+  Math.max(1, Math.ceil((reviews.value?.total ?? 0) / REVIEW_PAGE_SIZE)),
+);
 const reviewLoading = ref(false);
 const reviewDialog = ref<HTMLDialogElement>();
 const reviewEditing = ref<ReviewItem | null>(null);
@@ -45,12 +50,7 @@ const reviewEvidence = ref('');
 const reviewError = ref('');
 const reviewBusy = ref(false);
 
-const visibleReviews = computed(() => {
-  const items = reviews.value?.items ?? [];
-  return reviewFilter.value === 'all'
-    ? items
-    : items.filter((item) => item.status === reviewFilter.value);
-});
+const visibleReviews = computed(() => reviews.value?.items ?? []);
 
 const fileInput = ref<HTMLInputElement>();
 const previewDialog = ref<HTMLDialogElement>();
@@ -113,7 +113,12 @@ async function loadReviews() {
   reviewLoading.value = true;
   try {
     reviews.value = await api<ReviewSummary>(
-      '/admin/reviews',
+      '/admin/reviews?' +
+        new URLSearchParams({
+          status: reviewFilter.value,
+          page: String(reviewPage.value),
+          size: String(REVIEW_PAGE_SIZE),
+        }),
       'GET',
       undefined,
       undefined,
@@ -125,6 +130,17 @@ async function loadReviews() {
   } finally {
     reviewLoading.value = false;
   }
+}
+
+watch(reviewFilter, () => {
+  reviewPage.value = 1;
+  loadReviews();
+});
+
+async function turnReviewPage(delta: number) {
+  if (reviewLoading.value) return;
+  reviewPage.value = Math.min(reviewPages.value, Math.max(1, reviewPage.value + delta));
+  await loadReviews();
 }
 
 function backupFilename() {
@@ -458,6 +474,26 @@ onBeforeUnmount(() => {
               </div>
             </li>
           </ul>
+          <div v-if="reviewPages > 1" class="pagination">
+            <span class="muted"
+              >第 {{ reviews?.page ?? 1 }} / {{ reviewPages }} 页 · 共
+              {{ reviews?.total ?? 0 }} 条</span
+            >
+            <div class="actions">
+              <button
+                :disabled="(reviews?.page ?? 1) <= 1 || reviewLoading"
+                @click="turnReviewPage(-1)"
+              >
+                上一页
+              </button>
+              <button
+                :disabled="(reviews?.page ?? 1) >= reviewPages || reviewLoading"
+                @click="turnReviewPage(1)"
+              >
+                下一页
+              </button>
+            </div>
+          </div>
         </template>
       </section>
     </div>

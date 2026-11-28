@@ -57,10 +57,13 @@ export function useKnowledgeAdmin() {
     previewError = ref('');
   const previewTitle = ref('');
   let libraryController: AbortController | undefined,
-    previewController: AbortController | undefined;
+    previewController: AbortController | undefined,
+    indexController: AbortController | undefined;
   let librarySequence = 0,
     previewSequence = 0,
+    indexStopped = false,
     libraryTimer: ReturnType<typeof setTimeout> | undefined;
+  const indexProgress = ref<{ indexed: number; remaining: number } | null>(null);
   const sourceCount = computed(() =>
     library.value
       ? Object.values(library.value.counts).reduce((sum, count) => sum + count, 0)
@@ -174,6 +177,7 @@ export function useKnowledgeAdmin() {
     clearTimeout(libraryTimer);
     libraryController?.abort();
     previewController?.abort();
+    indexController?.abort();
     previewDialog.value?.close();
   });
 
@@ -439,18 +443,46 @@ export function useKnowledgeAdmin() {
   }
   async function index() {
     await run('index', async () => {
-      const result = await api<{ indexed: number; remaining: number }>(
-        '/admin/knowledge/index',
-        'POST',
-        {},
-        120000,
-        controller.signal,
-      );
+      indexStopped = false;
+      let totalIndexed = 0;
+      let remaining = -1;
+      // 自动分批直到清零或用户停止；每批独立提交，中断保留已完成部分。
+      while (remaining !== 0 && alive && !indexStopped) {
+        indexController = new AbortController();
+        let result: { indexed: number; remaining: number };
+        try {
+          result = await api<{ indexed: number; remaining: number }>(
+            '/admin/knowledge/index',
+            'POST',
+            {},
+            120000,
+            indexController.signal,
+          );
+        } catch (e) {
+          if (indexStopped) break;
+          throw e;
+        }
+        if (!alive) return;
+        totalIndexed += result.indexed;
+        remaining = result.remaining;
+        indexProgress.value = { indexed: totalIndexed, remaining };
+        if (result.indexed === 0 && remaining > 0)
+          throw new Error('本批向量没有写入，请检查向量模型服务后重试');
+      }
       await load();
-      notice.value = result.remaining
-        ? `本批完成 ${result.indexed} 个片段，还剩 ${result.remaining} 个待构建，可继续下一批。`
-        : '向量已全部构建完成，AI 问答可使用混合检索。';
+      indexProgress.value = null;
+      notice.value = indexStopped
+        ? `已停止构建：本次完成 ${totalIndexed} 个片段，剩余 ${remaining} 个可稍后继续。`
+        : totalIndexed
+          ? `向量构建完成：共 ${totalIndexed} 个片段，AI 问答可使用混合检索。`
+          : '向量已全部构建完成，AI 问答可使用混合检索。';
     });
+  }
+
+  function stopIndex() {
+    if (operation.value !== 'index') return;
+    indexStopped = true;
+    indexController?.abort();
   }
 
   return {
@@ -497,6 +529,8 @@ export function useKnowledgeAdmin() {
     vectorPercent,
     pendingVectors,
     index,
+    stopIndex,
+    indexProgress,
     closePreview,
     previewBackdrop,
     previewDialog,

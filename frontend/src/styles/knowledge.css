@@ -802,6 +802,14 @@
   color: var(--muted);
   font-size: 12px;
 }
+.knowledge-index-stop {
+  min-height: 34px;
+  margin-top: 14px;
+  margin-left: 8px;
+  padding: 6px 10px;
+  color: var(--danger, #b42318);
+  font-size: 12px;
+}
 .knowledge-setup {
   margin-top: 22px;
   border: 1px solid #e9ecf2;

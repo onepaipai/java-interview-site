@@ -4,6 +4,7 @@ import AiPanel from './AiPanel.vue';
 import Icon from './Icon.vue';
 import { categoryName } from '../lib/display';
 import { readSetting, saveSetting } from '../lib/storage';
+import { PAGE_SIZE } from '../lib/navigation';
 import type { Question } from '../lib/types';
 const props = defineProps<{
   selected: Question;
@@ -41,7 +42,7 @@ const revealed = ref(false);
 const answerVisible = computed(() => !props.practice || revealed.value);
 const structuredAnswer = computed(() => props.rendered.includes('class="explanation-content'));
 const position = computed(() =>
-  props.questionIndex < 0 ? 0 : (props.page - 1) * 15 + props.questionIndex + 1,
+  props.questionIndex < 0 ? 0 : (props.page - 1) * PAGE_SIZE + props.questionIndex + 1,
 );
 const noteDraft = ref(props.note);
 const notePending = ref(false);
@@ -156,7 +157,7 @@ const nextDisabled = computed(
   () =>
     props.busy ||
     props.questionIndex < 0 ||
-    (props.page - 1) * 15 + props.questionIndex + 1 >= props.total,
+    (props.page - 1) * PAGE_SIZE + props.questionIndex + 1 >= props.total,
 );
 function closeMobileToc(event?: PointerEvent) {
   if (!event || !mobileToc.value?.contains(event.target as Node)) {

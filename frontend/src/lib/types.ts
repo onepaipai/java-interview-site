@@ -27,6 +27,9 @@ export interface ReviewItem {
 export interface ReviewSummary {
   counts: Record<ReviewItem['status'], number>;
   items: ReviewItem[];
+  total: number;
+  page: number;
+  size: number;
 }
 export interface PublicationStatus {
   packVersion: string;

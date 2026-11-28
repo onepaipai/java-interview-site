@@ -62,6 +62,7 @@ export async function api<T = unknown>(
   body?: unknown,
   timeout?: number,
   signal?: AbortSignal,
+  retryOnForbidden = true,
 ): Promise<T> {
   if (signal?.aborted) throw new DOMException('请求已取消', 'AbortError');
   if (method !== 'GET' && !csrf) await refreshCsrf();
@@ -84,6 +85,14 @@ export async function api<T = unknown>(
           csrf = null;
           if (path !== '/login' && path !== '/me')
             window.dispatchEvent(new Event('session-expired'));
+        }
+        // 长时间挂起的页面会话仍在但 CSRF 令牌已失效：刷新令牌后重试一次，避免用户整页刷新。
+        if (response.status === 403 && method !== 'GET' && retryOnForbidden && csrf) {
+          csrf = null;
+          try {
+            await refreshCsrf();
+          } catch {}
+          return api<T>(path, method, body, timeout, signal, false);
         }
         let message = '操作失败，请重试';
         try {

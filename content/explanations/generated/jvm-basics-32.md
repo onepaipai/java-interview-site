@@ -12,7 +12,7 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 
 <!-- explanation:deep -->
 
-> 场景与约束：Java 17 教学场景：突发流量下服务抛 "unable to create new native thread" 后整个进程不可用。拆解线程创建的资源链（栈内存、内核线程、系统限额），说明为什么与 Xmx 无关。
+> 场景与约束：Java 17 教学场景：突发流量下服务抛 "unable to create native thread" 后整个进程不可用。拆解线程创建的资源链（栈内存、内核线程、系统限额），说明为什么与 Xmx 无关。
 
 1. 每个 Java 线程对应一个内核线程并预占栈内存（Xss 默认约 1MB）：千线程即 GB 级本地内存预留，外加内核侧的调度与页表开销。
 2. 创建失败的三道闸：进程地址空间/RSS 预算（容器 cgroup 更紧）、系统与容器限额（ulimit -u、pids.max）、内核线程数上限——任何一道拒绝即抛 unable to create native thread。

@@ -18410,10 +18410,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18537,10 +18540,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/invoke/MethodHandle.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18664,10 +18670,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18776,10 +18785,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -18888,10 +18900,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://openjdk.org/jeps/374"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19000,10 +19015,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19142,10 +19160,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/management/MemoryMXBean.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19269,10 +19290,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19396,10 +19420,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19508,10 +19535,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ref/package-summary.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19635,10 +19665,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://openjdk.org/jeps/421",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ref/Cleaner.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19779,10 +19812,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ref/Cleaner.html",
+          "https://openjdk.org/jeps/421"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -19906,10 +19942,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20018,10 +20057,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/collectors.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20147,10 +20189,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20276,10 +20321,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/z-garbage-collector.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20388,10 +20436,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20530,10 +20581,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20671,10 +20724,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20813,10 +20869,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -20940,10 +20999,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21052,10 +21114,12 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21178,10 +21242,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NoClassDefFoundError.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21305,10 +21372,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21434,10 +21504,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://github.com/openjdk/jmh"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21546,10 +21619,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21658,10 +21734,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21763,17 +21842,20 @@
     {
       "sourceKey": "c5376bc8ca3cac47063d6a328f673ae8ecef2319625190d74bfcc9842863343d",
       "title": "代码缓存耗尽为什么会影响吞吐？",
-      "answerSha256": "64d369be8b4085bd78d5c101f2c9d8f2b6e678e2cf837351044fe6b112e6ea84",
+      "answerSha256": "df7b8d46e8a426b7826e1f15c90a20f7dafcf1f579f838bc3f790c499bbf4af6",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -21869,6 +21951,21 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "64d369be8b4085bd78d5c101f2c9d8f2b6e678e2cf837351044fe6b112e6ea84",
+          "title": "代码缓存耗尽为什么会影响吞吐？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
@@ -21882,10 +21979,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/management/MemoryMXBean.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22009,10 +22109,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/OutOfMemoryError.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22136,10 +22239,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/StackOverflowError.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22256,17 +22362,20 @@
     {
       "sourceKey": "a9ecedf5ce62a04b5284fa5cf9be9244a313afc5adc51831a8a83b0497ad8177",
       "title": "大量创建线程为什么可能使进程无法继续运行？",
-      "answerSha256": "ddc6d379d1268adeb265b628c701f01c0868840a6e22761974eded9a93efa629",
+      "answerSha256": "06095c37787dcde547c35be00559360e428cefc6173d7934b6a520d05888cc6b",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Thread.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22377,6 +22486,21 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "ddc6d379d1268adeb265b628c701f01c0868840a6e22761974eded9a93efa629",
+          "title": "大量创建线程为什么可能使进程无法继续运行？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
@@ -22390,10 +22514,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22517,10 +22644,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/Buffer.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22661,10 +22791,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22788,10 +22921,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -22917,10 +23053,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23029,10 +23168,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23156,10 +23298,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23261,17 +23406,20 @@
     {
       "sourceKey": "4cb78a1d471044a5c76923d6276f9468d40ac36ab22ee23d3ac9de2a31ae055b",
       "title": "Java 进程的 CPU 使用率超过百分之百意味着什么？",
-      "answerSha256": "8b8fa2138b16f9b919d93d777dc72e4f3960c9494cecd94dc2a8cb94ea0c4b4e",
+      "answerSha256": "ea323b1a3746954ba1df4d67a8b380075664ac5de5378546b7d70ade7fa04665",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23397,6 +23545,21 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "8b8fa2138b16f9b919d93d777dc72e4f3960c9494cecd94dc2a8cb94ea0c4b4e",
+          "title": "Java 进程的 CPU 使用率超过百分之百意味着什么？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
@@ -23410,10 +23573,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23522,10 +23688,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23634,10 +23803,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23746,10 +23918,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23858,10 +24033,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -23970,10 +24148,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -24097,10 +24278,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -24202,17 +24386,20 @@
     {
       "sourceKey": "6c04594e997b10ddccaaff59e9ddadee5da746796554216eac03a648e2afd679",
       "title": "容器中的 Java 内存预算应该怎样拆分？",
-      "answerSha256": "1495d20f1d5dcc637e5b0f7848bb35f183d6ae12a81b06059b64a01bef258edc",
+      "answerSha256": "8d826d4baf2a594efb7612fa0142e93a38d9157f6ccdb0937f35fba5a4ac1804",
       "structure": "validated",
       "example": {
         "status": "pending",
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/en/java/javase/17/troubleshoot/environment-issues.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -24308,6 +24495,21 @@
             "reviewer": ""
           },
           "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "1495d20f1d5dcc637e5b0f7848bb35f183d6ae12a81b06059b64a01bef258edc",
+          "title": "容器中的 Java 内存预算应该怎样拆分？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
         }
       ]
     },
@@ -24321,10 +24523,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html",
+          "https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [
@@ -24450,10 +24655,13 @@
         "evidence": []
       },
       "factualReview": {
-        "status": "pending",
-        "applicableVersion": "",
-        "evidence": [],
-        "reviewer": ""
+        "status": "verified",
+        "applicableVersion": "JDK 17（历史行为按正文标注）",
+        "evidence": [
+          "https://docs.oracle.com/en/java/javase/17/migrate/develop-migrating-jdk-17.html",
+          "https://docs.oracle.com/en/java/javase/17/gctuning/garbage-collector-implementation.html"
+        ],
+        "reviewer": "zcode-review-20261128"
       },
       "manualMerge": "not-assessed",
       "history": [

@@ -30,7 +30,7 @@ Java 示例以 17 为基准；虚拟线程、ScopedValue 与历史实现按正�
 ### 第二步扩展② 反例：脚本引擎的慢性消耗
 
 - Groovy/JS 引擎每执行一段动态脚本就生成新类与新方法，数月积累百万级方法体。
-- 特征：JFR/JMX 的 CodeCache 满载率爬升、`CodeCache is full` 告警、fullNativeMemorySegment 警告后吞吐掉档。
+- 特征：JFR/JMX 的 CodeCache 满载率爬升，日志出现 `CodeCache is full. Compiler has been disabled`，新方法不再编译、热点回退解释执行，吞吐掉档。
 - 对策：升级脚本引擎复用编译产物、限制动态类生成、调大 ReservedCodeCacheSize 只解燃眉。
 
 ### 第二步扩展③ 取舍：容量与回收参数怎么配

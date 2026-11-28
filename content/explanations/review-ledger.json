@@ -67272,7 +67272,7 @@
     {
       "sourceKey": "7d022c459b7b17237fa619ab50e29e541ac3db8db4f61aab737ae4b9108bf6bc",
       "title": "缓存键为什么要包含租户与版本？",
-      "answerSha256": "9c6d3f644ef8a3757cb34a676809ce9266ed40d25af24a956ac7502aa0ee2f26",
+      "answerSha256": "4761eb5077594dfaf8dd5790ba0fe3466ddb9416c518cfa5419419d85b9a83f2",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -67395,6 +67395,21 @@
         },
         {
           "answerSha256": "871aa861c89e703b10e3ee2ca5da4d79432e8368a00e2313ac8f7a346f189b44",
+          "title": "缓存键为什么要包含租户与版本？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9c6d3f644ef8a3757cb34a676809ce9266ed40d25af24a956ac7502aa0ee2f26",
           "title": "缓存键为什么要包含租户与版本？",
           "example": {
             "status": "pending",
@@ -67897,7 +67912,7 @@
     {
       "sourceKey": "90f350585d21e6bce4b1fab36589bbc6f0ef1825aa075c54657999dd6780c8a0",
       "title": "方法级授权与 URL 授权应怎样配合？",
-      "answerSha256": "5c02fc736a948cf318f6ce1933f190c74985bcb756174274d7ef6f6b012edc65",
+      "answerSha256": "2399f6bf7201af713d926f2f94ffbb7703380786a24e91b87ef6eefedb77340e",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -68020,6 +68035,21 @@
         },
         {
           "answerSha256": "6429031fa18f0a7ccbac8f9eda5b0c01e91c84cb699d816c30e2f8e17c83f216",
+          "title": "方法级授权与 URL 授权应怎样配合？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "5c02fc736a948cf318f6ce1933f190c74985bcb756174274d7ef6f6b012edc65",
           "title": "方法级授权与 URL 授权应怎样配合？",
           "example": {
             "status": "pending",
@@ -69042,7 +69072,7 @@
     {
       "sourceKey": "68c9ce4a3e1595a0f727a167ace599d7fdb3fb8cf20e4c14c8116bfd68f169cc",
       "title": "过滤器提前读取请求体会带来什么问题？",
-      "answerSha256": "75eced495350e0eb2b491ccbedb42f44d33b44d9a6db273762f288219ea5da19",
+      "answerSha256": "885b9c489064362127a8b54fb4c422317d92decfecef59ffac60531b28d779a3",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -69165,6 +69195,21 @@
         },
         {
           "answerSha256": "d9803c903ea11308a2b066196413b8170f73d1ace1d0a8f4d0fef84845cc8390",
+          "title": "过滤器提前读取请求体会带来什么问题？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "75eced495350e0eb2b491ccbedb42f44d33b44d9a6db273762f288219ea5da19",
           "title": "过滤器提前读取请求体会带来什么问题？",
           "example": {
             "status": "pending",
@@ -71292,7 +71337,7 @@
     {
       "sourceKey": "cf4d98e3d4cc4d0119d35c4270f31b838f6c17acff1f69668ae974c1e7ce4e09",
       "title": "分页列表为何应避免每行单独查询标签？",
-      "answerSha256": "9fd4607ca0a1397b9c8686d4f6df18c352c01624ca362386c78fbc64b8df8905",
+      "answerSha256": "1c681b0825abb809dfa772665271e99a50adb7347750c881635848e9c9921937",
       "structure": "validated",
       "example": {
         "status": "pending",
@@ -71415,6 +71460,21 @@
         },
         {
           "answerSha256": "8547e34393d561041f6e2e450cf28cbf107c07e613dd871b7c420880549fb8b8",
+          "title": "分页列表为何应避免每行单独查询标签？",
+          "example": {
+            "status": "pending",
+            "evidence": []
+          },
+          "factualReview": {
+            "status": "pending",
+            "applicableVersion": "",
+            "evidence": [],
+            "reviewer": ""
+          },
+          "manualMerge": "not-assessed"
+        },
+        {
+          "answerSha256": "9fd4607ca0a1397b9c8686d4f6df18c352c01624ca362386c78fbc64b8df8905",
           "title": "分页列表为何应避免每行单独查询标签？",
           "example": {
             "status": "pending",

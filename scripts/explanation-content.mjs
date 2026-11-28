@@ -42,8 +42,7 @@ export function validateQuestionContent(value, key, expectedTitle) {
 
 const numbered = points => points.map((point, index) => `${index + 1}. ${point.trim().replace(/[。；]+$/, '')}。`).join('\n');
 
-export function renderQuestionContent(value) {
-  if (value.format === 'deep') return renderDeepContent(value);
+function renderCompactContent(value) {
   const steps = value.case.map((step, index) => {
     let text = `${index + 1}. ${step.text.trim().replace(/[。；]+$/, '')}。`;
     if (step.diagram) text += `\n\n![${value.title}](/explanations/${step.diagram}.svg)`;
@@ -52,4 +51,10 @@ export function renderQuestionContent(value) {
   }).join('\n\n');
   const analysis = value.analysis ? `## 参考分析\n\n${numbered(value.analysis)}\n\n` : '';
   return `## 参考回答\n\n${numbered(value.answer)}\n\n${analysis}## 案例\n\n${steps}\n\n## 总结点\n\n${numbered(value.summary)}\n`;
+}
+
+export function renderQuestionContent(value) {
+  const markdown = value.format === 'deep' ? renderDeepContent(value) : renderCompactContent(value);
+  // 行尾空白清零：发布产物按此规范生成，磁盘副本、逐字节校验与渲染源头保持同一份字节。
+  return markdown.replace(/[ \t]+(?=\r?\n)/g, '');
 }

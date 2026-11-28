@@ -1,51 +1,537 @@
-import {testTarget} from './target.mjs';
-const testEnvironment=await testTarget();
-import {chromium} from '@playwright/test';
-import {readFile,mkdir} from 'node:fs/promises';import assert from 'node:assert/strict';
-const base=testEnvironment.base,password=testEnvironment.password,stamp=Date.now();
-await mkdir('test-results/workbench',{recursive:true});const browser=await chromium.launch({channel:'chrome',headless:true,args:['--disable-gpu','--renderer-process-limit=2','--js-flags=--max-old-space-size=192']});
-async function req(context,path,method='GET',data){const headers={};if(method!=='GET'){const c=await(await context.request.get(base+'/api/csrf')).json();headers[c.headerName]=c.token;}const r=await context.request.fetch(base+'/api'+path,{method,headers,...(data===undefined?{}:{data})});assert.ok(r.ok(),method+' '+path+' '+r.status());return r.headers()['content-type']?.includes('json')?r.json():null;}
-async function overflow(p,name){assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,name+' overflow');}
-async function screenshot(p,name,label){await overflow(p,name+' '+label);await p.screenshot({path:'test-results/workbench/'+name+'-'+label+'.png'});}
-async function confirm(p,name){await p.locator('.confirm-dialog').getByRole('button',{name,exact:true}).click();}
-async function login(p){await p.goto(base);await p.getByLabel('账号',{exact:true}).fill('admin');await p.getByLabel('密码',{exact:true}).fill(password);await p.getByRole('button',{name:'登录',exact:true}).click();await p.getByRole('heading',{name:'知识目录',exact:true}).waitFor();}
-try{for(const [name,width,height]of [['desktop',1440,1000],['mobile',390,844],['small-mobile',320,740]]){
-const context=await browser.newContext({viewport:{width,height}}),p=await context.newPage(),errors=[],createdQuestions=[],createdCategories=[],createdAccounts=[];p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.addInitScript(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:async t=>{window.__copied=t;}}});});
-try{
-await login(p);assert.equal(await p.locator('.question-row').count(),0);assert.match(p.url(),/#\/catalog$/);await screenshot(p,name,'catalog');
-const modules=await req(context,'/categories');await p.locator('.module-card').first().click();await p.locator('.question-row').first().waitFor();const moduleURL=p.url();assert.match(moduleURL,/#\/module\/\d+/);assert.equal(await p.locator('.question-row').count(),Math.min(15,modules[0].question_count));
-await p.reload();await p.getByRole('heading',{name:'Java 语言',exact:true}).waitFor();assert.equal(p.url(),moduleURL);
-await p.locator('.question-row').first().click();await p.locator('.reader').waitFor();const questionURL=p.url();assert.match(questionURL,/#\/question\/\d+/);await p.reload();await p.locator('.reader').waitFor();assert.equal(p.url(),questionURL);await p.goBack();await p.locator('.question-row').first().waitFor();await p.goForward();await p.locator('.reader').waitFor();await p.getByRole('button',{name:width<=600?'题目列表':'返回题目列表',exact:true}).click();await p.locator('.question-row').first().waitFor();assert.equal(p.url(),moduleURL);await screenshot(p,name,'module');
-if(width<900){await p.getByRole('button',{name:'打开模块目录',exact:true}).click();await p.getByRole('dialog',{name:'模块目录',exact:true}).waitFor();await p.getByRole('button',{name:'关闭模块目录',exact:true}).click();}
-await p.getByRole('button',{name:'＋ 新增题目',exact:true}).click();await p.getByLabel('题目 Markdown',{exact:true}).waitFor();const title='知序验收 '+name+' '+stamp;
-await p.getByLabel('题目 Markdown',{exact:true}).fill(title);await p.getByLabel('题目 Markdown',{exact:true}).press('Control+a');await p.locator('.markdown-editor').first().getByRole('button',{name:'加粗',exact:true}).click();
-const rich='## 回答要点\n\n这是 **测试回答**。\n\n'+('解释并发场景下的行为，以及实际应用中的取舍。'.repeat(22))+'\n\n## 代码示例\n\n```java\nint value = 42;\n```\n\n## 对比说明\n\n| 项目 | 说明 |\n| --- | --- |\n| 示例 | 可验证的回答 |\n\n'+('补充边界条件和常见误区。'.repeat(30))+'\n<script>window.bad=true</script>';
-await p.getByLabel('回答 Markdown',{exact:true}).fill(rich);const answerEditor=p.locator('.markdown-editor').last();await answerEditor.getByRole('button',{name:'预览',exact:true}).click();assert.equal(await answerEditor.locator('.markdown strong').innerText(),'测试回答');await answerEditor.getByRole('button',{name:'编辑',exact:true}).click();
-await p.getByRole('button',{name:'返回',exact:true}).click();await p.getByRole('heading',{name:'放弃未保存的修改？',exact:true}).waitFor();await confirm(p,'取消');assert.equal(await p.getByLabel('题目 Markdown',{exact:true}).innerText(),'**'+title+'**');const editorURL=p.url();await p.goBack();await p.getByRole('heading',{name:'放弃未保存的修改？',exact:true}).waitFor();await confirm(p,'取消');await p.waitForURL(editorURL);assert.equal(await p.getByLabel('题目 Markdown',{exact:true}).innerText(),'**'+title+'**');await screenshot(p,name,'editor');
-const png=Buffer.from(await p.evaluate(()=>{const c=document.createElement('canvas');c.width=640;c.height=140;const x=c.getContext('2d');x.fillStyle='#f0eef6';x.fillRect(0,0,640,140);x.fillStyle='#5b557b';x.font='bold 26px sans-serif';x.fillText('Markdown 图片预览',30,58);x.font='16px sans-serif';x.fillText('上传 · 粘贴 · 拖入 → 保存与查看',30,96);return c.toDataURL('image/png').split(',')[1];}),'base64');
-await answerEditor.locator('input[type=file]').setInputFiles({name:'test.png',mimeType:'image/png',buffer:png});await p.getByLabel('回答 Markdown',{exact:true}).filter({hasText:'/uploads/'}).waitFor();
-for(const type of ['paste','drop']){const count=(await p.getByLabel('回答 Markdown',{exact:true}).innerText()).split('/uploads/').length;await p.getByLabel('回答 Markdown',{exact:true}).evaluate((el,{type,data})=>{const dt=new DataTransfer();dt.items.add(new File([Uint8Array.from(atob(data),c=>c.charCodeAt(0))],'image.png',{type:'image/png'}));el.dispatchEvent(type==='paste'?new ClipboardEvent('paste',{clipboardData:dt,bubbles:true,cancelable:true}):new DragEvent('drop',{dataTransfer:dt,bubbles:true,cancelable:true}));},{type,data:png.toString('base64')});await p.waitForFunction(({count})=>(document.querySelector('[aria-label="回答 Markdown"]')?.textContent?.split('/uploads/').length||0)>count,{count});}
-await p.getByRole('button',{name:'保存',exact:true}).click();await p.locator('.question-markdown').getByText(title,{exact:true}).waitFor();const id=Number(p.url().match(/question\/(\d+)/)[1]);createdQuestions.push(id);assert.equal(await p.locator('.answer-content img').count(),3);assert.equal(await p.evaluate(()=>window.bad),undefined);
-await p.locator('.answer-content img').first().click();await p.getByRole('dialog',{name:'图片查看'}).waitFor();await p.getByRole('button',{name:'关闭图片',exact:true}).click();await p.getByRole('button',{name:'复制代码',exact:true}).click();assert.equal((await p.evaluate(()=>window.__copied)).trim(),'int value = 42;');
-if(width>1150){await p.locator('.answer-outline').waitFor();assert.equal(await p.locator('.answer-outline button').count(),3);}await p.evaluate(()=>scrollTo(0,0));await screenshot(p,name,'reader');
-const savedURL=p.url();await p.reload();await p.locator('.question-markdown').getByText(title,{exact:true}).waitFor();assert.equal(p.url(),savedURL);
-await p.keyboard.press('Control+k');await p.getByLabel('全局搜索关键词',{exact:true}).fill(title);await p.getByRole('dialog',{name:'全局搜索',exact:true}).locator('.search-result').filter({hasText:title}).waitFor();await screenshot(p,name,'global-search');await p.getByRole('dialog',{name:'全局搜索',exact:true}).getByRole('button',{name:/查看全部/}).click();await p.locator('.grouped-search-list .question-row').waitFor();assert.match(p.url(),/#\/search\?/);await p.locator('.grouped-search-list .question-row').first().click();await p.locator('.reader').waitFor();
-await p.getByRole('button',{name:/^(编辑题解|添加回答)$/}).click();await p.getByLabel('题目 Markdown',{exact:true}).fill(title+' 已修改');await p.getByLabel('回答 Markdown',{exact:true}).fill('修改后的回答');await p.getByRole('button',{name:'保存',exact:true}).click();await p.locator('.question-markdown').getByText(title+' 已修改',{exact:true}).waitFor();
-await p.getByRole('button',{name:/^(编辑题解|添加回答)$/}).click();await p.getByLabel('回答 Markdown',{exact:true}).fill('本地未保存的回答');const current=await req(context,'/questions/'+id);await req(context,'/admin/questions/'+id,'PUT',{title:current.title,categoryId:current.category_id,difficulty:current.difficulty,answer:'其他窗口的回答',sortOrder:current.sort_order,tags:current.tags,version:current.version});await p.getByRole('button',{name:'保存',exact:true}).click();await p.locator('.editor-error').waitFor();assert.equal(await p.getByLabel('回答 Markdown',{exact:true}).innerText(),'本地未保存的回答');await p.getByRole('button',{name:'重新加载',exact:true}).click();await p.getByText('已恢复上次未保存的草稿').waitFor();assert.equal(await p.getByLabel('回答 Markdown',{exact:true}).innerText(),'本地未保存的回答');await p.getByRole('button',{name:'返回',exact:true}).click();await confirm(p,'放弃修改');await p.locator('.reader').waitFor();
-await p.locator('.more-menu summary').click();await p.getByRole('button',{name:'删除回答',exact:true}).click();await confirm(p,'删除回答');await p.getByText('暂无回答，等待补充。',{exact:true}).waitFor();await p.locator('.more-menu summary').click();await p.getByRole('button',{name:'删除题目',exact:true}).click();await confirm(p,'删除题目');await p.getByLabel('搜索题目',{exact:true}).waitFor();assert.equal((await req(context,'/questions?search='+encodeURIComponent(title))).total,0);
-const paging=await req(context,'/admin/categories','POST',{name:'分页验收模块 '+name+' '+stamp,sortOrder:0});createdCategories.push(paging.id);const pagingIds=[];for(let n=1;n<=18;n++){const q=await req(context,'/admin/questions','POST',{title:'分页验收问题 '+n,categoryId:paging.id,difficulty:'基础',answer:'分页测试回答',sortOrder:n,tags:[]});pagingIds.push(q.id);createdQuestions.push(q.id);}
-const pagingURL=base+'/#/module/'+paging.id+'?search='+encodeURIComponent('分页验收');await p.goto(pagingURL);await p.locator('.question-row').nth(14).waitFor();await p.locator('.question-row').nth(10).scrollIntoViewIfNeeded();const beforeScroll=await p.evaluate(()=>scrollY);await p.locator('.question-row').nth(10).click();await p.locator('.reader').waitFor();await p.getByRole('button',{name:width<=600?'题目列表':'返回题目列表',exact:true}).click();await p.locator('.question-row').nth(14).waitFor();assert.equal(p.url(),pagingURL);assert.ok(Math.abs((await p.evaluate(()=>scrollY))-beforeScroll)<3,'scroll position restored');
-await p.getByRole('button',{name:'下一页',exact:true}).click();await p.locator('.question-row').first().getByText('分页验收问题 16',{exact:true}).waitFor();const pageTwoURL=p.url();assert.match(pageTwoURL,/page=2/);await p.locator('.question-row').first().click();await p.locator('.question-markdown').getByText('分页验收问题 16',{exact:true}).waitFor();await p.reload();await p.locator('.reader').waitFor();await p.getByRole('button',{name:/^(← )?上一题$/}).click();await p.locator('.question-markdown').getByText('分页验收问题 15',{exact:true}).waitFor();await p.getByRole('button',{name:/^下一题(?: →)?$/}).click();await p.locator('.question-markdown').getByText('分页验收问题 16',{exact:true}).waitFor();await p.getByRole('button',{name:width<=600?'题目列表':'返回题目列表',exact:true}).click();await p.locator('.question-row').first().waitFor();assert.equal(p.url(),pageTwoURL);
-if(width>900){const group=p.locator('.rail-group-toggle').filter({hasText:'Java 核心'});if(await group.getAttribute('aria-expanded')==='false')await group.click();let intercepted=0;await p.route('**/api/categories',async route=>{if(++intercepted===1)await new Promise(r=>setTimeout(r,180));await route.continue();});await p.evaluate(()=>{const buttons=document.querySelectorAll('.workspace-sidebar .sidebar-module');buttons[0].click();buttons[1].click();});await p.getByRole('heading',{name:'Java 集合',exact:true}).waitFor();await p.waitForTimeout(250);assert.equal(await p.getByRole('heading',{name:'Java 集合',exact:true}).count(),1);await p.unroute('**/api/categories');}
-await p.getByRole('button',{name:'知识模块',exact:true}).click();await p.getByLabel('搜索模块',{exact:true}).waitFor();await screenshot(p,name,'modules');
-await p.locator('.managed-module-card').first().getByRole('button',{name:/^归档.*模块$/}).click();await p.getByRole('heading',{name:'这个模块还有题目',exact:true}).waitFor();await confirm(p,'知道了');
-const module='模块验收 '+name+' '+stamp;await p.getByRole('button',{name:'新建模块',exact:true}).click();await p.getByLabel('模块名称',{exact:true}).fill('Java 语言');await p.getByRole('button',{name:'创建模块',exact:true}).click();await p.getByText('已存在同名模块，请使用其他名称',{exact:true}).waitFor();await p.getByLabel('模块名称',{exact:true}).fill(module);const managerURL=p.url();await p.goBack();await p.getByRole('heading',{name:'放弃未保存的修改？',exact:true}).waitFor();await confirm(p,'取消');await p.waitForURL(managerURL);assert.equal(await p.getByLabel('模块名称',{exact:true}).inputValue(),module);await p.getByRole('button',{name:'创建模块',exact:true}).click();let row=p.locator('.managed-module-card').filter({hasText:module});await row.waitFor();const cat=(await req(context,'/categories')).find(c=>c.name===module);createdCategories.push(cat.id);
-await p.getByRole('button',{name:/^空模块 /}).click();await p.getByLabel('搜索模块',{exact:true}).fill(module);assert.equal(await p.locator('.managed-module-card').count(),1);await row.getByRole('button',{name:'重命名',exact:true}).click();await p.getByLabel('模块名称',{exact:true}).fill(module+' 新');await screenshot(p,name,'module-dialog');await p.getByRole('button',{name:'保存修改',exact:true}).click();row=p.locator('.managed-module-card').filter({hasText:module+' 新'});await row.waitFor();
-const history=await req(context,'/admin/questions','POST',{title:'模块历史 '+stamp,categoryId:cat.id,difficulty:'基础',answer:'历史内容保留',sortOrder:0,tags:[]});createdQuestions.push(history.id);await req(context,'/admin/questions/'+history.id,'DELETE');await row.getByRole('button',{name:'归档'+module+' 新模块',exact:true}).click();await confirm(p,'归档模块');await row.waitFor({state:'detached'});assert.ok((await req(context,'/questions?trash=true&size=100&search='+encodeURIComponent('模块历史 '+stamp))).items.some(q=>q.id===history.id&&q.answered===true));await req(context,'/admin/categories','POST',{name:module+' 新',sortOrder:0});const recreated=(await req(context,'/categories')).find(c=>c.name===module+' 新');createdCategories.push(recreated.id);
-await p.getByRole('button',{name:'账号管理',exact:true}).click();await p.locator('.account-row').first().waitFor();await screenshot(p,name,'accounts');await p.getByRole('button',{name:'创建账号',exact:true}).click();const account='qa_'+stamp+'_'+width;await p.getByLabel('新账号',{exact:true}).fill(account);const accountsURL=p.url();await p.goBack();await p.getByRole('heading',{name:'放弃未保存的修改？',exact:true}).waitFor();await confirm(p,'取消');await p.waitForURL(accountsURL);assert.equal(await p.getByLabel('新账号',{exact:true}).inputValue(),account);await p.getByLabel('初始密码',{exact:true}).fill('test-password-12345');assert.equal(await p.getByLabel('初始密码',{exact:true}).getAttribute('type'),'password');await p.getByRole('button',{name:'显示密码',exact:true}).click();assert.equal(await p.getByLabel('初始密码',{exact:true}).getAttribute('type'),'text');await p.getByRole('button',{name:'隐藏密码',exact:true}).click();await screenshot(p,name,'account-dialog');await p.getByRole('dialog').getByRole('button',{name:'创建账号',exact:true}).click();let accountRow=p.locator('.account-row').filter({hasText:account});try{await accountRow.waitFor();}catch(e){console.log('ACCOUNT DIAGNOSTIC',await p.locator('.inline-error').allTextContents(),await p.locator('.account-row').allTextContents());await p.screenshot({path:'test-results/workbench/account-failure.png'});throw e;}const a=(await req(context,'/admin/accounts')).find(a=>a.username===account);createdAccounts.push(a.id);
-const guest=await browser.newContext();try{let csrf=await(await guest.request.get(base+'/api/csrf')).json();let response=await guest.request.post(base+'/api/login',{form:{username:account,password:'test-password-12345'},headers:{[csrf.headerName]:csrf.token}});assert.ok(response.ok());assert.equal((await guest.request.get(base+'/api/admin/accounts')).status(),403);
-await accountRow.getByRole('button',{name:'修改',exact:true}).click();await p.getByLabel('账号名称',{exact:true}).fill(account+'_new');await p.getByRole('button',{name:'保存修改',exact:true}).click();accountRow=p.locator('.account-row').filter({hasText:account+'_new'});await accountRow.waitFor();assert.equal((await guest.request.get(base+'/api/me')).status(),401);
-await accountRow.getByRole('button',{name:'重置密码',exact:true}).click();await p.getByLabel('新密码',{exact:true}).fill('reset-password-12345');await p.getByRole('dialog').getByRole('button',{name:'重置密码',exact:true}).click();await p.getByRole('dialog').waitFor({state:'hidden'});csrf=await(await guest.request.get(base+'/api/csrf')).json();response=await guest.request.post(base+'/api/login',{form:{username:account+'_new',password:'reset-password-12345'},headers:{[csrf.headerName]:csrf.token}});assert.ok(response.ok());await accountRow.getByRole('button',{name:'删除',exact:true}).click();await confirm(p,'删除账号');await accountRow.waitFor({state:'detached'});assert.equal((await guest.request.get(base+'/api/me')).status(),401);}finally{await guest.close();}
-assert.deepEqual(errors,[]);console.log(name+': routes/refresh/back, search, Markdown/images, archive preservation, account dialogs/permissions PASS');
-}catch(e){console.log('REGRESSION DIAGNOSTIC',p.url(),await p.locator('h1').allTextContents(),await p.locator('[role=alert]').allTextContents());await p.screenshot({path:'test-results/workbench/regression-failure.png'});throw e;}finally{for(const id of createdQuestions){try{await req(context,'/admin/questions/'+id,'DELETE');}catch{}}for(const id of createdCategories){try{await req(context,'/admin/categories/'+id,'DELETE');}catch{}}for(const id of createdAccounts){try{await req(context,'/admin/accounts/'+id,'DELETE');}catch{}}await context.close();}
-}}finally{await browser.close();}
+import { testTarget } from './target.mjs';
+const testEnvironment = await testTarget();
+import { chromium } from '@playwright/test';
+import { readFile, mkdir } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const base = testEnvironment.base,
+  password = testEnvironment.password,
+  stamp = Date.now();
+await mkdir('test-results/workbench', { recursive: true });
+const browser = await chromium.launch({
+  channel: 'chrome',
+  headless: true,
+  args: ['--disable-gpu', '--renderer-process-limit=2', '--js-flags=--max-old-space-size=192'],
+});
+async function req(context, path, method = 'GET', data) {
+  const headers = {};
+  if (method !== 'GET') {
+    const c = await (await context.request.get(base + '/api/csrf')).json();
+    headers[c.headerName] = c.token;
+  }
+  const r = await context.request.fetch(base + '/api' + path, {
+    method,
+    headers,
+    ...(data === undefined ? {} : { data }),
+  });
+  assert.ok(r.ok(), method + ' ' + path + ' ' + r.status());
+  return r.headers()['content-type']?.includes('json') ? r.json() : null;
+}
+async function overflow(p, name) {
+  assert.equal(
+    await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+    true,
+    name + ' overflow',
+  );
+}
+async function screenshot(p, name, label) {
+  await overflow(p, name + ' ' + label);
+  await p.screenshot({ path: 'test-results/workbench/' + name + '-' + label + '.png' });
+}
+async function confirm(p, name) {
+  await p.locator('.confirm-dialog').getByRole('button', { name, exact: true }).click();
+}
+async function login(p) {
+  await p.goto(base);
+  await p.getByLabel('账号', { exact: true }).fill('admin');
+  await p.getByLabel('密码', { exact: true }).fill(password);
+  await p.getByRole('button', { name: '登录', exact: true }).click();
+  await p.getByRole('heading', { name: '知识目录', exact: true }).waitFor();
+}
+try {
+  for (const [name, width, height] of [
+    ['desktop', 1440, 1000],
+    ['mobile', 390, 844],
+    ['small-mobile', 320, 740],
+  ]) {
+    const context = await browser.newContext({ viewport: { width, height } }),
+      p = await context.newPage(),
+      errors = [],
+      createdQuestions = [],
+      createdCategories = [],
+      createdAccounts = [];
+    p.on('pageerror', (e) => errors.push(e.message));
+    p.on('dialog', (d) => d.accept());
+    await p.addInitScript(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: async (t) => {
+            window.__copied = t;
+          },
+        },
+      });
+    });
+    try {
+      await login(p);
+      assert.equal(await p.locator('.question-row').count(), 0);
+      assert.match(p.url(), /#\/catalog$/);
+      await screenshot(p, name, 'catalog');
+      const modules = await req(context, '/categories');
+      await p.locator('.module-card').first().click();
+      await p.locator('.question-row').first().waitFor();
+      const moduleURL = p.url();
+      assert.match(moduleURL, /#\/module\/\d+/);
+      assert.equal(
+        await p.locator('.question-row').count(),
+        Math.min(15, modules[0].question_count),
+      );
+      await p.reload();
+      await p.getByRole('heading', { name: 'Java 语言', exact: true }).waitFor();
+      assert.equal(p.url(), moduleURL);
+      await p.locator('.question-row').first().click();
+      await p.locator('.reader').waitFor();
+      const questionURL = p.url();
+      assert.match(questionURL, /#\/question\/\d+/);
+      await p.reload();
+      await p.locator('.reader').waitFor();
+      assert.equal(p.url(), questionURL);
+      await p.goBack();
+      await p.locator('.question-row').first().waitFor();
+      await p.goForward();
+      await p.locator('.reader').waitFor();
+      await p
+        .getByRole('button', { name: width <= 600 ? '题目列表' : '返回题目列表', exact: true })
+        .click();
+      await p.locator('.question-row').first().waitFor();
+      assert.equal(p.url(), moduleURL);
+      await screenshot(p, name, 'module');
+      if (width < 900) {
+        await p.getByRole('button', { name: '打开模块目录', exact: true }).click();
+        await p.getByRole('dialog', { name: '模块目录', exact: true }).waitFor();
+        await p.getByRole('button', { name: '关闭模块目录', exact: true }).click();
+      }
+      await p.getByRole('button', { name: '＋ 新增题目', exact: true }).click();
+      await p.getByLabel('题目 Markdown', { exact: true }).waitFor();
+      const title = '知序验收 ' + name + ' ' + stamp;
+      await p.getByLabel('题目 Markdown', { exact: true }).fill(title);
+      await p.getByLabel('题目 Markdown', { exact: true }).press('Control+a');
+      await p
+        .locator('.markdown-editor')
+        .first()
+        .getByRole('button', { name: '加粗', exact: true })
+        .click();
+      const rich =
+        '## 回答要点\n\n这是 **测试回答**。\n\n' +
+        '解释并发场景下的行为，以及实际应用中的取舍。'.repeat(22) +
+        '\n\n## 代码示例\n\n```java\nint value = 42;\n```\n\n## 对比说明\n\n| 项目 | 说明 |\n| --- | --- |\n| 示例 | 可验证的回答 |\n\n' +
+        '补充边界条件和常见误区。'.repeat(30) +
+        '\n<script>window.bad=true</script>';
+      await p.getByLabel('回答 Markdown', { exact: true }).fill(rich);
+      const answerEditor = p.locator('.markdown-editor').last();
+      await answerEditor.getByRole('button', { name: '预览', exact: true }).click();
+      assert.equal(await answerEditor.locator('.markdown strong').innerText(), '测试回答');
+      await answerEditor.getByRole('button', { name: '编辑', exact: true }).click();
+      await p.getByRole('button', { name: '返回', exact: true }).click();
+      await p.getByRole('heading', { name: '放弃未保存的修改？', exact: true }).waitFor();
+      await confirm(p, '取消');
+      assert.equal(
+        await p.getByLabel('题目 Markdown', { exact: true }).innerText(),
+        '**' + title + '**',
+      );
+      const editorURL = p.url();
+      await p.goBack();
+      await p.getByRole('heading', { name: '放弃未保存的修改？', exact: true }).waitFor();
+      await confirm(p, '取消');
+      await p.waitForURL(editorURL);
+      assert.equal(
+        await p.getByLabel('题目 Markdown', { exact: true }).innerText(),
+        '**' + title + '**',
+      );
+      await screenshot(p, name, 'editor');
+      const png = Buffer.from(
+        await p.evaluate(() => {
+          const c = document.createElement('canvas');
+          c.width = 640;
+          c.height = 140;
+          const x = c.getContext('2d');
+          x.fillStyle = '#f0eef6';
+          x.fillRect(0, 0, 640, 140);
+          x.fillStyle = '#5b557b';
+          x.font = 'bold 26px sans-serif';
+          x.fillText('Markdown 图片预览', 30, 58);
+          x.font = '16px sans-serif';
+          x.fillText('上传 · 粘贴 · 拖入 → 保存与查看', 30, 96);
+          return c.toDataURL('image/png').split(',')[1];
+        }),
+        'base64',
+      );
+      await answerEditor
+        .locator('input[type=file]')
+        .setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer: png });
+      await p
+        .getByLabel('回答 Markdown', { exact: true })
+        .filter({ hasText: '/uploads/' })
+        .waitFor();
+      for (const type of ['paste', 'drop']) {
+        const count = (await p.getByLabel('回答 Markdown', { exact: true }).innerText()).split(
+          '/uploads/',
+        ).length;
+        await p.getByLabel('回答 Markdown', { exact: true }).evaluate(
+          (el, { type, data }) => {
+            const dt = new DataTransfer();
+            dt.items.add(
+              new File([Uint8Array.from(atob(data), (c) => c.charCodeAt(0))], 'image.png', {
+                type: 'image/png',
+              }),
+            );
+            el.dispatchEvent(
+              type === 'paste'
+                ? new ClipboardEvent('paste', {
+                    clipboardData: dt,
+                    bubbles: true,
+                    cancelable: true,
+                  })
+                : new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }),
+            );
+          },
+          { type, data: png.toString('base64') },
+        );
+        await p.waitForFunction(
+          ({ count }) =>
+            (document.querySelector('[aria-label="回答 Markdown"]')?.textContent?.split('/uploads/')
+              .length || 0) > count,
+          { count },
+        );
+      }
+      await p.getByRole('button', { name: '保存', exact: true }).click();
+      await p.locator('.question-markdown').getByText(title, { exact: true }).waitFor();
+      const id = Number(p.url().match(/question\/(\d+)/)[1]);
+      createdQuestions.push(id);
+      assert.equal(await p.locator('.answer-content img').count(), 3);
+      assert.equal(await p.evaluate(() => window.bad), undefined);
+      await p.locator('.answer-content img').first().click();
+      await p.getByRole('dialog', { name: '图片查看' }).waitFor();
+      await p.getByRole('button', { name: '关闭图片', exact: true }).click();
+      await p.getByRole('button', { name: '复制代码', exact: true }).click();
+      assert.equal((await p.evaluate(() => window.__copied)).trim(), 'int value = 42;');
+      if (width > 1150) {
+        await p.locator('.answer-outline').waitFor();
+        assert.equal(await p.locator('.answer-outline button').count(), 3);
+      }
+      await p.evaluate(() => scrollTo(0, 0));
+      await screenshot(p, name, 'reader');
+      const savedURL = p.url();
+      await p.reload();
+      await p.locator('.question-markdown').getByText(title, { exact: true }).waitFor();
+      assert.equal(p.url(), savedURL);
+      await p.keyboard.press('Control+k');
+      await p.getByLabel('全局搜索关键词', { exact: true }).fill(title);
+      await p
+        .getByRole('dialog', { name: '全局搜索', exact: true })
+        .locator('.search-result')
+        .filter({ hasText: title })
+        .waitFor();
+      await screenshot(p, name, 'global-search');
+      await p
+        .getByRole('dialog', { name: '全局搜索', exact: true })
+        .getByRole('button', { name: /查看全部/ })
+        .click();
+      await p.locator('.grouped-search-list .question-row').waitFor();
+      assert.match(p.url(), /#\/search\?/);
+      await p.locator('.grouped-search-list .question-row').first().click();
+      await p.locator('.reader').waitFor();
+      await p.getByRole('button', { name: /^(编辑题解|添加回答)$/ }).click();
+      await p.getByLabel('题目 Markdown', { exact: true }).fill(title + ' 已修改');
+      await p.getByLabel('回答 Markdown', { exact: true }).fill('修改后的回答');
+      await p.getByRole('button', { name: '保存', exact: true }).click();
+      await p
+        .locator('.question-markdown')
+        .getByText(title + ' 已修改', { exact: true })
+        .waitFor();
+      await p.getByRole('button', { name: /^(编辑题解|添加回答)$/ }).click();
+      await p.getByLabel('回答 Markdown', { exact: true }).fill('本地未保存的回答');
+      const current = await req(context, '/questions/' + id);
+      await req(context, '/admin/questions/' + id, 'PUT', {
+        title: current.title,
+        categoryId: current.category_id,
+        difficulty: current.difficulty,
+        answer: '其他窗口的回答',
+        sortOrder: current.sort_order,
+        tags: current.tags,
+        version: current.version,
+      });
+      await p.getByRole('button', { name: '保存', exact: true }).click();
+      await p.locator('.editor-error').waitFor();
+      assert.equal(
+        await p.getByLabel('回答 Markdown', { exact: true }).innerText(),
+        '本地未保存的回答',
+      );
+      await p.getByRole('button', { name: '重新加载', exact: true }).click();
+      await p.getByText('已恢复上次未保存的草稿').waitFor();
+      assert.equal(
+        await p.getByLabel('回答 Markdown', { exact: true }).innerText(),
+        '本地未保存的回答',
+      );
+      await p.getByRole('button', { name: '返回', exact: true }).click();
+      await confirm(p, '放弃修改');
+      await p.locator('.reader').waitFor();
+      await p.locator('.more-menu summary').click();
+      await p.getByRole('button', { name: '删除回答', exact: true }).click();
+      await confirm(p, '删除回答');
+      await p.getByText('暂无回答，等待补充。', { exact: true }).waitFor();
+      await p.locator('.more-menu summary').click();
+      await p.getByRole('button', { name: '删除题目', exact: true }).click();
+      await confirm(p, '删除题目');
+      await p.getByLabel('搜索题目', { exact: true }).waitFor();
+      assert.equal((await req(context, '/questions?search=' + encodeURIComponent(title))).total, 0);
+      const paging = await req(context, '/admin/categories', 'POST', {
+        name: '分页验收模块 ' + name + ' ' + stamp,
+        sortOrder: 0,
+      });
+      createdCategories.push(paging.id);
+      const pagingIds = [];
+      for (let n = 1; n <= 18; n++) {
+        const q = await req(context, '/admin/questions', 'POST', {
+          title: '分页验收问题 ' + n,
+          categoryId: paging.id,
+          difficulty: '基础',
+          answer: '分页测试回答',
+          sortOrder: n,
+          tags: [],
+        });
+        pagingIds.push(q.id);
+        createdQuestions.push(q.id);
+      }
+      const pagingURL =
+        base + '/#/module/' + paging.id + '?search=' + encodeURIComponent('分页验收');
+      await p.goto(pagingURL);
+      await p.locator('.question-row').nth(14).waitFor();
+      await p.locator('.question-row').nth(10).scrollIntoViewIfNeeded();
+      const beforeScroll = await p.evaluate(() => scrollY);
+      await p.locator('.question-row').nth(10).click();
+      await p.locator('.reader').waitFor();
+      await p
+        .getByRole('button', { name: width <= 600 ? '题目列表' : '返回题目列表', exact: true })
+        .click();
+      await p.locator('.question-row').nth(14).waitFor();
+      assert.equal(p.url(), pagingURL);
+      assert.ok(
+        Math.abs((await p.evaluate(() => scrollY)) - beforeScroll) < 3,
+        'scroll position restored',
+      );
+      await p.getByRole('button', { name: '下一页', exact: true }).click();
+      await p
+        .locator('.question-row')
+        .first()
+        .getByText('分页验收问题 16', { exact: true })
+        .waitFor();
+      const pageTwoURL = p.url();
+      assert.match(pageTwoURL, /page=2/);
+      await p.locator('.question-row').first().click();
+      await p.locator('.question-markdown').getByText('分页验收问题 16', { exact: true }).waitFor();
+      await p.reload();
+      await p.locator('.reader').waitFor();
+      await p.getByRole('button', { name: /^(← )?上一题$/ }).click();
+      await p.locator('.question-markdown').getByText('分页验收问题 15', { exact: true }).waitFor();
+      await p.getByRole('button', { name: /^下一题(?: →)?$/ }).click();
+      await p.locator('.question-markdown').getByText('分页验收问题 16', { exact: true }).waitFor();
+      await p
+        .getByRole('button', { name: width <= 600 ? '题目列表' : '返回题目列表', exact: true })
+        .click();
+      await p.locator('.question-row').first().waitFor();
+      assert.equal(p.url(), pageTwoURL);
+      if (width > 900) {
+        const group = p.locator('.rail-group-toggle').filter({ hasText: 'Java 核心' });
+        if ((await group.getAttribute('aria-expanded')) === 'false') await group.click();
+        let intercepted = 0;
+        await p.route('**/api/categories', async (route) => {
+          if (++intercepted === 1) await new Promise((r) => setTimeout(r, 180));
+          await route.continue();
+        });
+        await p.evaluate(() => {
+          const buttons = document.querySelectorAll('.workspace-sidebar .sidebar-module');
+          buttons[0].click();
+          buttons[1].click();
+        });
+        await p.getByRole('heading', { name: 'Java 集合', exact: true }).waitFor();
+        await p.waitForTimeout(250);
+        assert.equal(await p.getByRole('heading', { name: 'Java 集合', exact: true }).count(), 1);
+        await p.unroute('**/api/categories');
+      }
+      await p.getByRole('button', { name: '知识模块', exact: true }).click();
+      await p.getByLabel('搜索模块', { exact: true }).waitFor();
+      await screenshot(p, name, 'modules');
+      await p
+        .locator('.managed-module-card')
+        .first()
+        .getByRole('button', { name: /^归档.*模块$/ })
+        .click();
+      await p.getByRole('heading', { name: '这个模块还有题目', exact: true }).waitFor();
+      await confirm(p, '知道了');
+      const module = '模块验收 ' + name + ' ' + stamp;
+      await p.getByRole('button', { name: '新建模块', exact: true }).click();
+      await p.getByLabel('模块名称', { exact: true }).fill('Java 语言');
+      await p.getByRole('button', { name: '创建模块', exact: true }).click();
+      await p.getByText('已存在同名模块，请使用其他名称', { exact: true }).waitFor();
+      await p.getByLabel('模块名称', { exact: true }).fill(module);
+      const managerURL = p.url();
+      await p.goBack();
+      await p.getByRole('heading', { name: '放弃未保存的修改？', exact: true }).waitFor();
+      await confirm(p, '取消');
+      await p.waitForURL(managerURL);
+      assert.equal(await p.getByLabel('模块名称', { exact: true }).inputValue(), module);
+      await p.getByRole('button', { name: '创建模块', exact: true }).click();
+      let row = p.locator('.managed-module-card').filter({ hasText: module });
+      await row.waitFor();
+      const cat = (await req(context, '/categories')).find((c) => c.name === module);
+      createdCategories.push(cat.id);
+      await p.getByRole('button', { name: /^空模块 / }).click();
+      await p.getByLabel('搜索模块', { exact: true }).fill(module);
+      // 只统计可见卡：隐藏的归档卡（v-show 常驻 DOM）与活动卡共用同一 class，desktop 轮
+      // 留下的归档模块会让全量计数混入隐藏元素。
+      let managedCount = 0;
+      for (
+        let i = 0;
+        i < 50 && (managedCount = await p.locator('.managed-module-card:visible').count()) !== 1;
+        i++
+      )
+        await p.waitForTimeout(100);
+      if (managedCount !== 1)
+        console.log(
+          'MODULE FILTER DIAGNOSTIC',
+          await p.locator('.managed-module-card:visible').allTextContents(),
+        );
+      assert.equal(managedCount, 1);
+      await row.getByRole('button', { name: '重命名', exact: true }).click();
+      await p.getByLabel('模块名称', { exact: true }).fill(module + ' 新');
+      await screenshot(p, name, 'module-dialog');
+      await p.getByRole('button', { name: '保存修改', exact: true }).click();
+      row = p.locator('.managed-module-card').filter({ hasText: module + ' 新' });
+      await row.waitFor();
+      const history = await req(context, '/admin/questions', 'POST', {
+        title: '模块历史 ' + stamp,
+        categoryId: cat.id,
+        difficulty: '基础',
+        answer: '历史内容保留',
+        sortOrder: 0,
+        tags: [],
+      });
+      createdQuestions.push(history.id);
+      await req(context, '/admin/questions/' + history.id, 'DELETE');
+      await row.getByRole('button', { name: '归档' + module + ' 新模块', exact: true }).click();
+      await confirm(p, '归档模块');
+      await row.waitFor({ state: 'detached' });
+      assert.ok(
+        (
+          await req(
+            context,
+            '/questions?trash=true&size=100&search=' + encodeURIComponent('模块历史 ' + stamp),
+          )
+        ).items.some((q) => q.id === history.id && q.answered === true),
+      );
+      await req(context, '/admin/categories', 'POST', { name: module + ' 新', sortOrder: 0 });
+      const recreated = (await req(context, '/categories')).find((c) => c.name === module + ' 新');
+      createdCategories.push(recreated.id);
+      await p.getByRole('button', { name: '账号管理', exact: true }).click();
+      await p.locator('.account-row').first().waitFor();
+      await screenshot(p, name, 'accounts');
+      await p.getByRole('button', { name: '创建账号', exact: true }).click();
+      const account = 'qa_' + stamp + '_' + width;
+      await p.getByLabel('新账号', { exact: true }).fill(account);
+      const accountsURL = p.url();
+      await p.goBack();
+      await p.getByRole('heading', { name: '放弃未保存的修改？', exact: true }).waitFor();
+      await confirm(p, '取消');
+      await p.waitForURL(accountsURL);
+      assert.equal(await p.getByLabel('新账号', { exact: true }).inputValue(), account);
+      await p.getByLabel('初始密码', { exact: true }).fill('test-password-12345');
+      assert.equal(
+        await p.getByLabel('初始密码', { exact: true }).getAttribute('type'),
+        'password',
+      );
+      await p.getByRole('button', { name: '显示密码', exact: true }).click();
+      assert.equal(await p.getByLabel('初始密码', { exact: true }).getAttribute('type'), 'text');
+      await p.getByRole('button', { name: '隐藏密码', exact: true }).click();
+      await screenshot(p, name, 'account-dialog');
+      await p.getByRole('dialog').getByRole('button', { name: '创建账号', exact: true }).click();
+      let accountRow = p.locator('.account-row').filter({ hasText: account });
+      try {
+        await accountRow.waitFor();
+      } catch (e) {
+        console.log(
+          'ACCOUNT DIAGNOSTIC',
+          await p.locator('.inline-error').allTextContents(),
+          await p.locator('.account-row').allTextContents(),
+        );
+        await p.screenshot({ path: 'test-results/workbench/account-failure.png' });
+        throw e;
+      }
+      const a = (await req(context, '/admin/accounts')).find((a) => a.username === account);
+      createdAccounts.push(a.id);
+      const guest = await browser.newContext();
+      try {
+        let csrf = await (await guest.request.get(base + '/api/csrf')).json();
+        let response = await guest.request.post(base + '/api/login', {
+          form: { username: account, password: 'test-password-12345' },
+          headers: { [csrf.headerName]: csrf.token },
+        });
+        assert.ok(response.ok());
+        assert.equal((await guest.request.get(base + '/api/admin/accounts')).status(), 403);
+        await accountRow.getByRole('button', { name: '修改', exact: true }).click();
+        await p.getByLabel('账号名称', { exact: true }).fill(account + '_new');
+        await p.getByRole('button', { name: '保存修改', exact: true }).click();
+        accountRow = p.locator('.account-row').filter({ hasText: account + '_new' });
+        await accountRow.waitFor();
+        assert.equal((await guest.request.get(base + '/api/me')).status(), 401);
+        await accountRow.getByRole('button', { name: '重置密码', exact: true }).click();
+        await p.getByLabel('新密码', { exact: true }).fill('reset-password-12345');
+        await p.getByRole('dialog').getByRole('button', { name: '重置密码', exact: true }).click();
+        await p.getByRole('dialog').waitFor({ state: 'hidden' });
+        csrf = await (await guest.request.get(base + '/api/csrf')).json();
+        response = await guest.request.post(base + '/api/login', {
+          form: { username: account + '_new', password: 'reset-password-12345' },
+          headers: { [csrf.headerName]: csrf.token },
+        });
+        assert.ok(response.ok());
+        await accountRow.getByRole('button', { name: '删除', exact: true }).click();
+        await confirm(p, '删除账号');
+        await accountRow.waitFor({ state: 'detached' });
+        assert.equal((await guest.request.get(base + '/api/me')).status(), 401);
+      } finally {
+        await guest.close();
+      }
+      assert.deepEqual(errors, []);
+      console.log(
+        name +
+          ': routes/refresh/back, search, Markdown/images, archive preservation, account dialogs/permissions PASS',
+      );
+    } catch (e) {
+      console.log(
+        'REGRESSION DIAGNOSTIC',
+        p.url(),
+        await p.locator('h1').allTextContents(),
+        await p.locator('[role=alert]').allTextContents(),
+      );
+      await p.screenshot({ path: 'test-results/workbench/regression-failure.png' });
+      throw e;
+    } finally {
+      for (const id of createdQuestions) {
+        try {
+          await req(context, '/admin/questions/' + id, 'DELETE');
+        } catch {}
+      }
+      for (const id of createdCategories) {
+        try {
+          await req(context, '/admin/categories/' + id, 'DELETE');
+        } catch {}
+      }
+      for (const id of createdAccounts) {
+        try {
+          await req(context, '/admin/accounts/' + id, 'DELETE');
+        } catch {}
+      }
+      await context.close();
+    }
+  }
+} finally {
+  await browser.close();
+}
